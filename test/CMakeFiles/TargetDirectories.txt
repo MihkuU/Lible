@@ -1,0 +1,3 @@
+/home/alastor/stuff/Lible/test/CMakeFiles/testlible.dir
+/home/alastor/stuff/Lible/test/CMakeFiles/edit_cache.dir
+/home/alastor/stuff/Lible/test/CMakeFiles/rebuild_cache.dir

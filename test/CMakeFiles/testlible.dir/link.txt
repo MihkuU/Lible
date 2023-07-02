@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/testlible.dir/testlible.cpp.o -o testlible  -Wl,-rpath,/home/alastor/stuff/Lible/build /home/alastor/stuff/Lible/build/liblible.so 
