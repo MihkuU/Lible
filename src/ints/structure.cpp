@@ -7,7 +7,7 @@
 
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
-#include "defs.h"
+#include "defs_ints.h"
 #include "structure.h"
 
 using namespace Lible;
@@ -61,7 +61,7 @@ std::vector<Shells::Shell> Ints::Structure::parseBasisJSONFile(const std::string
     {
         std::string element = elements[iatom];
         std::cout << element << std::endl;
-        std::string atomic_number = std::to_string(atomic_numbers.at(element));
+        std::string atomic_number = std::to_string(IntsDefs::atomic_numbers.at(element));
         auto shells_json = basis_set_json.at("elements").at(atomic_number).at("electron_shells");
         for (auto &shell_json : shells_json)
         {
@@ -70,7 +70,7 @@ std::vector<Shells::Shell> Ints::Structure::parseBasisJSONFile(const std::string
             // first ones -- this can lead to big problems!
 
             int angular_momentum = shell_json.at("angular_momentum")[0];
-            int atomic_number = atomic_numbers.at(element);
+            int atomic_number = IntsDefs::atomic_numbers.at(element);
             std::size_t dim_cartesian = Shells::calcShellDimCartesian(angular_momentum);
             std::size_t dim_spherical = Shells::calcShellDimSpherical(angular_momentum);
             std::array<double, 3> xyz_coordinates{coordinates[3 * iatom], coordinates[3 * iatom + 1], coordinates[3 * iatom + 2]};

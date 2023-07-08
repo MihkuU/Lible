@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,38 +35,23 @@ namespace Lible
             YARKONY
         };
 
-        GeomOpt(const std::vector<double> geometry_) : geometry{geometry_}
-        {
-        }
+        GeomOpt();
 
         template <Option option>
-        std::vector<double> optimize(std::function<
-                                     void(double &energy, std::vector<double> &geometry, std::vector<double> &gradient)>
-                                         singlePointCalculation);
-        // {
-        //     std::vector<double> opt_geometry = geometry;
-        //     for (std::size_t iter = 0; iter < max_iter; iter++)
-        //     {
-        //         double energy;
-        //         std::vector<double> geometry, gradient;
-        //         singlePointCalculation(energy, geometry, gradient);
-
-        //         opt_geometry = update<option>(geometry);
-        //     }
-
-        //     return opt_geometry;
-        // }
+        std::vector<double> optimize(std::function<void(double &energy, std::vector<double> &coords, std::vector<double> &gradient)> singlePointCalculation);
 
         template <OptionForCIOpt option_for_ciopt>
         std::vector<double> optimizeConicalIntersection();
 
     private:
+        struct Geometry;
+        std::unique_ptr<Geometry> geometry;
+
         template <Option option>
-        std::vector<double> update(const std::vector<double> &previous_geometry);
+        std::vector<double> update(const std::vector<double> &coords_previous);
 
         double tol_grad_norm{1e-3};
         double tol_energy_diff{1e-6};
         std::size_t max_iter{1};
-        std::vector<double> geometry{};
     };
 }

@@ -6,16 +6,16 @@
 #include <cmath>
 #include <utility>
 #include <vector>
+
 #include "ints_util.h"
 
 namespace Lible
 {
     /*
-     * Here we deal with atomic orbital shells. We follow conventions outline in https://iodata.readthedocs.io/en/latest/basis.html.
-     * Definition:
-     *   Shell - set of basis functions with same angular momentum, contraction coefficients and
+     * Here we deal with atomic orbital shells. We follow conventions outlined in https://iodata.readthedocs.io/en/latest/basis.html.
+     * Definitions:
+     *   Shell - set of basis functions with the same angular momentum, contraction coefficients and
      *   exponents of gaussian primitives.
-     *
      *
      */
     namespace Shells
@@ -94,11 +94,6 @@ namespace Lible
 
         struct ShellPair
         {
-            // ShellPair(const std::pair<Shell, Shell> &shell_pair) : shell_pair(shell_pair) {}
-
-            // const std::pair<Shell, Shell> shell_pair;
-            // const Shell first = shell_pair.first;
-            // const Shell second = shell_pair.second;
             ShellPair(const Shell &first, const Shell &second) : first(first), second(second) {}
 
             const Shell first;

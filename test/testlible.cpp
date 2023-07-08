@@ -11,15 +11,15 @@ void singlePointCalc(double &energy, vector<double> geometry, vector<double> gra
 
 void testLibleGeomOpt()
 {
-    GeomOpt geom_opt(vector<double>{});
+    // GeomOpt geom_opt(vector<double>{});
 
     // auto singlePointCalculation =
     // std::function<void(double &energy, std::vector<double> &geometry, std::vector<double> &gradient)> singlePointCalculation =
         // [](double &energy, std::vector<double> &geometry, std::vector<double> &gradient) {};
     // std::vector<double> sitt = geom_opt.sitt();
-    vector<double> optimized_geometry = geom_opt.optimize<GeomOpt::Option::KRIGING>(
-        [](double &energy, vector<double> &geometry, vector<double> &gradient)
-        { singlePointCalc(energy, geometry, gradient); });
+    // vector<double> optimized_geometry = geom_opt.optimize<GeomOpt::Option::KRIGING>(
+    //     [](double &energy, vector<double> &geometry, vector<double> &gradient)
+    //     { singlePointCalc(energy, geometry, gradient); });
 }
 
 void testLibleInts()

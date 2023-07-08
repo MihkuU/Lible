@@ -3,9 +3,9 @@
 using namespace Lible; 
 
 template<>
-std::vector<double> GeomOpt::update<GeomOpt::Option::GDESCENT>(const std::vector<double> &previous_geometry)
+std::vector<double> GeomOpt::update<GeomOpt::Option::GDESCENT>(const std::vector<double> &coords_previous)
 {
-    std::vector<double> new_geometry = previous_geometry;
+    std::vector<double> coords_new = coords_previous;
     /* Do stuff */
-    return new_geometry;
+    return coords_new;
 }

@@ -7,7 +7,7 @@ using namespace Lible;
 
 Ints::Ints(const std::string &basis_set, const std::vector<double> &coordinates, const std::vector<std::string> &elements)
 {
-    assert(coordinates.size() / 3 == elements.size());
+    assert(coordinates.size() / 3 == elements.size());    
     
     structure.reset(new Structure(basis_set, coordinates, elements));
 }
