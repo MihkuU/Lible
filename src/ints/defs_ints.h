@@ -7,6 +7,9 @@ namespace Lible
 {
     namespace IntsDefs
     {
+        constexpr double bohr_to_ang = 0.5291772490; // Source: "https://www.unitconverters.net/length/bohr-radius-to-angstrom.htm"
+        constexpr double ang_to_bohr = 1.8897259886; // Source: "https://www.unitconverters.net/length/angstrom-to-bohr-radius.htm"
+
         constexpr int max_angular_momentum = 6;
 
         const std::map<int, std::string> angmom_to_label{

@@ -13,13 +13,15 @@ namespace Lible
      */
     struct Lible::Ints::Structure
     {
-        Structure(const std::string &basis_set, const std::vector<double> &coordinates, const std::vector<std::string> &elements);
+        Structure(const std::string &basis_set, const std::vector<double> &coordinates_angstroem, const std::vector<std::string> &elements);
 
-        int max_angular_momentum;
-        std::map<std::pair<int, int>, std::vector<Shells::ShellPair>> shell_pairs;
+        int max_angular_momentum; //TODO: make const?
+        std::size_t n_atomic_orbitals; //TODO: make const?
+        std::map<int, std::vector<Shells::Shell>> shells;
+        std::map<std::pair<int, int>, std::vector<Shells::ShellPair>> shell_pairs; // TODO: make const?
 
-    private:
-        std::size_t n_atoms;
+    private:        
+        std::size_t n_atoms;        
         std::string basis_set;
         std::vector<double> coordinates;
         std::vector<std::string> elements;

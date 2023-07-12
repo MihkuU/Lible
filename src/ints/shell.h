@@ -29,13 +29,11 @@ namespace Lible
 
         inline std::size_t calcShellDimCartesian(const int &angular_momentum)
         {
-            assert(angular_momentum >= 0);
             return (angular_momentum + 1) * (angular_momentum + 2) / 2;
         }
 
         inline std::size_t calcShellDimSpherical(const int &angular_momentum)
         {
-            assert(angular_momentum >= 0);
             return 2 * angular_momentum + 1;
         }
 
@@ -46,14 +44,18 @@ namespace Lible
             std::vector<std::array<int, 3>> cartesian_exps(dim_cartesian);
             for (int x = angular_momentum, pos = 0; x >= 0; x--)
                 for (int y = angular_momentum; y >= 0; y--)
-                    for (int z = angular_momentum; z >= 0; z--, pos++)
+                    for (int z = angular_momentum; z >= 0; z--)
                         if (x + y + z == angular_momentum)
+                        {
                             cartesian_exps[pos] = {x, y, z};
+                            pos++;
+                        }
 
             return cartesian_exps;
         }
 
-        std::vector<double> calcShellNormalization();
+        std::vector<double> calcShellNormalization(const int &angmom, const std::vector<double> &contraction_coeffs,
+                                                   const std::vector<double> &contraction_exps, const std::vector<std::array<int, 3>> &cartesian_exps);
 
         struct Shell
         {
@@ -77,6 +79,21 @@ namespace Lible
                   contraction_exps(contraction_exps),
                   normalization(normalization),
                   cartesian_exps(cartesian_exps)
+            {
+            }
+
+            Shell(const int &angular_momentum, const std::size_t &dim_cartesian,
+                  const std::size_t &dim_spherical)
+                : angular_momentum(angular_momentum),
+                  atomic_number(0),
+                  dim_cartesian(dim_cartesian),
+                  dim_spherical(dim_spherical),
+                  pos(0),
+                  xyz_coordinates({}),
+                  contraction_coeffs({}),
+                  contraction_exps({}),
+                  normalization({}),
+                  cartesian_exps({})
             {
             }
 

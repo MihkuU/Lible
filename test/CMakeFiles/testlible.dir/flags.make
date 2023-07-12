@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/alastor/stuff/Lible/include
+CXX_INCLUDES = -I/home/alastor/stuff/Lible/include -I/home/alastor/stuff/Lible/test/../build/dep/armadillo-12.4.1/build/include
 
-CXX_FLAGS = 
+CXX_FLAGS = -O3
 

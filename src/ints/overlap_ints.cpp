@@ -6,7 +6,7 @@ using std::size_t;
 using std::vector;
 
 template <>
-void Kernels1El::oneElIntKernel<Ints::Option1El::OVERLAP>(const int &la, const int &lb, const vector<Shells::ShellPair> &shell_pairs,
+void Kernels1El::oneElIntKernel<Ints::Option1El::OVERLAP>(const int &la, const int &lb, const std::size_t &n_ao, const vector<Shells::ShellPair> &shell_pairs,
                                                           vector<double> &one_el_ints)
 {
     std::array<double, 3> overlap_00;
@@ -24,18 +24,17 @@ void Kernels1El::oneElIntKernel<Ints::Option1El::OVERLAP>(const int &la, const i
     size_t dim_sph_a = Shells::calcShellDimSpherical(la);
     size_t dim_sph_b = Shells::calcShellDimSpherical(lb);
     vector<double> one_el_ints_cart(dim_cart_a * dim_cart_b, 0);
-    vector<double> one_el_ints_sph_cart(dim_sph_a * dim_cart_b, 0); 
-    vector<double> one_el_ints_sph(dim_sph_a * dim_sph_b, 0);       
+    vector<double> one_el_ints_sph_cart(dim_sph_a * dim_cart_b, 0);
+    vector<double> one_el_ints_sph(dim_sph_a * dim_sph_b, 0);
 
     vector<trafo_coeff_tuple> spherical_trafo_first = SphericalTrafo::returnSphericalTrafo(la);
     vector<trafo_coeff_tuple> spherical_trafo_second = SphericalTrafo::returnSphericalTrafo(lb);
-
     for (size_t ishell_pair = 0; ishell_pair < shell_pairs.size(); ishell_pair++)
     {
         auto shell_pair = shell_pairs[ishell_pair];
         std::array<double, 3> xyz_a = shell_pair.first.xyz_coordinates;
         std::array<double, 3> xyz_b = shell_pair.second.xyz_coordinates;
-        
+
         std::fill(one_el_ints_cart.begin(), one_el_ints_cart.end(), 0);
         std::fill(one_el_ints_sph_cart.begin(), one_el_ints_sph_cart.end(), 0);
         std::fill(one_el_ints_sph.begin(), one_el_ints_sph.end(), 0);
@@ -85,9 +84,9 @@ void Kernels1El::oneElIntKernel<Ints::Option1El::OVERLAP>(const int &la, const i
                         int l = cart_exps_b[1];
                         int n = cart_exps_b[2];
 
-                        int ij = i * lb + j;
-                        int kl = k * lb + l;
-                        int mn = m * lb + n;
+                        int ij = i * (lb + 1) + j;
+                        int kl = k * (lb + 1) + l;
+                        int mn = m * (lb + 1) + n;
                         one_el_ints_cart[ikmjln] += dadb * overlap_x[ij] * overlap_y[kl] * overlap_z[mn];
                     }
                 }
@@ -95,6 +94,7 @@ void Kernels1El::oneElIntKernel<Ints::Option1El::OVERLAP>(const int &la, const i
         }
         SphericalTrafo::transformCartesianIntsToSpherical(shell_pair, one_el_ints_cart, spherical_trafo_first, spherical_trafo_second,
                                                           one_el_ints_sph_cart, one_el_ints_sph);
+        SphericalTrafo::transferSphericalInts(n_ao, shell_pair, one_el_ints_sph, one_el_ints);
     }
 }
 
@@ -115,7 +115,7 @@ void Kernels1El::ObaraSaika::overlapX(const int &angmom_a, const int &angmom_b, 
     {
         overlap_x[dim_b] = x_pa * overlap_00;
 
-        for (int i = 2; i < angmom_a; i++)
+        for (int i = 2; i <= angmom_a; i++)
             overlap_x[i * dim_b] = x_pa * overlap_x[(i - 1) * dim_b] + one_over_2p * (i - 1) * overlap_x[(i - 2) * dim_b];
     }
 
@@ -124,18 +124,18 @@ void Kernels1El::ObaraSaika::overlapX(const int &angmom_a, const int &angmom_b, 
         /* S0j */
         overlap_x[1] = x_pb * overlap_00;
 
-        for (int j = 2; j < angmom_b; j++)
+        for (int j = 2; j <= angmom_b; j++)
             overlap_x[j] = x_pb * overlap_x[j - 1] + one_over_2p * (j - 1) * overlap_x[j - 2];
 
         /* Si1 */
-        for (int i = 1; i < angmom_a; i++)
+        for (int i = 1; i <= angmom_a; i++)
             overlap_x[i * dim_b + 1] = x_pb * overlap_x[i * dim_b] + one_over_2p * i * overlap_x[(i - 1) * dim_b];
 
         /* Sij */
         if (angmom_b > 1)
         {
-            for (int i = 1; i < angmom_a; i++)
-                for (int j = 2; j < angmom_b; j++)
+            for (int i = 1; i <= angmom_a; i++)
+                for (int j = 2; j <= angmom_b; j++)
                     overlap_x[i * dim_b + j] = x_pb * overlap_x[i * dim_b + j - 1] +
                                                one_over_2p * (i * overlap_x[(i - 1) * dim_b + j - 1] + (j - 1) * overlap_x[i * dim_b + j - 2]);
         }

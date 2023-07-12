@@ -21,6 +21,9 @@ namespace Lible
                                                const std::vector<trafo_coeff_tuple> &spherical_trafo_second,
                                                std::vector<double> &one_el_ints_sph_cart, std::vector<double> &one_el_ints_sph);
 
+        void transferSphericalInts(const std::size_t &n_ao, const Shells::ShellPair &shell_pair, const std::vector<double> &ints_in,
+                                   std::vector<double> &ints_out);
+
         enum class Idx
         {
             FIRST,

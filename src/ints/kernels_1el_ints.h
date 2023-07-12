@@ -10,7 +10,7 @@ namespace Lible
     namespace Kernels1El
     {
         template <Ints::Option1El option>
-        void oneElIntKernel(const int &la, const int &lb, const std::vector<Shells::ShellPair> &shell_pairs,
+        void oneElIntKernel(const int &la, const int &lb, const std::size_t &n_ao, const std::vector<Shells::ShellPair> &shell_pairs,
                             std::vector<double> &one_el_ints);
 
         namespace ObaraSaika
