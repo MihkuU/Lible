@@ -50,62 +50,9 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
   /usr/include/c++/11/ext/numeric_traits.h \
   /usr/include/c++/11/bits/cpp_type_traits.h \
   /usr/include/c++/11/ext/type_traits.h \
-  /home/alastor/stuff/Lible/include/lible \
-  /home/alastor/stuff/Lible/src/geomopt/geomopt_include.h \
-  /home/alastor/stuff/Lible/src/geomopt/geomopt_impl.h \
-  /home/alastor/stuff/Lible/src/geomopt/geomopt.h \
-  /usr/include/c++/11/functional \
-  /usr/include/c++/11/bits/stl_function.h \
-  /usr/include/c++/11/bits/move.h \
-  /usr/include/c++/11/backward/binders.h \
-  /usr/include/c++/11/new \
-  /usr/include/c++/11/bits/exception.h \
-  /usr/include/c++/11/tuple \
-  /usr/include/c++/11/utility \
-  /usr/include/c++/11/bits/stl_relops.h \
-  /usr/include/c++/11/bits/stl_pair.h \
-  /usr/include/c++/11/initializer_list \
-  /usr/include/c++/11/array \
-  /usr/include/c++/11/bits/functexcept.h \
-  /usr/include/c++/11/bits/exception_defines.h \
-  /usr/include/c++/11/bits/stl_algobase.h \
-  /usr/include/c++/11/bits/stl_iterator_base_types.h \
-  /usr/include/c++/11/bits/stl_iterator_base_funcs.h \
-  /usr/include/c++/11/bits/concept_check.h \
-  /usr/include/c++/11/debug/assertions.h \
-  /usr/include/c++/11/bits/stl_iterator.h \
-  /usr/include/c++/11/bits/ptr_traits.h \
-  /usr/include/c++/11/debug/debug.h \
-  /usr/include/c++/11/bits/predefined_ops.h \
-  /usr/include/c++/11/bits/range_access.h \
-  /usr/include/c++/11/bits/uses_allocator.h \
-  /usr/include/c++/11/bits/invoke.h \
-  /usr/include/c++/11/bits/functional_hash.h \
-  /usr/include/c++/11/bits/hash_bytes.h \
-  /usr/include/c++/11/bits/refwrap.h \
-  /usr/include/c++/11/bits/std_function.h \
-  /usr/include/c++/11/typeinfo \
-  /usr/include/c++/11/unordered_map \
-  /usr/include/c++/11/bits/allocator.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h \
-  /usr/include/c++/11/ext/new_allocator.h \
-  /usr/include/c++/11/bits/memoryfwd.h \
-  /usr/include/c++/11/ext/alloc_traits.h \
-  /usr/include/c++/11/bits/alloc_traits.h \
-  /usr/include/c++/11/bits/stl_construct.h \
-  /usr/include/c++/11/ext/aligned_buffer.h \
-  /usr/include/c++/11/bits/hashtable.h \
-  /usr/include/c++/11/bits/hashtable_policy.h \
-  /usr/include/c++/11/bits/enable_special_members.h \
-  /usr/include/c++/11/bits/node_handle.h \
-  /usr/include/c++/11/bits/unordered_map.h \
-  /usr/include/c++/11/bits/erase_if.h \
-  /usr/include/c++/11/vector \
-  /usr/include/c++/11/bits/stl_uninitialized.h \
-  /usr/include/c++/11/bits/stl_vector.h \
-  /usr/include/c++/11/bits/stl_bvector.h \
-  /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/bits/stl_algo.h \
+  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo \
+  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/config.hpp \
+  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_check.hpp \
   /usr/include/c++/11/cstdlib \
   /usr/include/stdlib.h \
   /usr/include/x86_64-linux-gnu/bits/waitflags.h \
@@ -132,130 +79,20 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib.h \
   /usr/include/c++/11/bits/std_abs.h \
-  /usr/include/c++/11/bits/algorithmfwd.h \
-  /usr/include/c++/11/bits/stl_heap.h \
-  /usr/include/c++/11/bits/stl_tempbuf.h \
-  /usr/include/c++/11/bits/uniform_int_dist.h \
-  /usr/include/c++/11/memory \
-  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
-  /usr/include/c++/11/bits/align.h \
-  /usr/include/c++/11/bit \
-  /usr/include/c++/11/bits/unique_ptr.h \
-  /usr/include/c++/11/bits/shared_ptr.h \
-  /usr/include/c++/11/iosfwd \
-  /usr/include/c++/11/bits/stringfwd.h \
-  /usr/include/c++/11/bits/postypes.h \
-  /usr/include/c++/11/cwchar \
-  /usr/include/wchar.h \
-  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
-  /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
-  /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
-  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
-  /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
-  /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
-  /usr/include/x86_64-linux-gnu/bits/wchar2.h \
-  /usr/include/c++/11/bits/shared_ptr_base.h \
-  /usr/include/c++/11/bits/allocated_ptr.h \
-  /usr/include/c++/11/ext/atomicity.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/gthr.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h \
-  /usr/include/pthread.h \
-  /usr/include/sched.h \
-  /usr/include/x86_64-linux-gnu/bits/sched.h \
-  /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
-  /usr/include/x86_64-linux-gnu/bits/cpu-set.h \
-  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
-  /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
-  /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h \
-  /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
-  /usr/include/c++/11/ext/concurrence.h \
-  /usr/include/c++/11/exception \
-  /usr/include/c++/11/bits/exception_ptr.h \
-  /usr/include/c++/11/bits/cxxabi_init_exception.h \
-  /usr/include/c++/11/bits/nested_exception.h \
-  /usr/include/c++/11/bits/shared_ptr_atomic.h \
-  /usr/include/c++/11/bits/atomic_base.h \
-  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
-  /usr/include/c++/11/backward/auto_ptr.h \
-  /usr/include/c++/11/pstl/glue_memory_defs.h \
-  /usr/include/c++/11/pstl/execution_defs.h \
-  /usr/include/c++/11/string \
-  /usr/include/c++/11/bits/char_traits.h \
-  /usr/include/c++/11/bits/localefwd.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/c++locale.h \
-  /usr/include/c++/11/clocale \
-  /usr/include/locale.h \
-  /usr/include/x86_64-linux-gnu/bits/locale.h \
-  /usr/include/c++/11/cctype \
-  /usr/include/ctype.h \
-  /usr/include/c++/11/bits/ostream_insert.h \
-  /usr/include/c++/11/bits/cxxabi_forced.h \
-  /usr/include/c++/11/bits/basic_string.h \
-  /usr/include/c++/11/string_view \
-  /usr/include/c++/11/bits/string_view.tcc \
-  /usr/include/c++/11/ext/string_conversions.h \
+  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cstdio \
   /usr/include/stdio.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
   /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+  /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
   /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
   /usr/include/x86_64-linux-gnu/bits/stdio.h \
   /usr/include/x86_64-linux-gnu/bits/stdio2.h \
-  /usr/include/c++/11/cerrno \
-  /usr/include/errno.h \
-  /usr/include/x86_64-linux-gnu/bits/errno.h \
-  /usr/include/linux/errno.h \
-  /usr/include/x86_64-linux-gnu/asm/errno.h \
-  /usr/include/asm-generic/errno.h \
-  /usr/include/asm-generic/errno-base.h \
-  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
-  /usr/include/c++/11/bits/charconv.h \
-  /usr/include/c++/11/bits/basic_string.tcc \
-  /home/alastor/stuff/Lible/src/ints/ints_include.h \
-  /home/alastor/stuff/Lible/src/ints/ints_impl.h \
-  /home/alastor/stuff/Lible/src/ints/kernels_1el_ints.h \
-  /home/alastor/stuff/Lible/src/ints/ints.h \
-  /usr/include/c++/11/cassert \
-  /usr/include/assert.h \
-  /home/alastor/stuff/Lible/src/ints/shell.h \
-  /usr/include/c++/11/cmath \
-  /usr/include/math.h \
-  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
-  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
-  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
-  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
-  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
-  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
-  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
-  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
-  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
-  /usr/include/c++/11/bits/specfun.h \
-  /usr/include/c++/11/tr1/gamma.tcc \
-  /usr/include/c++/11/tr1/special_function_util.h \
-  /usr/include/c++/11/tr1/bessel_function.tcc \
-  /usr/include/c++/11/tr1/beta_function.tcc \
-  /usr/include/c++/11/tr1/ell_integral.tcc \
-  /usr/include/c++/11/tr1/exp_integral.tcc \
-  /usr/include/c++/11/tr1/hypergeometric.tcc \
-  /usr/include/c++/11/tr1/legendre_function.tcc \
-  /usr/include/c++/11/tr1/modified_bessel_func.tcc \
-  /usr/include/c++/11/tr1/poly_hermite.tcc \
-  /usr/include/c++/11/tr1/poly_laguerre.tcc \
-  /usr/include/c++/11/tr1/riemann_zeta.tcc \
-  /home/alastor/stuff/Lible/src/ints/ints_util.h \
-  /home/alastor/stuff/Lible/src/ints/spherical_trafo.h \
-  /home/alastor/stuff/Lible/src/ints/structure.h \
-  /usr/include/c++/11/map \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_map.h \
-  /usr/include/c++/11/bits/stl_multimap.h \
-  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo \
-  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/config.hpp \
-  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_check.hpp \
-  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cstring \
   /usr/include/string.h \
   /usr/include/strings.h \
@@ -268,14 +105,117 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
   /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/linux/limits.h \
+  /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
   /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
   /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
   /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
+  /usr/include/c++/11/cmath \
+  /usr/include/math.h \
+  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+  /usr/include/c++/11/bits/specfun.h \
+  /usr/include/c++/11/bits/stl_algobase.h \
+  /usr/include/c++/11/bits/functexcept.h \
+  /usr/include/c++/11/bits/exception_defines.h \
+  /usr/include/c++/11/bits/stl_pair.h \
+  /usr/include/c++/11/bits/move.h \
+  /usr/include/c++/11/bits/stl_iterator_base_types.h \
+  /usr/include/c++/11/bits/stl_iterator_base_funcs.h \
+  /usr/include/c++/11/bits/concept_check.h \
+  /usr/include/c++/11/debug/assertions.h \
+  /usr/include/c++/11/bits/stl_iterator.h \
+  /usr/include/c++/11/bits/ptr_traits.h \
+  /usr/include/c++/11/debug/debug.h \
+  /usr/include/c++/11/bits/predefined_ops.h \
+  /usr/include/c++/11/tr1/gamma.tcc \
+  /usr/include/c++/11/tr1/special_function_util.h \
+  /usr/include/c++/11/tr1/bessel_function.tcc \
+  /usr/include/c++/11/tr1/beta_function.tcc \
+  /usr/include/c++/11/tr1/ell_integral.tcc \
+  /usr/include/c++/11/tr1/exp_integral.tcc \
+  /usr/include/c++/11/tr1/hypergeometric.tcc \
+  /usr/include/c++/11/tr1/legendre_function.tcc \
+  /usr/include/c++/11/tr1/modified_bessel_func.tcc \
+  /usr/include/c++/11/tr1/poly_hermite.tcc \
+  /usr/include/c++/11/tr1/poly_laguerre.tcc \
+  /usr/include/c++/11/tr1/riemann_zeta.tcc \
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/ostream \
   /usr/include/c++/11/ios \
+  /usr/include/c++/11/iosfwd \
+  /usr/include/c++/11/bits/stringfwd.h \
+  /usr/include/c++/11/bits/memoryfwd.h \
+  /usr/include/c++/11/bits/postypes.h \
+  /usr/include/c++/11/cwchar \
+  /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+  /usr/include/x86_64-linux-gnu/bits/wchar2.h \
+  /usr/include/c++/11/exception \
+  /usr/include/c++/11/bits/exception.h \
+  /usr/include/c++/11/bits/exception_ptr.h \
+  /usr/include/c++/11/bits/cxxabi_init_exception.h \
+  /usr/include/c++/11/typeinfo \
+  /usr/include/c++/11/bits/hash_bytes.h \
+  /usr/include/c++/11/new \
+  /usr/include/c++/11/bits/nested_exception.h \
+  /usr/include/c++/11/bits/char_traits.h \
+  /usr/include/c++/11/bits/localefwd.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++locale.h \
+  /usr/include/c++/11/clocale \
+  /usr/include/locale.h \
+  /usr/include/x86_64-linux-gnu/bits/locale.h \
+  /usr/include/c++/11/cctype \
+  /usr/include/ctype.h \
   /usr/include/c++/11/bits/ios_base.h \
+  /usr/include/c++/11/ext/atomicity.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/gthr.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h \
+  /usr/include/pthread.h \
+  /usr/include/sched.h \
+  /usr/include/x86_64-linux-gnu/bits/sched.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
+  /usr/include/x86_64-linux-gnu/bits/cpu-set.h \
+  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h \
+  /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
   /usr/include/c++/11/bits/locale_classes.h \
+  /usr/include/c++/11/string \
+  /usr/include/c++/11/bits/allocator.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h \
+  /usr/include/c++/11/ext/new_allocator.h \
+  /usr/include/c++/11/bits/ostream_insert.h \
+  /usr/include/c++/11/bits/cxxabi_forced.h \
+  /usr/include/c++/11/bits/stl_function.h \
+  /usr/include/c++/11/backward/binders.h \
+  /usr/include/c++/11/bits/range_access.h \
+  /usr/include/c++/11/initializer_list \
+  /usr/include/c++/11/bits/basic_string.h \
+  /usr/include/c++/11/ext/alloc_traits.h \
+  /usr/include/c++/11/bits/alloc_traits.h \
+  /usr/include/c++/11/bits/stl_construct.h \
+  /usr/include/c++/11/string_view \
+  /usr/include/c++/11/bits/functional_hash.h \
+  /usr/include/c++/11/bits/string_view.tcc \
+  /usr/include/c++/11/ext/string_conversions.h \
+  /usr/include/c++/11/cerrno \
+  /usr/include/errno.h \
+  /usr/include/x86_64-linux-gnu/bits/errno.h \
+  /usr/include/linux/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/errno-base.h \
+  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
+  /usr/include/c++/11/bits/charconv.h \
+  /usr/include/c++/11/bits/basic_string.tcc \
   /usr/include/c++/11/bits/locale_classes.tcc \
   /usr/include/c++/11/system_error \
   /usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h \
@@ -303,19 +243,54 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
   /usr/include/c++/11/sstream \
   /usr/include/c++/11/bits/sstream.tcc \
   /usr/include/c++/11/algorithm \
+  /usr/include/c++/11/utility \
+  /usr/include/c++/11/bits/stl_relops.h \
+  /usr/include/c++/11/bits/stl_algo.h \
+  /usr/include/c++/11/bits/algorithmfwd.h \
+  /usr/include/c++/11/bits/stl_heap.h \
+  /usr/include/c++/11/bits/stl_tempbuf.h \
+  /usr/include/c++/11/bits/uniform_int_dist.h \
   /usr/include/c++/11/pstl/glue_algorithm_defs.h \
+  /usr/include/c++/11/functional \
+  /usr/include/c++/11/tuple \
+  /usr/include/c++/11/array \
+  /usr/include/c++/11/bits/uses_allocator.h \
+  /usr/include/c++/11/bits/invoke.h \
+  /usr/include/c++/11/bits/refwrap.h \
+  /usr/include/c++/11/bits/std_function.h \
+  /usr/include/c++/11/unordered_map \
+  /usr/include/c++/11/ext/aligned_buffer.h \
+  /usr/include/c++/11/bits/hashtable.h \
+  /usr/include/c++/11/bits/hashtable_policy.h \
+  /usr/include/c++/11/bits/enable_special_members.h \
+  /usr/include/c++/11/bits/node_handle.h \
+  /usr/include/c++/11/bits/unordered_map.h \
+  /usr/include/c++/11/bits/erase_if.h \
+  /usr/include/c++/11/vector \
+  /usr/include/c++/11/bits/stl_uninitialized.h \
+  /usr/include/c++/11/bits/stl_vector.h \
+  /usr/include/c++/11/bits/stl_bvector.h \
+  /usr/include/c++/11/bits/vector.tcc \
+  /usr/include/c++/11/pstl/execution_defs.h \
   /usr/include/c++/11/complex \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
   /usr/include/c++/11/random \
   /usr/include/c++/11/bits/random.h \
   /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
   /usr/include/c++/11/bits/random.tcc \
   /usr/include/c++/11/numeric \
   /usr/include/c++/11/bits/stl_numeric.h \
+  /usr/include/c++/11/bit \
   /usr/include/c++/11/pstl/glue_numeric_defs.h \
   /usr/include/c++/11/mutex \
   /usr/include/c++/11/bits/std_mutex.h \
   /usr/include/c++/11/bits/unique_lock.h \
   /usr/include/c++/11/atomic \
+  /usr/include/c++/11/bits/atomic_base.h \
+  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
   /usr/include/unistd.h \
   /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
   /usr/include/x86_64-linux-gnu/bits/environments.h \
@@ -938,8 +913,71 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
   /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_TridiagEigen_meat.hpp \
   /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_UpperHessenbergEigen_meat.hpp \
   /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_UpperHessenbergQR_meat.hpp \
-  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_setup_post.hpp
+  /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_setup_post.hpp \
+  /home/alastor/stuff/Lible/include/lible \
+  /home/alastor/stuff/Lible/src/geomopt/geomopt_include.h \
+  /home/alastor/stuff/Lible/src/geomopt/geomopt_impl.h \
+  /home/alastor/stuff/Lible/src/geomopt/geomopt.h \
+  /usr/include/c++/11/memory \
+  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+  /usr/include/c++/11/bits/align.h \
+  /usr/include/c++/11/bits/unique_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr_base.h \
+  /usr/include/c++/11/bits/allocated_ptr.h \
+  /usr/include/c++/11/ext/concurrence.h \
+  /usr/include/c++/11/bits/shared_ptr_atomic.h \
+  /usr/include/c++/11/backward/auto_ptr.h \
+  /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /home/alastor/stuff/Lible/src/geomopt/geometry.h \
+  /usr/include/c++/11/cassert \
+  /usr/include/assert.h \
+  /usr/include/c++/11/set \
+  /usr/include/c++/11/bits/stl_set.h \
+  /usr/include/c++/11/bits/stl_multiset.h \
+  /home/alastor/stuff/Lible/src/ints/ints_include.h \
+  /home/alastor/stuff/Lible/src/ints/ints_impl.h \
+  /home/alastor/stuff/Lible/src/ints/kernels_1el_ints.h \
+  /home/alastor/stuff/Lible/src/ints/ints.h \
+  /home/alastor/stuff/Lible/src/ints/shell.h \
+  /home/alastor/stuff/Lible/src/ints/ints_util.h \
+  /home/alastor/stuff/Lible/src/ints/spherical_trafo.h \
+  /home/alastor/stuff/Lible/src/ints/structure.h
 
+
+/home/alastor/stuff/Lible/src/ints/structure.h:
+
+/home/alastor/stuff/Lible/src/ints/spherical_trafo.h:
+
+/home/alastor/stuff/Lible/src/ints/ints_util.h:
+
+/home/alastor/stuff/Lible/src/ints/shell.h:
+
+/usr/include/c++/11/bits/stl_multiset.h:
+
+/usr/include/c++/11/bits/stl_set.h:
+
+/usr/include/c++/11/cassert:
+
+/usr/include/c++/11/pstl/glue_memory_defs.h:
+
+/usr/include/c++/11/ext/concurrence.h:
+
+/usr/include/assert.h:
+
+/usr/include/c++/11/bits/allocated_ptr.h:
+
+/usr/include/c++/11/bits/shared_ptr_base.h:
+
+/usr/include/c++/11/bits/shared_ptr.h:
+
+/usr/include/c++/11/bits/unique_ptr.h:
+
+/usr/include/c++/11/memory:
+
+/home/alastor/stuff/Lible/src/geomopt/geomopt.h:
+
+/home/alastor/stuff/Lible/src/geomopt/geomopt_impl.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_setup_post.hpp:
 
@@ -1211,6 +1249,10 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_nonzeros.hpp:
 
+/home/alastor/stuff/Lible/src/ints/ints.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_clamp.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_normalise.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_chol_meat.hpp:
@@ -1226,6 +1268,10 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_any.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_fft.hpp:
+
+/usr/include/c++/11/bits/align.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_histc.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_sylvester.hpp:
 
@@ -1295,6 +1341,10 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_orth_null.hpp:
 
+/home/alastor/stuff/Lible/src/ints/ints_impl.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_eye.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_zeros.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_eig_gen.hpp:
@@ -1363,55 +1413,35 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/debug.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_UpperHessenbergEigen_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_eig_sym.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_TridiagEigen_bones.hpp:
+/usr/include/c++/11/bits/uses_allocator.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_nonzeros_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_inv_gen_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SymEigsShiftSolver_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/running_stat_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SymEigsSolver_bones.hpp:
+/usr/include/c++/11/bits/unique_lock.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sp_plus_meat.hpp:
+/usr/include/c++/11/bits/std_abs.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_GenEigsSolver_bones.hpp:
+/usr/include/c++/11/pstl/execution_defs.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_kron_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_shift_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SparseGenMatProd_bones.hpp:
+/usr/include/c++/11/sstream:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spsolve_factoriser_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/translate_atlas.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trimat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_polyfit_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_merge_bones.hpp:
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_min_bones.hpp:
+/usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_kron_bones.hpp:
+/home/alastor/stuff/Lible/src/ints/ints_include.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_join_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_times_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_log_det_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_schur_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_minus_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_plus_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_vecnorm_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpMat_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_norm_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_qr.hpp:
-
-/usr/include/c++/11/bits/enable_special_members.h:
+/usr/include/c++/11/istream:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spdiagview_meat.hpp:
 
@@ -1419,59 +1449,61 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /usr/include/c++/11/bits/codecvt.h:
 
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_qr.hpp:
+
+/usr/include/c++/11/bits/enable_special_members.h:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/include_superlu.hpp:
 
-/home/alastor/stuff/Lible/src/ints/ints_util.h:
+/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h:
 
-/usr/include/c++/11/bits/stl_tempbuf.h:
+/usr/include/c++/11/bits/streambuf_iterator.h:
 
-/usr/include/c++/11/tr1/riemann_zeta.tcc:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_kron_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_relational_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SparseGenMatProd_bones.hpp:
 
-/usr/include/c++/11/tr1/legendre_function.tcc:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trunc_log.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtSpGlue_meat.hpp:
+/usr/include/c++/11/bits/basic_ios.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_DenseGenMatProd_bones.hpp:
+/usr/include/c++/11/bits/uniform_int_dist.h:
 
-/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+/usr/include/c++/11/utility:
 
-/usr/include/c++/11/tr1/beta_function.tcc:
+/usr/include/c++/11/ios:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Mat_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_min_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/cond_rel_bones.hpp:
+/usr/include/c++/11/bits/basic_string.tcc:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_median_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_find_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_numel.hpp:
+/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h:
 
-/usr/include/c++/11/tr1/gamma.tcc:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_cmath.hpp:
 
-/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+/usr/include/wctype.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_check.hpp:
+/usr/include/sched.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/field_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/traits.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpMat_meat.hpp:
 
-/usr/include/c++/11/bits/node_handle.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_norm_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_setup.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/wchar2.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/hdf5_name.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SizeCube_bones.hpp:
+/usr/include/c++/11/cerrno:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/unwrap.hpp:
+/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_regspace.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/upgrade_val.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+/usr/include/c++/11/bits/functional_hash.h:
 
 /usr/include/c++/11/string_view:
 
@@ -1479,93 +1511,45 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_max_meat.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_rng_cxx03.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/auxlib_meat.hpp:
+/usr/include/errno.h:
 
-/usr/include/c++/11/cstring:
+/usr/include/c++/11/bits/alloc_traits.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_clamp.hpp:
+/usr/include/stdc-predef.h:
 
-/home/alastor/stuff/Lible/src/ints/ints.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_min_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
+/usr/include/c++/11/initializer_list:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/span.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpSubview_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_bones.hpp:
+/usr/include/c++/11/iosfwd:
 
-/usr/include/c++/11/bits/basic_string.tcc:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_min_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_fft_meat.hpp:
+/usr/include/c++/11/bits/stl_function.h:
 
-/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+/usr/include/c++/11/bits/memoryfwd.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_stddev_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_normalise_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/diagview_meat.hpp:
+/usr/include/c++/11/ext/alloc_traits.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_vecnorm_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_setup.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_normpdf.hpp:
 
-/usr/include/c++/11/cerrno:
+/usr/include/c++/11/bits/algorithmfwd.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio2.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_min_meat.hpp:
-
-/usr/include/string.h:
-
-/usr/include/stdio.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/MapMat_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/podarray_bones.hpp:
-
-/home/alastor/stuff/Lible/src/ints/structure.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_htrans_bones.hpp:
+/usr/include/c++/11/bits/cxxabi_forced.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
-/usr/include/ctype.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/gmm_diag_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_relational_meat.hpp:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Mat_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/diskio_bones.hpp:
-
-/usr/include/c++/11/bits/localefwd.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/field_meat.hpp:
-
-/usr/include/c++/11/tr1/bessel_function.tcc:
-
-/usr/include/c++/11/bits/atomic_lockfree_defines.h:
-
-/usr/include/c++/11/bits/nested_exception.h:
-
-/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
-
-/usr/include/c++/11/ext/string_conversions.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/BaseCube_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_repmat_bones.hpp:
-
-/usr/include/c++/11/tr1/poly_hermite.tcc:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_prod_bones.hpp:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h:
 
@@ -1575,37 +1559,15 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_affmul_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_diff.hpp:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/c++locale.h:
-
-/usr/include/linux/errno.h:
-
-/usr/include/c++/11/functional:
-
 /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eOpCube_meat.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
-
-/usr/include/c++/11/bits/stl_bvector.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/config.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
 
+/usr/include/c++/11/bits/stl_bvector.h:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_cx_scalar_bones.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
-
-/usr/include/time.h:
-
-/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtSpOp_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eGlue_meat.hpp:
 
@@ -1613,21 +1575,9 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eop_core_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_normalise_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/diagview_meat.hpp:
 
-/usr/include/c++/11/ext/alloc_traits.h:
-
-/usr/include/sched.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_cmath.hpp:
-
-/usr/include/wctype.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/traits.hpp:
-
-/usr/include/c++/11/ext/concurrence.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_orth_null_bones.hpp:
+/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:
 
@@ -1639,31 +1589,107 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_quantile_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/cond_rel_meat.hpp:
+/usr/include/ctype.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_powext.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_inplace_trans.hpp:
 
-/usr/include/c++/11/bits/specfun.h:
+/usr/include/c++/11/cctype:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_eye.hpp:
+/usr/include/c++/11/bits/ostream.tcc:
 
-/home/alastor/stuff/Lible/src/ints/ints_impl.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_randperm.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_elem.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_diagmat_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_schur.hpp:
+/usr/include/c++/11/functional:
 
-/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_conv_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_inplace_strans.hpp:
+/usr/include/asm-generic/errno-base.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo:
+/usr/include/c++/11/bits/nested_exception.h:
 
-/usr/include/x86_64-linux-gnu/bits/timex.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_shift.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_vectorise_meat.hpp:
+/usr/include/c++/11/bits/string_view.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_ostream.hpp:
+
+/usr/include/c++/11/bits/move.h:
+
+/usr/include/c++/11/typeinfo:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/BaseCube_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_repmat_bones.hpp:
+
+/usr/include/c++/11/bits/locale_facets.h:
+
+/usr/include/c++/11/bits/cxxabi_init_exception.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_min_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_princomp_meat.hpp:
+
+/usr/include/c++/11/ostream:
+
+/usr/include/c++/11/tr1/riemann_zeta.tcc:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_prod_bones.hpp:
+
+/usr/include/c++/11/tr1/poly_hermite.tcc:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_relational_meat.hpp:
+
+/usr/include/c++/11/tr1/legendre_function.tcc:
+
+/usr/include/c++/11/bits/localefwd.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
+
+/usr/include/c++/11/bits/stl_construct.h:
+
+/usr/include/c++/11/tr1/exp_integral.tcc:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h:
+
+/usr/include/c++/11/tr1/ell_integral.tcc:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_stddev_bones.hpp:
+
+/usr/include/c++/11/tr1/beta_function.tcc:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Mat_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/cond_rel_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_min_meat.hpp:
+
+/usr/include/string.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/field_meat.hpp:
+
+/usr/include/c++/11/tr1/bessel_function.tcc:
+
+/usr/include/c++/11/bits/locale_classes.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_median_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_numel.hpp:
+
+/usr/include/c++/11/tr1/gamma.tcc:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/include/c++/11/bits/predefined_ops.h:
+
+/usr/include/x86_64-linux-gnu/bits/typesizes.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_rcond_meat.hpp:
+
+/usr/include/c++/11/debug/debug.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h:
 
 /usr/include/c++/11/debug/assertions.h:
 
@@ -1671,81 +1697,65 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/CubeToMatOp_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpSubview_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_hypot_meat.hpp:
 
-/usr/include/c++/11/iosfwd:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eOp_meat.hpp:
 
-/usr/include/c++/11/initializer_list:
+/usr/include/c++/11/bits/concept_check.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_min_bones.hpp:
+/usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:
 
-/usr/include/c++/11/bits/unique_ptr.h:
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
 
-/usr/include/c++/11/memory:
+/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_det.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtSpGlue_bones.hpp:
+/usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_wishrnd_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/typedef_mat_fixed.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_UpperHessenbergQR_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_repmat_meat.hpp:
 
-/usr/include/c++/11/bits/stl_heap.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/sym_helper.hpp:
 
-/usr/include/c++/11/bits/std_abs.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_field_bones.hpp:
 
-/usr/include/c++/11/pstl/execution_defs.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eOpCube_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_shift_bones.hpp:
+/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
 
-/usr/include/c++/11/bits/stl_function.h:
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
 
-/usr/include/c++/11/bits/memoryfwd.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_UpperHessenbergEigen_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_conv_meat.hpp:
+/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
-/usr/include/asm-generic/errno-base.h:
+/usr/include/c++/11/cstdint:
 
-/usr/include/c++/11/bits/stl_relops.h:
+/usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
-/usr/include/c++/11/bits/locale_facets.h:
+/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
-/usr/include/x86_64-linux-gnu/bits/wchar.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_qz.hpp:
 
-/usr/include/c++/11/cstddef:
+/usr/include/x86_64-linux-gnu/bits/uio_lim.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_mixed_meat.hpp:
+/usr/include/stdio.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_str.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/MapMat_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_toeplitz_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpCol_bones.hpp:
-
-/usr/include/c++/11/map:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_randperm.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_diagmat_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_join_bones.hpp:
-
-/home/alastor/stuff/Lible/include/lible:
-
-/home/alastor/stuff/Lible/src/geomopt/geomopt.h:
-
-/usr/include/c++/11/bits/cxxabi_init_exception.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_min_bones.hpp:
-
-/usr/include/c++/11/bits/uniform_int_dist.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trunc_log.hpp:
-
-/usr/include/c++/11/bits/basic_ios.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/podarray_bones.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
+
+/usr/include/stdint.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_intersect_bones.hpp:
+
+/usr/include/endian.h:
+
+/usr/include/c++/11/bits/cpp_type_traits.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_diagmat.hpp:
 
@@ -1759,17 +1769,35 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtGlueCube_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_vectorise_bones.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
+
+/usr/include/c++/11/bits/stl_iterator.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_unique_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
+/usr/include/time.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtSpOp_bones.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
+/usr/include/c++/11/tr1/poly_laguerre.tcc:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_rel_comparators.hpp:
+
+/usr/include/c++/11/bits/std_mutex.h:
+
+/usr/include/c++/11/cstdlib:
+
+/usr/include/c++/11/bits/stl_iterator_base_types.h:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_elem2_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_reverse_bones.hpp:
 
@@ -1783,43 +1811,37 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_reshape_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/asm/errno.h:
-
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
 
-/home/alastor/stuff/Lible/src/ints/shell.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_polyval.hpp:
 
-/usr/include/c++/11/ext/atomicity.h:
+/usr/include/c++/11/bits/sstream.tcc:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/auxlib_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_polyval_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trace.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_join_meat.hpp:
 
-/usr/include/c++/11/bits/stl_pair.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_chi2rnd_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_dot_meat.hpp:
+/usr/include/c++/11/bits/invoke.h:
 
-/usr/include/x86_64-linux-gnu/bits/time.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/running_stat_vec_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/select.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_inplace_strans.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtGlue_bones.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/gmm_misc_bones.hpp:
+/usr/include/x86_64-linux-gnu/bits/timex.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_elem.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_schur.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
+
+/usr/include/c++/11/bits/stl_relops.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
-
-/usr/include/c++/11/bits/shared_ptr.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
-
-/usr/include/c++/11/bits/stl_construct.h:
-
-/usr/include/c++/11/bits/std_function.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_trimat_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Glue_meat.hpp:
 
@@ -1833,49 +1855,29 @@ CMakeFiles/testlible.dir/testlible.cpp.o: testlible.cpp \
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/gmm_full_bones.hpp:
 
-/usr/include/c++/11/bits/cpp_type_traits.h:
-
-/usr/include/endian.h:
-
-/usr/include/stdint.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_intersect_bones.hpp:
-
-/usr/include/x86_64-linux-gnu/sys/types.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_elem2_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_rcond_meat.hpp:
-
-/usr/include/c++/11/debug/debug.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h:
+/usr/include/c++/11/streambuf:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_norm_meat.hpp:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h:
 
-/usr/include/c++/11/bits/stl_map.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Glue_bones.hpp:
-
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_cov_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_hypot_meat.hpp:
+/usr/include/c++/11/ext/aligned_buffer.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eOp_meat.hpp:
+/usr/include/c++/11/bits/locale_classes.tcc:
 
-/usr/include/c++/11/bits/concept_check.h:
+/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+/usr/include/c++/11/bits/node_handle.h:
 
 /usr/include/c++/11/bits/postypes.h:
 
 testlible.cpp:
+
+/home/alastor/stuff/Lible/src/geomopt/geometry.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_affmul_meat.hpp:
 
@@ -1883,7 +1885,17 @@ testlible.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
 
-/usr/include/c++/11/bits/stl_multimap.h:
+/usr/include/c++/11/bits/stl_tempbuf.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_trimat_bones.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
+
+/usr/include/c++/11/bits/std_function.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/auxlib_meat.hpp:
+
+/usr/include/c++/11/cstring:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trimat_ind.hpp:
 
@@ -1892,26 +1904,6 @@ testlible.cpp:
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SparseGenRealShiftSolve_meat.hpp:
 
 /usr/include/c++/11/ext/numeric_traits.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/hdf5_name.hpp:
-
-/usr/include/c++/11/utility:
-
-/usr/include/c++/11/ios:
-
-/usr/include/c++/11/tr1/ell_integral.tcc:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_min_bones.hpp:
-
-/usr/include/c++/11/bits/unordered_map.h:
-
-/usr/include/c++/11/pstl/glue_memory_defs.h:
-
-/usr/include/c++/11/bits/shared_ptr_atomic.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_strans_bones.hpp:
 
 /usr/include/c++/11/ext/type_traits.h:
 
@@ -1931,9 +1923,39 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/constants_old.hpp:
 
+/usr/include/c++/11/bits/stringfwd.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_schur_meat.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_misc_bones.hpp:
+
+/home/alastor/stuff/Lible/src/geomopt/geomopt_include.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_shuffle.hpp:
+
+/usr/include/c++/11/bits/locale_facets.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/stdio.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_div.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_minus.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_schur.hpp:
+
+/usr/include/stdlib.h:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_eigs_gen.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/translate_arpack.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_forward.hpp:
+
+/usr/include/c++/11/chrono:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_symmat_meat.hpp:
 
@@ -1951,17 +1973,23 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SizeMat_bones.hpp:
 
-/usr/include/c++/11/cstdio:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_fft_meat.hpp:
 
-/usr/include/c++/11/bits/ptr_traits.h:
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_trimat_bones.hpp:
+/usr/include/x86_64-linux-gnu/asm/errno.h:
 
-/usr/include/stdc-predef.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
-/usr/include/errno.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/span.hpp:
 
-/usr/include/c++/11/bits/alloc_traits.h:
+/usr/include/c++/11/cwctype:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/unwrap.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/upgrade_val.hpp:
 
 /usr/include/c++/11/bits/range_access.h:
 
@@ -1971,15 +1999,7 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_logmat_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_ostream.hpp:
-
-/usr/include/c++/11/bits/move.h:
-
-/usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
-
 /usr/include/c++/11/bits/basic_string.h:
-
-/usr/include/c++/11/bits/shared_ptr_base.h:
 
 /usr/include/linux/limits.h:
 
@@ -1989,33 +2009,13 @@ testlible.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/endian.h:
 
+/usr/include/c++/11/set:
+
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_norm_meat.hpp:
+/usr/include/c++/11/bits/allocator.h:
 
-/usr/include/c++/11/bits/vector.tcc:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_each_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/translate_superlu.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_qz.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/uio_lim.h:
-
-/home/alastor/stuff/Lible/src/geomopt/geomopt_impl.h:
-
-/usr/include/c++/11/cwchar:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_princomp.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_plus.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/select2.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h:
-
-/usr/include/unistd.h:
+/usr/include/c++/11/cmath:
 
 /usr/include/x86_64-linux-gnu/sys/single_threaded.h:
 
@@ -2023,37 +2023,21 @@ testlible.cpp:
 
 /usr/include/c++/11/type_traits:
 
-/usr/include/c++/11/bits/allocator.h:
-
-/usr/include/c++/11/cmath:
-
 /usr/include/c++/11/pstl/pstl_config.h:
-
-/home/alastor/stuff/Lible/src/ints/spherical_trafo.h:
-
-/usr/include/c++/11/cstdint:
-
-/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
 /usr/include/c++/11/tr1/modified_bessel_func.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/usr/include/x86_64-linux-gnu/bits/typesizes.h:
+/usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
 
-/usr/include/c++/11/bits/predefined_ops.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/compiler_check.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_strans.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Glue_bones.hpp:
 
-/usr/include/c++/11/bits/stl_tree.h:
+/usr/include/c++/11/bits/stl_map.h:
 
-/usr/include/c++/11/tuple:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_config.hpp:
-
-/usr/include/c++/11/cassert:
-
-/usr/include/c++/11/bits/stl_algo.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/field_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_intersect.hpp:
 
@@ -2069,16 +2053,6 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_diff_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_relational_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sum_bones.hpp:
-
-/usr/include/c++/11/bits/stl_uninitialized.h:
-
-/usr/include/c++/11/bits/atomic_base.h:
-
-/usr/include/c++/11/bits/random.tcc:
-
 /usr/include/c++/11/iostream:
 
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
@@ -2087,57 +2061,183 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_symmat_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpGlue_bones.hpp:
+/usr/include/c++/11/bits/ios_base.h:
 
-/usr/include/c++/11/new:
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_polyval.hpp:
+/usr/include/x86_64-linux-gnu/bits/wchar2.h:
 
-/usr/include/c++/11/bits/sstream.tcc:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SizeCube_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+/usr/include/x86_64-linux-gnu/sys/select.h:
 
-/usr/include/c++/11/bits/stl_iterator.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/include_hdf5.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
+/usr/include/c++/11/algorithm:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_eig_sym.hpp:
+/usr/include/c++/11/backward/binders.h:
 
-/usr/include/c++/11/bits/uses_allocator.h:
+/usr/include/x86_64-linux-gnu/bits/select.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_inv_gen_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_dot_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/running_stat_meat.hpp:
+/usr/include/x86_64-linux-gnu/bits/time.h:
 
-/usr/include/c++/11/bits/unique_lock.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtGlue_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_polyval_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/gmm_misc_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_join_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_princomp.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_chi2rnd_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_plus.hpp:
 
-/usr/include/c++/11/bits/invoke.h:
+/usr/include/x86_64-linux-gnu/bits/select2.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/running_stat_vec_bones.hpp:
+/usr/include/c++/11/cwchar:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_regspace.hpp:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:
 
-/usr/include/c++/11/bits/functional_hash.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/csv_name.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_shift.hpp:
+/usr/include/c++/11/bits/istream.tcc:
 
-/usr/include/c++/11/bits/string_view.tcc:
+/usr/include/c++/11/ext/new_allocator.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpBase_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eop_core_meat.hpp:
+
+/usr/include/c++/11/bits/char_traits.h:
+
+/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
+
+/usr/include/alloca.h:
+
+/usr/include/c++/11/cstddef:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_mixed_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_str.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_toeplitz_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpCol_bones.hpp:
+
+/usr/include/c++/11/cstdio:
+
+/usr/include/c++/11/bits/ptr_traits.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_trimat_bones.hpp:
+
+/usr/include/c++/11/tuple:
+
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtSpGlue_bones.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpGlue_meat.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
 
-/usr/include/c++/11/typeinfo:
+/usr/include/strings.h:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_inplace_trans.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_vectorise_meat.hpp:
 
-/usr/include/c++/11/cctype:
+/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/strings_fortified.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_elem2_meat.hpp:
+
+/usr/include/c++/11/bits/hash_bytes.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Cube_bones.hpp:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_diff.hpp:
+
+/usr/include/linux/errno.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++locale.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/gmm_diag_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_relational_meat.hpp:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Mat_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/diskio_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_DenseGenMatProd_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpSubview_col_list_meat.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/locale.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_mean_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_resize_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_all.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/c++/11/bits/charconv.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/usr/include/c++/11/bits/exception_ptr.h:
+
+/usr/include/math.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h:
+
+/usr/include/c++/11/bits/stl_algo.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_config.hpp:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h:
+
+/usr/include/unistd.h:
+
+/usr/include/c++/11/ext/string_conversions.h:
+
+/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/cond_rel_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_powext.hpp:
+
+/usr/include/c++/11/bits/specfun.h:
+
+/usr/include/c++/11/new:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpGlue_bones.hpp:
+
+/usr/include/c++/11/ext/atomicity.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/auxlib_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trace.hpp:
+
+/usr/include/c++/11/bits/stl_pair.h:
+
+/usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_roots_meat.hpp:
 
@@ -2157,42 +2257,6 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_relational_bones.hpp:
 
-/usr/include/math.h:
-
-/usr/include/c++/11/bits/charconv.h:
-
-/usr/include/c++/11/bits/exception_ptr.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h:
-
-/usr/include/c++/11/bits/stringfwd.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_schur_meat.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_shuffle.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/stdio.h:
-
-/home/alastor/stuff/Lible/src/geomopt/geomopt_include.h:
-
-/usr/include/c++/11/bits/locale_facets.tcc:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_misc_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_vecnorm_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_normpdf.hpp:
-
-/usr/include/c++/11/bits/algorithmfwd.h:
-
-/usr/include/c++/11/bits/cxxabi_forced.h:
-
-/usr/include/c++/11/tr1/exp_integral.tcc:
-
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_trimat_meat.hpp:
 
 /usr/include/c++/11/bits/hashtable.h:
@@ -2201,163 +2265,29 @@ testlible.cpp:
 
 /usr/include/c++/11/bits/hashtable_policy.h:
 
-/usr/include/c++/11/backward/binders.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_histc.hpp:
-
-/usr/include/c++/11/bits/align.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_flip_bones.hpp:
+/usr/include/c++/11/bits/unordered_map.h:
 
 /usr/include/c++/11/vector:
 
-/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sum_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_det.hpp:
+/usr/include/c++/11/bits/stl_uninitialized.h:
 
-/usr/include/x86_64-linux-gnu/bits/floatn-common.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_norm_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/typedef_mat_fixed.hpp:
+/usr/include/c++/11/bits/vector.tcc:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_repmat_meat.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_each_meat.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/sym_helper.hpp:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/translate_superlu.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_field_bones.hpp:
+/usr/include/c++/11/map:
 
-/usr/include/c++/11/tr1/poly_laguerre.tcc:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_strans.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_rel_comparators.hpp:
+/usr/include/c++/11/bits/stl_tree.h:
 
-/usr/include/c++/11/bits/std_mutex.h:
-
-/usr/include/c++/11/bits/allocated_ptr.h:
-
-/usr/include/assert.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpValProxy_bones.hpp:
-
-/usr/include/c++/11/bit:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_max_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_index_min_bones.hpp:
-
-/usr/include/c++/11/bits/stl_iterator_base_types.h:
-
-/usr/include/c++/11/cstdlib:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_div.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_cube_minus.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/operator_schur.hpp:
-
-/usr/include/stdlib.h:
-
-/usr/include/x86_64-linux-gnu/bits/waitflags.h:
-
-/usr/include/x86_64-linux-gnu/sys/select.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/include_hdf5.hpp:
-
-/usr/include/c++/11/ext/new_allocator.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpBase_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eop_core_meat.hpp:
-
-/usr/include/c++/11/bits/char_traits.h:
-
-/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
-
-/usr/include/alloca.h:
-
-/usr/include/strings.h:
-
-/usr/include/x86_64-linux-gnu/bits/strings_fortified.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_elem2_meat.hpp:
-
-/usr/include/c++/11/bits/hash_bytes.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Cube_bones.hpp:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
-
-/usr/include/x86_64-linux-gnu/bits/locale.h:
-
-/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
-
-/usr/include/x86_64-linux-gnu/bits/local_lim.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_mean_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_resize_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_all.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_DenseGenMatProd_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpSubview_col_list_meat.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_princomp_meat.hpp:
-
-/usr/include/c++/11/ostream:
-
-/usr/include/c++/11/bits/ios_base.h:
-
-/usr/include/c++/11/bits/locale_classes.h:
-
-/usr/include/c++/11/ext/aligned_buffer.h:
-
-/usr/include/c++/11/bits/locale_classes.tcc:
-
-/usr/include/c++/11/streambuf:
-
-/usr/include/c++/11/cwctype:
-
-/usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_find_meat.hpp:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h:
-
-/usr/include/c++/11/bits/streambuf_iterator.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h:
-
-/usr/include/c++/11/bits/ostream.tcc:
-
-/home/alastor/stuff/Lible/src/ints/ints_include.h:
-
-/usr/include/c++/11/istream:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/csv_name.hpp:
-
-/usr/include/c++/11/bits/istream.tcc:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_forward.hpp:
-
-/usr/include/c++/11/chrono:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/translate_arpack.hpp:
-
-/usr/include/c++/11/sstream:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/translate_atlas.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_polyfit_bones.hpp:
-
-/usr/include/c++/11/algorithm:
+/usr/include/c++/11/bits/stl_multimap.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_cumprod.hpp:
 
@@ -2377,19 +2307,33 @@ testlible.cpp:
 
 /usr/include/c++/11/numeric:
 
+/usr/include/c++/11/bit:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_max_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_index_min_bones.hpp:
+
 /usr/include/c++/11/mutex:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_plus_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_kmeans.hpp:
 
 /usr/include/c++/11/atomic:
 
+/usr/include/c++/11/bits/random.tcc:
+
+/usr/include/c++/11/bits/atomic_base.h:
+
+/usr/include/c++/11/bits/atomic_lockfree_defines.h:
+
 /usr/include/x86_64-linux-gnu/bits/posix_opt.h:
 
 /usr/include/x86_64-linux-gnu/bits/confname.h:
 
-/usr/include/x86_64-linux-gnu/bits/stdlib.h:
-
 /usr/include/c++/11/bits/functexcept.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib.h:
 
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
@@ -2400,6 +2344,12 @@ testlible.cpp:
 /usr/include/x86_64-linux-gnu/bits/unistd.h:
 
 /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_kron_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sp_plus_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_GenEigsSolver_bones.hpp:
 
 /usr/include/c++/11/bits/stl_numeric.h:
 
@@ -2424,20 +2374,6 @@ testlible.cpp:
 /usr/include/x86_64-linux-gnu/bits/types/error_t.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arma_static_check.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_chol.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spdiagview_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/typedef_elem.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_reverse_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_DoubleShiftQR_bones.hpp:
-
-/usr/include/c++/11/pstl/glue_algorithm_defs.h:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/typedef_elem_check.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtOpCube_bones.hpp:
 
@@ -2509,17 +2445,21 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/arrayops_bones.hpp:
 
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_nonzeros_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SymEigsShiftSolver_bones.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/sp_auxlib_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eglue_core_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/Row_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/GlueCube_bones.hpp:
+/usr/include/c++/11/bits/refwrap.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_dot_bones.hpp:
 
-/usr/include/c++/11/bits/refwrap.h:
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/GlueCube_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_normalise_bones.hpp:
 
@@ -2530,6 +2470,8 @@ testlible.cpp:
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/xtrans_mat_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_resize_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpValProxy_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_toeplitz_bones.hpp:
 
@@ -2543,7 +2485,21 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/SpSubview_col_list_bones.hpp:
 
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_chol.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/typedef_elem.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spdiagview_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_htrans_bones.hpp:
+
+/home/alastor/stuff/Lible/include/lible:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_join_bones.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/MapMat_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/subview_bones.hpp:
 
 /usr/include/c++/11/complex:
 
@@ -2597,12 +2553,6 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eGlue_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_max_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/access.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/GenCube_bones.hpp:
-
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_max_meat.hpp:
 
 /usr/include/c++/11/bits/parse_numbers.h:
@@ -2611,11 +2561,11 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_max.hpp:
 
+/usr/include/c++/11/system_error:
+
 /usr/include/features-time64.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
-
-/usr/include/c++/11/system_error:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_det_bones.hpp:
 
@@ -2643,15 +2593,19 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sort_index_bones.hpp:
 
+/usr/include/c++/11/bits/shared_ptr_atomic.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_strans_bones.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/podarray_meat.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_sum_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_var_bones.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
 /usr/include/c++/11/backward/auto_ptr.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_repelem_bones.hpp:
 
@@ -2665,6 +2619,8 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_pinv_bones.hpp:
 
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_flip_bones.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_reverse_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_any_bones.hpp:
@@ -2674,6 +2630,8 @@ testlible.cpp:
 /usr/include/c++/11/bits/stl_vector.h:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_princomp_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_orth_null_bones.hpp:
 
 /usr/include/c++/11/bits/stl_raw_storage_iter.h:
 
@@ -2729,23 +2687,13 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_roots_bones.hpp:
 
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_join_bones.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_cond_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_rcond_bones.hpp:
 
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eop_aux.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_EigsSelect.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sp_plus_bones.hpp:
-
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_powmat_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_min_meat.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SparseGenRealShiftSolve_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_rank_bones.hpp:
 
 /usr/include/c++/11/string:
 
@@ -2771,6 +2719,8 @@ testlible.cpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_conv_bones.hpp:
 
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_relational_bones.hpp:
+
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_hist_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_trapz_bones.hpp:
@@ -2790,10 +2740,6 @@ testlible.cpp:
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_log_det.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/glue_powext_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_relational_bones.hpp:
-
-/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_strans_bones.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_any_meat.hpp:
 
@@ -2816,3 +2762,69 @@ testlible.cpp:
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_reshape.hpp:
 
 /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_normalise_bones.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_vectorise_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_vecnorm_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_minus_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_log_det_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_schur_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_times_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/access.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/GenCube_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_max_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/fn_trimat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_merge_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_strans_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spglue_relational_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spsolve_factoriser_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/eop_aux.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_sp_plus_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_EigsSelect.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/mtSpGlue_meat.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_DenseGenMatProd_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_min_meat.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_rank_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SparseGenRealShiftSolve_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/spop_reverse_meat.hpp:
+
+/usr/include/c++/11/pstl/glue_algorithm_defs.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/typedef_elem_check.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_DoubleShiftQR_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_SymEigsSolver_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_TridiagEigen_bones.hpp:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/op_wishrnd_meat.hpp:
+
+/usr/include/c++/11/bits/stl_heap.h:
+
+/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include/armadillo_bits/newarp_UpperHessenbergQR_bones.hpp:

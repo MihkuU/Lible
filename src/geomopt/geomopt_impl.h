@@ -1,22 +1,26 @@
 #pragma once
 
 #include "geomopt.h"
+#include "geometry.h"
 
 namespace Lible
 {
     template <GeomOpt::Option option>
-    std::vector<double> GeomOpt::optimize(std::function<void(double &energy, std::vector<double> &coords, std::vector<double> &gradient)> singlePointCalculation)
+    std::vector<double> GeomOpt::optimize(std::function<void(const std::vector<double> &coords_cart, double &energy, std::vector<double> &gradient_cart)> singlePointCalculation)
     {
-        // std::vector<double> coords_opt = coords;
-        // for (std::size_t iter = 0; iter < max_iter; iter++)
-        // {
-        //     double energy;
-        //     std::vector<double> geometry, gradient;
-        //     singlePointCalculation(energy, geometry, gradient);
+        std::vector<double> coords_cart = geometry->getCoordsCart();
+        for (std::size_t iter = 0; iter < max_iter; iter++)
+        {
+            double energy;
+            std::vector<double> grad_cart;
+            singlePointCalculation(coords_cart, energy, grad_cart);
 
-        //     coords_opt = update<option>(coords_opt);
-        // }
+            std::vector<double> coords_redint;
+            std::vector<double> grad_redint;
 
-        // return coords_opt;
+            coords_cart = update<option>(coords_redint, grad_redint);
+        }
+
+        return coords_cart;
     }
 }

@@ -8,10 +8,13 @@ namespace Lible
 {
     namespace GeomOptDefs
     {
+        constexpr double bonding_factor = 1.3;        
+
         /*
-         * Took the covalent radii from MOLBLOCK, which it took it from https://doi.org/10.1039/B801115J.
+         * Took the covalent radii from MOLBLOCK, which took them from https://doi.org/10.1039/B801115J.
          */
         const std::map<std::string, int> covalent_radii{
+            // TODO: fix values!
             {"H", 0.0},
             {"He", 0.31},
             {"Li", 0.28},

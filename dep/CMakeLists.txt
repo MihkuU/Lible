@@ -1,3 +1,5 @@
+cmake_minimum_required (VERSION 3.20)
+
 # Setting up some external libraries
 # List of libraries:
 #   - armadillo, https://arma.sourceforge.net/
@@ -24,6 +26,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${build_dep
 message("   ... Installing")
 execute_process(COMMAND ${CMAKE_COMMAND} --install . WORKING_DIRECTORY ${build_dep_dir}/${arma_extract} OUTPUT_FILE arma_install.log)
 target_include_directories(lible PUBLIC ${build_dep_dir}/${arma_extract}/build/include)
+target_link_libraries(lible ${build_dep_dir}/${arma_extract}/build/lib/libarmadillo.so)
 
 # fmt
 message("2.  Setting up fmt-library (header-only)")
@@ -33,7 +36,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E rm fmt-master.zip WORKING_DIRECTORY 
 target_include_directories(lible PUBLIC ${build_dep_dir}/fmt-master/include)
 
 # json
-message("3.  Setting for json-library (header-only)")
+message("3.  Setting up json-library (header-only)")
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${src_dep_dir}/json-develop.zip ${build_dep_dir}/json-develop.zip)
 execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf json-develop.zip WORKING_DIRECTORY ${build_dep_dir})
 execute_process(COMMAND ${CMAKE_COMMAND} -E rm json-develop.zip WORKING_DIRECTORY ${build_dep_dir})

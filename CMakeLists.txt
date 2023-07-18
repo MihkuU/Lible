@@ -16,8 +16,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_COMPILER "clang++")
 
 # Specify some C++ flags.
-set(CMAKE_CXX_FLAGS "-O3")
-# set(CMAKE_CXX_FLAGS "-g")
+# set(CMAKE_CXX_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS "-g")
 
 ### The main target of Lible project.
 add_library(lible SHARED)

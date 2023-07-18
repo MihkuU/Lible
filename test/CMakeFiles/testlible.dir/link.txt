@@ -1,1 +1,1 @@
-/usr/bin/c++ -O3 -rdynamic CMakeFiles/testlible.dir/testlible.cpp.o -o testlible  -Wl,-rpath,/home/alastor/stuff/Lible/build /home/alastor/stuff/Lible/build/liblible.so 
+/usr/bin/c++ -O3 -rdynamic CMakeFiles/testlible.dir/testlible.cpp.o -o testlible  -Wl,-rpath,/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/lib:/home/alastor/stuff/Lible/build /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/lib/libarmadillo.so /home/alastor/stuff/Lible/build/liblible.so 

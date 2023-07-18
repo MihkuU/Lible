@@ -92,6 +92,7 @@ testlible_EXTERNAL_OBJECTS =
 
 testlible: CMakeFiles/testlible.dir/testlible.cpp.o
 testlible: CMakeFiles/testlible.dir/build.make
+testlible: /home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/lib/libarmadillo.so
 testlible: /home/alastor/stuff/Lible/build/liblible.so
 testlible: CMakeFiles/testlible.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/alastor/stuff/Lible/test/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable testlible"

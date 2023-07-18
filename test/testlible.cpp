@@ -1,7 +1,8 @@
 
-#include <chrono>
-#include <lible> // Change <> to ""
+#include <chrono> // Change <> to ""
 #include <armadillo>
+
+#include "lible"
 
 using namespace Lible;
 using std::vector;
