@@ -5,13 +5,13 @@
 #include "defs_geomopt.h"
 #include "geometry.h"
 
-using namespace Lible;
+using namespace Lible::GeomOpt;
 using std::pair;
 using std::set;
 using std::size_t;
 using std::vector;
 
-GeomOpt::Geometry::Geometry(const vector<double> &coords_cart_, const vector<std::string> &atoms_) : coords_cart(coords_cart_), atoms(atoms_)
+Geometry::Geometry(const vector<double> &coords_cart_, const vector<std::string> &atoms_) : coords_cart(coords_cart_), atoms(atoms_)
 {
     assert((coords_cart.size() % 3 == 0));
     assert((coords_cart.size() / 3 == atoms.size()));
@@ -24,24 +24,24 @@ GeomOpt::Geometry::Geometry(const vector<double> &coords_cart_, const vector<std
     red_int_coords = constructRedIntCoords();
 }
 
-double GeomOpt::Geometry::calcDistance(const size_t &iatom, const size_t &jatom)
+double Geometry::calcDistance(const size_t &iatom, const size_t &jatom)
 {
     return arma::norm(atom_coords_cart[iatom] - atom_coords_cart[jatom]);
 }
 
-double GeomOpt::Geometry::calcAngle(const size_t &iatom, const size_t &jatom, const size_t &katom)
+double Geometry::calcAngle(const size_t &iatom, const size_t &jatom, const size_t &katom)
 {
     arma::dvec ij_vec = atom_coords_cart[iatom] - atom_coords_cart[jatom];
     arma::dvec kj_vec = atom_coords_cart[katom] - atom_coords_cart[jatom];
     return acos(arma::dot(ij_vec, kj_vec) / (arma::norm(ij_vec) * arma::norm(kj_vec)));
 }
 
-double GeomOpt::Geometry::calcDihedral(const size_t &iatom, const size_t &jatom, const size_t &katom, const size_t &latom)
+double Geometry::calcDihedral(const size_t &iatom, const size_t &jatom, const size_t &katom, const size_t &latom)
 {
     return 0; // TODO
 }
 
-size_t GeomOpt::Geometry::findClosestAtom(const size_t &iatom)
+size_t Geometry::findClosestAtom(const size_t &iatom)
 {
     double min_distance = std::numeric_limits<double>::max();
     size_t closest_atom;
@@ -57,7 +57,7 @@ size_t GeomOpt::Geometry::findClosestAtom(const size_t &iatom)
     return closest_atom;
 }
 
-vector<set<size_t>> GeomOpt::Geometry::findAtomBondingPartners()
+vector<set<size_t>> Geometry::findAtomBondingPartners()
 {
     vector<double> covalent_radii(n_atoms);
     for (size_t iatom = 0; iatom < n_atoms; iatom++)
@@ -84,7 +84,7 @@ vector<set<size_t>> GeomOpt::Geometry::findAtomBondingPartners()
     return atom_bonding_partners;
 }
 
-GeomOpt::Geometry::RedundantInternalCoordinates GeomOpt::Geometry::constructRedIntCoords()
+Geometry::RedundantInternalCoordinates Geometry::constructRedIntCoords()
 {
     vector<set<size_t>> atom_bonding_partners = findAtomBondingPartners();
 
@@ -120,12 +120,12 @@ GeomOpt::Geometry::RedundantInternalCoordinates GeomOpt::Geometry::constructRedI
     return red_int_coords;
 }
 
-void GeomOpt::Geometry::constructBMatrix(arma::dmat &bmatrix)
+void Geometry::constructBMatrix(arma::dmat &bmatrix)
 {
 
 }
 
-void GeomOpt::Geometry::constructBMatrix(arma::sp_dmat &bmatrix)
+void Geometry::constructBMatrix(arma::sp_dmat &bmatrix)
 {
 
 }
