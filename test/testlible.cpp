@@ -37,7 +37,8 @@ void testLibleInts()
     for (int i = 0; i < 10; i++)
     {
         auto start = high_resolution_clock::now();
-        vector<double> one_el_ints = ints.calcOneElInts<Ints::Option1El::OVERLAP>();
+        // vector<double> one_el_ints = ints.calcOneElInts<Ints::Option1El::OVERLAP>();
+        vector<double> one_el_ints = ints.calcOneElInts<Ints::OVERLAP>();        
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<nanoseconds>(stop - start);
         std::cout << "duration.count() = " << duration.count() << " nanoseconds" << std::endl;

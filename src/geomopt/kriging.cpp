@@ -2,7 +2,7 @@
 using namespace Lible;
 
 template<>
-std::vector<double> GeomOpt::update<GeomOpt::Option::KRIGING>(const std::vector<double> &coords_redint, const std::vector<double> &grad_redint)
+std::vector<double> GeomOpt::update<GeomOpt::KRIGING>(const std::vector<double> &coords_redint, const std::vector<double> &grad_redint)
 {
     std::vector<double> coords_new = coords_redint;
     /* Do stuff */

@@ -15,14 +15,14 @@ namespace Lible
     class Ints
     {
     public:
-        enum class Option1El
+        enum Option1El
         {
             KINETIC,
             OVERLAP,
             POTENTIAL
         };
 
-        enum class Option2El
+        enum Option2El
         {
             COULOMB,
             EXCHANGE

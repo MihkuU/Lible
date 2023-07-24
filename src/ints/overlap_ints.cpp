@@ -6,7 +6,7 @@ using std::size_t;
 using std::vector;
 
 template <>
-void Kernels1El::oneElIntKernel<Ints::Option1El::OVERLAP>(const int &la, const int &lb, const std::size_t &n_ao, const vector<Shells::ShellPair> &shell_pairs,
+void Kernels1El::oneElIntKernel<Ints::OVERLAP>(const int &la, const int &lb, const std::size_t &n_ao, const vector<Shells::ShellPair> &shell_pairs,
                                                           vector<double> &one_el_ints)
 {
     std::array<double, 3> overlap_00;

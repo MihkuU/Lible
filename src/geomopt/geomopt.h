@@ -22,8 +22,7 @@ namespace Lible
     {
     public:
 
-        // TODO: consider removing the 'class'
-        enum class Option
+        enum Option
         {
             BFGS,
             GDESCENT,
@@ -31,8 +30,7 @@ namespace Lible
             KRIGING
         };
 
-        // TODO: consider removing the 'class'
-        enum class OptionForCIOpt
+        enum OptionCIOpt
         {
             IGNACIO,
             MOROKUMA,
@@ -44,7 +42,7 @@ namespace Lible
         template <Option option>
         std::vector<double> optimize(std::function<void(const std::vector<double> &coords_cart, double &energy, std::vector<double> &gradient_cart)> singlePointCalculation);
 
-        template <OptionForCIOpt option_for_ciopt>
+        template <OptionCIOpt option_ciopt>
         std::vector<double> optimizeConicalIntersection();
 
     private:
@@ -55,7 +53,6 @@ namespace Lible
         std::vector<double> update(const std::vector<double> &coords_redint, const std::vector<double> &grad_redint);
 
         double tol_grad_norm{1e-3};
-        double tol_energy_diff{1e-6};
         std::size_t max_iter{1};
     };
 }

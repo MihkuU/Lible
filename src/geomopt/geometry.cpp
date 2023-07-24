@@ -34,7 +34,6 @@ double GeomOpt::Geometry::calcAngle(const size_t &iatom, const size_t &jatom, co
     arma::dvec ij_vec = atom_coords_cart[iatom] - atom_coords_cart[jatom];
     arma::dvec kj_vec = atom_coords_cart[katom] - atom_coords_cart[jatom];
     return acos(arma::dot(ij_vec, kj_vec) / (arma::norm(ij_vec) * arma::norm(kj_vec)));
-    // return (180 / std::numbers::pi) * acos(arma::dot(ij_vec, kj_vec) / (arma::norm(ij_vec) * arma::norm(kj_vec)));
 }
 
 double GeomOpt::Geometry::calcDihedral(const size_t &iatom, const size_t &jatom, const size_t &katom, const size_t &latom)
