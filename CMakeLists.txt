@@ -23,3 +23,5 @@ add_subdirectory(src)
 
 # miscellaneous
 add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
+
+message("WTH IS GOING ON")
