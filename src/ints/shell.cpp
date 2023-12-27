@@ -3,11 +3,14 @@
 #include "spherical_trafo.h"
 
 using namespace Lible;
+using std::array;
 using std::size_t;
 using std::vector;
 
-std::vector<double> Shells::calcShellNormalization(const int &angmom, const std::vector<double> &contraction_coeffs,
-                                                   const std::vector<double> &contraction_exps, const std::vector<std::array<int, 3>> &cartesian_exps)
+vector<double> Shells::calcShellNormalization(const int &angmom,
+                                              const vector<double> &contraction_coeffs,
+                                              const vector<double> &contraction_exps,
+                                              const vector<array<int, 3>> &cartesian_exps)
 {
     int dim_cart_ints = (angmom + 1) * (angmom + 1);
     vector<double> overlap_x(dim_cart_ints, 0);
@@ -17,7 +20,7 @@ std::vector<double> Shells::calcShellNormalization(const int &angmom, const std:
     size_t dim_cart = calcShellDimCartesian(angmom);
     size_t dim_sph = calcShellDimSpherical(angmom);
 
-    std::vector<double> one_el_ints_cart(dim_cart * dim_cart, 0);
+    vector<double> one_el_ints_cart(dim_cart * dim_cart, 0);
     size_t contraction_dim = contraction_exps.size();
     for (size_t a = 0; a < contraction_dim; a++)
     {
@@ -30,7 +33,7 @@ std::vector<double> Shells::calcShellNormalization(const int &angmom, const std:
             double one_over_2p = 1.0 / (2 * p);
 
             double overlap_00 = std::sqrt(M_PI / p);
-            Kernels1El::ObaraSaika::overlapX(angmom, angmom, one_over_2p, 0, 0, overlap_00, overlap_x);
+            // Kernels1El::ObaraSaika::overlapX(angmom, angmom, one_over_2p, 0, 0, overlap_00, overlap_x);
             overlap_y = overlap_x;
             overlap_z = overlap_x;
 
@@ -55,7 +58,7 @@ std::vector<double> Shells::calcShellNormalization(const int &angmom, const std:
                 }
             }
         }
-    }    
+    }
 
     vector<trafo_coeff_tuple> spherical_trafo_first = SphericalTrafo::returnSphericalTrafo(angmom);
     vector<trafo_coeff_tuple> spherical_trafo_second = SphericalTrafo::returnSphericalTrafo(angmom);
@@ -63,8 +66,13 @@ std::vector<double> Shells::calcShellNormalization(const int &angmom, const std:
     ShellPair shell_pair(shell, shell);
     vector<double> one_el_ints_sph_cart(dim_sph * dim_cart, 0);
     vector<double> one_el_ints_sph(dim_sph * dim_sph, 0);
-    SphericalTrafo::transformCartesianIntsToSpherical(shell_pair, one_el_ints_cart, spherical_trafo_first, spherical_trafo_second,
-                                                      one_el_ints_sph_cart, one_el_ints_sph);
+    
+    SphericalTrafo::transformCartesianIntsToSpherical(shell_pair,
+                                                      one_el_ints_cart,
+                                                      spherical_trafo_first,
+                                                      spherical_trafo_second,
+                                                      one_el_ints_sph_cart,
+                                                      one_el_ints_sph);
 
     vector<double> normalization(dim_sph);
     for (size_t i = 0; i < dim_sph; i++)

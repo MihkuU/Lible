@@ -1,11 +1,14 @@
-#include "geomopt.h"
+#include "geomopt_impl.h"
 
 using namespace Lible; 
+using GeomOpt::BFGS;
 
-template<>
-std::vector<double> GeomOpt::update<GeomOpt::BFGS>(const std::vector<double> &coords_redint, const std::vector<double> &grad_redint)
+using std::vector;
+
+vector<double> GeomOpt::Optimizer<BFGS>::update(const vector<double> &coords_redint_in, const vector<double> &grad_redint)
 {
-    std::vector<double> coords_new = coords_redint;
-    /* Do stuff */
-    return coords_new;
+    vector<double> coords_redint_out;
+
+    return coords_redint_out;
 }
+

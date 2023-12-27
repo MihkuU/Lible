@@ -10,17 +10,25 @@
 #include "defs_ints.h"
 #include "structure.h"
 
-using namespace Lible;
-using json = nlohmann::json;
-
 namespace fs = std::filesystem;
 
-Ints::Structure::Structure(const std::string &basis_set, const std::vector<double> &coordinates_angstroem, const std::vector<std::string> &elements)
+using namespace Lible;
+using namespace Lible::Ints;
+
+using std::array;
+using std::string;
+using std::vector;
+
+using json = nlohmann::json;
+
+Structure::Structure(const string &basis_set,
+                     const vector<double> &coordinates_angstroem,
+                     const vector<string> &elements)
     : basis_set(basis_set), coordinates(coordinates_angstroem), elements(elements)
 {
     n_atoms = elements.size();
 
-    for (std::size_t i = 0; i < coordinates.size(); i++)
+    for (size_t i = 0; i < coordinates.size(); i++)
         coordinates[i] *= IntsDefs::ang_to_bohr;
 
     readBasis(basis_set);
@@ -29,19 +37,19 @@ Ints::Structure::Structure(const std::string &basis_set, const std::vector<doubl
 #ifdef BASIS_DIR
 #define path_to_basis_sets BASIS_DIR
 #endif
-std::string Ints::Structure::returnBasisPath(const std::string &basis_set)
+string Structure::returnBasisPath(const string &basis_set)
 {
-    std::string bs = basis_set;
-    std::transform(bs.begin(), bs.end(), bs.begin(),
-                   [](unsigned char c)
-                   { return std::tolower(c); });
+    string bs = basis_set;
+    transform(bs.begin(), bs.end(), bs.begin(),
+              [](unsigned char c)
+              { return std::tolower(c); });
 
     bool basis_found = false;
-    std::string basis_path;
+    string basis_path;
     for (const auto &entry : fs::directory_iterator(path_to_basis_sets))
     {
         basis_path = entry.path();
-        std::string basis_name = entry.path().filename();
+        string basis_name = entry.path().filename();
         basis_name = basis_name.substr(0, basis_name.find("."));
         if (basis_name == bs)
         {
@@ -55,18 +63,18 @@ std::string Ints::Structure::returnBasisPath(const std::string &basis_set)
     return basis_path;
 }
 
-std::vector<Shells::Shell> Ints::Structure::parseBasisJSONFile(const std::string &basis_path)
+vector<Shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
 {
     json basis_set_json = json::parse(std::ifstream{basis_path});
 
     max_angular_momentum = 0;
 
-    std::size_t pos = 0;
-    std::vector<Shells::Shell> shells;
-    for (std::size_t iatom = 0; iatom < n_atoms; iatom++)
+    size_t pos = 0;
+    vector<Shells::Shell> shells;
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
     {
-        std::string element = elements[iatom];
-        std::string atomic_number = std::to_string(IntsDefs::atomic_numbers.at(element));
+        string element = elements[iatom];
+        string atomic_number = std::to_string(IntsDefs::atomic_numbers.at(element));
         auto shells_json = basis_set_json.at("elements").at(atomic_number).at("electron_shells");
         for (auto &shell_json : shells_json)
         {
@@ -81,25 +89,25 @@ std::vector<Shells::Shell> Ints::Structure::parseBasisJSONFile(const std::string
                 max_angular_momentum = angular_momentum;
 
             int atomic_number = IntsDefs::atomic_numbers.at(element);
-            std::size_t dim_cartesian = Shells::calcShellDimCartesian(angular_momentum);
-            std::size_t dim_spherical = Shells::calcShellDimSpherical(angular_momentum);
-            std::array<double, 3> xyz_coordinates{coordinates[3 * iatom], coordinates[3 * iatom + 1], coordinates[3 * iatom + 2]};
+            size_t dim_cartesian = Shells::calcShellDimCartesian(angular_momentum);
+            size_t dim_spherical = Shells::calcShellDimSpherical(angular_momentum);
+            array<double, 3> xyz_coordinates{coordinates[3 * iatom], coordinates[3 * iatom + 1], coordinates[3 * iatom + 2]};
 
-            std::vector<double> contraction_coeffs;
-            for (const std::string &coeff : shell_json.at("coefficients")[0])
+            vector<double> contraction_coeffs;
+            for (const string &coeff : shell_json.at("coefficients")[0])
                 contraction_coeffs.push_back(std::stod(coeff));
 
-            std::vector<double> contraction_exps;
-            for (const std::string &exp : shell_json.at("exponents"))
+            vector<double> contraction_exps;
+            for (const string &exp : shell_json.at("exponents"))
                 contraction_exps.push_back(std::stod(exp));
 
-            for (std::size_t i = 0; i < contraction_exps.size(); i++)
+            for (size_t i = 0; i < contraction_exps.size(); i++)
                 contraction_coeffs[i] *= Shells::calcPureGaussianPrimitiveNorm(angular_momentum, contraction_exps[i]);
 
-            std::vector<std::array<int, 3>> cartesian_exps = Shells::calcShellCartesianExps(angular_momentum);
+            vector<array<int, 3>> cartesian_exps = Shells::calcShellCartesianExps(angular_momentum);
 
-            std::vector<double> normalization = Shells::calcShellNormalization(angular_momentum, contraction_coeffs, contraction_exps,
-                                                                               cartesian_exps);
+            vector<double> normalization = Shells::calcShellNormalization(angular_momentum, contraction_coeffs, contraction_exps,
+                                                                          cartesian_exps);
 
             Shells::Shell shell(angular_momentum, atomic_number, dim_cartesian, dim_spherical, pos, xyz_coordinates,
                                 contraction_coeffs, contraction_exps, normalization, cartesian_exps);
@@ -113,10 +121,10 @@ std::vector<Shells::Shell> Ints::Structure::parseBasisJSONFile(const std::string
     return shells;
 }
 
-void Ints::Structure::readBasis(const std::string &basis_set)
+void Ints::Structure::readBasis(const string &basis_set)
 {
-    std::string basis_path = returnBasisPath(basis_set);
-    std::vector<Shells::Shell> shells_vec = parseBasisJSONFile(basis_path);
+    string basis_path = returnBasisPath(basis_set);
+    vector<Shells::Shell> shells_vec = parseBasisJSONFile(basis_path);
 
     for (const auto &shell : shells_vec)
         shells[shell.angular_momentum].push_back(shell);
@@ -125,9 +133,10 @@ void Ints::Structure::readBasis(const std::string &basis_set)
         for (int lb = la; lb >= 0; lb--)
             if (la == lb)
             {
-                for (std::size_t ishell = 0; ishell < shells.at(la).size(); ishell++)
-                    for (std::size_t jshell = ishell; jshell < shells.at(lb).size(); jshell++)
-                        shell_pairs[std::make_pair(la, lb)].push_back(Shells::ShellPair(shells.at(la)[ishell], shells.at(lb)[jshell]));
+                for (size_t ishell = 0; ishell < shells.at(la).size(); ishell++)
+                    for (size_t jshell = ishell; jshell < shells.at(lb).size(); jshell++)
+                        shell_pairs[std::make_pair(la, lb)].push_back(
+                            Shells::ShellPair(shells.at(la)[ishell], shells.at(lb)[jshell]));
             }
             else
             {

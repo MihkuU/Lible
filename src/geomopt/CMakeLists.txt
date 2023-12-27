@@ -1,2 +1,2 @@
-file(GLOB geomopt_sources "*.cpp")
-target_sources(lible PRIVATE ${geomopt_sources})
+file(GLOB geomopt_sources "*.cpp" "*.h")
+target_sources(le PRIVATE ${geomopt_sources})

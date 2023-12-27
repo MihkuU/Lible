@@ -6,38 +6,65 @@
 #include <tuple>
 #include <vector>
 
+#include "lible_types.h"
+#include "structure.h"
+
 namespace Lible
 {
-    /*
-     * A class that implements functions for calculating molecular integrals.
-     *
-     */
-    class Ints
+    namespace Ints
     {
-    public:
-        enum Option1El
+        Vec2D<double> overlap(const Structure &structure);
+
+        Vec2D<double> kineticEnergy(const Structure &structure);
+
+        Vec2D<double> coulombAttraction(const Structure &structure);
+
+        Vec2D<double> dipoleMoment(const Structure &structure);
+
+        namespace Kernels
         {
-            KINETIC,
-            OVERLAP,
-            POTENTIAL
-        };
+            Vec2D<double> overlap();
+            
+            Vec2D<double> kineticEnergy();
 
-        enum Option2El
-        {
-            COULOMB,
-            EXCHANGE
-        };
+            Vec2D<double> coulombAttraction();
 
-        Ints(const std::string &basis_set, const std::vector<double> &coordinates, const std::vector<std::string> &elements);
+            Vec2D<double> dipoleMoment();
+        }
+    }
 
-        template <Option1El option>
-        std::vector<double> calcOneElInts();
 
-        template <Option2El option>
-        std::vector<double> calcTwoElInts(const std::vector<double> &density); // TODO: rethink the name of this function
+    // class Ints
+    // {
+    // public:
+    // Ints(const std::string &basis_set, const std::vector<double> &coordinates_ang,
+    //      const std::vector<std::string> &elements);
 
-    private:
-        struct Structure;
-        std::unique_ptr<Structure> structure;
-    };
+    // enum Option1El
+    // {
+    //     KINETIC,
+    //     OVERLAP,
+    //     POTENTIAL
+    // };
+
+    // enum Option2El
+    // {
+    //     COULOMB,
+    //     EXCHANGE
+    // };
+
+    // template <Option1El option>
+    // std::vector<double> calcOneElInts();
+
+    // template <Option1El option>
+    // std::vector<double> calcOneElIntsGPU();
+
+    // template <Option2El option>
+    // std::vector<double> calcTwoElInts(const std::vector<double> &density); // TODO: rethink the name of this function
+
+    // struct Structure;
+    // struct StructureGPU;
+    // std::unique_ptr<Structure> structure;
+    // std::unique_ptr<StructureGPU> structure_gpu;
+    // };
 }

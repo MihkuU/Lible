@@ -4,20 +4,21 @@ project(lible_external_libs)
 
 include(ExternalProject)
 
+cmake_host_system_information(RESULT nprocs QUERY NUMBER_OF_PHYSICAL_CORES)
+
 # armadillo library
 set(arma_dir "@CMAKE_BINARY_DIR@/extern/arma")
 ExternalProject_Add(arma
 	URL 					   "@CMAKE_SOURCE_DIR@/extern/armadillo-12.4.1.tar.xz"
 	SOURCE_DIR 		           "${arma_dir}"
     CONFIGURE_COMMAND 
-		"${CMAKE_COMMAND}" -E env "${arma_dir}/configure" "${arma_dir}/"
+		${CMAKE_COMMAND} -E env "${arma_dir}/configure" "${arma_dir}/"
 	BUILD_COMMAND     
-		cmake ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build
+		${CMAKE_COMMAND} ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build
     TEST_COMMAND      ""
 	BUILD_ALWAYS	  		   OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 )
-#target_include_directories(lible PUBLIC ${arma_dir}/build/include)
 
 # fmt library
 set(fmt_dir "@CMAKE_BINARY_DIR@/extern/fmt")
@@ -28,6 +29,7 @@ ExternalProject_Add(fmt
 	BUILD_COMMAND 	           ""
 	INSTALL_COMMAND            ""
 	TEST_COMMAND               ""
+    BUILD_ALWAYS               OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 )
 
@@ -40,5 +42,33 @@ ExternalProject_Add(json
 	BUILD_COMMAND              ""
 	INSTALL_COMMAND            ""
 	TEST_COMMAND               ""
+	BUILD_ALWAYS			   OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
+)
+
+# mpl library
+set(mpl_dir "@CMAKE_BINARY_DIR@/extern/mpl")
+ExternalProject_Add(mpl
+	URL	                       "@CMAKE_SOURCE_DIR@/extern/mpl-master.zip"
+    SOURCE_DIR                 "${mpl_dir}"
+    CONFIGURE_COMMAND          
+		${CMAKE_COMMAND} -S "${mpl_dir}" -B "${mpl_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${mpl_dir}/build
+    BUILD_COMMAND              "" 
+    INSTALL_COMMAND            
+		${CMAKE_COMMAND} --install "${mpl_dir}/build"
+    TEST_COMMAND               ""
+	BUILD_ALWAYS			   OFF
+    DOWNLOAD_EXTRACT_TIMESTAMP FALSE
+)
+
+set(robinhood_dir "@CMAKE_BINARY_DIR@/extern/robinhood")
+ExternalProject_Add(robinhood
+    URL                        "@CMAKE_SOURCE_DIR@/extern/robin-hood-hashing-master.zip"
+    SOURCE_DIR                 "${robinhood_dir}"
+    CONFIGURE_COMMAND          ""
+    BUILD_COMMAND              ""
+    INSTALL_COMMAND            ""
+    TEST_COMMAND               ""
+    BUILD_ALWAYS               OFF
+    DOWNLOAD_EXTRACT_TIMESTAMP OFF
 )

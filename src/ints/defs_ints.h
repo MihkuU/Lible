@@ -7,8 +7,10 @@ namespace Lible
 {
     namespace IntsDefs
     {
-        constexpr double bohr_to_ang = 0.5291772490; // Source: "https://www.unitconverters.net/length/bohr-radius-to-angstrom.htm"
-        constexpr double ang_to_bohr = 1.8897259886; // Source: "https://www.unitconverters.net/length/angstrom-to-bohr-radius.htm"
+        // constexpr double bohr_to_ang = 0.5291772490; // Source: "https://www.unitconverters.net/length/bohr-radius-to-angstrom.htm"
+        constexpr double bohr_to_ang = 0.5291772083; // Source: Molblock, testing
+        // constexpr double ang_to_bohr = 1.8897259886; // Source: "https://www.unitconverters.net/length/angstrom-to-bohr-radius.htm"
+        constexpr double ang_to_bohr = 1.0 / bohr_to_ang; // Source: Molblock, testing
 
         constexpr int max_angular_momentum = 6;
 
