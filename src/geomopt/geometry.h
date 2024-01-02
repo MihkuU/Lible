@@ -8,9 +8,9 @@
 
 #include "geomopt.h"
 
-namespace Lible
+namespace lible
 {
-    namespace GeomOpt
+    namespace geomopt
     {
         class Geometry
         {

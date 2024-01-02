@@ -1,8 +1,8 @@
-#include "gugaci.h"
-#include "gugaci_settings.h"
-#include "connections.h"
-#include "coupling_coeffs.h"
-#include "lible_util.h"
+#include <lible/guga_sci.h>
+#include <lible/gci_settings.h>
+#include <lible/connections.h>
+#include <lible/coupling_coeffs.h>
+#include <lible/util.h>
 
 #include <armadillo>
 #include <omp.h>
@@ -12,9 +12,9 @@
 // namespace mpi = boost::mpi;
 #endif
 
-using namespace Lible;
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
 using std::map;
 using std::pair;
@@ -23,7 +23,7 @@ using std::string;
 using std::tuple;
 using std::vector;
 
-vector<vector<double>> GCI::calcGuess(const vector<double> &diag)
+vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
 {
     size_t dim_wfn = wave_function->getNumCSFs();
 
@@ -121,7 +121,7 @@ vector<vector<double>> GCI::calcGuess(const vector<double> &diag)
         for (auto &item2 : item1.second.second)
         {
             string csf = item2.first;
-            string sf = Util::extractSF(csf);
+            string sf = extractSF(csf);
             size_t pos = sfs_map__sf_to_idx[nue][sf];
             cfg.insertCSF(pos, csf);
         }

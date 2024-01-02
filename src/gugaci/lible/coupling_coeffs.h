@@ -1,21 +1,21 @@
 #pragma once
 
-#include "gugaci.h"
-#include "gugaci_util.h"
-
 #include <map>
 #include <set>
 
-namespace Lible
+#include <lible/guga_sci.h>
+#include <lible/gci_util.h>
+
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
-        class GCI::CouplingCoeffs
+        class SCI::CouplingCoeffs
         {
         public:
-            CouplingCoeffs(GCI *gci_) : gci(gci_)
+            CouplingCoeffs(SCI *gci_) : sci(gci_)
             {
-                spin = gci->spin;
+                spin = sci->spin;
             }
 
             void constructCCs(const sf_pair_map_1el &sf_pairs_1el_new,
@@ -32,7 +32,7 @@ namespace Lible
                               std::map<quintet, cc_map> &ccs_dia);
 
         private:
-            GCI *gci;
+            SCI *sci;
             double spin;
 
             sf_pair_map_1el sf_pairs_1el;

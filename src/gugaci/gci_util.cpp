@@ -1,11 +1,11 @@
-#include "gugaci_util.h"
+#include <lible/gci_util.h>
 
 #include <stdexcept>
 
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
-namespace GU = Lible::GUGA::Util;
+namespace GU = lible::guga::util;
 
 using std::map;
 using std::set;
@@ -51,6 +51,20 @@ double GU::fNS(const int &nue, const double &spin)
 {
     return (tgamma(double(nue + 1)) / (tgamma(double(0.5 * nue - spin + 1)) * tgamma(double(0.5 * nue + spin + 1))) -
             tgamma(double(nue + 1)) / (tgamma(double(0.5 * nue - spin)) * tgamma(double(0.5 * nue + spin + 2))));
+}
+
+int GU::determineStepb(const char &d)
+{
+    if (d == '0')
+        return 0;
+    else if (d == '1')
+        return 1;
+    else if (d == '2')
+        return -1;
+    else if (d == '3')
+        return 0;
+    else
+        throw std::runtime_error("Error: wrong step value d!");
 }
 
 bool GU::determine1ElPhase(const int &p, const int &q, const string &cfg_right)
@@ -135,7 +149,7 @@ size_t GU::pqrs4DTo1D(const int &p, const int &q, const int &r, const int &s,
     return p * pow(n_orb, 3) + q * pow(n_orb, 2) + r * n_orb + s;
 }
 
-tuple<int, int> pq1DTo2D(const size_t &pq, const int &n_orbs)
+tuple<int, int> GU::pq1DTo2D(const size_t &pq, const int &n_orbs)
 {
     int p = pq / n_orbs;
     int q = pq % n_orbs;
@@ -143,7 +157,7 @@ tuple<int, int> pq1DTo2D(const size_t &pq, const int &n_orbs)
     return {p, q};
 }
 
-tuple<int, int, int, int> pqrs1DTo4D(const size_t &pqrs, const int &n_orbs)
+tuple<int, int, int, int> GU::pqrs1DTo4D(const size_t &pqrs, const int &n_orbs)
 {
     size_t x = pqrs;
     int p = x / pow(n_orbs, 3);

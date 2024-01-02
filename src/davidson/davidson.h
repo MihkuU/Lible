@@ -6,9 +6,9 @@
 
 #include "davidson_settings.h"
 
-namespace Lible
+namespace lible
 {
-    namespace Davidson
+    namespace davidson
     {
         std::pair<std::vector<double>, std::vector<std::vector<double>>>
         diagonalize(const size_t &n_roots,

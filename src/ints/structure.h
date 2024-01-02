@@ -4,9 +4,9 @@
 
 #include "shell.h"
 
-namespace Lible
+namespace lible
 {
-    namespace Ints
+    namespace ints
     {
         struct Structure
         {

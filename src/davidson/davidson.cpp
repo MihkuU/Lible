@@ -1,6 +1,6 @@
 #include "davidson.h"
 #include "davidson_settings.h"
-#include "lible_util.h"
+#include <lible/util.h>
 
 #include <armadillo>
 #include <fmt/core.h>
@@ -10,9 +10,9 @@
 #ifdef _USE_MPI_
 #endif
 
-namespace LD = Lible::Davidson;
+namespace LD = lible::davidson;
 
-using namespace Lible;
+using namespace lible;
 
 using std::function;
 using std::pair;
@@ -26,11 +26,11 @@ LD::diagonalize(const size_t &n_roots,
 {
     // TODO: decompose it nicely into functions.
     /*
-     * Implementation of the Davidson algorithm, based on Section 3.2.1 in
+     * Implementation of the davidson algorithm, based on Section 3.2.1 in
      * https://doi.org/10.1016/S0065-3276(08)60532-8.
      *
      */
-    palPrint(fmt::format("\n   Lible::Davidson diagonalization\n\n"));
+    palPrint(fmt::format("\n   lible::davidson diagonalization\n\n"));
 
     palPrint(fmt::format("      Calculating the diagonal...                             "));
     auto start{std::chrono::steady_clock::now()};
@@ -174,7 +174,7 @@ LD::diagonalize(const size_t &n_roots,
         if (converged)
             return std::make_pair(eigenvalues, eigenvectors);
 
-        // Davidson correction vector, apply the preconditioner
+        // davidson correction vector, apply the preconditioner
         vector<arma::dvec> delta_vectors(n_roots);
         for (size_t iroot = 0; iroot < n_roots; iroot++)
         {
@@ -243,7 +243,7 @@ LD::diagonalize(const size_t &n_roots,
         // palPrint(boost::format("  (%6.6lf s)\n") % (t2 - t1), silent);
     }
 
-    palPrint(fmt::format("\nLible::Davidson solver didn't converge in {:} iterations, aborting!\n",
+    palPrint(fmt::format("\nLible::davidson solver didn't converge in {:} iterations, aborting!\n",
                          Settings::getMaxIter()));
 
     // #ifdef _USE_MPI_

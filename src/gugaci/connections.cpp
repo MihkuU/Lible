@@ -1,17 +1,17 @@
-#include "connections.h"
-#include "lible_util.h"
+#include <lible/connections.h>
+#include <lible/util.h>
 
 #include <algorithm>
 #include <omp.h>
 
-using namespace Lible;
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
 using std::string;
 using std::vector;
 
-void GCI::Connections::constructConnections(const std::set<std::string> &cfgs_right,
+void SCI::Connections::constructConnections(const std::set<std::string> &cfgs_right,
                                             const wfn_ptr &wfn_left,
                                             const wfn_ptr &wfn_right,
                                             connection_map_1el &connections_1el,
@@ -25,8 +25,8 @@ void GCI::Connections::constructConnections(const std::set<std::string> &cfgs_ri
         connection_map_dia connections_dia_omp;
 
 #ifdef _USE_MPI_
-        // int rank_total = returnTotalRank(gci->world);
-        // int size_total = returnTotalSize(gci->world);
+        // int rank_total = returnTotalRank(sci->world);
+        // int size_total = returnTotalSize(sci->world);
         int rank_total;
         int size_total;        
 #else
@@ -103,7 +103,7 @@ void GCI::Connections::constructConnections(const std::set<std::string> &cfgs_ri
     }
 }
 
-void GCI::Connections::constructConnections_Epq(const int &icfg_right, const string &cfg_right,
+void SCI::Connections::constructConnections_Epq(const int &icfg_right, const string &cfg_right,
                                                 const wfn_ptr &wfn_left, connection_map_1el &connections_1el)
 {
     size_t nue_right = std::count(cfg_right.begin(), cfg_right.end(), '1');
@@ -190,7 +190,7 @@ void GCI::Connections::constructConnections_Epq(const int &icfg_right, const str
     }
 }
 
-void GCI::Connections::constructConnections_EpqEqp(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqEqp(const int &icfg_right, const std::string &cfg_right,
                                                    connection_map_dia &connections_dia)
 {
     size_t nue_right = std::count(cfg_right.begin(), cfg_right.end(), '1');
@@ -223,7 +223,7 @@ void GCI::Connections::constructConnections_EpqEqp(const int &icfg_right, const 
     }
 }
 
-void GCI::Connections::constructConnections_EpqEqr(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqEqr(const int &icfg_right, const std::string &cfg_right,
                                                    const std::string &operators, const wfn_ptr &wfn_left,
                                                    connection_map_2el &connections_2el)
 {
@@ -364,7 +364,7 @@ void GCI::Connections::constructConnections_EpqEqr(const int &icfg_right, const 
     }
 }
 
-void GCI::Connections::constructConnections_EpqErp(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqErp(const int &icfg_right, const std::string &cfg_right,
                                                    const std::string &operators, const wfn_ptr &wfn_left,
                                                    connection_map_2el &connections_2el)
 {
@@ -503,7 +503,7 @@ void GCI::Connections::constructConnections_EpqErp(const int &icfg_right, const 
     }
 }
 
-void GCI::Connections::constructConnections_EpqEpq(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqEpq(const int &icfg_right, const std::string &cfg_right,
                                                    const wfn_ptr &wfn_left, connection_map_2el &connections_2el)
 {
     size_t nue_right = std::count(cfg_right.begin(), cfg_right.end(), '1');
@@ -621,7 +621,7 @@ void GCI::Connections::constructConnections_EpqEpq(const int &icfg_right, const 
     }
 }
 
-void GCI::Connections::constructConnections_EpqEpr(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqEpr(const int &icfg_right, const std::string &cfg_right,
                                                    const std::string &operators, const wfn_ptr &wfn_left,
                                                    connection_map_2el &connections_2el)
 {
@@ -747,7 +747,7 @@ void GCI::Connections::constructConnections_EpqEpr(const int &icfg_right, const 
     }
 }
 
-void GCI::Connections::constructConnections_EpqErq(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqErq(const int &icfg_right, const std::string &cfg_right,
                                                    const std::string &operators, const wfn_ptr &wfn_left,
                                                    connection_map_2el &connections_2el)
 {
@@ -874,7 +874,7 @@ void GCI::Connections::constructConnections_EpqErq(const int &icfg_right, const 
     }
 }
 
-void GCI::Connections::constructConnections_EpqErs(const int &icfg_right, const std::string &cfg_right,
+void SCI::Connections::constructConnections_EpqErs(const int &icfg_right, const std::string &cfg_right,
                                                    const std::string &operators, const wfn_ptr &wfn_left,
                                                    connection_map_2el &connections_2el)
 {

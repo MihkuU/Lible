@@ -3,12 +3,12 @@
 #include <string>
 #include <vector>
 
-#include "configuration.h"
-#include "configurationtree.h"
+#include <lible/configuration.h>
+#include <lible/configurationtree.h>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
         class WaveFunction : public CFGTree
         {

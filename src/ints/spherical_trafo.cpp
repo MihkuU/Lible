@@ -3,7 +3,7 @@
 #include "defs_ints.h"
 #include "spherical_trafo.h"
 
-using namespace Lible;
+using namespace lible;
 
 template <>
 void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::FIRST>(const Shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,

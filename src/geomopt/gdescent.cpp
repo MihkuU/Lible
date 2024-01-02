@@ -1,6 +1,6 @@
 #include "geomopt_impl.h"
 
-namespace LG = Lible::GeomOpt;
+namespace LG = lible::geomopt;
 using namespace LG;
 
 using std::vector;

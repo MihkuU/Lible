@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-namespace Lible
+namespace lible
 {
     namespace IntsDefs
     {

@@ -7,15 +7,15 @@
 #include <tuple>
 #include <vector>
 
-#include "configuration.h"
-#include "wave_function.h"
+#include <lible/configuration.h>
+#include <lible/wave_function.h>
 
 #include <armadillo>
 #include <robin_hood.h>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
         using nonet = std::tuple<int, int, int, int, int, int, int, int, int>;
         using quintet = std::tuple<int, int, int, int, int>;
@@ -70,7 +70,7 @@ namespace Lible
             SV
         };
 
-        namespace Util
+        namespace util
         {
             double A(const int &b, const int &x, const int &y);
             double C(const int &b, const int &x);

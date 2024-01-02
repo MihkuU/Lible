@@ -1,19 +1,19 @@
-#include "gugaci.h"
-#include "lible_util.h"
+#include <lible/guga_sci.h>
+#include <lible/util.h>
 
 #ifdef _USE_MPI_
 // #include <boost/mpi.hpp>
 // namespace mpi = boost::mpi;
 #endif
 
-using namespace Lible;
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
 using std::string;
 using std::vector;
 
-vector<double> GCI::calcCCXDiag(const int &p, const int &q, const CFG *cfg)
+vector<double> SCI::calcCCXDiag(const int &p, const int &q, const CFG *cfg)
 {
     vector<double> ccx(cfg->getNumCSFs(), 0);
 
@@ -94,7 +94,7 @@ vector<double> GCI::calcCCXDiag(const int &p, const int &q, const CFG *cfg)
     return ccx;
 }
 
-vector<double> GCI::calcDiag()
+vector<double> SCI::calcDiag()
 {
     arma::dvec diag(wave_function->getNumCSFs(), arma::fill::zeros);
 
@@ -192,7 +192,7 @@ vector<double> GCI::calcDiag()
     return arma::conv_to<vector<double>>::from(diag);
 }
 
-vector<double> GCI::calcDiag(const WaveFunction *wave_function)
+vector<double> SCI::calcDiag(const WaveFunction *wave_function)
 {
     vector<double> diag(wave_function->getNumCSFs(), 0);
 

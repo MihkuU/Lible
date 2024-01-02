@@ -1,10 +1,10 @@
-#include "coupling_coeffs.h"
+#include <lible/coupling_coeffs.h>
 
 #include <armadillo>
 #include <omp.h>
 
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
 using std::map;
 using std::pair;
@@ -12,7 +12,7 @@ using std::set;
 using std::string;
 using std::vector;
 
-void GCI::CouplingCoeffs::constructCCs(const sf_pair_map_1el &sf_pairs_1el_new,
+void SCI::CouplingCoeffs::constructCCs(const sf_pair_map_1el &sf_pairs_1el_new,
                                        const sf_pair_map_2el &sf_pairs_2el_new,
                                        std::map<nonet, cc_map> &ccs_2el,
                                        std::map<quintet, cc_map> &ccs_1el)
@@ -104,7 +104,7 @@ void GCI::CouplingCoeffs::constructCCs(const sf_pair_map_1el &sf_pairs_1el_new,
     }
 }
 
-void GCI::CouplingCoeffs::constructCCs(const connection_map_1el &connections_1el_new,
+void SCI::CouplingCoeffs::constructCCs(const connection_map_1el &connections_1el_new,
                                        const connection_map_2el &connections_2el_new,
                                        const connection_map_dia &connections_dia_new,
                                        const wfn_ptr &wave_function,
@@ -251,7 +251,7 @@ void GCI::CouplingCoeffs::constructCCs(const connection_map_1el &connections_1el
     }
 }
 
-sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial,
+sfs_pair_t SCI::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial,
                                                 const sf_pair_map_1el &sf_pairs_1el,
                                                 const quintet &key)
 {
@@ -271,7 +271,7 @@ sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial
     return sfs_pair_new;
 }
 
-sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial,
+sfs_pair_t SCI::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial,
                                                 const sf_pair_map_2el &sf_pairs_2el,
                                                 const nonet &key)
 {
@@ -291,7 +291,7 @@ sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial
     return sfs_pair_new;
 }
 
-sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const connection_list_1el &connections,
+sfs_pair_t SCI::CouplingCoeffs::returnNewSFPair(const connection_list_1el &connections,
                                                 const sf_pair_map_1el &sf_pairs_1el,
                                                 const quintet &key,
                                                 const wfn_ptr &wave_function)
@@ -327,7 +327,7 @@ sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const connection_list_1el &conne
     return sfs_pair_new;
 }
 
-sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const connection_list_2el &connections,
+sfs_pair_t SCI::CouplingCoeffs::returnNewSFPair(const connection_list_2el &connections,
                                                 const sf_pair_map_2el &sf_pairs_2el,
                                                 const nonet &key,
                                                 const wfn_ptr &wave_function)
@@ -363,7 +363,7 @@ sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const connection_list_2el &conne
     return sfs_pair_new;
 }
 
-sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const connection_list_dia &connections,
+sfs_pair_t SCI::CouplingCoeffs::returnNewSFPair(const connection_list_dia &connections,
                                                 const sf_pair_map_1el &sf_pairs_dia,
                                                 const quintet &key,
                                                 const wfn_ptr &wave_function)
@@ -398,7 +398,7 @@ sfs_pair_t GCI::CouplingCoeffs::returnNewSFPair(const connection_list_dia &conne
     return sfs_pair_new;
 }
 
-sfs_pair_t GCI::CouplingCoeffs::returnSFPair(const set<int> &sfs_left,
+sfs_pair_t SCI::CouplingCoeffs::returnSFPair(const set<int> &sfs_left,
                                              const set<int> &sfs_right)
 {
     sfs_pair_t sfs_pair;
@@ -407,7 +407,7 @@ sfs_pair_t GCI::CouplingCoeffs::returnSFPair(const set<int> &sfs_left,
     return sfs_pair;
 }
 
-proto_1el_tuple GCI::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair_t &sfs_pair,
+proto_1el_tuple SCI::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair_t &sfs_pair,
                                                             const quintet &key)
 {
     proto_1el_tuple cfg_prototypes;
@@ -420,11 +420,11 @@ proto_1el_tuple GCI::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair_t &sf
 
     vector<string> sfs_left;
     for (const int &sf_idx : sfs_pair.first)
-        sfs_left.push_back(gci->sfs_map__idx_to_sf.at(nue_left).at(sf_idx));
+        sfs_left.push_back(sci->sfs_map__idx_to_sf.at(nue_left).at(sf_idx));
 
     vector<string> sfs_right;
     for (const int &sf_idx : sfs_pair.second)
-        sfs_right.push_back(gci->sfs_map__idx_to_sf.at(nue_right).at(sf_idx));
+        sfs_right.push_back(sci->sfs_map__idx_to_sf.at(nue_right).at(sf_idx));
 
     int norb, p, q;
     if (exctype == ExcType::DS)
@@ -510,7 +510,7 @@ proto_1el_tuple GCI::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair_t &sf
         throw std::runtime_error("\nError: Wrong  exctype!");
 }
 
-proto_2el_tuple GCI::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair_t &sfs_pair,
+proto_2el_tuple SCI::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair_t &sfs_pair,
                                                             const nonet &key)
 {
     proto_2el_tuple cfg_prototypes;
@@ -536,9 +536,9 @@ proto_2el_tuple GCI::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair_t &sf
     vector<string> sfs_left;
     vector<string> sfs_right;
     for (const size_t &sf_idx : sfs_pair.first)
-        sfs_left.push_back(gci->sfs_map__idx_to_sf.at(nue_left).at(sf_idx));
+        sfs_left.push_back(sci->sfs_map__idx_to_sf.at(nue_left).at(sf_idx));
     for (const size_t &sf_idx : sfs_pair.second)
-        sfs_right.push_back(gci->sfs_map__idx_to_sf.at(nue_right).at(sf_idx));
+        sfs_right.push_back(sci->sfs_map__idx_to_sf.at(nue_right).at(sf_idx));
 
     int norb, p, q;
     // <RI|Ers|right>
@@ -713,7 +713,7 @@ proto_2el_tuple GCI::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair_t &sf
                            std::move(cfg_ri_right), std::move(cfg_right));
 }
 
-proto_1el_tuple GCI::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair_t &sfs_pair,
+proto_1el_tuple SCI::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair_t &sfs_pair,
                                                             const quintet &key)
 {
     proto_1el_tuple cfg_prototypes;
@@ -726,7 +726,7 @@ proto_1el_tuple GCI::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair_t &sf
 
     vector<string> sfs_right;
     for (const size_t &sf_idx : sfs_pair.second)
-        sfs_right.push_back(gci->sfs_map__idx_to_sf[nue_right][sf_idx]);
+        sfs_right.push_back(sci->sfs_map__idx_to_sf[nue_right][sf_idx]);
 
     int norb, p, q;
     if (exctype == ExcType::DS)
@@ -821,7 +821,7 @@ proto_1el_tuple GCI::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair_t &sf
         throw std::runtime_error("Error: Wrong exctype!");
 }
 
-void GCI::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
+void SCI::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
                                      const proto_1el_tuple &cfg_prototypes,
                                      const quintet &key,
                                      std::map<quintet, cc_map> &ccs_1el)
@@ -853,7 +853,7 @@ void GCI::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
     }
 }
 
-void GCI::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
+void SCI::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
                                      const proto_2el_tuple &cfg_prototypes,
                                      const nonet &key,
                                      std::map<nonet, cc_map> &ccs_2el)
@@ -961,7 +961,7 @@ void GCI::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
     }
 }
 
-void GCI::CouplingCoeffs::calcCCsDia(const sfs_pair_t &sfs_pair,
+void SCI::CouplingCoeffs::calcCCsDia(const sfs_pair_t &sfs_pair,
                                      const proto_1el_tuple &cfg_prototypes,
                                      const quintet &key,
                                      std::map<quintet, cc_map> &ccs_dia)

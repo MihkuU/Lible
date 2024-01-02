@@ -7,7 +7,7 @@
 #include "geometry.h"
 #include <fmt/core.h>
 
-using namespace Lible::GeomOpt;
+using namespace lible::geomopt;
 using std::pair;
 using std::size_t;
 using std::string;
@@ -19,7 +19,7 @@ Geometry::Geometry(const vector<double> &coords_cart_, const vector<string> &ato
     assert((coords_cart.size() / 3 == atoms.size()));
 
     for (const string &atom : atoms)
-        if (!GeomOptDefs::atomic_numbers.contains(atom))
+        if (!geomoptdefs::atomic_numbers.contains(atom))
             throw std::runtime_error(fmt::format("Undefined element {}!", atom));
 
     n_atoms = atoms.size();
@@ -189,7 +189,7 @@ vector<vector<size_t>> Geometry::findAtomBondingPartners(const vector<dvec3> &at
 {
     vector<double> covalent_radii(n_atoms);
     for (size_t matom = 0; matom < n_atoms; matom++)
-        covalent_radii[matom] = GeomOptDefs::covalent_radii.at(atoms[matom]);
+        covalent_radii[matom] = geomoptdefs::covalent_radii.at(atoms[matom]);
 
     vector<vector<size_t>> atom_bonding_partners(n_atoms);
     for (size_t matom = 0; matom < n_atoms; matom++)
@@ -201,7 +201,7 @@ vector<vector<size_t>> Geometry::findAtomBondingPartners(const vector<dvec3> &at
                 continue; 
 
             double sum_cov_radii = covalent_radii[matom] + covalent_radii[natom];
-            double bonding_distance = GeomOptDefs::bonding_factor * sum_cov_radii;
+            double bonding_distance = geomoptdefs::bonding_factor * sum_cov_radii;
             double distance = calcDistance(matom, natom, atom_coords_cart);
             if (distance < bonding_distance)
                 bonding_partners.push_back(natom);

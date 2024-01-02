@@ -4,9 +4,9 @@
 #include "geometry.h"
 #include <vector>
 
-namespace Lible
+namespace lible
 {
-    namespace GeomOpt
+    namespace geomopt
     {
         double calcGradNorm(const std::vector<double> &grad);
 

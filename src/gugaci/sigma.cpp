@@ -1,18 +1,18 @@
-#include "gugaci.h"
-#include "lible_util.h"
+#include <lible/guga_sci.h>
+#include <lible/util.h>
 
 #ifdef _USE_MPI_
 #include <mpl/mpl.hpp>
 #endif
 
-using namespace Lible;
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
 using std::string;
 using std::vector;
 
-vector<double> GCI::calcSigma(const vector<double> &trial)
+vector<double> SCI::calcSigma(const vector<double> &trial)
 {
     arma::dvec sigma(trial.size(), arma::fill::zeros);
 
@@ -242,7 +242,7 @@ vector<double> GCI::calcSigma(const vector<double> &trial)
     return arma::conv_to<vector<double>>::from(sigma);
 }
 
-vector<double> GCI::calcSigma(const vector<double> &aux_1el_ints,
+vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
                               const vector<double> &aux_2el_ints,
                               const vector<double> &trial)
 {
@@ -493,7 +493,7 @@ vector<double> GCI::calcSigma(const vector<double> &aux_1el_ints,
     return arma::conv_to<vector<double>>::from(sigma);
 }
 
-vector<double> GCI::calcSigma(const DataFOIS &data_fois,
+vector<double> SCI::calcSigma(const DataFOIS &data_fois,
                               const std::vector<double> &ci_vector,
                               const WaveFunction *wfn_cipsi)
 {

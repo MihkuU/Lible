@@ -1,11 +1,39 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-add_subdirectory(davidson)
-add_subdirectory(geomopt)
-add_subdirectory(gugasci)
-add_subdirectory(ints)
-add_subdirectory(util)
+file(GLOB util_sources "util/*.cpp")
+target_sources(lible PRIVATE ${util_sources})
+target_include_directories(lible PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/util>
+	$<INSTALL_INTERFACE:include>
+)
 
-target_include_directories(le PUBLIC util)
-#target_include_directories(le PUBLIC davidson)
-target_include_directories(le PRIVATE davidson)
+file(GLOB davidson_sources "davidson/*.cpp")
+target_sources(lible PRIVATE ${davidson_sources})
+target_include_directories(lible PUBLIC 
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/davidson>
+	$<INSTALL_INTERFACE:include>
+)
+
+file(GLOB geomopt_sources "geomopt/*.cpp")
+target_sources(lible PRIVATE ${geomopt_sources})
+target_include_directories(lible PUBLIC 
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/geomopt>
+	$<INSTALL_INTERFACE:include>
+)
+
+file(GLOB gugaci_sources "gugaci/*.cpp")
+target_sources(lible PRIVATE ${gugaci_sources})
+target_include_directories(lible PUBLIC 
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gugaci>
+	$<INSTALL_INTERFACE:include>
+)
+
+file(GLOB ints_sources "ints/*.cpp")
+target_sources(lible PRIVATE ${ints_sources})
+target_include_directories(lible PUBLIC 
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ints>
+	$<INSTALL_INTERFACE:include>
+)
+
+#target_sources(le PRIVATE experimental/overlap_ints_gpu.cpp)
+#target_sources(le PRIVATE experimental/structure_gpu.cpp)

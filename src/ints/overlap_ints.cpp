@@ -2,8 +2,8 @@
 #include "ints.h"
 #include "spherical_trafo.h"
 
-using namespace Lible;
-using namespace Lible::Ints;
+using namespace lible;
+using namespace lible::ints;
 
 using std::array;
 using std::size_t;
@@ -15,7 +15,7 @@ Vec2D<double> calcOverlap(const Structure &Structure)
 }
 
 // template <>
-// void Kernels1El::oneElIntKernel<Ints::OVERLAP>(const int &la,
+// void Kernels1El::oneElIntKernel<ints::OVERLAP>(const int &la,
 //                                                const int &lb,
 //                                                const size_t &n_ao,
 //                                                const vector<Shells::ShellPair> &shell_pairs,

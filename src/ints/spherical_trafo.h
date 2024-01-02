@@ -4,7 +4,7 @@
 
 #include "shell.h"
 
-namespace Lible
+namespace lible
 {
     typedef std::tuple<std::size_t, std::size_t, double> trafo_coeff_tuple; // TODO is this place appropriate??
 

@@ -4,9 +4,9 @@
 #include <cassert>
 #include <vector>
 
-namespace Lible
+namespace lible
 {
-    namespace IntsUtil
+    namespace IntsUtil // TODO: rename
     {
         inline double doubleFactorial(const int &n)
         {

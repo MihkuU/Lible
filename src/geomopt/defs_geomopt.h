@@ -4,9 +4,9 @@
 #include <vector>
 #include <string>
 
-namespace Lible
+namespace lible
 {
-    namespace GeomOptDefs // TODO nest it inside GeomOpt???
+    namespace geomoptdefs // TODO nest it inside geomopt???
     {
         constexpr int n_print_chars = 80;
         constexpr double bonding_factor = 1.3;

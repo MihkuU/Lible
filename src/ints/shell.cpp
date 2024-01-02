@@ -2,7 +2,7 @@
 #include "shell.h"
 #include "spherical_trafo.h"
 
-using namespace Lible;
+using namespace lible;
 using std::array;
 using std::size_t;
 using std::vector;

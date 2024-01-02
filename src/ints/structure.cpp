@@ -12,8 +12,8 @@
 
 namespace fs = std::filesystem;
 
-using namespace Lible;
-using namespace Lible::Ints;
+using namespace lible;
+using namespace lible::ints;
 
 using std::array;
 using std::string;
@@ -121,7 +121,7 @@ vector<Shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
     return shells;
 }
 
-void Ints::Structure::readBasis(const string &basis_set)
+void ints::Structure::readBasis(const string &basis_set)
 {
     string basis_path = returnBasisPath(basis_set);
     vector<Shells::Shell> shells_vec = parseBasisJSONFile(basis_path);

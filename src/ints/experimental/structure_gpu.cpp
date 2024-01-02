@@ -1,8 +1,8 @@
 #include <hip/hip_runtime.h>
 #include "structure_gpu.h"
 
-using namespace Lible;
-using namespace Lible::Ints;
+using namespace lible;
+using namespace lible::ints;
 
 using std::vector;
 

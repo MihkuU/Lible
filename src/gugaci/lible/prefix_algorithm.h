@@ -6,29 +6,29 @@
 #include <utility>
 #include <vector>
 
-#include "gugaci.h"
-#include "gugaci_util.h"
+#include <lible/guga_sci.h>
+#include <lible/guga_sci.h>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
-        class GCI::PrefixAlgorithm
+        class SCI::PrefixAlgorithm
         {
         public:
             /*
              * Wrapper struct for hiding the ugly details of the prefix algorithm.
              */
-            PrefixAlgorithm(GCI *gci_) : gci(gci_)
+            PrefixAlgorithm(SCI *sci_) : sci(sci_)
             {
-                spin = gci->spin;
-                min_nue = gci->min_nue;
-                n_orbs = gci->n_orbs;
+                spin = sci->spin;
+                min_nue = sci->min_nue;
+                n_orbs = sci->n_orbs;
 
-                int n_doubly_occ = (gci->n_els - min_nue) / 2;
+                int n_doubly_occ = (sci->n_els - min_nue) / 2;
                 prefix_size = min_nue + n_doubly_occ;
 
-                constructSortedIntegralLists(gci->one_el_ints, gci->two_el_ints,
+                constructSortedIntegralLists(sci->one_el_ints, sci->two_el_ints,
                                              max_abs_1el_element, max_abs_2el_element);
             }
 
@@ -51,7 +51,7 @@ namespace Lible
             using ints_22_map = std::map<std::pair<int, int>, std::vector<std::tuple<int, int, double>>>;
             using ints_31_map = std::map<std::tuple<int, int, int>, std::vector<std::tuple<int, double>>>;
 
-            GCI *gci;
+            SCI *sci;
 
             double max_abs_1el_element;
             double max_abs_2el_element;

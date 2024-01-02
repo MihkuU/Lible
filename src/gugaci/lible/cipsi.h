@@ -2,19 +2,19 @@
 
 #include <armadillo>
 
-#include "gugaci.h"
+#include <lible/guga_sci.h>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
-        class GCI::CIPSI
+        class SCI::CIPSI
         {
         public:
-            CIPSI(GCI *gci_) : gci(gci_)
+            CIPSI(SCI *gci_) : sci(gci_)
             {
-                spin = gci->spin;
-                n_roots = gci->n_roots;
+                spin = sci->spin;
+                n_roots = sci->n_roots;
             }
 
             std::set<std::string> selectCFGsAndCSFs(wfn_ptr &wave_function);
@@ -35,7 +35,7 @@ namespace Lible
             }
 
         private:
-            GCI *gci;
+            SCI *sci;
             double spin;
             int n_roots;
             size_t n_csfs_new;

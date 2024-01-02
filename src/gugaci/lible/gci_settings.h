@@ -2,9 +2,9 @@
 
 #include <string>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
         class Settings
         {

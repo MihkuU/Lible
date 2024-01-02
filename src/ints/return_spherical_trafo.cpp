@@ -1,6 +1,6 @@
 #include "spherical_trafo.h"
 
-using namespace Lible;
+using namespace lible;
 
 typedef std::tuple<std::size_t, std::size_t, double> trafo_coeff_tuple;
 

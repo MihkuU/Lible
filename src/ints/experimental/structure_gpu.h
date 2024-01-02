@@ -2,9 +2,9 @@
 
 #include "../structure.h"
 
-namespace Lible
+namespace lible
 {
-    namespace Ints
+    namespace ints
     {
         namespace GPUShells
         {

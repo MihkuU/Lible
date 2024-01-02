@@ -1,8 +1,8 @@
-#include "configuration.h"
+#include <lible/configuration.h>
 
 #include <stdexcept>
 
-using namespace Lible::GUGA;
+using namespace lible::guga;
 
 using std::array;
 using std::map;

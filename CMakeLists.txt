@@ -12,18 +12,18 @@ if(NOT((CMAKE_BUILD_TYPE STREQUAL "Debug") OR (CMAKE_BUILD_TYPE STREQUAL "Releas
 endif()
 
 # TODO: compile which submodule of the library.
-option(BUILD_GEOMOPT "" ON)
-option(BUILD_INTS    "" ON)
-option(BUILD_GPUINTS "" OFF)
+### options
+option(BUILD_DAVIDSON "" ON)
+option(BUILD_GEOMOPT  "" ON)
+option(BUILD_GUGASCI  "" ON)
+option(BUILD_INTS     "" ON)
+option(BUILD_GPUINTS  "" OFF)
 
 option(USE_MPI "" ON)
 
 if(USE_MPI)
 	find_package(MPI REQUIRED)
-	#set(CMAKE_CXX_COMPILER mpic++)
-	#execute_process(COMMAND which mpic++ OUTPUT_VARIABLE FOO)
-	#set(CMAKE_CXX_COMPILER "${FOO}")
-	set(CMAKE_CXX_COMPILER /home/alastor/libs/openmpi-4.1.1/build/bin/mpic++)
+	set(CMAKE_CXX_COMPILER mpic++)
 	add_definitions(-D_USE_MPI_)
 endif()
 
@@ -33,21 +33,41 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #set(CMAKE_CXX_COMPILER "hipcc") # TODO: use hipcc only if "ints"-module is built
 #set(CMAKE_CXX_COMPILER mpic++)
 
-add_library(le SHARED) # lib-prefix will be prepended
+### the main target
+add_library(lible SHARED)
+set_target_properties(lible PROPERTIES PREFIX "")
+
 add_subdirectory(extern)
 add_subdirectory(src)
+
+find_package(OpenMP REQUIRED)
+target_link_libraries(lible PUBLIC ${OpenMP_CXX_LIBRARIES})
 
 # miscellaneous
 add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
 
+### installation
+set(lible_public_headers "src/util/lible/util.h")
+list(APPEND lible_public_headers "src/util/lible/types.h")
+list(APPEND lible_public_headers "src/gugaci/lible/gci.h")
 
-# installation
+set_target_properties(lible PROPERTIES
+	PUBLIC_HEADER "${lible_public_headers}"
+)
+
 include(GNUInstallDirs)
-message("CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
-message("CMAKE_INSTALL_INCLUDEDIR = ${CMAKE_INSTALL_INCLUDEDIR}/lible")
-install(TARGETS le DESTINATION "${CMAKE_INSTALL_LIBDIR}/lible")
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/include/lible.h"
-		DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lible")
+install(TARGETS lible
+	EXPORT LibleTargets
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible
+)
 
-get_target_property(LE_PUBLIC_HEADERS le INTERFACE_SOURCES)
-message("LE_PUBLIC_HEADERS: ${LE_PUBLIC_HEADERS}")
+install(EXPORT LibleTargets
+	FILE LibleTargets.cmake
+	NAMESPACE Lible::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible
+)
+
+install(FILES "src/LibleConfig.cmake"
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible
+)

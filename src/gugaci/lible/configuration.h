@@ -4,11 +4,11 @@
 #include <set>
 #include <vector>
 
-#include "csftree.h"
+#include <lible/csftree.h>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
         class CFG : public CSFTree
         {

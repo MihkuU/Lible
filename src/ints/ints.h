@@ -6,12 +6,12 @@
 #include <tuple>
 #include <vector>
 
-#include "lible_types.h"
+#include <lible/types.h>
 #include "structure.h"
 
-namespace Lible
+namespace lible
 {
-    namespace Ints
+    namespace ints
     {
         Vec2D<double> overlap(const Structure &structure);
 
@@ -34,10 +34,10 @@ namespace Lible
     }
 
 
-    // class Ints
+    // class ints
     // {
     // public:
-    // Ints(const std::string &basis_set, const std::vector<double> &coordinates_ang,
+    // ints(const std::string &basis_set, const std::vector<double> &coordinates_ang,
     //      const std::vector<std::string> &elements);
 
     // enum Option1El

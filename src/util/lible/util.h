@@ -13,7 +13,7 @@
 #include <mpl/mpl.hpp>
 #endif
 
-namespace Lible
+namespace lible
 {
 
 #ifdef _USE_MPI_

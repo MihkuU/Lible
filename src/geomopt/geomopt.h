@@ -6,9 +6,9 @@
 #include <tuple>
 #include <vector>
 
-namespace Lible
+namespace lible
 {
-    namespace GeomOpt
+    namespace geomopt
     {
         enum Option
         {

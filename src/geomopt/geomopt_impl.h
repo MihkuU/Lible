@@ -4,9 +4,9 @@
 #include "geometry.h"
 #include "geomopt_utils.h"
 
-namespace Lible
+namespace lible
 {
-    namespace GeomOpt
+    namespace geomopt
     {
         template <>
         struct Optimizer<BFGS>

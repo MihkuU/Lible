@@ -1,19 +1,20 @@
-#include "cipsi.h"
-#include "connections.h"
-#include "coupling_coeffs.h"
-#include "prefix_algorithm.h"
-#include "gugaci.h"
+#include <lible/cipsi.h>
+#include <lible/connections.h>
+#include <lible/coupling_coeffs.h>
+#include <lible/prefix_algorithm.h>
 
-#include "davidson.h"
-#include "lible_util.h"
+#include <lible/guga_sci.h>
+
+#include <davidson.h>
+#include <lible/util.h>
 
 #include <chrono>
 
 #include <fmt/core.h>
 
-using namespace Lible;
-using namespace Lible::GUGA;
-using namespace Lible::GUGA::Util;
+using namespace lible;
+using namespace lible::guga;
+using namespace lible::guga::util;
 
 using std::map;
 using std::set;
@@ -21,7 +22,7 @@ using std::string;
 using std::unordered_map;
 using std::vector;
 
-GCI::GCI(const int &n_orbs_, const int &n_els_,
+SCI::SCI(const int &n_orbs_, const int &n_els_,
          const int &n_roots_, const int &multiplicity_,
          const vector<double> &one_el_ints_,
          const vector<double> &two_el_ints_)
@@ -33,24 +34,15 @@ GCI::GCI(const int &n_orbs_, const int &n_els_,
     min_nue = 2 * spin;
 }
 
-#ifdef _USE_MPI_
-GCI::GCI(MPI_Comm world_,
-         const int &n_orbs_, const int &n_els_,
-         const int &n_roots_, const int &multiplicity_,
-         const vector<double> &one_el_ints_,
-         const vector<double> &two_el_ints_)
-    : n_orbs(n_orbs_), n_els(n_els_),
-      n_roots(n_roots_), multiplicity(multiplicity_),
-      one_el_ints(one_el_ints_), two_el_ints(two_el_ints_)
-{
-    outworld = world_;
-}
-#endif
+SCI::~SCI() = default;
 
-void GCI::run(vector<double> &ci_energies_out,
+SCI::SCI(SCI &&) noexcept = default;
+SCI &SCI::operator=(SCI &&) noexcept = default;
+
+void SCI::run(vector<double> &ci_energies_out,
               vector<vector<double>> &ci_vectors_out)
 {
-    palPrint("\nLible::GUGA-SCI calculation\n\n");
+    palPrint("\nLible::guga-SCI calculation\n\n");
 
     palPrint("   Starting from the HF-configuration... \n");
 
@@ -73,14 +65,14 @@ void GCI::run(vector<double> &ci_energies_out,
     }
 #endif
 
-    palPrint("\nLible::GUGA-SCI finished\n");
+    palPrint("\nLible::guga-SCI finished\n");
 }
 
-void GCI::runFromCFGs(const vector<string> &cfgs,
+void SCI::runFromCFGs(const vector<string> &cfgs,
                       vector<double> &ci_energies_out,
                       vector<vector<double>> &ci_vectors_out)
 {
-    palPrint("\nLible::GUGA-SCI calculation\n\n");
+    palPrint("\nLible::guga-SCI calculation\n\n");
 
     palPrint("   Starting from the given CFGs... \n");
     palPrint("      All CSFs per CFG will be created\n");
@@ -101,14 +93,14 @@ void GCI::runFromCFGs(const vector<string> &cfgs,
     }
 #endif
 
-    palPrint("\nLible::GUGA-SCI finished\n");
+    palPrint("\nLible::guga-SCI finished\n");
 }
 
-void GCI::runFromCSFs(const vector<string> &csfs,
+void SCI::runFromCSFs(const vector<string> &csfs,
                       vector<double> &ci_energies_out,
                       vector<vector<double>> &ci_vectors_out)
 {
-    palPrint("\nLible::GUGA-SCI calculation\n\n");
+    palPrint("\nLible::guga-SCI calculation\n\n");
 
     palPrint("   Starting from the given CSFs... \n");
 
@@ -128,14 +120,14 @@ void GCI::runFromCSFs(const vector<string> &csfs,
     }
 #endif
 
-    palPrint("\nLible::GUGA-SCI finished\n");
+    palPrint("\nLible::guga-SCI finished\n");
 }
 
-void GCI::runFromCFGsFile(const string &cfgs_fname,
+void SCI::runFromCFGsFile(const string &cfgs_fname,
                           vector<double> &ci_energies_out,
                           vector<vector<double>> &ci_vectors_out)
 {
-    palPrint("\nLible::GUGA-SCI calculation\n\n");
+    palPrint("\nLible::guga-SCI calculation\n\n");
 
     palPrint(fmt::format("   Reading starting CFGs from a file: {}\n", cfgs_fname));
 
@@ -155,14 +147,14 @@ void GCI::runFromCFGsFile(const string &cfgs_fname,
     }
 #endif
 
-    palPrint("\nLible::GUGA-SCI finished\n");
+    palPrint("\nLible::guga-SCI finished\n");
 }
 
-void GCI::runFromCSFsFile(const string &csfs_fname,
+void SCI::runFromCSFsFile(const string &csfs_fname,
                           vector<double> &ci_energies_out,
                           vector<vector<double>> &ci_vectors_out)
 {
-    palPrint("\nLible::GUGA-SCI calculation\n\n");
+    palPrint("\nLible::guga-SCI calculation\n\n");
 
     palPrint(fmt::format("   Readinf starting CSFs from a file: {}\n", csfs_fname));
 
@@ -182,11 +174,11 @@ void GCI::runFromCSFsFile(const string &csfs_fname,
     }
 #endif
 
-    palPrint("\nLible::GUGA-SCI finished\n");
+    palPrint("\nLible::guga-SCI finished\n");
 }
 
 vector<unordered_map<string, double>>
-GCI::mapPreviousCIVector(const vector<vector<double>> &ci_vectors)
+SCI::mapPreviousCIVector(const vector<vector<double>> &ci_vectors)
 {
     vector<unordered_map<string, double>> previous_ci_coeffs_map(n_roots);
     for (size_t iroot = 0; iroot < n_roots; iroot++)
@@ -208,7 +200,7 @@ GCI::mapPreviousCIVector(const vector<vector<double>> &ci_vectors)
     return previous_ci_coeffs_map;
 }
 
-void GCI::createHFConf(set<string> &cfgs_new,
+void SCI::createHFConf(set<string> &cfgs_new,
                        wfn_ptr &wave_function,
                        map<int, set<string>> &sfs,
                        map<int, map<int, string>> &sfs_map__idx_to_sf,
@@ -243,7 +235,7 @@ void GCI::createHFConf(set<string> &cfgs_new,
     wave_function->insertCFG(cfg);
 }
 
-void GCI::createAllSFs(const int &nue_max,
+void SCI::createAllSFs(const int &nue_max,
                        map<int, set<string>> &sfs,
                        map<int, map<int, string>> &sfs_map__idx_to_sf,
                        map<int, map<string, int>> &sfs_map__sf_to_idx)
@@ -282,7 +274,7 @@ void GCI::createAllSFs(const int &nue_max,
     }
 }
 
-void GCI::createAllSFsRecursive(const int &nue, char step,
+void SCI::createAllSFsRecursive(const int &nue, char step,
                                 double s, int i, string sf,
                                 map<int, set<string>> &sfs)
 {
@@ -304,7 +296,7 @@ void GCI::createAllSFsRecursive(const int &nue, char step,
     }
 }
 
-void GCI::runKernel(vector<double> &ci_energies,
+void SCI::runKernel(vector<double> &ci_energies,
                     vector<vector<double>> &ci_vectors,
                     vector<vector<double>> &energies_per_iter,
                     vector<unordered_map<string, double>> &previous_ci_coeffs_map)
@@ -323,7 +315,7 @@ void GCI::runKernel(vector<double> &ci_energies,
 
     for (iter_sci = 1; iter_sci <= Settings::getMaxIter(); iter_sci++)
     {
-        palPrint(fmt::format("\n============================|  GCI iteration %3d  |============================\n", iter_sci));
+        palPrint(fmt::format("\n============================|  SCI iteration %3d  |============================\n", iter_sci));
 
         palPrint(fmt::format("\n   Selecting CFGs and CSFs (HCI+CIPSI)...           "));
 
@@ -370,7 +362,7 @@ void GCI::runKernel(vector<double> &ci_energies,
 
         if (converged)
         {
-            palPrint(fmt::format("\n   GCI converged - E_diff = {:.2e} less than E_tol = {:.2e}\n",
+            palPrint(fmt::format("\n   SCI converged - E_diff = {:.2e} less than E_tol = {:.2e}\n",
                                  arma::min(arma::abs(energy_diff)), Settings::getEnergyTol()));
             break;
         }
@@ -385,7 +377,7 @@ void GCI::runKernel(vector<double> &ci_energies,
     palPrint(fmt::format("\n\n    Duration of variational part: {:6.4} s.\n", duration.count()));
 }
 
-void GCI::solveCI(vector<double> &ci_energies,
+void SCI::solveCI(vector<double> &ci_energies,
                   vector<vector<double>> &ci_vectors,
                   vector<vector<double>> &energies_per_iter,
                   vector<unordered_map<string, double>> &previous_ci_coeffs_map)
@@ -423,14 +415,14 @@ void GCI::solveCI(vector<double> &ci_energies,
     /*
      * Diagonalizing the Hamiltonian
      */
-    auto [eigenvalues, eigenvectors] = Lible::Davidson::diagonalize(
+    auto [eigenvalues, eigenvectors] = lible::davidson::diagonalize(
         n_roots,
         [this]()
-        { return GCI::calcDiag(); },
+        { return SCI::calcDiag(); },
         [this](const vector<double> &diag)
-        { return GCI::calcGuess(diag); },
+        { return SCI::calcGuess(diag); },
         [this](const vector<double> &trial)
-        { return GCI::calcSigma(trial); });
+        { return SCI::calcSigma(trial); });
 
     ci_energies = std::move(eigenvalues);
     ci_vectors = std::move(eigenvectors);

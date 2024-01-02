@@ -6,37 +6,36 @@
 #include <utility>
 #include <vector>
 
-#include "gugaci_settings.h"
-#include "gugaci_util.h"
+#include "lible/gci_settings.h"
+#include "lible/gci_util.h"
 
 #ifdef _USE_MPI_
 #include <mpi.h>
 #endif
 
-namespace Lible
+namespace lible
 {
-	namespace GUGA
+	namespace guga
 	{
-		class GCISettings;
-
-		class GCI
+		class SCI
 		{
 			/*
 			 *
 			 */
 		public:
-			GCI(const int &n_orbs, const int &n_els,
+			SCI(const int &n_orbs, const int &n_els,
 				const int &n_roots, const int &multiplicity,
 				const std::vector<double> &one_el_ints,
 				const std::vector<double> &two_el_ints);
 
-#ifdef _USE_MPI_
-			GCI(MPI_Comm world_,
-				const int &n_orbs, const int &n_els,
-				const int &n_roots, const int &multiplicity,
-				const std::vector<double> &one_el_ints,
-				const std::vector<double> &two_el_ints);
-#endif
+			~SCI();
+
+			SCI(const SCI &) = delete;
+			SCI &operator=(const SCI &) = delete;
+
+			SCI(SCI &&) noexcept;
+			SCI &operator=(SCI &&) noexcept;
+
 			void run(std::vector<double> &ci_energies_out,
 					 std::vector<std::vector<double>> &ci_vectors_out);
 

@@ -3,7 +3,7 @@
 
 #include "../kernels_1el_ints.h"
 
-using namespace Lible;
+using namespace lible;
 using std::vector;
 
 __device__ void overlapGPUInner()

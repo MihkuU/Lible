@@ -1,8 +1,8 @@
 #pragma once
 
-namespace Lible
+namespace lible
 {
-    namespace Davidson
+    namespace davidson
     {
         class Settings
         {
@@ -56,6 +56,8 @@ namespace Lible
             {
                 max_n_trial = m;
             }
+
+            Settings() = delete;
 
         private:
             static inline double tol_discard = 1e-7;

@@ -3,19 +3,19 @@
 #include <set>
 #include <string>
 
-#include "gugaci.h"
-#include "gugaci_util.h"
+#include <lible/guga_sci.h>
+#include <lible/gci_util.h>
 
-namespace Lible
+namespace lible
 {
-    namespace GUGA
+    namespace guga
     {
-        class GCI::Connections
+        class SCI::Connections
         {
         public:
-            Connections(GCI *gci_) : gci(gci_)
+            Connections(SCI *gci_) : sci(gci_)
             {
-                min_nue = gci->min_nue;
+                min_nue = sci->min_nue;
             }
 
             void constructConnections(const std::set<std::string> &cfgs_right,
@@ -26,7 +26,7 @@ namespace Lible
                                       connection_map_dia &connections_dia);
 
         private:
-            GCI *gci;
+            SCI *sci;
             
             size_t min_nue;
             size_t n_orbs;            

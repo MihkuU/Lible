@@ -9,7 +9,7 @@
 
 #include "ints_util.h"
 
-namespace Lible
+namespace lible
 {
     /*
      * Here we deal with atomic orbital shells. We follow conventions outlined in https://iodata.readthedocs.io/en/latest/basis.html.

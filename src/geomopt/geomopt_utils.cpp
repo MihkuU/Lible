@@ -5,7 +5,7 @@
 #include <fmt/core.h>
 #include <iostream>
 
-namespace LG = Lible::GeomOpt;
+namespace LG = lible::geomopt;
 using namespace LG;
 
 using std::string;
@@ -24,8 +24,8 @@ double LG::calcGradNorm(const vector<double> &grad)
 
 void LG::optimizePrintPreamble(const Geometry &geometry)
 {
-    std::cout << string(Lible::GeomOptDefs::n_print_chars, '-') << std::endl;
-    std::cout << string(3, ' ') << "Lible-GeomOpt optimize called" << std::endl;
+    std::cout << string(lible::geomoptdefs::n_print_chars, '-') << std::endl;
+    std::cout << string(3, ' ') << "Lible-geomopt optimize called" << std::endl;
     std::cout << string(3, ' ') << "#-redundant internal coordinates:" << std::endl; //TODO: replace # with the actual number of coords.
     std::cout << string(6, ' ') << format("Bonds: {}", geometry.getNumBonds()) << std::endl; //TODO: make it like n-bonds if # > 0.
     std::cout << string(6, ' ') << format("Angles: {}", geometry.getNumAngles()) << std::endl; //TODO: make it like m-angles if # > 0.
@@ -34,7 +34,7 @@ void LG::optimizePrintPreamble(const Geometry &geometry)
     // std::string 
     // std::cout << fmt::format() << std::endl;
 
-    std::cout << std::string(Lible::GeomOptDefs::n_print_chars, '-') << std::endl;
+    std::cout << std::string(lible::geomoptdefs::n_print_chars, '-') << std::endl;
 }
 
 void LG::optimizePrintEpilogue(const bool &converged)

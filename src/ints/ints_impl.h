@@ -6,10 +6,10 @@
 #include "experimental/structure_gpu.h"
 #include "ints.h"
 
-namespace Lible
+namespace lible
 {
-    // template <Ints::Option1El option>
-    // std::vector<double> Ints::calcOneElInts()
+    // template <ints::Option1El option>
+    // std::vector<double> ints::calcOneElInts()
     // {
     //     int max_l = structure->max_angular_momentum;
     //     std::size_t n_ao = structure->n_atomic_orbitals;
@@ -24,8 +24,8 @@ namespace Lible
     //     return one_el_ints;
     // }
 
-    // template <Ints::Option1El option>
-    // std::vector<double> Ints::calcOneElIntsGPU()
+    // template <ints::Option1El option>
+    // std::vector<double> ints::calcOneElIntsGPU()
     // {
     //     int max_l = structure->max_angular_momentum;
     //     std::size_t n_ao = structure->n_atomic_orbitals;
