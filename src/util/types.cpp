@@ -13,7 +13,7 @@ Vec2D<T>::Vec2D(const size_t &dim1, const size_t &dim2, const T &val)
 template <typename T>
 T &Vec2D<T>::operator()(const size_t &i, const size_t &j)
 {
-    return data[i * dims[0] + j];
+    return data[i * dims[1] + j];
 }
 
 template <typename T>
@@ -45,7 +45,7 @@ Vec4D<T>::Vec4D(const size_t &dim1, const size_t &dim2, const size_t &dim3, cons
 template <typename T>
 T &Vec4D<T>::operator()(const size_t &i, const size_t &j, const size_t &k, const size_t &l)
 {
-    return data[i * dims[0] * dims[1] * dims[2] + j * dims[0] * dims[1] + k * dims[0] + l];
+    return data[i * dims[1] * dims[2] * dims[3] + j * dims[2] * dims[3] + k * dims[3] + l];
 }
 
 template <typename T>
