@@ -12,7 +12,7 @@ using namespace lible::guga::util;
 using std::string;
 using std::vector;
 
-vector<double> SCI::calcSigma(const vector<double> &trial)
+vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
 {
     arma::dvec sigma(trial.size(), arma::fill::zeros);
 
@@ -29,10 +29,10 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
         // int size_total = returnTotalSize(world);
         int rank_total;
         int size_total;
-#else   
+#else
         int rank_total = thread_num;
-        int size_total = num_threads;     
-#endif        
+        int size_total = num_threads;
+#endif
 
         /* No excitation (diagonal) */
         int ipal = 0;
@@ -55,8 +55,7 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
                 if (p_occ == 0)
                     continue;
 
-                val += p_occ * (one_el_ints[pq2DTo1D(p, p, n_orbs)] +
-                                0.5 * p_occ * two_el_ints[pqrs4DTo1D(p, p, p, p, n_orbs)]);
+                val += p_occ * (one_el_ints(p, p) + 0.5 * p_occ * two_el_ints(p, p, p, p));
 
                 for (size_t q = p + 1; q < n_orbs; q++)
                 {
@@ -64,7 +63,7 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
                     if (q_occ == 0)
                         continue;
 
-                    val += p_occ * q_occ * two_el_ints[pqrs4DTo1D(p, p, q, q, n_orbs)];
+                    val += p_occ * q_occ * two_el_ints(p, p, q, q);
                 }
             }
 
@@ -102,14 +101,14 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
                 string onv_left = cfg_left->getONV();
                 string onv_right = cfg_right->getONV();
 
-                double contrib = one_el_ints[pq2DTo1D(p, q, n_orbs)];
+                double contrib = one_el_ints(p, q);
                 for (size_t r = 0; r < n_orbs; r++)
                 {
                     int r_occ = onv_right[r] - '0';
                     if (r_occ == 0)
                         continue;
 
-                    contrib += 0.5 * r_occ * two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)];
+                    contrib += 0.5 * r_occ * two_el_ints(p, q, r, r);
                 }
 
                 for (size_t r = 0; r < n_orbs; r++)
@@ -118,7 +117,7 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
                     if (r_occ == 0)
                         continue;
 
-                    contrib += 0.5 * r_occ * two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)];
+                    contrib += 0.5 * r_occ * two_el_ints(r, r, p, q);
                 }
 
                 double fac = 1;
@@ -161,7 +160,8 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
 
             for (const auto &[icfg, pqqp] : connections)
             {
-                double two_el_int = 0.5 * two_el_ints[pqqp];
+                auto [p, q, r, s] = pqrs1DTo4D(pqqp, n_orbs);
+                double two_el_int = 0.5 * two_el_ints(p, q, q, p);
 
                 size_t pos = wave_function->getPos(icfg);
 
@@ -206,7 +206,9 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
                 if (phase)
                     fac *= -1;
 
-                double contrib = two_el_ints[pqrs];
+
+                auto [p, q, r, s] = pqrs1DTo4D(pqrs, n_orbs);
+                double contrib = two_el_ints(p, q, r, s);
                 contrib *= fac;
 
                 CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
@@ -242,9 +244,9 @@ vector<double> SCI::calcSigma(const vector<double> &trial)
     return arma::conv_to<vector<double>>::from(sigma);
 }
 
-vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
-                              const vector<double> &aux_2el_ints,
-                              const vector<double> &trial)
+vector<double> GCI::Impl::calcSigma(const vec2d &aux_1el_ints,
+                                    const vec4d &aux_2el_ints,
+                                    const vector<double> &trial)
 {
     /*
      * Calculates the sigma-vector with arbitrary Hamiltonian matrix elements
@@ -268,10 +270,10 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
         // int size_total = returnTotalSize(world);
         int rank_total;
         int size_total;
-#else   
+#else
         int rank_total = thread_num;
-        int size_total = num_threads;     
-#endif           
+        int size_total = num_threads;
+#endif
 
         /* No excitation (diagonal) */
         int ipal = 0;
@@ -294,8 +296,7 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
                 if (p_occ == 0)
                     continue;
 
-                val += p_occ * (aux_1el_ints[pq2DTo1D(p, p, n_orbs)] +
-                                0.5 * p_occ * aux_2el_ints[pqrs4DTo1D(p, p, p, p, n_orbs)]);
+                val += p_occ * (aux_1el_ints(p, p) + 0.5 * p_occ * aux_2el_ints(p, p, p, p));
                 for (size_t q = 0; q < n_orbs; q++)
                 {
                     if (p == q)
@@ -305,14 +306,14 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
                     if (q_occ == 0)
                         continue;
 
-                    val += 0.5 * p_occ * q_occ * aux_2el_ints[pqrs4DTo1D(p, p, q, q, n_orbs)];                        
+                    val += 0.5 * p_occ * q_occ * aux_2el_ints(p, p, q, q);
                 }
             }
 
             size_t dim = wave_function->getDim(icfg);
             size_t pos = wave_function->getPos(icfg);
 
-            for (int mu = 0; mu < dim; mu++)                
+            for (int mu = 0; mu < dim; mu++)
                 sigma_omp(pos + mu) += val * trial_omp(pos + mu);
         }
 
@@ -329,7 +330,7 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
 
             cc_map ccs = ccs_1el.at(key);
             for (const auto &[icfg_left, icfg_right, pq, phase] : connections)
-            {                
+            {
                 CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
                 CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
 
@@ -339,9 +340,9 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
                 // auto [p, q] = pq1DTo2D(pq);
                 // size_t qp = pq2DTo1D(q, p);
                 auto [p, q] = pq1DTo2D(pq, n_orbs);
-                size_t qp = pq2DTo1D(q, p, n_orbs); 
-                double contrib1 = aux_1el_ints[pq];
-                double contrib2 = aux_1el_ints[qp];
+                // size_t qp = pq2DTo1D(q, p, n_orbs);
+                double contrib1 = aux_1el_ints(p, q);
+                double contrib2 = aux_1el_ints(q, p);
                 for (size_t r = 0; r < n_orbs; r++)
                 {
                     int r_occ = onv_right[r] - '0';
@@ -350,10 +351,10 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
 
                     // size_t pqrr = pqrs4DTo1D(p, q, r, r);
                     // size_t rrqp = pqrs4DTo1D(r, r, q, p);
-                    size_t pqrr = pqrs4DTo1D(p, q, r, r, n_orbs);
-                    size_t rrqp = pqrs4DTo1D(r, r, q, p, n_orbs);
-                    contrib1 += 0.5 * r_occ * aux_2el_ints[pqrr];
-                    contrib2 += 0.5 * r_occ * aux_2el_ints[rrqp];
+                    // size_t pqrr = pqrs4DTo1D(p, q, r, r, n_orbs);
+                    // size_t rrqp = pqrs4DTo1D(r, r, q, p, n_orbs);
+                    contrib1 += 0.5 * r_occ * aux_2el_ints(p, q, r, r);
+                    contrib2 += 0.5 * r_occ * aux_2el_ints(r, r, q, p);
                 }
 
                 for (size_t r = 0; r < n_orbs; r++)
@@ -364,10 +365,10 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
 
                     // size_t rrpq = pqrs4DTo1D(r, r, p, q);
                     // size_t qprr = pqrs4DTo1D(q, p, r, r);
-                    size_t rrpq = pqrs4DTo1D(r, r, p, q, n_orbs);
-                    size_t qprr = pqrs4DTo1D(q, p, r, r, n_orbs);
-                    contrib1 += 0.5 * r_occ * aux_2el_ints[rrpq];
-                    contrib2 += 0.5 * r_occ * aux_2el_ints[qprr];
+                    // size_t rrpq = pqrs4DTo1D(r, r, p, q, n_orbs);
+                    // size_t qprr = pqrs4DTo1D(q, p, r, r, n_orbs);
+                    contrib1 += 0.5 * r_occ * aux_2el_ints(r, r, p, q);
+                    contrib2 += 0.5 * r_occ * aux_2el_ints(q, p, r, r);
                 }
 
                 double fac = 1;
@@ -405,7 +406,8 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
             cc_map ccs = ccs_dia.at(key);
             for (const auto &[icfg, pqqp] : connections)
             {
-                double two_el_int = 0.5 * aux_2el_ints[pqqp];
+                auto [p, q, r, s] = pqrs1DTo4D(pqqp, n_orbs);
+                double two_el_int = 0.5 * aux_2el_ints(p, q, q, p);
 
                 size_t pos = wave_function->getPos(icfg);
 
@@ -447,14 +449,14 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
                 if (phase)
                     fac *= -1;
 
-                double contrib1 = aux_2el_ints[pqrs];
-                double contrib2 = aux_2el_ints[srqp];
+                double contrib1 = aux_2el_ints(p, q, r, s);
+                double contrib2 = aux_2el_ints(s, r, q, p);
 
                 if (two_el_ex)
                 {
                     /*
                      * Due to using symmetry of Hamiltonian
-                     */                    
+                     */
                     // size_t rspq = pqrs4DTo1D(r, s, p, q);
                     // size_t qpsr = pqrs4DTo1D(q, p, s, r);
                     // contrib1 += eff_2el_part(rspq);
@@ -493,9 +495,9 @@ vector<double> SCI::calcSigma(const vector<double> &aux_1el_ints,
     return arma::conv_to<vector<double>>::from(sigma);
 }
 
-vector<double> SCI::calcSigma(const DataFOIS &data_fois,
-                              const std::vector<double> &ci_vector,
-                              const WaveFunction *wfn_cipsi)
+vector<double> GCI::Impl::calcSigma(const DataFOIS &data_fois,
+                                    const std::vector<double> &ci_vector,
+                                    const WaveFunction *wfn_cipsi)
 {
     vector<double> sigma(wfn_cipsi->getNumCSFs(), 0);
 
@@ -504,7 +506,8 @@ vector<double> SCI::calcSigma(const DataFOIS &data_fois,
         cc_map ccs = ccs_1el.at(key);
         for (const auto &[icfg_left, icfg_right, pq, phase] : connections)
         {
-            double contrib = one_el_ints[pq];
+            auto [p, q] = pq1DTo2D(pq, n_orbs);
+            double contrib = one_el_ints(p, q);
 
             double fac = 1;
             if (phase)
@@ -552,7 +555,8 @@ vector<double> SCI::calcSigma(const DataFOIS &data_fois,
             for (auto &pqrr_r : connection.second)
             {
                 size_t pqrr = get<0>(pqrr_r);
-                double two_el_int = two_el_ints[pqrr];
+                auto [p, q, r, s] = pqrs1DTo4D(pqrr, n_orbs);
+                double two_el_int = two_el_ints(p, q, r, s);
                 two_el_int *= fac;
                 for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
@@ -589,7 +593,8 @@ vector<double> SCI::calcSigma(const DataFOIS &data_fois,
             for (auto &rrpq_r : connection.second)
             {
                 size_t rrpq = get<0>(rrpq_r);
-                double two_el_int = two_el_ints[rrpq];
+                auto [p, q, r, s] = pqrs1DTo4D(rrpq, n_orbs);
+                double two_el_int = two_el_ints(p, q, r, s);
                 two_el_int *= fac;
                 for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
@@ -612,7 +617,8 @@ vector<double> SCI::calcSigma(const DataFOIS &data_fois,
             if (phase)
                 fac *= -1;
 
-            double contrib = two_el_ints[pqrs];
+            auto [p, q, r, s] = pqrs1DTo4D(pqrs, n_orbs);
+            double contrib = two_el_ints(p, q, r, s);
             contrib *= fac;
 
             size_t pos_left = wfn_cipsi->getPos(icfg_left);

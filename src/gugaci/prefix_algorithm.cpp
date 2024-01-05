@@ -5,6 +5,7 @@
 #include <mpi.h>
 #endif
 
+using namespace lible;
 using namespace lible::guga;
 using namespace lible::guga::util;
 
@@ -14,19 +15,22 @@ using std::string;
 using std::tuple;
 using std::vector;
 
-bool compByScnd(const tuple<int, double>& a, const tuple<int, double>& b) {
+bool compByScnd(const tuple<int, double> &a, const tuple<int, double> &b)
+{
     return get<1>(a) > get<1>(b);
 }
 
-bool compByThrd(const tuple<int, int, double>& a, const tuple<int, int, double>& b) {
+bool compByThrd(const tuple<int, int, double> &a, const tuple<int, int, double> &b)
+{
     return get<2>(a) > get<2>(b);
 }
 
-bool compByFrth(const tuple<int, int, int, double>& a, const tuple<int, int, int, double>& b) {
+bool compByFrth(const tuple<int, int, int, double> &a, const tuple<int, int, int, double> &b)
+{
     return get<3>(a) > get<3>(b);
 }
 
-vector<string> SCI::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs)
+vector<string> GCI::Impl::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs)
 {
     set<string> prefixes_wfn;
     set<string> prefixes_excited;
@@ -36,11 +40,11 @@ vector<string> SCI::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs)
 
 #ifdef _USE_MPI_
     int rank;
-    MPI_Comm_rank(sci->world, &rank);
+    MPI_Comm_rank(impl->world, &rank);
 
     if (rank == 0)
     {
-#endif        
+#endif
         for (const string &cfg : cfgs)
         {
             string prefix;
@@ -283,13 +287,13 @@ vector<string> SCI::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs)
         for (const string &prefix : prefixes_excited)
             prefixes_vec.push_back(prefix);
         std::random_shuffle(prefixes_vec.begin(), prefixes_vec.end());
-#ifdef _USE_MPI_        
+#ifdef _USE_MPI_
     }
-#endif    
+#endif
 
 #ifdef _USE_MPI_
     int size;
-    MPI_Comm_size(sci->world, &size);
+    MPI_Comm_size(impl->world, &size);
     vector<vector<string>> prefixes_scatter(size);
     for (size_t ipref = 0; ipref < prefixes_vec.size(); ipref++)
     {
@@ -297,21 +301,21 @@ vector<string> SCI::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs)
         prefixes_scatter[rank].push_back(prefixes_vec[ipref]);
     }
 #else
-    for (size_t ipref = 0; ipref < prefixes_vec.size(); ipref++)            
-        prefixes_scattered.push_back(prefixes_vec[ipref]);    
+    for (size_t ipref = 0; ipref < prefixes_vec.size(); ipref++)
+        prefixes_scattered.push_back(prefixes_vec[ipref]);
 #endif
 
 #ifdef _USE_MPI__
-    mpi::scatter(sci->world, prefixes_scatter, prefixes_scattered, 0);
+    mpi::scatter(impl->world, prefixes_scatter, prefixes_scattered, 0);
 #endif
 
     return prefixes_scattered;
 }
 
-void SCI::PrefixAlgorithm::generateConfsAndConnections(const vector<string> &prefixes,
-                                                       const vector<vector<pair<string, arma::dvec>>> &generators_by_roots,
-                                                       const wfn_ptr &wfn_right,
-                                                       DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::generateConfsAndConnections(const vector<string> &prefixes,
+                                                             const vector<vector<pair<string, arma::dvec>>> &generators_by_roots,
+                                                             const wfn_ptr &wfn_right,
+                                                             DataFOIS &data_fois, DataVar &data_var)
 {
     for (const string &prefix : prefixes)
     {
@@ -409,23 +413,23 @@ void SCI::PrefixAlgorithm::generateConfsAndConnections(const vector<string> &pre
     }
 }
 
-void SCI::PrefixAlgorithm::constructSortedIntegralLists(const vector<double> &one_el_ints,
-                                                        const vector<double> &two_el_ints,
-                                                        double &max_abs_1el_element_out,
-                                                        double &max_abs_2el_element_out)
+void GCI::Impl::PrefixAlgorithm::constructSortedIntegralLists(const vec2d &one_el_ints,
+                                                              const vec4d &two_el_ints,
+                                                              double &max_abs_1el_element_out,
+                                                              double &max_abs_2el_element_out)
 {
     double max_abs_1el_element = 0;
     double max_abs_2el_element = 0;
     for (size_t p = 0; p < n_orbs; p++)
         for (size_t q = 0; q < n_orbs; q++)
         {
-            double abs_1el_element = abs(one_el_ints[pq2DTo1D(p, q, n_orbs)]);
+            double abs_1el_element = abs(one_el_ints(p, q));
             if (abs_1el_element > max_abs_1el_element)
                 max_abs_1el_element = abs_1el_element;
             for (size_t r = 0; r < n_orbs; r++)
                 for (size_t s = 0; s < n_orbs; s++)
                 {
-                    double abs_2el_element = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_2el_element = abs(two_el_ints(p, q, r, s));
                     if (abs_2el_element > max_abs_2el_element)
                         max_abs_2el_element = abs_2el_element;
                 }
@@ -498,8 +502,8 @@ void SCI::PrefixAlgorithm::constructSortedIntegralLists(const vector<double> &on
                                intlist_EpqErs_pqrIn_sOut);
 }
 
-vector<string> SCI::PrefixAlgorithm::findConnectedSFs1El(const vector<string> &sfs_right,
-                                                         const quintet &info_cc)
+vector<string> GCI::Impl::PrefixAlgorithm::findConnectedSFs1El(const vector<string> &sfs_right,
+                                                               const quintet &info_cc)
 {
     int exctype = std::get<0>(info_cc);
     int nue_left = std::get<1>(info_cc);
@@ -587,10 +591,10 @@ vector<string> SCI::PrefixAlgorithm::findConnectedSFs1El(const vector<string> &s
     return connected_sfs;
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_Epq(const vector<double> &one_el_ints,
-                                                   ints_11_map &intlist_Epq_pqOut,
-                                                   ints_11_map &intlist_Epq_pIn_qOut,
-                                                   ints_11_map &intlist_Epq_qIn_pOut)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_Epq(const vec2d &one_el_ints,
+                                                         ints_11_map &intlist_Epq_pqOut,
+                                                         ints_11_map &intlist_Epq_pIn_qOut,
+                                                         ints_11_map &intlist_Epq_qIn_pOut)
 {
     /* dn = 0 */
     // Epq - pq outside prefix
@@ -602,7 +606,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_Epq(const vector<double> &one_el_
             if (p == q)
                 continue;
 
-            double abs_eff_h = abs(one_el_ints[pq2DTo1D(p, q, n_orbs)]);
+            double abs_eff_h = abs(one_el_ints(p, q));
             doublets.push_back(std::make_tuple(p, abs_eff_h));
         }
         std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -616,7 +620,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_Epq(const vector<double> &one_el_
         vector<tuple<int, double>> doublets;
         for (size_t q = prefix_size; q < n_orbs; q++)
         {
-            double abs_eff_h = abs(one_el_ints[pq2DTo1D(p, q, n_orbs)]);
+            double abs_eff_h = abs(one_el_ints(p, q));
             doublets.push_back(std::make_tuple(q, abs_eff_h));
         }
         std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -629,7 +633,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_Epq(const vector<double> &one_el_
         vector<tuple<int, double>> doublets;
         for (size_t p = prefix_size; p < n_orbs; p++)
         {
-            double abs_eff_h = abs(one_el_ints[pq2DTo1D(p, q, n_orbs)]);
+            double abs_eff_h = abs(one_el_ints(p, q));
             doublets.push_back(std::make_tuple(p, abs_eff_h));
         }
         std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -637,12 +641,12 @@ void SCI::PrefixAlgorithm::integralListsHelper_Epq(const vector<double> &one_el_
     }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_el_ints,
-                                                      ints_12_map &intlist_EpqErr_pqrOut,
-                                                      ints_12_map &intlist_EpqErr_rIn_pqOut,
-                                                      ints_12_map &intlist_EpqErr_qIn_pOut,
-                                                      ints_12_map &intlist_EpqErr_pIn_qOut,
-                                                      ints_21_map &intlist_EpqErr_pqIn)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqErr(const vec4d &two_el_ints,
+                                                            ints_12_map &intlist_EpqErr_pqrOut,
+                                                            ints_12_map &intlist_EpqErr_rIn_pqOut,
+                                                            ints_12_map &intlist_EpqErr_qIn_pOut,
+                                                            ints_12_map &intlist_EpqErr_pIn_qOut,
+                                                            ints_21_map &intlist_EpqErr_pqIn)
 {
     /* dn = 0 */
     // EpqErr - pqr outside prefix
@@ -656,7 +660,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_
                 if (p == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, r));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         }
@@ -675,7 +679,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_
                 if (p == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, r));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         }
@@ -692,7 +696,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_
         {
             for (size_t r = 0; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, r));
                 triplets.push_back(std::make_tuple(p, r, abs_act_eri));
             }
         }
@@ -708,7 +712,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_
         {
             for (size_t r = 0; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, r));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -728,7 +732,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_
             vector<tuple<int, double>> doublets;
             for (size_t r = 0; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, r));
                 doublets.push_back(std::make_tuple(r, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -737,12 +741,12 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErr(const vector<double> &two_
     }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> &two_el_ints,
-                                                      ints_12_map &intlist_ErrEpq_pqrOut,
-                                                      ints_12_map &intlist_ErrEpq_rIn_pqOut,
-                                                      ints_12_map &intlist_ErrEpq_qIn_pOut,
-                                                      ints_12_map &intlist_ErrEpq_pIn_qOut,
-                                                      ints_21_map &intlist_ErrEpq_pqIn)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_ErrEpq(const vec4d &two_el_ints,
+                                                            ints_12_map &intlist_ErrEpq_pqrOut,
+                                                            ints_12_map &intlist_ErrEpq_rIn_pqOut,
+                                                            ints_12_map &intlist_ErrEpq_qIn_pOut,
+                                                            ints_12_map &intlist_ErrEpq_pIn_qOut,
+                                                            ints_21_map &intlist_ErrEpq_pqIn)
 {
     /* dn = 0 */
     // ErrEpq - pqr outside prefix
@@ -755,7 +759,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
                 if (p == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(r, r, p, q));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -771,7 +775,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
                 if (p == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(r, r, p, q));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -788,7 +792,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
                 if (p == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(r, r, p, q));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -807,7 +811,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
 
             for (size_t r = 0; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(r, r, p, q));
                 triplets.push_back(std::make_tuple(p, r, abs_act_eri));
             }
         }
@@ -823,7 +827,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
         {
             for (size_t r = 0; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(r, r, p, q));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -842,7 +846,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
             vector<tuple<int, double>> doublets;
             for (size_t r = 0; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(r, r, p, q));
                 doublets.push_back(std::make_tuple(r, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -850,11 +854,11 @@ void SCI::PrefixAlgorithm::integralListsHelper_ErrEpq(const std::vector<double> 
         }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqEqr(const std::vector<double> &two_el_ints,
-                                                      ints_12_map &intlist_EpqEqr_pqrOut,
-                                                      ints_12_map &intlist_EpqEqr_rIn_pOut,
-                                                      ints_12_map &intlist_EpqEqr_pIn_rOut,
-                                                      ints_21_map &intlist_EpqEqr_prIn)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqEqr(const vec4d &two_el_ints,
+                                                            ints_12_map &intlist_EpqEqr_pqrOut,
+                                                            ints_12_map &intlist_EpqEqr_rIn_pOut,
+                                                            ints_12_map &intlist_EpqEqr_pIn_rOut,
+                                                            ints_21_map &intlist_EpqEqr_prIn)
 {
     /* dn = 0 */
     // EpqEqr - pqr out
@@ -871,7 +875,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEqr(const std::vector<double> 
                 if (r == p or r == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, q, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, q, r));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -891,7 +895,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEqr(const std::vector<double> 
                 if (q == r or q == p)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, q, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, q, r));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         }
@@ -910,7 +914,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEqr(const std::vector<double> 
                 if (q == r or q == p)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, q, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, q, r));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -933,7 +937,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEqr(const std::vector<double> 
                 if (q == p or q == r)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, q, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, q, r));
                 doublets.push_back(std::make_tuple(q, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -942,11 +946,11 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEqr(const std::vector<double> 
     }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqErp(const std::vector<double> &two_el_ints,
-                                                      ints_12_map &intlist_EpqErp_pqrOut,
-                                                      ints_12_map &intlist_EpqErp_qIn_rOut,
-                                                      ints_12_map &intlist_EpqErp_rIn_qOut,
-                                                      ints_21_map &intlist_EpqErp_qrIn)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqErp(const vec4d &two_el_ints,
+                                                            ints_12_map &intlist_EpqErp_pqrOut,
+                                                            ints_12_map &intlist_EpqErp_qIn_rOut,
+                                                            ints_12_map &intlist_EpqErp_rIn_qOut,
+                                                            ints_21_map &intlist_EpqErp_qrIn)
 {
     /* dn = 0 */
     // EpqErp - pqr out
@@ -963,7 +967,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErp(const std::vector<double> 
                 if (r == p or r == q)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, p, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, p));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -982,7 +986,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErp(const std::vector<double> 
                 if (p == q or r == p)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, p, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, p));
                 triplets.push_back(std::make_tuple(p, r, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -999,7 +1003,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErp(const std::vector<double> 
                 if (p == q or r == p)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, p, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, p));
                 triplets.push_back(std::make_tuple(p, q, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -1020,7 +1024,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErp(const std::vector<double> 
                 if (p == q or r == p)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, p, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, p));
                 doublets.push_back(std::make_tuple(p, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1028,10 +1032,10 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErp(const std::vector<double> 
         }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqEpq(const std::vector<double> &two_el_ints,
-                                                      ints_11_map &intlist_EpqEpq_pqOut,
-                                                      ints_11_map &intlist_EpqEpq_qIn_pOut,
-                                                      ints_11_map &intlist_EpqEpq_pIn_qOut)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqEpq(const vec4d &two_el_ints,
+                                                            ints_11_map &intlist_EpqEpq_pqOut,
+                                                            ints_11_map &intlist_EpqEpq_qIn_pOut,
+                                                            ints_11_map &intlist_EpqEpq_pIn_qOut)
 {
     /* dn = 0 */
     // EpqEpq - pq out
@@ -1043,7 +1047,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpq(const std::vector<double> 
             if (p == q)
                 continue;
 
-            double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, q, n_orbs)]);
+            double abs_act_eri = abs(two_el_ints(p, q, p, q));
             doublets.push_back(std::make_tuple(p, abs_act_eri));
         }
         std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1057,7 +1061,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpq(const std::vector<double> 
         vector<tuple<int, double>> doublets;
         for (size_t p = prefix_size; p < n_orbs; p++)
         {
-            double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, q, n_orbs)]);
+            double abs_act_eri = abs(two_el_ints(p, q, p, q));
             doublets.push_back(std::make_tuple(p, abs_act_eri));
         }
         std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1070,7 +1074,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpq(const std::vector<double> 
         vector<tuple<int, double>> doublets;
         for (size_t q = prefix_size; q < n_orbs; q++)
         {
-            double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, q, n_orbs)]);
+            double abs_act_eri = abs(two_el_ints(p, q, p, q));
             doublets.push_back(std::make_tuple(q, abs_act_eri));
         }
         std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1078,12 +1082,12 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpq(const std::vector<double> 
     }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> &two_el_ints,
-                                                      ints_12_map &intlist_EpqEpr_pqrOut,
-                                                      ints_12_map &intlist_EpqEpr_qIn_prOut,
-                                                      ints_12_map &intlist_EpqEpr_pIn_qrOut,
-                                                      ints_21_map &intlist_EpqEpr_qrIn_pOut,
-                                                      ints_21_map &intlist_EpqEpr_pqIn_rOut)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqEpr(const vec4d &two_el_ints,
+                                                            ints_12_map &intlist_EpqEpr_pqrOut,
+                                                            ints_12_map &intlist_EpqEpr_qIn_prOut,
+                                                            ints_12_map &intlist_EpqEpr_pIn_qrOut,
+                                                            ints_21_map &intlist_EpqEpr_qrIn_pOut,
+                                                            ints_21_map &intlist_EpqEpr_pqIn_rOut)
 {
     // Due to symmetry of the excitation, enforcing
     // (pq) < (pr) => q < r
@@ -1103,7 +1107,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> 
                 if (r == p)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, p, r));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -1123,7 +1127,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> 
                 if (p == r)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, p, r));
                 triplets.push_back(std::make_tuple(p, r, abs_act_eri));
             }
         }
@@ -1140,7 +1144,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> 
             vector<tuple<int, double>> doublets;
             for (size_t p = prefix_size; p < n_orbs; p++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, p, r));
                 doublets.push_back(std::make_tuple(p, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1156,7 +1160,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> 
         {
             for (size_t r = q + 1; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, p, r));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         }
@@ -1175,7 +1179,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> 
             vector<tuple<int, double>> doublets;
             for (size_t r = prefix_size; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, p, r, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, p, r));
                 doublets.push_back(std::make_tuple(r, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1183,12 +1187,12 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqEpr(const std::vector<double> 
         }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> &two_el_ints,
-                                                      ints_12_map &intlist_EpqErq_pqrOut,
-                                                      ints_12_map &intlist_EpqErq_pIn_qrOut,
-                                                      ints_12_map &intlist_EpqErq_qIn_prOut,
-                                                      ints_21_map &intlist_EpqErq_prIn_qOut,
-                                                      ints_21_map &intlist_EpqErq_pqIn_rOut)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqErq(const vec4d &two_el_ints,
+                                                            ints_12_map &intlist_EpqErq_pqrOut,
+                                                            ints_12_map &intlist_EpqErq_pIn_qrOut,
+                                                            ints_12_map &intlist_EpqErq_qIn_prOut,
+                                                            ints_21_map &intlist_EpqErq_prIn_qOut,
+                                                            ints_21_map &intlist_EpqErq_pqIn_rOut)
 {
     // Due to symmetry of the excitation, enforcing
     // (pq) < (rq) => p < r
@@ -1206,7 +1210,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> 
             {
                 if (q == r)
                     continue;
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, q));
                 triplets.push_back(std::make_tuple(p, r, abs_act_eri));
             }
         }
@@ -1225,7 +1229,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> 
                 if (q == r)
                     continue;
 
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, q));
                 triplets.push_back(std::make_tuple(q, r, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -1240,7 +1244,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> 
         for (size_t p = prefix_size; p < n_orbs; p++)
             for (size_t r = p + 1; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, q));
                 triplets.push_back(std::make_tuple(p, r, abs_act_eri));
             }
         std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -1254,7 +1258,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> 
             vector<tuple<int, double>> doublets;
             for (size_t q = prefix_size; q < n_orbs; q++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, q));
                 doublets.push_back(std::make_tuple(q, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1272,7 +1276,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> 
             vector<tuple<int, double>> doublets;
             for (size_t r = prefix_size; r < n_orbs; r++)
             {
-                double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, q, n_orbs)]);
+                double abs_act_eri = abs(two_el_ints(p, q, r, q));
                 doublets.push_back(std::make_tuple(r, abs_act_eri));
             }
             std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1280,18 +1284,18 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErq(const std::vector<double> 
         }
 }
 
-void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> &two_el_ints,
-                                                      ints_13_map &intlist_EpqErs_sIn_pqrOut,
-                                                      ints_13_map &intlist_EpqErs_qIn_prsOut,
-                                                      ints_13_map &intlist_EpqErs_pIn_qrsOut,
-                                                      ints_22_map &intlist_EpqErs_pqrsOut,
-                                                      ints_22_map &intlist_EpqErs_qsIn_prOut,
-                                                      ints_22_map &intlist_EpqErs_prIn_qsOut,
-                                                      ints_22_map &intlist_EpqErs_pqIn_rsOut,
-                                                      ints_22_map &intlist_EpqErs_psIn_qrOut,
-                                                      ints_31_map &intlist_EpqErs_pqsIn_rOut,
-                                                      ints_31_map &intlist_EpqErs_prsIn_qOut,
-                                                      ints_31_map &intlist_EpqErs_pqrIn_sOut)
+void GCI::Impl::PrefixAlgorithm::integralListsHelper_EpqErs(const vec4d &two_el_ints,
+                                                            ints_13_map &intlist_EpqErs_sIn_pqrOut,
+                                                            ints_13_map &intlist_EpqErs_qIn_prsOut,
+                                                            ints_13_map &intlist_EpqErs_pIn_qrsOut,
+                                                            ints_22_map &intlist_EpqErs_pqrsOut,
+                                                            ints_22_map &intlist_EpqErs_qsIn_prOut,
+                                                            ints_22_map &intlist_EpqErs_prIn_qsOut,
+                                                            ints_22_map &intlist_EpqErs_pqIn_rsOut,
+                                                            ints_22_map &intlist_EpqErs_psIn_qrOut,
+                                                            ints_31_map &intlist_EpqErs_pqsIn_rOut,
+                                                            ints_31_map &intlist_EpqErs_prsIn_qOut,
+                                                            ints_31_map &intlist_EpqErs_pqrIn_sOut)
 {
     // Due to symmetry of the excitation, enforcing
     // (pq) < (rs) => p < r; q and s undetermined
@@ -1315,7 +1319,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (s == p or s == r or s == q)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     triplets.push_back(std::make_tuple(r, s, abs_act_eri));
                 }
             }
@@ -1339,7 +1343,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (r == q)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     quadruplets.push_back(std::make_tuple(p, q, r, abs_act_eri));
                 }
             }
@@ -1358,7 +1362,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (s == p or s == r)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     quadruplets.push_back(std::make_tuple(p, r, s, abs_act_eri));
                 }
         std::sort(quadruplets.begin(), quadruplets.end(), compByFrth);
@@ -1380,7 +1384,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (s == q or s == r)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     quadruplets.push_back(std::make_tuple(q, r, s, abs_act_eri));
                 }
             }
@@ -1401,7 +1405,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
             {
                 for (size_t r = p + 1; r < n_orbs; r++)
                 {
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     triplets.push_back(std::make_tuple(p, r, abs_act_eri));
                 }
             }
@@ -1420,7 +1424,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (q == s)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     triplets.push_back(std::make_tuple(q, s, abs_act_eri));
                 }
             std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -1441,7 +1445,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (s == r)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     triplets.push_back(std::make_tuple(r, s, abs_act_eri));
                 }
             std::sort(triplets.begin(), triplets.end(), compByThrd);
@@ -1463,7 +1467,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                     if (r == q)
                         continue;
 
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     triplets.push_back(std::make_tuple(q, r, abs_act_eri));
                 }
             }
@@ -1487,7 +1491,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                 vector<tuple<int, double>> doublets;
                 for (size_t r = prefix_size; r < n_orbs; r++)
                 {
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     doublets.push_back(std::make_tuple(r, abs_act_eri));
                 }
                 std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1506,7 +1510,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                 vector<tuple<int, double>> doublets;
                 for (size_t q = prefix_size; q < n_orbs; q++)
                 {
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     doublets.push_back(std::make_tuple(q, abs_act_eri));
                 }
                 std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1528,7 +1532,7 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
                 vector<tuple<int, double>> doublets;
                 for (size_t s = prefix_size; s < n_orbs; s++)
                 {
-                    double abs_act_eri = abs(two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+                    double abs_act_eri = abs(two_el_ints(p, q, r, s));
                     doublets.push_back(std::make_tuple(s, abs_act_eri));
                 }
                 std::sort(doublets.begin(), doublets.end(), compByScnd);
@@ -1537,11 +1541,11 @@ void SCI::PrefixAlgorithm::integralListsHelper_EpqErs(const std::vector<double> 
         }
 }
 
-void SCI::PrefixAlgorithm::innerPrefixHelper1El(const int &p, const int &q, const int &icfg_right,
-                                                const size_t &nue_right, const string &onv_right,
-                                                const vector<string> &sfs_right,
-                                                const wfn_ptr &wfn_right,
-                                                DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::innerPrefixHelper1El(const int &p, const int &q, const int &icfg_right,
+                                                      const size_t &nue_right, const string &onv_right,
+                                                      const vector<string> &sfs_right,
+                                                      const wfn_ptr &wfn_right,
+                                                      DataFOIS &data_fois, DataVar &data_var)
 {
     string onv_new = onv_right;
     if (onv_new[q] == '0')
@@ -1583,12 +1587,12 @@ void SCI::PrefixAlgorithm::innerPrefixHelper1El(const int &p, const int &q, cons
     }
 }
 
-void SCI::PrefixAlgorithm::innerPrefixHelper2El_EpqErr(const int &p, const int &q, const int &r,
-                                                       const int &icfg_right, const size_t &nue_right,
-                                                       const string &onv_right,
-                                                       const vector<string> &sfs_right,
-                                                       const wfn_ptr &wfn_right, DataFOIS &data_fois,
-                                                       DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::innerPrefixHelper2El_EpqErr(const int &p, const int &q, const int &r,
+                                                             const int &icfg_right, const size_t &nue_right,
+                                                             const string &onv_right,
+                                                             const vector<string> &sfs_right,
+                                                             const wfn_ptr &wfn_right, DataFOIS &data_fois,
+                                                             DataVar &data_var)
 {
     string onv_new = onv_right;
     if (onv_new[r] == '0')
@@ -1632,12 +1636,12 @@ void SCI::PrefixAlgorithm::innerPrefixHelper2El_EpqErr(const int &p, const int &
     }
 }
 
-void SCI::PrefixAlgorithm::innerPrefixHelper2El_ErrEpq(const int &p, const int &q, const int &r,
-                                                       const int &icfg_right, const size_t &nue_right,
-                                                       const string &onv_right,
-                                                       const vector<string> &sfs_right,
-                                                       const wfn_ptr &wfn_right, DataFOIS &data_fois,
-                                                       DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::innerPrefixHelper2El_ErrEpq(const int &p, const int &q, const int &r,
+                                                             const int &icfg_right, const size_t &nue_right,
+                                                             const string &onv_right,
+                                                             const vector<string> &sfs_right,
+                                                             const wfn_ptr &wfn_right, DataFOIS &data_fois,
+                                                             DataVar &data_var)
 {
     string onv_new = onv_right;
     if (onv_new[q] == '0')
@@ -1681,12 +1685,12 @@ void SCI::PrefixAlgorithm::innerPrefixHelper2El_ErrEpq(const int &p, const int &
     }
 }
 
-void SCI::PrefixAlgorithm::innerPrefixHelper2El(const int &p, const int &q, const int &r,
-                                                const int &s, const int &icfg_right,
-                                                const size_t &nue_right, const string &onv_right,
-                                                const vector<string> &sfs_right,
-                                                const wfn_ptr &wfn_right,
-                                                DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::innerPrefixHelper2El(const int &p, const int &q, const int &r,
+                                                      const int &s, const int &icfg_right,
+                                                      const size_t &nue_right, const string &onv_right,
+                                                      const vector<string> &sfs_right,
+                                                      const wfn_ptr &wfn_right,
+                                                      DataFOIS &data_fois, DataVar &data_var)
 {
     string onv_ri = onv_right;
     if (onv_ri[s] == '0')
@@ -1751,12 +1755,12 @@ void SCI::PrefixAlgorithm::innerPrefixHelper2El(const int &p, const int &q, cons
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_Epq(const double &max_ci_coeff, const int &na, const int &nc,
-                                            const int &occ_diff_sum, const int &p, const int &q,
-                                            const int &icfg_right, const string &onv_right,
-                                            const vector<string> &sfs_right,
-                                            const wfn_ptr &wfn_right, DataFOIS &data_fois,
-                                            DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_Epq(const double &max_ci_coeff, const int &na, const int &nc,
+                                                  const int &occ_diff_sum, const int &p, const int &q,
+                                                  const int &icfg_right, const string &onv_right,
+                                                  const vector<string> &sfs_right,
+                                                  const wfn_ptr &wfn_right, DataFOIS &data_fois,
+                                                  DataVar &data_var)
 {
     if (occ_diff_sum > 2)
         return;
@@ -1820,7 +1824,7 @@ void SCI::PrefixAlgorithm::prefixHelper_Epq(const double &max_ci_coeff, const in
     {
         if (na == 1 and nc == 1)
         {
-            double one_el_int = abs(sci->one_el_ints[pq2DTo1D(p, q, n_orbs)]);
+            double one_el_int = abs(impl->one_el_ints(p, q));
             if (max_ci_coeff * one_el_int > Settings::getEpsilonVar())
                 innerPrefixHelper1El(p, q, icfg_right, nue_right, onv_right,
                                      sfs_right, wfn_right, data_fois, data_var);
@@ -1832,13 +1836,13 @@ void SCI::PrefixAlgorithm::prefixHelper_Epq(const double &max_ci_coeff, const in
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqErr(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right, const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqErr(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right, const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 2)
         return;
@@ -1945,13 +1949,13 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqErr(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_ErrEpq(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right, const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_ErrEpq(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right, const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 2)
         return;
@@ -2060,13 +2064,13 @@ void SCI::PrefixAlgorithm::prefixHelper_ErrEpq(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqEqr(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right, const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqEqr(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right, const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 2)
         return;
@@ -2156,13 +2160,13 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqEqr(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqErp(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right, const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqErp(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right, const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 2)
         return;
@@ -2252,13 +2256,13 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqErp(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqEpq(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right, const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqEpq(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right, const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 4)
         return;
@@ -2328,7 +2332,7 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqEpq(const double &max_ci_coeff, const
             {
                 int p = c_idxs[0];
                 int q = a_idxs[0];
-                double two_el_int = abs(sci->two_el_ints[pqrs4DTo1D(p, q, p, q, n_orbs)]);
+                double two_el_int = abs(impl->two_el_ints(p, q, p, q));
                 if (max_ci_coeff * two_el_int > Settings::getEpsilonVar())
                     innerPrefixHelper2El(p, q, p, q, icfg_right, nue_right, onv_right,
                                          sfs_right, wfn_right, data_fois, data_var);
@@ -2341,14 +2345,14 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqEpq(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqEpr(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right,
-                                               const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqEpr(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right,
+                                                     const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 4)
         return;
@@ -2462,7 +2466,7 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqEpr(const double &max_ci_coeff, const
             int r = a_idxs[1];
             int p = c_idxs[0];
 
-            double two_el_int = abs(sci->two_el_ints[pqrs4DTo1D(p, q, p, r, n_orbs)]);
+            double two_el_int = abs(impl->two_el_ints(p, q, p, r));
             if (max_ci_coeff * two_el_int > Settings::getEpsilonVar())
                 innerPrefixHelper2El(p, q, p, r, icfg_right, nue_right, onv_right,
                                      sfs_right, wfn_right, data_fois, data_var);
@@ -2474,14 +2478,14 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqEpr(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqErq(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right,
-                                               const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqErq(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right,
+                                                     const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 4)
         return;
@@ -2594,7 +2598,7 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqErq(const double &max_ci_coeff, const
             int p = c_idxs[0];
             int r = c_idxs[1];
 
-            double two_el_int = abs(sci->two_el_ints[pqrs4DTo1D(p, q, r, q, n_orbs)]);
+            double two_el_int = abs(impl->two_el_ints(p, q, r, q));
             if (max_ci_coeff * two_el_int > Settings::getEpsilonVar())
                 innerPrefixHelper2El(p, q, r, q, icfg_right, nue_right, onv_right,
                                      sfs_right, wfn_right, data_fois, data_var);
@@ -2606,14 +2610,14 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqErq(const double &max_ci_coeff, const
     }
 }
 
-void SCI::PrefixAlgorithm::prefixHelper_EpqErs(const double &max_ci_coeff, const int &na, const int &nc,
-                                               const int &occ_diff_sum, const int &icfg_right,
-                                               const string &onv_right,
-                                               const vector<int> &a_idxs,
-                                               const vector<int> &c_idxs,
-                                               const vector<string> &sfs_right,
-                                               const wfn_ptr &wfn_right,
-                                               DataFOIS &data_fois, DataVar &data_var)
+void GCI::Impl::PrefixAlgorithm::prefixHelper_EpqErs(const double &max_ci_coeff, const int &na, const int &nc,
+                                                     const int &occ_diff_sum, const int &icfg_right,
+                                                     const string &onv_right,
+                                                     const vector<int> &a_idxs,
+                                                     const vector<int> &c_idxs,
+                                                     const vector<string> &sfs_right,
+                                                     const wfn_ptr &wfn_right,
+                                                     DataFOIS &data_fois, DataVar &data_var)
 {
     if (occ_diff_sum > 4)
         return;
@@ -2858,12 +2862,12 @@ void SCI::PrefixAlgorithm::prefixHelper_EpqErs(const double &max_ci_coeff, const
             int p = c_idxs[0];
             int r = c_idxs[1];
 
-            double two_el_int = abs(sci->two_el_ints[pqrs4DTo1D(p, q, r, s, n_orbs)]);
+            double two_el_int = abs(impl->two_el_ints(p, q, r, s));
             if (max_ci_coeff * two_el_int > Settings::getEpsilonVar())
                 innerPrefixHelper2El(p, q, r, s, icfg_right, nue_right, onv_right,
                                      sfs_right, wfn_right, data_fois, data_var);
 
-            two_el_int = abs(sci->two_el_ints[pqrs4DTo1D(p, s, r, q, n_orbs)]);
+            two_el_int = abs(impl->two_el_ints(p, s, r, q));
             if (max_ci_coeff * two_el_int > Settings::getEpsilonVar())
                 innerPrefixHelper2El(p, s, r, q, icfg_right, nue_right, onv_right,
                                      sfs_right, wfn_right, data_fois, data_var);

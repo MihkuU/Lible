@@ -18,7 +18,7 @@ using std::set;
 using std::string;
 using std::vector;
 
-set<string> SCI::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
+set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
 {
     vector<vector<pair<string, dvec>>> generators_by_roots = generateGenerators(n_generators);
     set<string> generators;
@@ -28,13 +28,13 @@ set<string> SCI::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
             generators.insert(item2.first);
     }
 
-    vector<string> prefixes_scattered = sci->prefix_algorithm->prefixBonanza(generators);
+    vector<string> prefixes_scattered = impl->prefix_algorithm->prefixBonanza(generators);
     n_prefixes = prefixes_scattered.size();
 
 #ifdef _USE_MPI_
-    // mpi::all_reduce(mpi::communicator(sci->world, mpi::comm_duplicate),
+    // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
     //                 n_prefixes, n_prefixes, std::plus<size_t>());
-#endif                    
+#endif
 
     int num_threads;
 #pragma omp parallel
@@ -70,7 +70,7 @@ set<string> SCI::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
         int thread_num = omp_get_thread_num();
         DataFOIS data_fois_local;
         DataVar data_var_local;
-        sci->prefix_algorithm->generateConfsAndConnections(prefixes_para[thread_num],
+        impl->prefix_algorithm->generateConfsAndConnections(prefixes_para[thread_num],
                                                            generators_by_roots,
                                                            wave_function,
                                                            data_fois_local,
@@ -93,8 +93,8 @@ set<string> SCI::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     /*
      * Next is a crucial section where the new spin-functions are appended to the current ones.
      */
-    appendSpinFunctions(onvs_sfs_reduced, sci->sfs_map__idx_to_sf,
-                        sci->sfs_map__sf_to_idx);
+    appendSpinFunctions(onvs_sfs_reduced, impl->sfs_map__idx_to_sf,
+                        impl->sfs_map__sf_to_idx);
 
     /*
      * Setting up the wave function for CIPSI-pruning. Essentially we transfer the HCI-wave function
@@ -114,8 +114,8 @@ set<string> SCI::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     /*
      * Almost there.. now calculating CCs.
      */
-    sci->coupling_coeffs->constructCCs(sf_pairs_1el_cipsi, sf_pairs_2el_cipsi,
-                                       sci->ccs_2el, sci->ccs_1el);
+    impl->coupling_coeffs->constructCCs(sf_pairs_1el_cipsi, sf_pairs_2el_cipsi,
+                                       impl->ccs_2el, impl->ccs_1el);
 
     /*
      * Finally do the CIPSI-pruning....
@@ -133,9 +133,9 @@ set<string> SCI::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     return selected_cfgs;
 }
 
-void SCI::CIPSI::appendCFGsAndCSFs(const map<string, vector<int>> &selected_cfgs_sfs,
-                                   set<string> &selected_cfgs,
-                                   wfn_ptr &wave_function)
+void GCI::Impl::CIPSI::appendCFGsAndCSFs(const map<string, vector<int>> &selected_cfgs_sfs,
+                                         set<string> &selected_cfgs,
+                                         wfn_ptr &wave_function)
 {
     for (auto &item : selected_cfgs_sfs)
     {
@@ -143,7 +143,7 @@ void SCI::CIPSI::appendCFGsAndCSFs(const map<string, vector<int>> &selected_cfgs
         selected_cfgs.insert(item.first);
         CFG cfg(spin, onv);
         int nue = cfg.getNUE();
-        map<int, string> sfs_map = sci->sfs_map__idx_to_sf.at(nue);
+        map<int, string> sfs_map = impl->sfs_map__idx_to_sf.at(nue);
         map<string, int> sfs_map_new;
         for (const int &sf_idx : item.second)
             sfs_map_new[sfs_map.at(sf_idx)] = sf_idx;
@@ -153,21 +153,21 @@ void SCI::CIPSI::appendCFGsAndCSFs(const map<string, vector<int>> &selected_cfgs
 }
 
 vector<vector<pair<string, dvec>>>
-SCI::CIPSI::generateGenerators(size_t &n_generators)
-{    
+GCI::Impl::CIPSI::generateGenerators(size_t &n_generators)
+{
     vector<vector<pair<string, dvec>>> generators_by_roots(n_roots);
     n_generators = 0;
     for (size_t iroot = 0; iroot < n_roots; iroot++)
     {
         vector<pair<string, dvec>> generators_iroot;
 
-        dvec coeffs_iroot = arma::conv_to<arma::dvec>::from(sci->ci_vectors[iroot]);
+        dvec coeffs_iroot = arma::conv_to<arma::dvec>::from(impl->ci_vectors[iroot]);
 
-        for (size_t iconf = 0; iconf < sci->wave_function->getNumCFGs(); iconf++)
+        for (size_t iconf = 0; iconf < impl->wave_function->getNumCFGs(); iconf++)
         {
-            size_t pos = sci->wave_function->getPos(iconf);
-            size_t dim = sci->wave_function->getDim(iconf);
-            string cfg = sci->wave_function->getONV(iconf);
+            size_t pos = impl->wave_function->getPos(iconf);
+            size_t dim = impl->wave_function->getDim(iconf);
+            string cfg = impl->wave_function->getONV(iconf);
 
             dvec coeffs(dim);
             for (size_t mu = 0; mu < dim; mu++)
@@ -179,7 +179,7 @@ SCI::CIPSI::generateGenerators(size_t &n_generators)
             {
                 generators_iroot.push_back(std::make_pair(cfg, coeffs));
                 n_generators++;
-            }                
+            }
         }
 
         std::sort(generators_iroot.begin(), generators_iroot.end(),
@@ -192,9 +192,9 @@ SCI::CIPSI::generateGenerators(size_t &n_generators)
     return generators_by_roots;
 }
 
-void SCI::CIPSI::appendSpinFunctions(const map<string, set<string>> &onvs_sfs_reduced,
-                                     map<int, map<int, string>> &sfs_map__idx_to_sf,
-                                     map<int, map<string, int>> &sfs_map__sf_to_idx)
+void GCI::Impl::CIPSI::appendSpinFunctions(const map<string, set<string>> &onvs_sfs_reduced,
+                                           map<int, map<int, string>> &sfs_map__idx_to_sf,
+                                           map<int, map<string, int>> &sfs_map__sf_to_idx)
 {
     map<size_t, set<string>> sfs_reduced;
     for (auto &item : onvs_sfs_reduced)
@@ -203,23 +203,23 @@ void SCI::CIPSI::appendSpinFunctions(const map<string, set<string>> &onvs_sfs_re
         size_t nue = count(cfg.begin(), cfg.end(), '1');
         sfs_reduced[nue].insert(item.second.begin(), item.second.end());
     }
-#ifdef _USE_MPI_    
-    // mpi::all_reduce(mpi::communicator(sci->world, mpi::comm_duplicate),
+#ifdef _USE_MPI_
+    // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
     //                 sfs_reduced, sfs_reduced, addAndReturnMaps());
-#endif                    
+#endif
 
     for (auto &item : sfs_reduced)
     {
         size_t nue = item.first;
-        sci->spin_functions[nue].insert(item.second.begin(), item.second.end());
+        impl->spin_functions[nue].insert(item.second.begin(), item.second.end());
 
-        if (sci->sfs_map__sf_to_idx.find(nue) == sci->sfs_map__sf_to_idx.end())
+        if (impl->sfs_map__sf_to_idx.find(nue) == impl->sfs_map__sf_to_idx.end())
         {
             size_t pos = 0;
             for (auto &sf : item.second)
             {
-                sci->sfs_map__sf_to_idx[nue][sf] = pos;
-                sci->sfs_map__idx_to_sf[nue][pos] = sf;
+                impl->sfs_map__sf_to_idx[nue][sf] = pos;
+                impl->sfs_map__idx_to_sf[nue][pos] = sf;
                 pos++;
             }
         }
@@ -227,11 +227,11 @@ void SCI::CIPSI::appendSpinFunctions(const map<string, set<string>> &onvs_sfs_re
         {
             for (auto &sf : item.second)
             {
-                if (sci->sfs_map__sf_to_idx.at(nue).find(sf) == sci->sfs_map__sf_to_idx.at(nue).end())
+                if (impl->sfs_map__sf_to_idx.at(nue).find(sf) == impl->sfs_map__sf_to_idx.at(nue).end())
                 {
-                    size_t pos = sci->sfs_map__sf_to_idx.at(nue).size();
-                    sci->sfs_map__sf_to_idx[nue][sf] = pos;
-                    sci->sfs_map__idx_to_sf[nue][pos] = sf;
+                    size_t pos = impl->sfs_map__sf_to_idx.at(nue).size();
+                    impl->sfs_map__sf_to_idx[nue][sf] = pos;
+                    impl->sfs_map__idx_to_sf[nue][pos] = sf;
                 }
                 else
                     continue;
@@ -240,7 +240,7 @@ void SCI::CIPSI::appendSpinFunctions(const map<string, set<string>> &onvs_sfs_re
     }
 }
 
-vector<wfn_ptr> SCI::CIPSI::setUpCIPSIWaveFunction(const vector<DataFOIS> &data_fois_para)
+vector<wfn_ptr> GCI::Impl::CIPSI::setUpCIPSIWaveFunction(const vector<DataFOIS> &data_fois_para)
 {
     int num_threads;
 #pragma omp parallel
@@ -258,7 +258,7 @@ vector<wfn_ptr> SCI::CIPSI::setUpCIPSIWaveFunction(const vector<DataFOIS> &data_
         {
             const CFG *cfg = wfn_hci_local->getCFGPtr(icfg);
             int nue = cfg->getNUE();
-            map<string, int> sf_map = returnSFMap(sci->sfs_map__sf_to_idx.at(nue), sfs);
+            map<string, int> sf_map = returnSFMap(impl->sfs_map__sf_to_idx.at(nue), sfs);
 
             CFG cfg_new(spin, cfg->getONV());
             cfg_new.createCSFsFromSFs(sf_map);
@@ -274,12 +274,12 @@ vector<wfn_ptr> SCI::CIPSI::setUpCIPSIWaveFunction(const vector<DataFOIS> &data_
     return wfn_cipsi_para;
 }
 
-void SCI::CIPSI::constructSFPairs(const wfn_ptr &wave_function,
-                                  const vector<DataFOIS> &data_fois_para,
-                                  const vector<DataVar> &data_var_para,
-                                  const vector<wfn_ptr> &wfn_cipsi_para,
-                                  sf_pair_map_1el &sf_pairs_1el_cipsi,
-                                  sf_pair_map_2el &sf_pairs_2el_cipsi)
+void GCI::Impl::CIPSI::constructSFPairs(const wfn_ptr &wave_function,
+                                        const vector<DataFOIS> &data_fois_para,
+                                        const vector<DataVar> &data_var_para,
+                                        const vector<wfn_ptr> &wfn_cipsi_para,
+                                        sf_pair_map_1el &sf_pairs_1el_cipsi,
+                                        sf_pair_map_2el &sf_pairs_2el_cipsi)
 {
 #pragma omp parallel
     {
@@ -368,8 +368,8 @@ void SCI::CIPSI::constructSFPairs(const wfn_ptr &wave_function,
 }
 
 map<string, vector<int>>
-SCI::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
-                           const vector<DataFOIS> &data_fois_para)
+GCI::Impl::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
+                                 const vector<DataFOIS> &data_fois_para)
 {
     map<string, vector<int>> selected_cfgs_sfs;
 #pragma omp parallel
@@ -377,19 +377,19 @@ SCI::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
         int thread_num = omp_get_thread_num();
         const WaveFunction *wfn_cipsi_local = wfn_cipsi_para[thread_num].get();
 
-        dvec diag = arma::conv_to<dvec>::from(sci->calcDiag(wfn_cipsi_local));
+        dvec diag = arma::conv_to<dvec>::from(impl->calcDiag(wfn_cipsi_local));
 
         vector<dvec> sigma_vectors(n_roots);
         for (size_t iroot = 0; iroot < n_roots; iroot++)
-            sigma_vectors[iroot] = arma::conv_to<dvec>::from(sci->calcSigma(data_fois_para[thread_num],
-                                                                            sci->ci_vectors[iroot],
+            sigma_vectors[iroot] = arma::conv_to<dvec>::from(impl->calcSigma(data_fois_para[thread_num],
+                                                                            impl->ci_vectors[iroot],
                                                                             wfn_cipsi_local));
 
         map<string, vector<int>> selected_cfgs_sfs_local;
         for (size_t iroot = 0; iroot < n_roots; iroot++)
         {
             dvec energy_minus_diag(diag.n_elem);
-            energy_minus_diag.fill(sci->ci_energies[iroot]);
+            energy_minus_diag.fill(impl->ci_energies[iroot]);
             energy_minus_diag -= diag;
 
             dvec cipsi_importance_function = abs(sigma_vectors[iroot] / energy_minus_diag);
@@ -423,10 +423,10 @@ SCI::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
         }
     }
 
-#ifdef _USE_MPI_    
-    // mpi::all_reduce(mpi::communicator(sci->world, mpi::comm_duplicate),
+#ifdef _USE_MPI_
+    // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
     //                 selected_cfgs_sfs, selected_cfgs_sfs, mergeAndReturnMaps());
-#endif                    
+#endif
 
     return selected_cfgs_sfs;
 }

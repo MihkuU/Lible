@@ -8,13 +8,13 @@ namespace lible
 {
     namespace guga
     {
-        class SCI::CIPSI
+        class GCI::Impl::CIPSI
         {
         public:
-            CIPSI(SCI *gci_) : sci(gci_)
+            CIPSI(Impl *gci_) : impl(gci_)
             {
-                spin = sci->spin;
-                n_roots = sci->n_roots;
+                spin = impl->spin;
+                n_roots = impl->n_roots;
             }
 
             std::set<std::string> selectCFGsAndCSFs(wfn_ptr &wave_function);
@@ -35,7 +35,7 @@ namespace lible
             }
 
         private:
-            SCI *sci;
+            Impl *impl;
             double spin;
             int n_roots;
             size_t n_csfs_new;

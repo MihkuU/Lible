@@ -22,36 +22,39 @@ using std::string;
 using std::unordered_map;
 using std::vector;
 
-SCI::SCI(const int &n_orbs_, const int &n_els_,
-         const int &n_roots_, const int &multiplicity_,
-         const vector<double> &one_el_ints_,
-         const vector<double> &two_el_ints_)
+GCI::Impl::Impl(const int &n_orbs_, const int &n_els_,
+                const int &n_roots_, const int &multiplicity_,
+                const vec2d &one_el_ints_,
+                const vec4d &two_el_ints_)
     : n_orbs(n_orbs_), n_els(n_els_),
       n_roots(n_roots_), multiplicity(multiplicity_),
       one_el_ints(one_el_ints_), two_el_ints(two_el_ints_)
 {
     spin = 0.5 * (multiplicity - 1);
     min_nue = 2 * spin;
+
+    wave_function = std::make_unique<WaveFunction>(spin);
+    connections = std::make_unique<Connections>(this);
+    coupling_coeffs = std::make_unique<CouplingCoeffs>(this);
 }
 
-SCI::~SCI() = default;
+GCI::Impl::~Impl() = default;
 
-SCI::SCI(SCI &&) noexcept = default;
-SCI &SCI::operator=(SCI &&) noexcept = default;
+GCI::Impl::Impl(Impl &&) noexcept = default;
+GCI::Impl &GCI::Impl::operator=(Impl &&) noexcept = default;
 
-void SCI::run(vector<double> &ci_energies_out,
-              vector<vector<double>> &ci_vectors_out)
+void GCI::Impl::run(vector<double> &ci_energies_out,
+                    vector<vector<double>> &ci_vectors_out)
 {
-    palPrint("\nLible::guga-SCI calculation\n\n");
-
-    palPrint("   Starting from the HF-configuration... \n");
-
-    createHFConf(cfgs_new, wave_function, spin_functions,
-                 sfs_map__idx_to_sf, sfs_map__sf_to_idx);
-
 #ifdef _USE_MPI_
     if (world != MPI_COMM_NULL)
     {
+        palPrint("\nLible::GCI calculation\n");
+
+        palPrint("   Starting from the HF-configuration. \n");
+
+        createHFConf(cfgs_new, wave_function, spin_functions,
+                     sfs_map__idx_to_sf, sfs_map__sf_to_idx);
 #endif
 
         runKernel(ci_energies, ci_vectors,
@@ -65,120 +68,119 @@ void SCI::run(vector<double> &ci_energies_out,
     }
 #endif
 
-    palPrint("\nLible::guga-SCI finished\n");
+    palPrint("\nLible::GCI finished\n");
 }
 
-void SCI::runFromCFGs(const vector<string> &cfgs,
-                      vector<double> &ci_energies_out,
-                      vector<vector<double>> &ci_vectors_out)
-{
-    palPrint("\nLible::guga-SCI calculation\n\n");
+// void GCI::Impl::runFromCFGs(const vector<string> &cfgs,
+//                             vector<double> &ci_energies_out,
+//                             vector<vector<double>> &ci_vectors_out)
+// {
+//     palPrint("\nLible::guga-Impl calculation\n\n");
 
-    palPrint("   Starting from the given CFGs... \n");
-    palPrint("      All CSFs per CFG will be created\n");
+//     palPrint("   Starting from the given CFGs. \n");
+//     palPrint("      All CSFs per CFG will be created\n");
 
-#ifdef _USE_MPI_
-    if (world != MPI_COMM_NULL)
-    {
-#endif
+// #ifdef _USE_MPI_
+//     if (world != MPI_COMM_NULL)
+//     {
+// #endif
 
-        runKernel(ci_energies, ci_vectors,
-                  energies_per_iter,
-                  previous_ci_coeffs_map);
+//         runKernel(ci_energies, ci_vectors,
+//                   energies_per_iter,
+//                   previous_ci_coeffs_map);
 
-        ci_energies_out = ci_energies;
-        ci_vectors_out = ci_vectors;
+//         ci_energies_out = ci_energies;
+//         ci_vectors_out = ci_vectors;
 
-#ifdef _USE_MPI_
-    }
-#endif
+// #ifdef _USE_MPI_
+//     }
+// #endif
 
-    palPrint("\nLible::guga-SCI finished\n");
-}
+//     palPrint("\nLible::guga-Impl finished\n");
+// }
 
-void SCI::runFromCSFs(const vector<string> &csfs,
-                      vector<double> &ci_energies_out,
-                      vector<vector<double>> &ci_vectors_out)
-{
-    palPrint("\nLible::guga-SCI calculation\n\n");
+// void GCI::Impl::runFromCSFs(const vector<string> &csfs,
+//                             vector<double> &ci_energies_out,
+//                             vector<vector<double>> &ci_vectors_out)
+// {
+//     palPrint("\nLible::guga-Impl calculation\n\n");
 
-    palPrint("   Starting from the given CSFs... \n");
+//     palPrint("   Starting from the given CSFs. \n");
 
-#ifdef _USE_MPI_
-    if (world != MPI_COMM_NULL)
-    {
-#endif
+// #ifdef _USE_MPI_
+//     if (world != MPI_COMM_NULL)
+//     {
+// #endif
 
-        runKernel(ci_energies, ci_vectors,
-                  energies_per_iter,
-                  previous_ci_coeffs_map);
+//         runKernel(ci_energies, ci_vectors,
+//                   energies_per_iter,
+//                   previous_ci_coeffs_map);
 
-        ci_energies_out = ci_energies;
-        ci_vectors_out = ci_vectors;
+//         ci_energies_out = ci_energies;
+//         ci_vectors_out = ci_vectors;
 
-#ifdef _USE_MPI_
-    }
-#endif
+// #ifdef _USE_MPI_
+//     }
+// #endif
 
-    palPrint("\nLible::guga-SCI finished\n");
-}
+//     palPrint("\nLible::guga-Impl finished\n");
+// }
 
-void SCI::runFromCFGsFile(const string &cfgs_fname,
-                          vector<double> &ci_energies_out,
-                          vector<vector<double>> &ci_vectors_out)
-{
-    palPrint("\nLible::guga-SCI calculation\n\n");
+// void GCI::Impl::runFromCFGsFile(const string &cfgs_fname,
+//                                 vector<double> &ci_energies_out,
+//                                 vector<vector<double>> &ci_vectors_out)
+// {
+//     palPrint("\nLible::guga-Impl calculation\n\n");
 
-    palPrint(fmt::format("   Reading starting CFGs from a file: {}\n", cfgs_fname));
+//     palPrint(fmt::format("   Reading starting CFGs from a file: {}\n", cfgs_fname));
 
-#ifdef _USE_MPI_
-    if (world != MPI_COMM_NULL)
-    {
-#endif
+// #ifdef _USE_MPI_
+//     if (world != MPI_COMM_NULL)
+//     {
+// #endif
 
-        runKernel(ci_energies, ci_vectors,
-                  energies_per_iter,
-                  previous_ci_coeffs_map);
+//         runKernel(ci_energies, ci_vectors,
+//                   energies_per_iter,
+//                   previous_ci_coeffs_map);
 
-        ci_energies_out = ci_energies;
-        ci_vectors_out = ci_vectors;
+//         ci_energies_out = ci_energies;
+//         ci_vectors_out = ci_vectors;
 
-#ifdef _USE_MPI_
-    }
-#endif
+// #ifdef _USE_MPI_
+//     }
+// #endif
 
-    palPrint("\nLible::guga-SCI finished\n");
-}
+//     palPrint("\nLible::guga-Impl finished\n");
+// }
 
-void SCI::runFromCSFsFile(const string &csfs_fname,
-                          vector<double> &ci_energies_out,
-                          vector<vector<double>> &ci_vectors_out)
-{
-    palPrint("\nLible::guga-SCI calculation\n\n");
+// void GCI::Impl::runFromCSFsFile(const string &csfs_fname,
+//                                 vector<double> &ci_energies_out,
+//                                 vector<vector<double>> &ci_vectors_out)
+// {
+// #ifdef _USE_MPI_
+//     if (world != MPI_COMM_NULL)
+//     {
+// #endif
+//         palPrint("\nLible::guga-Impl calculation\n\n");
 
-    palPrint(fmt::format("   Readinf starting CSFs from a file: {}\n", csfs_fname));
+//         palPrint(fmt::format("   Readinf starting CSFs from a file: {}\n", csfs_fname));
 
-#ifdef _USE_MPI_
-    if (world != MPI_COMM_NULL)
-    {
-#endif
+//         runKernel(ci_energies, ci_vectors,
+//                   energies_per_iter,
+//                   previous_ci_coeffs_map);
 
-        runKernel(ci_energies, ci_vectors,
-                  energies_per_iter,
-                  previous_ci_coeffs_map);
+//         ci_energies_out = ci_energies;
+//         ci_vectors_out = ci_vectors;
 
-        ci_energies_out = ci_energies;
-        ci_vectors_out = ci_vectors;
+// #ifdef _USE_MPI_
+//     }
+// #endif
 
-#ifdef _USE_MPI_
-    }
-#endif
-
-    palPrint("\nLible::guga-SCI finished\n");
-}
+//     palPrint("\nLible::guga-Impl finished\n");
+// }
 
 vector<unordered_map<string, double>>
-SCI::mapPreviousCIVector(const vector<vector<double>> &ci_vectors)
+GCI::Impl::mapPreviousCIVector(const vector<vector<double>> &ci_vectors)
 {
     vector<unordered_map<string, double>> previous_ci_coeffs_map(n_roots);
     for (size_t iroot = 0; iroot < n_roots; iroot++)
@@ -200,11 +202,11 @@ SCI::mapPreviousCIVector(const vector<vector<double>> &ci_vectors)
     return previous_ci_coeffs_map;
 }
 
-void SCI::createHFConf(set<string> &cfgs_new,
-                       wfn_ptr &wave_function,
-                       map<int, set<string>> &sfs,
-                       map<int, map<int, string>> &sfs_map__idx_to_sf,
-                       map<int, map<string, int>> &sfs_map__sf_to_idx)
+void GCI::Impl::createHFConf(set<string> &cfgs_new,
+                             wfn_ptr &wave_function,
+                             map<int, set<string>> &sfs,
+                             map<int, map<int, string>> &sfs_map__idx_to_sf,
+                             map<int, map<string, int>> &sfs_map__sf_to_idx)
 {
     string onv(n_orbs, '0');
 
@@ -235,10 +237,10 @@ void SCI::createHFConf(set<string> &cfgs_new,
     wave_function->insertCFG(cfg);
 }
 
-void SCI::createAllSFs(const int &nue_max,
-                       map<int, set<string>> &sfs,
-                       map<int, map<int, string>> &sfs_map__idx_to_sf,
-                       map<int, map<string, int>> &sfs_map__sf_to_idx)
+void GCI::Impl::createAllSFs(const int &nue_max,
+                             map<int, set<string>> &sfs,
+                             map<int, map<int, string>> &sfs_map__idx_to_sf,
+                             map<int, map<string, int>> &sfs_map__sf_to_idx)
 {
     sfs.clear();
     sfs_map__idx_to_sf.clear();
@@ -274,9 +276,9 @@ void SCI::createAllSFs(const int &nue_max,
     }
 }
 
-void SCI::createAllSFsRecursive(const int &nue, char step,
-                                double s, int i, string sf,
-                                map<int, set<string>> &sfs)
+void GCI::Impl::createAllSFsRecursive(const int &nue, char step,
+                                      double s, int i, string sf,
+                                      map<int, set<string>> &sfs)
 {
     sf[i] = step;
 
@@ -296,10 +298,10 @@ void SCI::createAllSFsRecursive(const int &nue, char step,
     }
 }
 
-void SCI::runKernel(vector<double> &ci_energies,
-                    vector<vector<double>> &ci_vectors,
-                    vector<vector<double>> &energies_per_iter,
-                    vector<unordered_map<string, double>> &previous_ci_coeffs_map)
+void GCI::Impl::runKernel(vector<double> &ci_energies,
+                          vector<vector<double>> &ci_vectors,
+                          vector<vector<double>> &energies_per_iter,
+                          vector<unordered_map<string, double>> &previous_ci_coeffs_map)
 
 {
     auto start = std::chrono::steady_clock::now();
@@ -315,7 +317,7 @@ void SCI::runKernel(vector<double> &ci_energies,
 
     for (iter_sci = 1; iter_sci <= Settings::getMaxIter(); iter_sci++)
     {
-        palPrint(fmt::format("\n============================|  SCI iteration %3d  |============================\n", iter_sci));
+        palPrint(fmt::format("\n============================|  GCI iteration %3d  |============================\n", iter_sci));
 
         palPrint(fmt::format("\n   Selecting CFGs and CSFs (HCI+CIPSI)...           "));
 
@@ -337,11 +339,13 @@ void SCI::runKernel(vector<double> &ci_energies,
 
         if (n_csfs_new == 0)
         {
-            palPrint(fmt::format("\n   SCI converged, no new CSFs were found!\n"));
+            palPrint(fmt::format("\n   Impl converged, no new CSFs were found!\n"));
             break;
         }
 
-        solveCI(ci_energies, ci_vectors, energies_per_iter,
+        solveCI(ci_energies,
+                ci_vectors,
+                energies_per_iter,
                 previous_ci_coeffs_map);
 
         size_t n_cfgs = wave_function->getNumCFGs();
@@ -362,12 +366,12 @@ void SCI::runKernel(vector<double> &ci_energies,
 
         if (converged)
         {
-            palPrint(fmt::format("\n   SCI converged - E_diff = {:.2e} less than E_tol = {:.2e}\n",
+            palPrint(fmt::format("\n   Impl converged - E_diff = {:.2e} less than E_tol = {:.2e}\n",
                                  arma::min(arma::abs(energy_diff)), Settings::getEnergyTol()));
             break;
         }
     }
-    
+
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> duration{end - start};
 
@@ -377,12 +381,12 @@ void SCI::runKernel(vector<double> &ci_energies,
     palPrint(fmt::format("\n\n    Duration of variational part: {:6.4} s.\n", duration.count()));
 }
 
-void SCI::solveCI(vector<double> &ci_energies,
-                  vector<vector<double>> &ci_vectors,
-                  vector<vector<double>> &energies_per_iter,
-                  vector<unordered_map<string, double>> &previous_ci_coeffs_map)
+void GCI::Impl::solveCI(vector<double> &ci_energies,
+                        vector<vector<double>> &ci_vectors,
+                        vector<vector<double>> &energies_per_iter,
+                        vector<unordered_map<string, double>> &previous_ci_coeffs_map)
 {
-    palPrint("\n\n   Constructing configuration connections...              ");
+    palPrint("   Constructing configuration connections...              ");
 
     auto start{std::chrono::steady_clock::now()};
     connection_map_2el connections_2el_new;
@@ -394,9 +398,9 @@ void SCI::solveCI(vector<double> &ci_energies,
 
     auto end(std::chrono::steady_clock::now());
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format("done ({:.4} s)", duration.count()));
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
 
-    palPrint("\n   Constructing coupling coefficients...");
+    palPrint("   Constructing coupling coefficients...                  ");
 
     start = std::chrono::steady_clock::now();
     coupling_coeffs->constructCCs(connections_1el_new, connections_2el_new,
@@ -404,7 +408,7 @@ void SCI::solveCI(vector<double> &ci_energies,
                                   ccs_1el, ccs_dia);
     end = std::chrono::steady_clock::now();
     duration = std::chrono::duration<double>(end - start);
-    palPrint(fmt::format("done ({:.4} s)", duration.count()));
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
 
     mergeConnections(connections_1el_new, connections_1el);
     mergeConnections(connections_2el_new, connections_2el);
@@ -418,11 +422,11 @@ void SCI::solveCI(vector<double> &ci_energies,
     auto [eigenvalues, eigenvectors] = lible::davidson::diagonalize(
         n_roots,
         [this]()
-        { return SCI::calcDiag(); },
+        { return Impl::calcDiag(); },
         [this](const vector<double> &diag)
-        { return SCI::calcGuess(diag); },
+        { return Impl::calcGuess(diag); },
         [this](const vector<double> &trial)
-        { return SCI::calcSigma(trial); });
+        { return Impl::calcSigma(trial); });
 
     ci_energies = std::move(eigenvalues);
     ci_vectors = std::move(eigenvectors);

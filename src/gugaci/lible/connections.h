@@ -10,12 +10,13 @@ namespace lible
 {
     namespace guga
     {
-        class SCI::Connections
+        class GCI::Impl::Connections
         {
         public:
-            Connections(SCI *gci_) : sci(gci_)
+            Connections(Impl *gci) : impl(gci)
             {
-                min_nue = sci->min_nue;
+                min_nue = impl->min_nue;
+                n_orbs = impl->n_orbs;
             }
 
             void constructConnections(const std::set<std::string> &cfgs_right,
@@ -26,7 +27,7 @@ namespace lible
                                       connection_map_dia &connections_dia);
 
         private:
-            SCI *sci;
+            Impl *impl;
             
             size_t min_nue;
             size_t n_orbs;            

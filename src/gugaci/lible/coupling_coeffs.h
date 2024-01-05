@@ -10,12 +10,12 @@ namespace lible
 {
     namespace guga
     {
-        class SCI::CouplingCoeffs
+        class GCI::Impl::CouplingCoeffs
         {
         public:
-            CouplingCoeffs(SCI *gci_) : sci(gci_)
+            CouplingCoeffs(Impl *gci_) : impl(gci_)
             {
-                spin = sci->spin;
+                spin = impl->spin;
             }
 
             void constructCCs(const sf_pair_map_1el &sf_pairs_1el_new,
@@ -32,7 +32,7 @@ namespace lible
                               std::map<quintet, cc_map> &ccs_dia);
 
         private:
-            SCI *sci;
+            Impl *impl;
             double spin;
 
             sf_pair_map_1el sf_pairs_1el;

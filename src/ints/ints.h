@@ -13,23 +13,23 @@ namespace lible
 {
     namespace ints
     {
-        Vec2D<double> overlap(const Structure &structure);
+        vec2d overlap(const Structure &structure);
+        
+        vec2d kineticEnergy(const Structure &structure);
 
-        Vec2D<double> kineticEnergy(const Structure &structure);
+        vec2d coulombAttraction(const Structure &structure);
 
-        Vec2D<double> coulombAttraction(const Structure &structure);
-
-        Vec2D<double> dipoleMoment(const Structure &structure);
+        vec2d dipoleMoment(const Structure &structure);        
 
         namespace Kernels
         {
-            Vec2D<double> overlap();
+            vec2d overlap();
             
-            Vec2D<double> kineticEnergy();
+            vec2d kineticEnergy();
 
-            Vec2D<double> coulombAttraction();
+            vec2d coulombAttraction();
 
-            Vec2D<double> dipoleMoment();
+            vec2d dipoleMoment();
         }
     }
 

@@ -15,13 +15,14 @@ endif()
 ### options
 option(BUILD_DAVIDSON "" ON)
 option(BUILD_GEOMOPT  "" ON)
-option(BUILD_GUGASCI  "" ON)
+option(BUILD_GCI      "" ON)
 option(BUILD_INTS     "" ON)
 option(BUILD_GPUINTS  "" OFF)
 
-option(USE_MPI "" ON)
+option(USE_MPI "" OFF)
 
 if(USE_MPI)
+	message("MUNN")
 	find_package(MPI REQUIRED)
 	set(CMAKE_CXX_COMPILER mpic++)
 	add_definitions(-D_USE_MPI_)

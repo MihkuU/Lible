@@ -22,6 +22,8 @@ CFG::CFG(const double &spin_, const string &occ_nr_vector_)
     top[0] = 0.5 * n_el - spin;
     top[1] = 2.0 * spin;
     top[2] = n_orb - top[0] - top[1];
+
+    
 }
 
 vector<string> CFG::extractSFs()
@@ -183,8 +185,7 @@ CFGProto::CFGProto(const double &spin_, const string &occ_nr_vector_)
 }
 
 CFGProto::CFGProto(const double &spin_, const string &occ_nr_vector_,
-                   const vector<string> &sfs)
-    : spin(spin_), occ_nr_vector(occ_nr_vector_)
+                   const vector<string> &sfs) : CFGProto(spin_, occ_nr_vector_)    
 {
     createCSFsFromSFs(sfs);
 }
@@ -232,7 +233,6 @@ void CFGProto::createCSFsFromSFs(const vector<string> &sfs)
                     sf_idx++;
                 }
             }
-
             size_t pos = csfs.size();
             csfs.push_back(csf);
             insertToTree(pos, csf);

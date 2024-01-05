@@ -13,7 +13,7 @@ namespace lible
         class WaveFunction : public CFGTree
         {
         public:
-            WaveFunction(const double &spin_) : spin(spin_)
+            WaveFunction(const double &spin) : spin(spin)
             {
                 pos_last_csf = 0;
             }

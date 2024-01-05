@@ -23,7 +23,7 @@ using std::string;
 using std::tuple;
 using std::vector;
 
-vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
+vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
 {
     size_t dim_wfn = wave_function->getNumCSFs();
 
@@ -108,7 +108,7 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
     /*
      * Guess-space connections and CC-s
      */
-    wfn_ptr wfn_guess;
+    wfn_ptr wfn_guess = std::make_unique<WaveFunction>(spin);
 
     set<string> onvs_guess;
     for (auto &item1 : sorted_diagonal_elements_map)
@@ -116,13 +116,14 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
         string onv = item1.first;
 
         onvs_guess.insert(onv);
+
         CFG cfg(spin, onv);
         int nue = cfg.getNUE();
         for (auto &item2 : item1.second.second)
         {
             string csf = item2.first;
             string sf = extractSF(csf);
-            size_t pos = sfs_map__sf_to_idx[nue][sf];
+            size_t pos = sfs_map__sf_to_idx.at(nue).at(sf);
             cfg.insertCSF(pos, csf);
         }
         wfn_guess->insertCFG(cfg);
@@ -148,8 +149,8 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
 #ifdef _USE_MPI_
         // int rank_total = returnTotalRank(world);
         // int size_total = returnTotalSize(world);
-        int rank_total;
-        int size_total;
+        int rank_total = thread_num; // TMP
+        int size_total = num_threads; // TMP
 #else
         int rank_total = thread_num;
         int size_total = num_threads;
@@ -178,8 +179,7 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
                 if (p_occ == 0)
                     continue;
 
-                val += p_occ * (one_el_ints[pq2DTo1D(p, p, n_orbs)] +
-                                0.5 * p_occ * two_el_ints[pqrs4DTo1D(p, p, p, p, n_orbs)]);
+                val += p_occ * (one_el_ints(p, p) + 0.5 * p_occ * two_el_ints(p, p, p, p));
 
                 for (size_t q = p + 1; q < n_orbs; q++)
                 {
@@ -187,7 +187,7 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
                     if (q_occ == 0)
                         continue;
 
-                    val += p_occ * q_occ * two_el_ints[pqrs4DTo1D(p, p, q, q, n_orbs)];
+                    val += p_occ * q_occ * two_el_ints(p, p, q, q);
                 }
             }
 
@@ -220,14 +220,14 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
                 string onv_left = cfg_left->getONV();
                 string onv_right = cfg_right->getONV();
 
-                double contrib = one_el_ints[pq2DTo1D(p, q, n_orbs)];
+                double contrib = one_el_ints(p, q);
                 for (size_t r = 0; r < n_orbs; r++)
                 {
                     int r_occ = onv_right[r] - '0';
                     if (r_occ == 0)
                         continue;
 
-                    contrib += 0.5 * r_occ * two_el_ints[pqrs4DTo1D(p, q, r, r, n_orbs)];
+                    contrib += 0.5 * r_occ * two_el_ints(p, q, r, r);
                 }
 
                 for (size_t r = 0; r < n_orbs; r++)
@@ -236,7 +236,7 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
                     if (r_occ == 0)
                         continue;
 
-                    contrib += 0.5 * r_occ * two_el_ints[pqrs4DTo1D(r, r, p, q, n_orbs)];
+                    contrib += 0.5 * r_occ * two_el_ints(r, r, p, q);
                 }
 
                 double fac = 1;
@@ -278,7 +278,8 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
 
             for (const auto &[icfg, pqqp] : connections)
             {
-                double two_el_int = 0.5 * two_el_ints[pqqp];
+                auto [p, q, r, s] = pqrs1DTo4D(pqqp, n_orbs);
+                double two_el_int = 0.5 * two_el_ints(p, q, r, s);
 
                 int pos = wfn_guess->getPos(icfg);
 
@@ -319,7 +320,8 @@ vector<vector<double>> SCI::calcGuess(const vector<double> &diag)
                 if (phase)
                     fac *= -1;
 
-                double contrib = two_el_ints[pqrs];
+                auto [p, q, r, s] = pqrs1DTo4D(pqrs, n_orbs);
+                double contrib = two_el_ints(p, q, r, s);
                 contrib *= fac;
 
                 CFG *cfg_left = wfn_guess->getCFGPtr(icfg_left);

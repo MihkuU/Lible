@@ -13,7 +13,7 @@ using namespace lible::guga::util;
 using std::string;
 using std::vector;
 
-vector<double> SCI::calcCCXDiag(const int &p, const int &q, const CFG *cfg)
+vector<double> GCI::Impl::calcCCXDiag(const int &p, const int &q, const CFG *cfg)
 {
     vector<double> ccx(cfg->getNumCSFs(), 0);
 
@@ -94,7 +94,7 @@ vector<double> SCI::calcCCXDiag(const int &p, const int &q, const CFG *cfg)
     return ccx;
 }
 
-vector<double> SCI::calcDiag()
+vector<double> GCI::Impl::calcDiag()
 {
     arma::dvec diag(wave_function->getNumCSFs(), arma::fill::zeros);
 
@@ -104,8 +104,8 @@ vector<double> SCI::calcDiag()
 #ifdef _USE_MPI_
         // int rank_total = returnTotalRank(world);
         // int size_total = returnTotalSize(world);
-        int rank_total;
-        int size_total;        
+        int rank_total = omp_get_thread_num(); // TMP
+        int size_total = omp_get_num_threads(); // TMP
 #else
         int rank_total = omp_get_thread_num();
         int size_total = omp_get_num_threads();
@@ -130,7 +130,7 @@ vector<double> SCI::calcDiag()
 
                 int p_occ = onv[p] - '0';
                 for (size_t mu = 0; mu < dim; mu++)
-                    diag_omp(pos + mu) += p_occ * one_el_ints[pq2DTo1D(p, p, n_orbs)];
+                    diag_omp(pos + mu) += p_occ * one_el_ints(p, p);
             }
 
             for (size_t p = 0; p < n_orbs; p++)
@@ -139,7 +139,7 @@ vector<double> SCI::calcDiag()
                     continue;
 
                 for (size_t mu = 0; mu < dim; mu++)
-                    diag_omp(pos + mu) += two_el_ints[pqrs4DTo1D(p, p, p, p, n_orbs)];
+                    diag_omp(pos + mu) += two_el_ints(p, p, p, p);
             }
 
             for (size_t p = 0; p < n_orbs; p++)
@@ -155,8 +155,7 @@ vector<double> SCI::calcDiag()
                     int q_occ = onv[q] - '0';
 
                     for (size_t mu = 0; mu < dim; mu++)
-                        diag_omp(pos + mu) += p_occ * q_occ *
-                                              two_el_ints[pqrs4DTo1D(p, p, q, q, n_orbs)];
+                        diag_omp(pos + mu) += p_occ * q_occ * two_el_ints(p, p, q, q);
                 }
             }
 
@@ -172,7 +171,7 @@ vector<double> SCI::calcDiag()
 
                     vector<double> ccx_diag = calcCCXDiag(p, q, conf_p);
                     for (size_t mu = 0; mu < dim; mu++)
-                        diag_omp(pos + mu) -= 0.5 * two_el_ints[pqrs4DTo1D(p, q, q, p, n_orbs)] *
+                        diag_omp(pos + mu) -= 0.5 * two_el_ints(p, q, q, p) *
                                               (p_occ * q_occ + ccx_diag[mu]);
                 }
             }
@@ -192,7 +191,7 @@ vector<double> SCI::calcDiag()
     return arma::conv_to<vector<double>>::from(diag);
 }
 
-vector<double> SCI::calcDiag(const WaveFunction *wave_function)
+vector<double> GCI::Impl::calcDiag(const WaveFunction *wave_function)
 {
     vector<double> diag(wave_function->getNumCSFs(), 0);
 
@@ -211,7 +210,7 @@ vector<double> SCI::calcDiag(const WaveFunction *wave_function)
 
             int p_occ = onv[p] - '0';
             for (size_t mu = 0; mu < dim; mu++)
-                diag[pos + mu] += p_occ * one_el_ints[pq2DTo1D(p, p, n_orbs)];
+                diag[pos + mu] += p_occ * one_el_ints(p, p);
         }
 
         for (size_t p = 0; p < n_orbs; p++)
@@ -220,14 +219,14 @@ vector<double> SCI::calcDiag(const WaveFunction *wave_function)
                 continue;
 
             for (size_t mu = 0; mu < dim; mu++)
-                diag[pos + mu] += two_el_ints[pqrs4DTo1D(p, p, p, p, n_orbs)];
+                diag[pos + mu] += two_el_ints(p, p, p, p);
         }
 
         for (size_t p = 0; p < n_orbs; p++)
         {
             if (onv[p] == '0')
                 continue;
-                
+
             int p_occ = onv[p] - '0';
             for (size_t q = p + 1; q < n_orbs; q++)
             {
@@ -236,8 +235,7 @@ vector<double> SCI::calcDiag(const WaveFunction *wave_function)
                 int q_occ = onv[q] - '0';
 
                 for (size_t mu = 0; mu < dim; mu++)
-                    diag[pos + mu] += p_occ * q_occ *
-                                      two_el_ints[pqrs4DTo1D(p, p, q, q, n_orbs)];
+                    diag[pos + mu] += p_occ * q_occ * two_el_ints(p, p, q, q);
             }
         }
 
@@ -253,8 +251,7 @@ vector<double> SCI::calcDiag(const WaveFunction *wave_function)
 
                 vector<double> ccx_diag = calcCCXDiag(p, q, cfg);
                 for (size_t mu = 0; mu < dim; mu++)
-                    diag[pos + mu] -= 0.5 * two_el_ints[pqrs4DTo1D(p, q, q, p, n_orbs)] *
-                                      (p_occ * q_occ + ccx_diag[mu]);
+                    diag[pos + mu] -= 0.5 * two_el_ints(p, q, q, p) * (p_occ * q_occ + ccx_diag[mu]);
             }
         }
     }

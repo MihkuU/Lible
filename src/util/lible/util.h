@@ -28,17 +28,17 @@ namespace lible
     };
 #endif
 
-    static void palPrint(const std::string &message, const bool silent = false)
+    static void palPrint(const std::string &message, const bool shutup = false)
     {
-        if (!silent)
+        if (!shutup)
         {
 #ifdef _USE_MPI_
             int rank;
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             if (rank == 0)
-                std::cout << message << std::endl;
+                std::cout << message;
 #else
-            std::cout << message << std::endl;
+            std::cout << message;
 #endif
         }
     }

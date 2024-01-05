@@ -6,8 +6,9 @@
 #include <utility>
 #include <vector>
 
-#include "lible/gci_settings.h"
-#include "lible/gci_util.h"
+#include <lible/gci.h>
+#include <lible/gci_settings.h>
+#include <lible/gci_util.h>
 
 #ifdef _USE_MPI_
 #include <mpi.h>
@@ -17,51 +18,49 @@ namespace lible
 {
 	namespace guga
 	{
-		class SCI
+		class GCI::Impl
 		{
 			/*
-			 *
+			 * TODO:: since its a nested PIMPL class that is forward-declared in "gci.h", maybe called it just Impl??
 			 */
 		public:
-			SCI(const int &n_orbs, const int &n_els,
-				const int &n_roots, const int &multiplicity,
-				const std::vector<double> &one_el_ints,
-				const std::vector<double> &two_el_ints);
+			Impl(const int &n_orbs, const int &n_els,
+				 const int &n_roots, const int &multiplicity,
+				 const vec2d &one_el_ints, const vec4d &two_el_ints);
+			~Impl();
 
-			~SCI();
+			Impl(const Impl &) = delete;
+			Impl &operator=(const Impl &) = delete;
 
-			SCI(const SCI &) = delete;
-			SCI &operator=(const SCI &) = delete;
-
-			SCI(SCI &&) noexcept;
-			SCI &operator=(SCI &&) noexcept;
+			Impl(Impl &&) noexcept;
+			Impl &operator=(Impl &&) noexcept;
 
 			void run(std::vector<double> &ci_energies_out,
 					 std::vector<std::vector<double>> &ci_vectors_out);
 
-			void runFromCFGs(const std::vector<std::string> &cfgs,
-							 std::vector<double> &ci_energies_out,
-							 std::vector<std::vector<double>> &ci_vectors_out);
+			// void runFromCFGs(const std::vector<std::string> &cfgs,
+			// 				 std::vector<double> &ci_energies_out,
+			// 				 std::vector<std::vector<double>> &ci_vectors_out);
 
-			void runFromCSFs(const std::vector<std::string> &csfs,
-							 std::vector<double> &ci_energies_out,
-							 std::vector<std::vector<double>> &ci_vectors_out);
+			// void runFromCSFs(const std::vector<std::string> &csfs,
+			// 				 std::vector<double> &ci_energies_out,
+			// 				 std::vector<std::vector<double>> &ci_vectors_out);
 
-			void runFromCFGsFile(const std::string &cfgs_fname,
-								 std::vector<double> &ci_energies_out,
-								 std::vector<std::vector<double>> &ci_vectors_out);
+			// void runFromCFGsFile(const std::string &cfgs_fname,
+			// 					 std::vector<double> &ci_energies_out,
+			// 					 std::vector<std::vector<double>> &ci_vectors_out);
 
-			void runFromCSFsFile(const std::string &csfs_fname,
-								 std::vector<double> &ci_energies_out,
-								 std::vector<std::vector<double>> &ci_vectors_out);
+			// void runFromCSFsFile(const std::string &csfs_fname,
+			// 					 std::vector<double> &ci_energies_out,
+			// 					 std::vector<std::vector<double>> &ci_vectors_out);
 
 			void calc1RDM(std::vector<double> &one_rdm_out);
 			void calc2RDM(std::vector<double> &two_rdm_out);
 			void calcSpin1RDM(std::vector<double> &one_srdm_out);
 
 			std::vector<double> calcSigma(const std::vector<double> &trial);
-			std::vector<double> calcSigma(const std::vector<double> &aux_1el_ints,
-										  const std::vector<double> &aux_2el_ints,
+			std::vector<double> calcSigma(const vec2d &aux_1el_ints,
+										  const vec4d &aux_2el_ints,
 										  const std::vector<double> &trial);
 
 		private:
@@ -131,8 +130,8 @@ namespace lible
 
 			std::set<std::string> cfgs_new;
 
-			std::vector<double> one_el_ints;
-			std::vector<double> two_el_ints;
+			vec2d one_el_ints;
+			vec4d two_el_ints;
 
 			std::vector<double> ci_energies;
 			std::vector<std::vector<double>> ci_vectors;

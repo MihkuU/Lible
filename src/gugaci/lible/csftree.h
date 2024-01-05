@@ -13,11 +13,31 @@ namespace lible
         public:
             struct Node
             {
-                bool end = false;
-                int b = 0;
-                int pos = -1;
-                std::array<std::unique_ptr<Node>, 4> step_values{nullptr, nullptr, nullptr, nullptr};
+                Node()
+                {
+                    end = false;                    
+                    b = 0;
+                    pos = -1;
+                    step_values = {nullptr, nullptr, nullptr, nullptr};
+                }
+
+                bool end;
+                int b;
+                int pos;
+                std::array<std::unique_ptr<Node>, 4> step_values;
             };
+
+            CSFTree()
+            {                
+                root = std::make_unique<Node>();
+            }
+            ~CSFTree() = default;
+
+            CSFTree(const CSFTree &) = delete;
+            CSFTree &operator=(const CSFTree &) = delete;
+
+            CSFTree(CSFTree &&) = default;
+            CSFTree &operator=(CSFTree &&) = default;
 
             void insertToTree(const int &pos, const std::string &csf)
             {
@@ -51,7 +71,7 @@ namespace lible
 
             void resetTree()
             {
-                root.reset();
+                root.reset(new Node());
             }
 
         private:

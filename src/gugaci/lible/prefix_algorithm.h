@@ -13,22 +13,22 @@ namespace lible
 {
     namespace guga
     {
-        class SCI::PrefixAlgorithm
+        class GCI::Impl::PrefixAlgorithm
         {
         public:
             /*
              * Wrapper struct for hiding the ugly details of the prefix algorithm.
              */
-            PrefixAlgorithm(SCI *sci_) : sci(sci_)
+            PrefixAlgorithm(Impl *sci_) : impl(sci_)
             {
-                spin = sci->spin;
-                min_nue = sci->min_nue;
-                n_orbs = sci->n_orbs;
+                spin = impl->spin;
+                min_nue = impl->min_nue;
+                n_orbs = impl->n_orbs;
 
-                int n_doubly_occ = (sci->n_els - min_nue) / 2;
+                int n_doubly_occ = (impl->n_els - min_nue) / 2;
                 prefix_size = min_nue + n_doubly_occ;
 
-                constructSortedIntegralLists(sci->one_el_ints, sci->two_el_ints,
+                constructSortedIntegralLists(impl->one_el_ints, impl->two_el_ints,
                                              max_abs_1el_element, max_abs_2el_element);
             }
 
@@ -51,7 +51,7 @@ namespace lible
             using ints_22_map = std::map<std::pair<int, int>, std::vector<std::tuple<int, int, double>>>;
             using ints_31_map = std::map<std::tuple<int, int, int>, std::vector<std::tuple<int, double>>>;
 
-            SCI *sci;
+            Impl *impl;
 
             double max_abs_1el_element;
             double max_abs_2el_element;
@@ -115,62 +115,62 @@ namespace lible
             ints_31_map intlist_EpqErs_prsIn_qOut;
             ints_31_map intlist_EpqErs_pqrIn_sOut;
 
-            void constructSortedIntegralLists(const std::vector<double> &one_el_ints,
-                                              const std::vector<double> &two_el_ints,
+            void constructSortedIntegralLists(const vec2d &one_el_ints,
+                                              const vec4d &two_el_ints,
                                               double &max_abs_1el_element_out,
                                               double &max_abs_2el_element_out);
 
-            void integralListsHelper_Epq(const std::vector<double> &one_el_ints,
+            void integralListsHelper_Epq(const vec2d &one_el_ints,
                                          ints_11_map &intlist_Epq_pqOut,
                                          ints_11_map &intlist_Epq_pIn_qOut,
                                          ints_11_map &intlist_Epq_qIn_pOut);
 
-            void integralListsHelper_EpqErr(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqErr(const vec4d &two_el_ints,
                                             ints_12_map &intlist_EpqErr_pqrOut,
                                             ints_12_map &intlist_EpqErr_rIn_pqOut,
                                             ints_12_map &intlist_EpqErr_qIn_pOut,
                                             ints_12_map &intlist_EpqErr_pIn_qOut,
                                             ints_21_map &intlist_EpqErr_pqIn);
 
-            void integralListsHelper_ErrEpq(const std::vector<double> &two_el_ints,
+            void integralListsHelper_ErrEpq(const vec4d &two_el_ints,
                                             ints_12_map &intlist_ErrEpq_pqrOut,
                                             ints_12_map &intlist_ErrEpq_rIn_pqOut,
                                             ints_12_map &intlist_ErrEpq_qIn_pOut,
                                             ints_12_map &intlist_ErrEpq_pIn_qOut,
                                             ints_21_map &intlist_ErrEpq_pqIn);
 
-            void integralListsHelper_EpqEqr(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqEqr(const vec4d &two_el_ints,
                                             ints_12_map &intlist_EpqEqr_pqrOut,
                                             ints_12_map &intlist_EpqEqr_rIn_pOut,
                                             ints_12_map &intlist_EpqEqr_pIn_rOut,
                                             ints_21_map &intlist_EpqEqr_prIn);
 
-            void integralListsHelper_EpqErp(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqErp(const vec4d &two_el_ints,
                                             ints_12_map &intlist_EpqErp_pqrOut,
                                             ints_12_map &intlist_EpqErp_qIn_rOut,
                                             ints_12_map &intlist_EpqErp_rIn_qOut,
                                             ints_21_map &intlist_EpqErp_qrIn);
 
-            void integralListsHelper_EpqEpq(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqEpq(const vec4d &two_el_ints,
                                             ints_11_map &intlist_EpqEpq_pqOut,
                                             ints_11_map &intlist_EpqEpq_qIn_pOut,
                                             ints_11_map &intlist_EpqEpq_pIn_qOut);
 
-            void integralListsHelper_EpqEpr(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqEpr(const vec4d &two_el_ints,
                                             ints_12_map &intlist_EpqEpr_pqrOut,
                                             ints_12_map &intlist_EpqEpr_qIn_prOut,
                                             ints_12_map &intlist_EpqEpr_pIn_qrOut,
                                             ints_21_map &intlist_EpqEpr_qrIn_pOut,
                                             ints_21_map &intlist_EpqEpr_pqIn_rOut);
 
-            void integralListsHelper_EpqErq(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqErq(const vec4d &two_el_ints,
                                             ints_12_map &intlist_EpqErq_pqrOut,
                                             ints_12_map &intlist_EpqErq_pIn_qrOut,
                                             ints_12_map &intlist_EpqErq_qIn_prOut,
                                             ints_21_map &intlist_EpqErq_prIn_qOut,
                                             ints_21_map &intlist_EpqErq_pqIn_rOut);
 
-            void integralListsHelper_EpqErs(const std::vector<double> &two_el_ints,
+            void integralListsHelper_EpqErs(const vec4d &two_el_ints,
                                             ints_13_map &intlist_EpqErs_sIn_pqrOut,
                                             ints_13_map &intlist_EpqErs_qIn_prsOut,
                                             ints_13_map &intlist_EpqErs_pIn_qrsOut,
@@ -191,7 +191,7 @@ namespace lible
 
             void innerPrefixHelper2El_EpqErr(const int &p, const int &q, const int &r,
                                              const int &icfg_right, const size_t &nue_right,
-                                             const std::string &onv_right, 
+                                             const std::string &onv_right,
                                              const std::vector<std::string> &sfs_right,
                                              const wfn_ptr &wfn_right, DataFOIS &data_fois,
                                              DataVar &data_var);
@@ -218,17 +218,17 @@ namespace lible
                                   DataVar &data_var);
 
             void prefixHelper_EpqErr(const double &max_ci_coeff, const int &na, const int &nc,
-                                     const int &occ_diff_sum, const int &icfg_right, 
+                                     const int &occ_diff_sum, const int &icfg_right,
                                      const std::string &onv_right, const std::vector<int> &a_idxs,
-                                     const std::vector<int> &c_idxs, 
-                                     const std::vector<std::string> &sfs_right, 
+                                     const std::vector<int> &c_idxs,
+                                     const std::vector<std::string> &sfs_right,
                                      const wfn_ptr &wfn_right,
                                      DataFOIS &data_fois, DataVar &data_var);
 
             void prefixHelper_ErrEpq(const double &max_ci_coeff, const int &na, const int &nc,
                                      const int &occ_diff_sum, const int &icfg_right,
                                      const std::string &onv_right, const std::vector<int> &a_idxs,
-                                     const std::vector<int> &c_idxs, 
+                                     const std::vector<int> &c_idxs,
                                      const std::vector<std::string> &sfs_right,
                                      const wfn_ptr &wfn_right,
                                      DataFOIS &data_fois, DataVar &data_var);
@@ -236,8 +236,8 @@ namespace lible
             void prefixHelper_EpqEqr(const double &max_ci_coeff, const int &na, const int &nc,
                                      const int &occ_diff_sum, const int &icfg_right,
                                      const std::string &onv_right, const std::vector<int> &a_idxs,
-                                     const std::vector<int> &c_idxs, 
-                                     const std::vector<std::string> &sfs_right, 
+                                     const std::vector<int> &c_idxs,
+                                     const std::vector<std::string> &sfs_right,
                                      const wfn_ptr &wfn_right,
                                      DataFOIS &data_fois, DataVar &data_var);
 

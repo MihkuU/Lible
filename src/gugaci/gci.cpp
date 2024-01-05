@@ -1,35 +1,62 @@
 #include <lible/gci.h>
 
 #include <lible/util.h>
-
-#include <lible/cipsi.h>
-#include <lible/coupling_coeffs.h>
-#include <lible/connections.h>
-#include <lible/prefix_algorithm.h>
 #include <lible/guga_sci.h>
 
-using namespace lible;
-using namespace lible::guga;
+namespace LG = lible::guga;
 
-GCICalc::GCICalc(std::unique_ptr<SCI> &&sci) : sci(std::move(sci))
+using namespace lible;
+
+LG::GCI::GCI()
 {
-    // sci = std::move(sci_);
 }
 
-GCICalc::~GCICalc() = default;
-
-GCICalc::GCICalc(GCICalc &&) noexcept = default;
-GCICalc &GCICalc::operator=(GCICalc &&) noexcept = default;
-
-GCICalc lible::guga::runGCI(const int &n_orbs, const int &n_els, const int &n_roots,
-                            const int &multiplicity, const Vec2D<double> &one_el_ints,
-                            const Vec4D<double> &two_el_ints)
+LG::GCI::GCI(std::unique_ptr<GCI::Impl> &&impl) : impl(std::move(impl))
 {
-    std::unique_ptr<SCI> sci = std::make_unique<SCI>(n_orbs, n_els, n_roots, multiplicity,
-                                                     std::vector<double>({1, 2}),
-                                                     std::vector<double>({1, 2, 3, 4}));
+}
 
-    palPrint("Calling runGCI!\n");                                                    
+LG::GCI::~GCI() = default;
 
-    return GCICalc(std::move(sci));
+LG::GCI::GCI(GCI &&) noexcept = default;
+LG::GCI &LG::GCI::operator=(GCI &&) noexcept = default;
+
+LG::GCI LG::run(const int &n_orbs, const int &n_els,
+                const int &n_roots, const int &multiplicity,
+                const vec2d &one_el_ints, const vec4d &two_el_ints,
+                std::vector<double> &ci_energies_out,
+                std::vector<std::vector<double>> &ci_vectors_out)
+{
+    std::unique_ptr<GCI::Impl> impl = std::make_unique<GCI::Impl>(n_orbs, n_els,
+                                                                  n_roots, multiplicity,
+                                                                  one_el_ints, two_el_ints);
+
+    impl->run(ci_energies_out, ci_vectors_out);
+
+    return GCI(std::move(impl));
+}
+
+vec2d LG::calc1RDM(const GCI &gci, const size_t &iroot, const size_t &jroot)
+{
+}
+
+vec2d LG::calc1SRDM(const GCI &gci, const size_t &iroot)
+{
+}
+
+vec4d LG::calc2RDM(const GCI &gci, const size_t &iroot, const size_t &jroot)
+{
+}
+
+std::pair<vec2d, vec4d>
+LG::calc12RDMs(const GCI &gci, const size_t &iroot, const size_t &jroot)
+{
+}
+
+std::vector<double> LG::calcSigma()
+{
+}
+
+std::vector<std::vector<std::tuple<std::string, std::string, double>>>
+LG::returnSignificantCSFs(const GCI &gci)
+{
 }
