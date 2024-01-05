@@ -14,6 +14,7 @@ Lible is a toolbox containing multiple libraries for implementing quantum chemic
     3. cmake --install build/ --prefix "<full path to the build/-directory>"
   ```
 ** Using Lible **
+
 The 3. step in the Installation ensures that the Lible can be conveniently incorporated in your CMake project using the 'find_package()' function call. In your 'CMakeLists.txt' file you could write:
   ```
   find_package(Lible REQUIRED)
