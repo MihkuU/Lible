@@ -12,10 +12,10 @@ execute_process(COMMAND "${CMAKE_COMMAND}" . WORKING_DIRECTORY ${CMAKE_BINARY_DI
 execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/extern)
 
 target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/include)
-if(EXISTS "${arma_dir}/build/lib")
-    target_link_libraries(molblock PRIVATE ${arma_dir}/build/lib/libarmadillo.so)
-elseif(EXISTS "${arma_dir}/build/lib64")
-    target_link_libraries(molblock PRIVATE ${arma_dir}/build/lib64/libarmadillo.so)
+if(EXISTS "${CMAKE_BINARY_DIR}/extern/arma/build/lib")
+    target_link_libraries(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/lib/libarmadillo.so)
+elseif(EXISTS "${CMAKE_BINARY_DIR}/extern/arma/build/lib64")
+    target_link_libraries(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/lib64/libarmadillo.so)
 endif()
 
 
