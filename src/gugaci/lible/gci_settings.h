@@ -13,6 +13,16 @@ namespace lible
              */
         public:
 
+            static bool getDoPT2()
+            {
+                return do_pt2;
+            }
+
+            static bool getVerbose()
+            {
+                return verbose;
+            }
+
             static double getEnergyTol()
             {
                 return energy_tol;
@@ -42,6 +52,16 @@ namespace lible
             {
                 return max_iter;
             }            
+
+            static void setDoPT2(const bool &d)
+            {
+                do_pt2 = d;
+            }
+
+            static void setVerbose(const bool &v)
+            {
+                verbose = v;
+            }
 
             static void setEnergyTol(const double &e)
             {
@@ -75,6 +95,7 @@ namespace lible
 
         private:
             static inline bool do_pt2 = false;
+            static inline bool verbose = false;
             static inline double energy_tol = 1e-5;
             static inline double epsilon_gen = 1e-2;
             static inline double epsilon_var = 1e-5;

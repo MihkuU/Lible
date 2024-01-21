@@ -25,11 +25,13 @@ if(USE_MPI)
 	find_package(MPI REQUIRED)
 	set(CMAKE_CXX_COMPILER mpic++)
 	add_definitions(-D_USE_MPI_)
+else()
+	set(CMAKE_CXX_COMPILER g++)
 endif()
+
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_COMPILER g++)
 #set(CMAKE_CXX_COMPILER "clang++")
 #set(CMAKE_CXX_COMPILER "hipcc") # TODO: use hipcc only if "ints"-module is built
 #set(CMAKE_CXX_COMPILER mpic++)
@@ -50,7 +52,15 @@ add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
 ### installation
 set(lible_public_headers "src/util/lible/util.h")
 list(APPEND lible_public_headers "src/util/lible/types.h")
+list(APPEND lible_public_headers "src/util/lible/vec2d.h")
+list(APPEND lible_public_headers "src/util/lible/vec3d.h")
+list(APPEND lible_public_headers "src/util/lible/vec4d.h")
+
 list(APPEND lible_public_headers "src/gugaci/lible/gci.h")
+list(APPEND lible_public_headers "src/gugaci/lible/gci_settings.h")
+list(APPEND lible_public_headers "src/davidson/lible/davidson_settings.h")
+
+list(APPEND lible_public_headers "src/ints/lible/mcmurchie_davidson.h")
 
 set_target_properties(lible PROPERTIES
 	PUBLIC_HEADER "${lible_public_headers}"

@@ -1,5 +1,6 @@
 #include <lible/configuration.h>
 
+#include <algorithm>
 #include <stdexcept>
 
 using namespace lible::guga;
@@ -21,9 +22,7 @@ CFG::CFG(const double &spin_, const string &occ_nr_vector_)
 
     top[0] = 0.5 * n_el - spin;
     top[1] = 2.0 * spin;
-    top[2] = n_orb - top[0] - top[1];
-
-    
+    top[2] = n_orb - top[0] - top[1];    
 }
 
 vector<string> CFG::extractSFs()
@@ -84,7 +83,7 @@ void CFG::createCSFsFromSFs(const map<string, int> &sfs)
             else if (occ_nr == '2')
                 csf[i] = '3';
         }
-        size_t pos = 0;
+        int pos = 0;
         csfs.push_back(csf);
         sf_idxs.push_back(pos);
     }
@@ -102,13 +101,16 @@ void CFG::createCSFsFromSFs(const map<string, int> &sfs)
                     csf[i] = '0';
                 else if (occ_nr == '2')
                     csf[i] = '3';
-                else if (sf[idx_sf] == '+')
-                    csf[i] = '1';
                 else
-                    csf[i] = '2';
-                idx_sf++;
+                {
+                    if (sf[idx_sf] == '+')
+                        csf[i] = '1';
+                    else
+                        csf[i] = '2';
+                    idx_sf++;
+                }
             }
-            size_t pos = item.second;
+            int pos = item.second;
             csfs.push_back(csf);
             sf_idxs.push_back(pos);
         }
@@ -197,7 +199,7 @@ void CFGProto::createCSFsFromSFs(const vector<string> &sfs)
 
     if (n_unpaired_el == 0)
     {
-        string csf(n_orb, 0);
+        string csf(n_orb, '0');
         for (size_t i = 0; i < occ_nr_vector.size(); i++)
         {
             char occ_nr = occ_nr_vector[i];
@@ -205,11 +207,10 @@ void CFGProto::createCSFsFromSFs(const vector<string> &sfs)
                 csf[i] = '0';
             else if (occ_nr == '2')
                 csf[i] = '3';
-
-            size_t pos = csfs.size();
-            csfs.push_back(csf);
-            insertToTree(pos, csf);
         }
+        size_t pos = csfs.size();
+        csfs.push_back(csf);
+        insertToTree(pos, csf);
     }
     else
     {

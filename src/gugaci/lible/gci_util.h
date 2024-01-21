@@ -44,16 +44,26 @@ namespace lible
 
         struct DataFOIS
         {
+            DataFOIS()
+            {
+                wfn = std::make_unique<WaveFunction>();
+            }
+
             std::map<size_t, std::set<std::string>> cfgs_sfs;
             connection_map_1el connections_1el;
             connection_map_2el connections_2el;
             connection_map_EpqErr connections_EpqErr;
             connection_map_EpqErr connections_ErrEpq;
-            wfn_ptr wfn;
+            wfn_ptr wfn;            
         };
 
         struct DataVar
         {
+            DataVar()
+            {
+                wfn = std::make_unique<WaveFunction>();
+            }
+
             std::map<size_t, std::set<std::string>> cfgs_sfs;
             connection_map_1el connections_1el;
             connection_map_2el connections_2el;
@@ -92,7 +102,12 @@ namespace lible
 
             std::tuple<int, int, int, int> pqrs1DTo4D(const size_t &pqrs, const int &n_orbs);
 
+            std::tuple<std::string, std::string> extractCFGandSF(const std::string &csf);
+
             std::string extractSF(const std::string &csf);
+
+            std::vector<std::string> returnSFs(const std::map<int, std::string> &sf_map,
+                                     const std::vector<int> &sf_idxs);
 
             std::map<std::string, int> returnSFMap(const std::map<std::string, int> &sf_map_in,
                                                    const std::set<std::string> &sfs);

@@ -54,7 +54,7 @@ namespace lible
             }
 
         private:
-            std::array<int, 3> determineStepRow(const char &d);            
+            std::array<int, 3> determineStepRow(const char &d);
 
             void createAllCSFsRecursively(char d, int i, std::array<int, 3> row, std::string csf);
 
@@ -75,9 +75,7 @@ namespace lible
         {
         public:
             CFGProto() {}
-
-            CFGProto(const double &spin_, const std::string &occ_nr_vector_);                
-
+            CFGProto(const double &spin_, const std::string &occ_nr_vector_);
             CFGProto(const double &spin_, const std::string &occ_nr_vector_,
                      const std::vector<std::string> &sfs);
 

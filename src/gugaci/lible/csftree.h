@@ -57,6 +57,9 @@ namespace lible
                     }
                     current = current->step_values[idx].get();
                 }
+
+                current->end = true;
+                current->pos = pos;
             }
 
             Node *getRoot()

@@ -1,4 +1,4 @@
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 #include <lible/util.h>
 
 #ifdef _USE_MPI_
@@ -101,14 +101,15 @@ vector<double> GCI::Impl::calcDiag()
 #pragma omp parallel
     {
 
+        int rank_total, size_total;
 #ifdef _USE_MPI_
         // int rank_total = returnTotalRank(world);
         // int size_total = returnTotalSize(world);
-        int rank_total = omp_get_thread_num(); // TMP
-        int size_total = omp_get_num_threads(); // TMP
+        rank_total = omp_get_thread_num(); // TMP
+        size_total = omp_get_num_threads(); // TMP
 #else
-        int rank_total = omp_get_thread_num();
-        int size_total = omp_get_num_threads();
+        rank_total = omp_get_thread_num();
+        size_total = omp_get_num_threads();
 #endif
 
         arma::dvec diag_omp(wave_function->getNumCSFs(), arma::fill::zeros);
@@ -130,7 +131,7 @@ vector<double> GCI::Impl::calcDiag()
 
                 int p_occ = onv[p] - '0';
                 for (size_t mu = 0; mu < dim; mu++)
-                    diag_omp(pos + mu) += p_occ * one_el_ints(p, p);
+                    diag_omp(pos + mu) += p_occ * one_el_ham(p, p);
             }
 
             for (size_t p = 0; p < n_orbs; p++)
@@ -152,6 +153,7 @@ vector<double> GCI::Impl::calcDiag()
                 {
                     if (onv[q] == '0')
                         continue;
+
                     int q_occ = onv[q] - '0';
 
                     for (size_t mu = 0; mu < dim; mu++)
@@ -210,7 +212,7 @@ vector<double> GCI::Impl::calcDiag(const WaveFunction *wave_function)
 
             int p_occ = onv[p] - '0';
             for (size_t mu = 0; mu < dim; mu++)
-                diag[pos + mu] += p_occ * one_el_ints(p, p);
+                diag[pos + mu] += p_occ * one_el_ham(p, p);
         }
 
         for (size_t p = 0; p < n_orbs; p++)
@@ -232,8 +234,8 @@ vector<double> GCI::Impl::calcDiag(const WaveFunction *wave_function)
             {
                 if (onv[q] == '0')
                     continue;
-                int q_occ = onv[q] - '0';
 
+                int q_occ = onv[q] - '0';
                 for (size_t mu = 0; mu < dim; mu++)
                     diag[pos + mu] += p_occ * q_occ * two_el_ints(p, p, q, q);
             }

@@ -2,7 +2,7 @@
 
 #include <armadillo>
 
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 
 namespace lible
 {
@@ -11,10 +11,13 @@ namespace lible
         class GCI::Impl::CIPSI
         {
         public:
-            CIPSI(Impl *gci_) : impl(gci_)
+            CIPSI(Impl *impl_) : impl(impl_)
             {
                 spin = impl->spin;
                 n_roots = impl->n_roots;
+                n_csfs_new = 0;
+                n_generators = 0;
+                n_prefixes = 0;
             }
 
             std::set<std::string> selectCFGsAndCSFs(wfn_ptr &wave_function);

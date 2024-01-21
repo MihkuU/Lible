@@ -18,9 +18,11 @@ namespace lible
      *   exponents of gaussian primitives.
      *
      */
-    namespace Shells
+    // TODO: Shove it inside 'ints' namespace
+    namespace shells
     {
-        inline double calcPureGaussianPrimitiveNorm(const int angular_momentum, const double &exponent)
+        inline double calcPureGaussianPrimitiveNorm(const int angular_momentum,
+                                                    const double &exponent)
         {
             double norm = std::sqrt(std::pow(2 * exponent / M_PI, 1.5) * std::pow(4 * exponent, angular_momentum) /
                                     IntsUtil::doubleFactorial(2 * angular_momentum - 1));
@@ -54,8 +56,10 @@ namespace lible
             return cartesian_exps;
         }
 
-        std::vector<double> calcShellNormalization(const int &angmom, const std::vector<double> &contraction_coeffs,
-                                                   const std::vector<double> &contraction_exps, const std::vector<std::array<int, 3>> &cartesian_exps);
+        std::vector<double> calcShellNormalization(const int &angmom,
+                                                   const std::vector<double> &contraction_coeffs,
+                                                   const std::vector<double> &contraction_exps,
+                                                   const std::vector<std::array<int, 3>> &cartesian_exps);
 
         struct Shell
         {
@@ -82,7 +86,8 @@ namespace lible
             {
             }
 
-            Shell(const int &angular_momentum, const std::size_t &dim_cartesian,
+            Shell(const int &angular_momentum,
+                  const std::size_t &dim_cartesian,
                   const std::size_t &dim_spherical)
                 : angular_momentum(angular_momentum),
                   atomic_number(0),
@@ -111,6 +116,7 @@ namespace lible
 
         struct ShellPair
         {
+            //TODO: remove this object
             ShellPair(const Shell &first, const Shell &second) : first(first), second(second) {}
 
             const Shell first;

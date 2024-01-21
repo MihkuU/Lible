@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include <fmt/core.h>
+
 using namespace lible::guga;
 using namespace lible::guga::util;
 
@@ -174,6 +176,39 @@ tuple<int, int, int, int> GU::pqrs1DTo4D(const size_t &pqrs, const int &n_orbs)
     return {p, q, r, s};
 }
 
+tuple<string, string> GU::extractCFGandSF(const string &csf)
+{
+    string cfg, sf;
+    for (const char &d : csf)
+    {
+        if (d == '0')
+        {
+            cfg.append("0");
+        }
+        else if (d == '1')
+        {
+            cfg.append("1");
+            sf.append("+");
+        }
+        else if (d == '2')
+        {
+            cfg.append("1");
+            sf.append("-");
+        }
+        else if (d == '3')
+        {
+            cfg.append("2");
+        }
+        else
+        {
+            throw std::runtime_error(fmt::format("   Error in reading CSF: %s\
+                                                \n      False step-value: %s",
+                                                 csf, d));
+        }
+    }
+    return std::make_tuple(cfg, sf);
+}
+
 string GU::extractSF(const string &csf)
 {
     string sf("");
@@ -185,6 +220,16 @@ string GU::extractSF(const string &csf)
             sf.append("-");
     }
     return sf;
+}
+
+vector<string> GU::returnSFs(const map<int, string> &sf_map,
+                             const vector<int> &sf_idxs)
+{
+    vector<string> sfs(sf_idxs.size());
+    for (size_t i = 0; i < sf_idxs.size(); i++)
+        sfs[i] = sf_map.at(sf_idxs.at(i));
+
+    return sfs;
 }
 
 map<string, int> GU::returnSFMap(const map<string, int> &sf_map_in, const set<string> &sfs)
@@ -1777,7 +1822,7 @@ void GU::mergeCCs(const T &ccs_in, T &ccs_out)
         auto key = item.first;
         if (ccs_out.find(key) == ccs_out.end())
         {
-            ccs_out.emplace(key, move(item.second));
+            ccs_out.emplace(key, std::move(item.second));
         }
         else
         {

@@ -1,38 +1,37 @@
 #pragma once
 
+#include <lible/types.h>
+#include <lible/structure.h>
+
 #include <cassert>
 #include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
 
-#include <lible/types.h>
-#include "structure.h"
-
 namespace lible
 {
     namespace ints
     {
         vec2d overlap(const Structure &structure);
-        
+
         vec2d kineticEnergy(const Structure &structure);
 
         vec2d coulombAttraction(const Structure &structure);
 
-        vec2d dipoleMoment(const Structure &structure);        
+        vec2d dipoleMoment(const Structure &structure);
 
-        namespace Kernels
+        namespace kernels
         {
-            vec2d overlap();
-            
-            vec2d kineticEnergy();
+            void overlap();
 
-            vec2d coulombAttraction();
+            void kineticEnergy();
 
-            vec2d dipoleMoment();
+            void coulombAttraction();
+
+            void dipoleMoment();
         }
     }
-
 
     // class ints
     // {

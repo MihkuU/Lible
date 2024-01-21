@@ -3,7 +3,7 @@
 #include <set>
 #include <string>
 
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 #include <lible/gci_util.h>
 
 namespace lible
@@ -13,7 +13,7 @@ namespace lible
         class GCI::Impl::Connections
         {
         public:
-            Connections(Impl *gci) : impl(gci)
+            Connections(Impl *impl) : impl(impl)
             {
                 min_nue = impl->min_nue;
                 n_orbs = impl->n_orbs;

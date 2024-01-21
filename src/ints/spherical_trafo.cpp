@@ -1,12 +1,12 @@
-#include <cassert>
+#include <lible/defs_ints.h>
+#include <lible/spherical_trafo.h>
 
-#include "defs_ints.h"
-#include "spherical_trafo.h"
+#include <cassert>
 
 using namespace lible;
 
 template <>
-void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::FIRST>(const Shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,
+void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::FIRST>(const shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,
                                                                    const std::vector<trafo_coeff_tuple> &spherical_trafo, std::vector<double> &one_el_ints_out)
 {
     std::size_t dim_cart_b = shell_pair.second.dim_cartesian;
@@ -16,7 +16,7 @@ void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::FIRST>(const Shells:
 }
 
 template <>
-void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::SECOND>(const Shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,
+void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::SECOND>(const shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,
                                                                     const std::vector<trafo_coeff_tuple> &spherical_trafo, std::vector<double> &one_el_ints_out)
 {
     std::size_t dim_cart_b = shell_pair.second.dim_cartesian;
@@ -27,7 +27,7 @@ void SphericalTrafo::transformAlongIdx<SphericalTrafo::Idx::SECOND>(const Shells
             one_el_ints_out[i * dim_sph_b + isph] += coeff * one_el_ints_in[i * dim_cart_b + icart];            
 }
 
-void SphericalTrafo::transformCartesianIntsToSpherical(const Shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_cart,
+void SphericalTrafo::transformCartesianIntsToSpherical(const shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_cart,
                                                        const std::vector<trafo_coeff_tuple> &spherical_trafo_first,
                                                        const std::vector<trafo_coeff_tuple> &spherical_trafo_second,
                                                        std::vector<double> &one_el_ints_sph_cart, std::vector<double> &one_el_ints_sph)
@@ -39,7 +39,7 @@ void SphericalTrafo::transformCartesianIntsToSpherical(const Shells::ShellPair &
     transformAlongIdx<SphericalTrafo::Idx::SECOND>(shell_pair, one_el_ints_sph_cart, spherical_trafo_second, one_el_ints_sph);
 }
 
-void SphericalTrafo::transferSphericalInts(const std::size_t &n_ao, const Shells::ShellPair &shell_pair, const std::vector<double> &ints_in,
+void SphericalTrafo::transferSphericalInts(const std::size_t &n_ao, const shells::ShellPair &shell_pair, const std::vector<double> &ints_in,
                                            std::vector<double> &ints_out)
 {
     assert((shell_pair.first.angular_momentum >= shell_pair.second.angular_momentum));

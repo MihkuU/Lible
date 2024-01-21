@@ -16,17 +16,17 @@
 namespace lible
 {
 
-#ifdef _USE_MPI_
-    struct Para
-    {
-        /*
-         * A word is appropriate here.
-         *
-         */
-        const static inline mpl::communicator &comm_world{mpl::environment::comm_world()};
-        // const mpl::communicator &comm_local;
-    };
-#endif
+// #ifdef _USE_MPI_
+//     struct Para
+//     {
+//         /*
+//          * A word is appropriate here.
+//          *
+//          */
+//         const static inline mpl::communicator &comm_world{mpl::environment::comm_world()};
+//         // const mpl::communicator &comm_local;
+//     };
+// #endif
 
     static void palPrint(const std::string &message, const bool shutup = false)
     {

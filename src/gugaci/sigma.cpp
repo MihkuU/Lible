@@ -1,4 +1,5 @@
-#include <lible/guga_sci.h>
+#include <lible/brain.hpp>
+#include <lible/gci_impl.hpp>
 #include <lible/util.h>
 
 #ifdef _USE_MPI_
@@ -24,14 +25,15 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
         int thread_num = omp_get_thread_num();
         int num_threads = omp_get_num_threads();
 
+        int rank_total, size_total;
 #ifdef _USE_MPI_
         // int rank_total = returnTotalRank(world);
         // int size_total = returnTotalSize(world);
-        int rank_total;
-        int size_total;
+        rank_total = omp_get_thread_num(); // TMP
+        size_total = omp_get_num_threads(); // TMP
 #else
-        int rank_total = thread_num;
-        int size_total = num_threads;
+        rank_total = omp_get_thread_num();
+        size_total = omp_get_num_threads();
 #endif
 
         /* No excitation (diagonal) */
@@ -78,7 +80,7 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
         ipal = 0;
         for (const auto &[key, connections] : connections_1el)
         {
-            if (ipal % num_threads != thread_num)
+            if (ipal % size_total != rank_total)
             {
                 ipal++;
                 continue;
@@ -145,7 +147,7 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
         ipal = 0;
         for (const auto &[key, connections] : connections_dia)
         {
-            if (ipal % num_threads != thread_num)
+            if (ipal % size_total != rank_total)
             {
                 ipal++;
                 continue;
@@ -182,7 +184,7 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
         ipal = 0;
         for (const auto &[key, connections] : connections_2el)
         {
-            if (ipal % num_threads != thread_num)
+            if (ipal % size_total != rank_total)
             {
                 ipal++;
                 continue;
@@ -234,11 +236,11 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
     }
 
 #ifdef _USE_MPI_
-    mpl::contiguous_layout<double> layout(sigma.n_elem);
-    // TODO: make this use the local communicator.
-    Para::comm_world.allreduce([](auto a, auto b)
-                               { return a + b; },
-                               sigma.memptr(), layout);
+    // mpl::contiguous_layout<double> layout(sigma.n_elem);
+    // // TODO: make this use the local communicator.
+    // Para::comm_world.allreduce([](auto a, auto b)
+    //                            { return a + b; },
+    //                            sigma.memptr(), layout);
 #endif
 
     return arma::conv_to<vector<double>>::from(sigma);

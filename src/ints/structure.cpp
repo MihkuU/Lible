@@ -1,3 +1,6 @@
+#include <lible/defs_ints.h>
+#include <lible/structure.h>
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -7,8 +10,6 @@
 
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
-#include "defs_ints.h"
-#include "structure.h"
 
 namespace fs = std::filesystem;
 
@@ -63,14 +64,14 @@ string Structure::returnBasisPath(const string &basis_set)
     return basis_path;
 }
 
-vector<Shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
+vector<shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
 {
     json basis_set_json = json::parse(std::ifstream{basis_path});
 
     max_angular_momentum = 0;
 
     size_t pos = 0;
-    vector<Shells::Shell> shells;
+    vector<shells::Shell> shells;
     for (size_t iatom = 0; iatom < n_atoms; iatom++)
     {
         string element = elements[iatom];
@@ -89,8 +90,8 @@ vector<Shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
                 max_angular_momentum = angular_momentum;
 
             int atomic_number = IntsDefs::atomic_numbers.at(element);
-            size_t dim_cartesian = Shells::calcShellDimCartesian(angular_momentum);
-            size_t dim_spherical = Shells::calcShellDimSpherical(angular_momentum);
+            size_t dim_cartesian = shells::calcShellDimCartesian(angular_momentum);
+            size_t dim_spherical = shells::calcShellDimSpherical(angular_momentum);
             array<double, 3> xyz_coordinates{coordinates[3 * iatom], coordinates[3 * iatom + 1], coordinates[3 * iatom + 2]};
 
             vector<double> contraction_coeffs;
@@ -102,14 +103,14 @@ vector<Shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
                 contraction_exps.push_back(std::stod(exp));
 
             for (size_t i = 0; i < contraction_exps.size(); i++)
-                contraction_coeffs[i] *= Shells::calcPureGaussianPrimitiveNorm(angular_momentum, contraction_exps[i]);
+                contraction_coeffs[i] *= shells::calcPureGaussianPrimitiveNorm(angular_momentum, contraction_exps[i]);
 
-            vector<array<int, 3>> cartesian_exps = Shells::calcShellCartesianExps(angular_momentum);
+            vector<array<int, 3>> cartesian_exps = shells::calcShellCartesianExps(angular_momentum);
 
-            vector<double> normalization = Shells::calcShellNormalization(angular_momentum, contraction_coeffs, contraction_exps,
+            vector<double> normalization = shells::calcShellNormalization(angular_momentum, contraction_coeffs, contraction_exps,
                                                                           cartesian_exps);
 
-            Shells::Shell shell(angular_momentum, atomic_number, dim_cartesian, dim_spherical, pos, xyz_coordinates,
+            shells::Shell shell(angular_momentum, atomic_number, dim_cartesian, dim_spherical, pos, xyz_coordinates,
                                 contraction_coeffs, contraction_exps, normalization, cartesian_exps);
             shells.push_back(shell);
             pos += dim_spherical;
@@ -124,7 +125,7 @@ vector<Shells::Shell> Structure::parseBasisJSONFile(const string &basis_path)
 void ints::Structure::readBasis(const string &basis_set)
 {
     string basis_path = returnBasisPath(basis_set);
-    vector<Shells::Shell> shells_vec = parseBasisJSONFile(basis_path);
+    vector<shells::Shell> shells_vec = parseBasisJSONFile(basis_path);
 
     for (const auto &shell : shells_vec)
         shells[shell.angular_momentum].push_back(shell);
@@ -136,12 +137,12 @@ void ints::Structure::readBasis(const string &basis_set)
                 for (size_t ishell = 0; ishell < shells.at(la).size(); ishell++)
                     for (size_t jshell = ishell; jshell < shells.at(lb).size(); jshell++)
                         shell_pairs[std::make_pair(la, lb)].push_back(
-                            Shells::ShellPair(shells.at(la)[ishell], shells.at(lb)[jshell]));
+                            shells::ShellPair(shells.at(la)[ishell], shells.at(lb)[jshell]));
             }
             else
             {
                 for (const auto &shell_a : shells.at(la))
                     for (const auto &shell_b : shells.at(lb))
-                        shell_pairs[std::make_pair(la, lb)].push_back(Shells::ShellPair(shell_a, shell_b));
+                        shell_pairs[std::make_pair(la, lb)].push_back(shells::ShellPair(shell_a, shell_b));
             }
 }

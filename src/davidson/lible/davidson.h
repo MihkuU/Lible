@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 
-#include "davidson_settings.h"
+#include <lible/davidson_settings.h>
 
 namespace lible
 {

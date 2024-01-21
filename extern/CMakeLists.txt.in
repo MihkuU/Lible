@@ -47,19 +47,21 @@ ExternalProject_Add(json
 )
 
 # mpl library
-set(mpl_dir "@CMAKE_BINARY_DIR@/extern/mpl")
-ExternalProject_Add(mpl
-	URL	                       "@CMAKE_SOURCE_DIR@/extern/mpl-master.zip"
-    SOURCE_DIR                 "${mpl_dir}"
-    CONFIGURE_COMMAND          
-		${CMAKE_COMMAND} -S "${mpl_dir}" -B "${mpl_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${mpl_dir}/build
-    BUILD_COMMAND              "" 
-    INSTALL_COMMAND            
-		${CMAKE_COMMAND} --install "${mpl_dir}/build"
-    TEST_COMMAND               ""
-	BUILD_ALWAYS			   OFF
-    DOWNLOAD_EXTRACT_TIMESTAMP FALSE
-)
+if(@USE_MPI@)
+	set(mpl_dir "@CMAKE_BINARY_DIR@/extern/mpl")
+	ExternalProject_Add(mpl
+		URL	                       "@CMAKE_SOURCE_DIR@/extern/mpl-master.zip"
+    	SOURCE_DIR                 "${mpl_dir}"
+	    CONFIGURE_COMMAND          
+			${CMAKE_COMMAND} -S "${mpl_dir}" -B "${mpl_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${mpl_dir}/build
+	    BUILD_COMMAND              "" 
+	    INSTALL_COMMAND            
+			${CMAKE_COMMAND} --install "${mpl_dir}/build"
+	    TEST_COMMAND               ""
+		BUILD_ALWAYS			   OFF
+	    DOWNLOAD_EXTRACT_TIMESTAMP FALSE
+	)
+endif()
 
 set(robinhood_dir "@CMAKE_BINARY_DIR@/extern/robinhood")
 ExternalProject_Add(robinhood

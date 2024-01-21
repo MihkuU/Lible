@@ -461,7 +461,7 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
         string right(norb, '1');
         right[p] = '0';
         right[q] = '2';
-
+        
         CFGProto cfg_left(spin, left, sfs_left);
         CFGProto cfg_right(spin, right, sfs_right);
         return std::make_tuple(std::move(cfg_left), std::move(cfg_right));
@@ -497,9 +497,9 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
 
         norb = nue_right + 1;
 
-        string left(norb, '1');
-        left[q] = '0';
+        string left(norb, '1');        
         string right(norb, '1');
+        left[q] = '0';
         right[p] = '0';
 
         CFGProto cfg_left(spin, left, sfs_left);
@@ -839,6 +839,13 @@ void GCI::Impl::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
         ccs = calcCCSOMOSOMO(prel, qrel, get<0>(cfg_prototypes), get<1>(cfg_prototypes));
     else if (exctype == ExcType::SV)
         ccs = calcCCSOMOVirtual(prel, qrel, get<0>(cfg_prototypes), get<1>(cfg_prototypes));
+
+    // printf("\n(%d, %d)\n",
+    //        get<0>(cfg_prototypes).getNumCSFs(), get<1>(cfg_prototypes).getNumCSFs());
+
+    // printf("\nsfs.first.size() = %d, sfs.second.size() = %d\n",
+    //        sfs_pair.first.size(), sfs_pair.second.size());
+    // std::cout << "\nccs:\n" << ccs << std::endl;
 
     size_t i = 0;
     for (auto &mu : sfs_pair.first)

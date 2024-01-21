@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "shell.h"
+#include <lible/shell.h>
 
 namespace lible
 {
@@ -19,19 +19,20 @@ namespace lible
                       const std::vector<double> &coordinates_angstroem,
                       const std::vector<std::string> &elements);
 
-            int max_angular_momentum;      // TODO: make const?
-            std::size_t n_atomic_orbitals; // TODO: make const?
-            std::map<int, std::vector<Shells::Shell>> shells;
-            std::map<std::pair<int, int>, std::vector<Shells::ShellPair>> shell_pairs; // TODO: make const?
+            int max_angular_momentum;      
+            std::size_t n_atomic_orbitals; 
+            std::map<int, std::vector<shells::Shell>> shells;
+            std::map<std::pair<int, int>, std::vector<shells::ShellPair>> shell_pairs; //TODO: remove
 
         private:
+            //TODO: in the future, different atoms must have the capability to have different basis.
             std::size_t n_atoms;
             std::string basis_set;
             std::vector<double> coordinates;
             std::vector<std::string> elements;
 
             std::string returnBasisPath(const std::string &basis_set);
-            std::vector<Shells::Shell> parseBasisJSONFile(const std::string &basis_path);
+            std::vector<shells::Shell> parseBasisJSONFile(const std::string &basis_path);
             void readBasis(const std::string &basis_set);
         };
     }

@@ -1,4 +1,4 @@
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 #include <lible/gci_settings.h>
 #include <lible/connections.h>
 #include <lible/coupling_coeffs.h>
@@ -35,6 +35,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
      * After some iterations, start using the previous CI-vector as the initial
      * guess.
      */
+
     if (iter_sci >= Settings::getIterContinueEigvec())
     {
         vector<vector<double>> guess(n_roots);
@@ -89,7 +90,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
 
     std::sort(sorted_diagonal_elements.begin(), sorted_diagonal_elements.end(),
               [](const tuple5 &lhs, const tuple5 &rhs)
-              { return abs(std::get<4>(lhs)) > abs(std::get<4>(rhs)); });
+              { return std::abs(std::get<4>(lhs)) > std::abs(std::get<4>(rhs)); });
 
     map<string, pair<size_t, map<string, size_t>>> sorted_diagonal_elements_map;
     for (size_t i = 0; i < guess_dim; i++)
@@ -109,7 +110,6 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
      * Guess-space connections and CC-s
      */
     wfn_ptr wfn_guess = std::make_unique<WaveFunction>(spin);
-
     set<string> onvs_guess;
     for (auto &item1 : sorted_diagonal_elements_map)
     {
@@ -132,8 +132,14 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
     connection_map_1el connections_1el;
     connection_map_2el connections_2el;
     connection_map_dia connections_dia;
-    connections->constructConnections(onvs_guess, wfn_guess, wfn_guess, connections_1el, connections_2el, connections_dia);
-    coupling_coeffs->constructCCs(connections_1el, connections_2el, connections_dia, wfn_guess, ccs_2el, ccs_1el, ccs_dia);
+
+    connections->constructConnections(onvs_guess, wfn_guess, wfn_guess,
+                                      connections_1el, connections_2el,
+                                      connections_dia);
+
+    coupling_coeffs->constructCCs(connections_1el, connections_2el,
+                                  connections_dia, wfn_guess, ccs_2el,
+                                  ccs_1el, ccs_dia);                                 
 
     /*
      * Constructing and diagonalizing the guess-space Hamiltonian
@@ -143,17 +149,18 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
 
 #pragma omp parallel
     {
-        int thread_num = omp_get_thread_num();
-        int num_threads = omp_get_num_threads();
+        // int thread_num = omp_get_thread_num();
+        // int num_threads = omp_get_num_threads();
 
+        int rank_total, size_total;
 #ifdef _USE_MPI_
         // int rank_total = returnTotalRank(world);
         // int size_total = returnTotalSize(world);
-        int rank_total = thread_num; // TMP
-        int size_total = num_threads; // TMP
+        rank_total = omp_get_thread_num(); // TMP
+        size_total = omp_get_num_threads(); // TMP
 #else
-        int rank_total = thread_num;
-        int size_total = num_threads;
+        rank_total = omp_get_thread_num();
+        size_total = omp_get_num_threads();
 #endif
 
         arma::dmat guess_hamiltonian_omp(dim_guess, dim_guess, arma::fill::zeros);
@@ -201,7 +208,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
         ipal = 0;
         for (const auto &[key, connections] : connections_1el)
         {
-            if (ipal % num_threads != thread_num)
+            if (ipal % size_total != rank_total)
             {
                 ipal++;
                 continue;
@@ -267,7 +274,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
         ipal = 0;
         for (const auto &[key, connections] : connections_dia)
         {
-            if (ipal % num_threads != thread_num)
+            if (ipal % size_total != rank_total)
             {
                 ipal++;
                 continue;
@@ -300,7 +307,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
         ipal = 0;
         for (const auto &[key, connections] : connections_2el)
         {
-            if (ipal % num_threads != thread_num)
+            if (ipal % size_total != rank_total)
             {
                 ipal++;
                 continue;

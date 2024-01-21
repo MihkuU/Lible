@@ -3,7 +3,7 @@
 #include <map>
 #include <set>
 
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 #include <lible/gci_util.h>
 
 namespace lible
@@ -13,7 +13,7 @@ namespace lible
         class GCI::Impl::CouplingCoeffs
         {
         public:
-            CouplingCoeffs(Impl *gci_) : impl(gci_)
+            CouplingCoeffs(Impl *impl) : impl(impl)
             {
                 spin = impl->spin;
             }

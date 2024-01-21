@@ -1,7 +1,7 @@
 #include <lible/gci.h>
 
 #include <lible/util.h>
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 
 namespace LG = lible::guga;
 
@@ -24,13 +24,33 @@ LG::GCI LG::run(const int &n_orbs, const int &n_els,
                 const int &n_roots, const int &multiplicity,
                 const vec2d &one_el_ints, const vec4d &two_el_ints,
                 std::vector<double> &ci_energies_out,
-                std::vector<std::vector<double>> &ci_vectors_out)
+                std::vector<std::vector<double>> &ci_vectors_out,
+                const double &core_energy)
 {
     std::unique_ptr<GCI::Impl> impl = std::make_unique<GCI::Impl>(n_orbs, n_els,
                                                                   n_roots, multiplicity,
-                                                                  one_el_ints, two_el_ints);
+                                                                  one_el_ints, two_el_ints,
+                                                                  core_energy);
 
     impl->run(ci_energies_out, ci_vectors_out);
+
+    return GCI(std::move(impl));
+}
+
+LG::GCI LG::runFromCSFsFile(const int &n_orbs, const int &n_els,
+                            const int &n_roots, const int &multiplicity,
+                            const vec2d &one_el_ints, const vec4d &two_el_ints,
+                            const std::string &csfs_fname,
+                            std::vector<double> &ci_energies_out,
+                            std::vector<std::vector<double>> &ci_vectors_out,
+                            const double &core_energy)
+{
+    std::unique_ptr<GCI::Impl> impl = std::make_unique<GCI::Impl>(n_orbs, n_els,
+                                                                  n_roots, multiplicity,
+                                                                  one_el_ints, two_el_ints,
+                                                                  core_energy);
+
+    impl->runFromCSFsFile(csfs_fname, ci_energies_out, ci_vectors_out);
 
     return GCI(std::move(impl));
 }

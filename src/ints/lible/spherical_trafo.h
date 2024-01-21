@@ -2,7 +2,7 @@
 
 #include <tuple>
 
-#include "shell.h"
+#include <lible/shell.h>
 
 namespace lible
 {
@@ -16,12 +16,12 @@ namespace lible
          */
         std::vector<trafo_coeff_tuple> returnSphericalTrafo(const int &angmom);
 
-        void transformCartesianIntsToSpherical(const Shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_cart,
+        void transformCartesianIntsToSpherical(const shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_cart,
                                                const std::vector<trafo_coeff_tuple> &spherical_trafo_first, 
                                                const std::vector<trafo_coeff_tuple> &spherical_trafo_second,
                                                std::vector<double> &one_el_ints_sph_cart, std::vector<double> &one_el_ints_sph);
 
-        void transferSphericalInts(const std::size_t &n_ao, const Shells::ShellPair &shell_pair, const std::vector<double> &ints_in,
+        void transferSphericalInts(const std::size_t &n_ao, const shells::ShellPair &shell_pair, const std::vector<double> &ints_in,
                                    std::vector<double> &ints_out);
 
         enum class Idx
@@ -33,7 +33,7 @@ namespace lible
         };
 
         template <Idx idx>
-        void transformAlongIdx(const Shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,
+        void transformAlongIdx(const shells::ShellPair &shell_pair, const std::vector<double> &one_el_ints_in,
                                const std::vector<trafo_coeff_tuple> &spherical_trafo, std::vector<double> &one_el_ints_out);
 
     }

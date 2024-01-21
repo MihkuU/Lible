@@ -1,15 +1,16 @@
-// #include "kernels_1el_ints.h"
-#include "ints.h"
-#include "spherical_trafo.h"
+#include <lible/oneel_impl.h>
+
+namespace LI = lible::ints;
+namespace LIO = lible::ints::one;
 
 using namespace lible;
-using namespace lible::ints;
 
 using std::array;
 using std::size_t;
 using std::vector;
 
-Vec2D<double> calcOverlap(const Structure &Structure)
+template<>
+void LIO::kernel<LIO::Option::OVERLAP>()
 {
 
 }
@@ -18,7 +19,7 @@ Vec2D<double> calcOverlap(const Structure &Structure)
 // void Kernels1El::oneElIntKernel<ints::OVERLAP>(const int &la,
 //                                                const int &lb,
 //                                                const size_t &n_ao,
-//                                                const vector<Shells::ShellPair> &shell_pairs,
+//                                                const vector<shells::ShellPair> &shell_pairs,
 //                                                vector<double> &one_el_ints)
 // {
 //     array<double, 3> overlap_00;
@@ -31,10 +32,10 @@ Vec2D<double> calcOverlap(const Structure &Structure)
 //     vector<double> overlap_y(dim_cart_ints, 0);
 //     vector<double> overlap_z(dim_cart_ints, 0);
 
-//     size_t dim_cart_a = Shells::calcShellDimCartesian(la);
-//     size_t dim_cart_b = Shells::calcShellDimCartesian(lb);
-//     size_t dim_sph_a = Shells::calcShellDimSpherical(la);
-//     size_t dim_sph_b = Shells::calcShellDimSpherical(lb);
+//     size_t dim_cart_a = shells::calcShellDimCartesian(la);
+//     size_t dim_cart_b = shells::calcShellDimCartesian(lb);
+//     size_t dim_sph_a = shells::calcShellDimSpherical(la);
+//     size_t dim_sph_b = shells::calcShellDimSpherical(lb);
 //     vector<double> one_el_ints_cart(dim_cart_a * dim_cart_b, 0);
 //     vector<double> one_el_ints_sph_cart(dim_sph_a * dim_cart_b, 0);
 //     vector<double> one_el_ints_sph(dim_sph_a * dim_sph_b, 0);

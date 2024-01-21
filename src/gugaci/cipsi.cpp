@@ -29,7 +29,7 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     }
 
     vector<string> prefixes_scattered = impl->prefix_algorithm->prefixBonanza(generators);
-    n_prefixes = prefixes_scattered.size();
+    n_prefixes = prefixes_scattered.size();        
 
 #ifdef _USE_MPI_
     // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
@@ -68,22 +68,22 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
 #pragma omp parallel
     {
         int thread_num = omp_get_thread_num();
-        DataFOIS data_fois_local;
-        DataVar data_var_local;
-        impl->prefix_algorithm->generateConfsAndConnections(prefixes_para[thread_num],
+        DataFOIS data_fois_omp;
+        DataVar data_var_omp;
+        impl->prefix_algorithm->generateCFGsAndConnections(prefixes_para[thread_num],
                                                            generators_by_roots,
                                                            wave_function,
-                                                           data_fois_local,
-                                                           data_var_local);
+                                                           data_fois_omp,
+                                                           data_var_omp);
 
 #pragma omp critical
         {
-            for (const auto &[iconf, sfs] : data_fois_local.cfgs_sfs)
+            for (const auto &[iconf, sfs] : data_fois_omp.cfgs_sfs)
             {
-                string onv = data_fois_local.wfn->getONV(iconf);
+                string onv = data_fois_omp.wfn->getONV(iconf);
                 onvs_sfs_reduced[onv].insert(sfs.begin(), sfs.end());
             }
-            data_fois_para[thread_num] = std::move(data_fois_local);
+            data_fois_para[thread_num] = std::move(data_fois_omp);
         }
     }
 
@@ -93,7 +93,8 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     /*
      * Next is a crucial section where the new spin-functions are appended to the current ones.
      */
-    appendSpinFunctions(onvs_sfs_reduced, impl->sfs_map__idx_to_sf,
+    appendSpinFunctions(onvs_sfs_reduced,
+                        impl->sfs_map__idx_to_sf,
                         impl->sfs_map__sf_to_idx);
 
     /*
@@ -121,13 +122,14 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
      * Finally do the CIPSI-pruning....
      */
     map<string, vector<int>> selected_cfgs_sfs = doCIPSIPruning(wfn_cipsi_para, data_fois_para);
+
     n_csfs_new = 0;
     for (auto &item : selected_cfgs_sfs)
         n_csfs_new += item.second.size();
 
     //     // map<string, vector<size_t>> selected_cfgs_sfs_var = doCIPSIPruningOnVarSpace();
 
-    set<string> selected_cfgs;
+    set<string> selected_cfgs;    
     appendCFGsAndCSFs(selected_cfgs_sfs, selected_cfgs, wave_function);
 
     return selected_cfgs;
@@ -252,22 +254,22 @@ vector<wfn_ptr> GCI::Impl::CIPSI::setUpCIPSIWaveFunction(const vector<DataFOIS> 
 #pragma omp parallel
     {
         int thread_num = omp_get_thread_num();
-        const WaveFunction *wfn_hci_local = data_fois_para[thread_num].wfn.get();
-        wfn_ptr wfn_cipsi_local = std::make_unique<WaveFunction>(spin);
+        const WaveFunction *wfn_hci_omp = data_fois_para[thread_num].wfn.get();
+        wfn_ptr wfn_cipsi_omp = std::make_unique<WaveFunction>(spin);
         for (const auto &[icfg, sfs] : data_fois_para[thread_num].cfgs_sfs)
         {
-            const CFG *cfg = wfn_hci_local->getCFGPtr(icfg);
+            const CFG *cfg = wfn_hci_omp->getCFGPtr(icfg);
             int nue = cfg->getNUE();
-            map<string, int> sf_map = returnSFMap(impl->sfs_map__sf_to_idx.at(nue), sfs);
+            map<string, int> sf_map = returnSFMap(impl->sfs_map__sf_to_idx.at(nue), sfs);           
 
             CFG cfg_new(spin, cfg->getONV());
             cfg_new.createCSFsFromSFs(sf_map);
-            wfn_cipsi_local->insertCFG(cfg_new);
+            wfn_cipsi_omp->insertCFG(cfg_new);
         }
 
 #pragma omp critical
         {
-            wfn_cipsi_para[thread_num] = std::move(wfn_cipsi_local);
+            wfn_cipsi_para[thread_num] = std::move(wfn_cipsi_omp);
         }
     }
 
@@ -284,85 +286,85 @@ void GCI::Impl::CIPSI::constructSFPairs(const wfn_ptr &wave_function,
 #pragma omp parallel
     {
         int thread_num = omp_get_thread_num();
-        const WaveFunction *wfn_cipsi_local = wfn_cipsi_para[thread_num].get();
-        const DataFOIS *data_fois_local = &data_fois_para[thread_num];
+        const WaveFunction *wfn_cipsi_omp = wfn_cipsi_para[thread_num].get();
+        const DataFOIS *data_fois_omp = &data_fois_para[thread_num];
 
-        sf_pair_map_1el sf_pairs_1el_local;
-        sf_pair_map_2el sf_pairs_2el_local;
-        for (const auto &[key, connections] : data_fois_local->connections_1el)
+        sf_pair_map_1el sf_pairs_1el_omp;
+        sf_pair_map_2el sf_pairs_2el_omp;
+        for (const auto &[key, connections] : data_fois_omp->connections_1el)
         {
             sfs_pair_t sfs_pair;
             for (const auto &connection : connections)
             {
                 size_t icfg_new = get<0>(connection);
                 size_t icfg_right = get<1>(connection);
-                const CFG *cfg_new = wfn_cipsi_local->getCFGPtr(icfg_new);
+                const CFG *cfg_new = wfn_cipsi_omp->getCFGPtr(icfg_new);
                 const CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
                 vector<int> sfs_new = cfg_new->getSFIdxs();
                 vector<int> sfs_right = cfg_right->getSFIdxs();
                 sfs_pair.first.insert(sfs_new.begin(), sfs_new.end());
                 sfs_pair.second.insert(sfs_right.begin(), sfs_right.end());
             }
-            sf_pairs_1el_local[key] = sfs_pair;
+            sf_pairs_1el_omp[key] = sfs_pair;
         }
 
-        for (const auto &[key, connections] : data_fois_local->connections_EpqErr)
+        for (const auto &[key, connections] : data_fois_omp->connections_EpqErr)
         {
             sfs_pair_t sfs_pair;
             for (const auto &connection : connections)
             {
                 size_t icfg_new = get<0>(connection.first);
                 size_t icfg_right = get<1>(connection.first);
-                const CFG *cfg_new = wfn_cipsi_local->getCFGPtr(icfg_new);
+                const CFG *cfg_new = wfn_cipsi_omp->getCFGPtr(icfg_new);
                 const CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
                 vector<int> sfs_new = cfg_new->getSFIdxs();
                 vector<int> sfs_right = cfg_right->getSFIdxs();
                 sfs_pair.first.insert(sfs_new.begin(), sfs_new.end());
                 sfs_pair.second.insert(sfs_right.begin(), sfs_right.end());
             }
-            sf_pairs_1el_local[key].first.insert(sfs_pair.first.begin(), sfs_pair.first.end());
-            sf_pairs_1el_local[key].second.insert(sfs_pair.second.begin(), sfs_pair.second.end());
+            sf_pairs_1el_omp[key].first.insert(sfs_pair.first.begin(), sfs_pair.first.end());
+            sf_pairs_1el_omp[key].second.insert(sfs_pair.second.begin(), sfs_pair.second.end());
         }
 
-        for (const auto &[key, connections] : data_fois_local->connections_ErrEpq)
+        for (const auto &[key, connections] : data_fois_omp->connections_ErrEpq)
         {
             sfs_pair_t sfs_pair;
             for (const auto &connection : connections)
             {
                 size_t icfg_new = get<0>(connection.first);
                 size_t icfg_right = get<1>(connection.first);
-                const CFG *cfg_new = wfn_cipsi_local->getCFGPtr(icfg_new);
+                const CFG *cfg_new = wfn_cipsi_omp->getCFGPtr(icfg_new);
                 const CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
                 vector<int> sfs_new = cfg_new->getSFIdxs();
                 vector<int> sfs_right = cfg_right->getSFIdxs();
                 sfs_pair.first.insert(sfs_new.begin(), sfs_new.end());
                 sfs_pair.second.insert(sfs_right.begin(), sfs_right.end());
             }
-            sf_pairs_1el_local[key].first.insert(sfs_pair.first.begin(), sfs_pair.first.end());
-            sf_pairs_1el_local[key].second.insert(sfs_pair.second.begin(), sfs_pair.second.end());
+            sf_pairs_1el_omp[key].first.insert(sfs_pair.first.begin(), sfs_pair.first.end());
+            sf_pairs_1el_omp[key].second.insert(sfs_pair.second.begin(), sfs_pair.second.end());
         }
 
-        for (const auto &[key, connections] : data_fois_local->connections_2el)
+        for (const auto &[key, connections] : data_fois_omp->connections_2el)
         {
             sfs_pair_t sfs_pair;
             for (const auto &connection : connections)
             {
                 size_t icfg_new = get<0>(connection);
                 size_t icfg_right = get<1>(connection);
-                const CFG *cfg_new = wfn_cipsi_local->getCFGPtr(icfg_new);
+                const CFG *cfg_new = wfn_cipsi_omp->getCFGPtr(icfg_new);
                 const CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
                 vector<int> sfs_new = cfg_new->getSFIdxs();
                 vector<int> sfs_right = cfg_right->getSFIdxs();
                 sfs_pair.first.insert(sfs_new.begin(), sfs_new.end());
                 sfs_pair.second.insert(sfs_right.begin(), sfs_right.end());
             }
-            sf_pairs_2el_local[key] = sfs_pair;
+            sf_pairs_2el_omp[key] = sfs_pair;
         }
 
 #pragma omp critical
         {
-            mergeSFPairs(sf_pairs_1el_local, sf_pairs_1el_cipsi);
-            mergeSFPairs(sf_pairs_2el_local, sf_pairs_2el_cipsi);
+            mergeSFPairs(sf_pairs_1el_omp, sf_pairs_1el_cipsi);
+            mergeSFPairs(sf_pairs_2el_omp, sf_pairs_2el_cipsi);
         }
     }
 }
@@ -375,30 +377,30 @@ GCI::Impl::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
 #pragma omp parallel
     {
         int thread_num = omp_get_thread_num();
-        const WaveFunction *wfn_cipsi_local = wfn_cipsi_para[thread_num].get();
+        const WaveFunction *wfn_cipsi_omp = wfn_cipsi_para[thread_num].get();
+        
+        dvec diag = arma::conv_to<dvec>::from(impl->calcDiag(wfn_cipsi_omp));
 
-        dvec diag = arma::conv_to<dvec>::from(impl->calcDiag(wfn_cipsi_local));
-
-        vector<dvec> sigma_vectors(n_roots);
+        vector<arma::dvec> sigma_vectors(n_roots);
         for (size_t iroot = 0; iroot < n_roots; iroot++)
             sigma_vectors[iroot] = arma::conv_to<dvec>::from(impl->calcSigma(data_fois_para[thread_num],
                                                                             impl->ci_vectors[iroot],
-                                                                            wfn_cipsi_local));
+                                                                            wfn_cipsi_omp));
 
-        map<string, vector<int>> selected_cfgs_sfs_local;
+        map<string, vector<int>> selected_cfgs_sfs_omp;
         for (size_t iroot = 0; iroot < n_roots; iroot++)
         {
             dvec energy_minus_diag(diag.n_elem);
             energy_minus_diag.fill(impl->ci_energies[iroot]);
             energy_minus_diag -= diag;
 
-            dvec cipsi_importance_function = abs(sigma_vectors[iroot] / energy_minus_diag);
-            for (size_t iconf = 0; iconf < wfn_cipsi_local->getNumCFGs(); iconf++)
+            dvec cipsi_importance_function = arma::abs(sigma_vectors[iroot] / energy_minus_diag);
+            for (size_t iconf = 0; iconf < wfn_cipsi_omp->getNumCFGs(); iconf++)
             {
-                const CFG *conf_p = wfn_cipsi_local->getCFGPtr(iconf);
+                const CFG *conf_p = wfn_cipsi_omp->getCFGPtr(iconf);
                 vector<int> sf_idxs = conf_p->getSFIdxs();
                 size_t dim = sf_idxs.size();
-                size_t pos = wfn_cipsi_local->getPos(iconf);
+                size_t pos = wfn_cipsi_omp->getPos(iconf);
 
                 dvec cipsi_importance_function_conf = cipsi_importance_function.rows(pos, pos + dim - 1);
                 if (max(cipsi_importance_function_conf) > Settings::getEpsilonVar())
@@ -411,7 +413,7 @@ GCI::Impl::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
                         if (cipsi_importance_function_conf(mu) > Settings::getEpsilonVar())
                             selected_sfs.push_back(sf_idx);
                     }
-                    selected_cfgs_sfs_local[selected_cfg].insert(selected_cfgs_sfs_local[selected_cfg].end(),
+                    selected_cfgs_sfs_omp[selected_cfg].insert(selected_cfgs_sfs_omp[selected_cfg].end(),
                                                                  selected_sfs.begin(), selected_sfs.end());
                 }
             }
@@ -419,7 +421,7 @@ GCI::Impl::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
 
 #pragma omp critical
         {
-            selected_cfgs_sfs.merge(selected_cfgs_sfs_local);
+            selected_cfgs_sfs.merge(selected_cfgs_sfs_omp);
         }
     }
 

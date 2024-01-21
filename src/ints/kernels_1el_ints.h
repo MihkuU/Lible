@@ -2,9 +2,9 @@
 
 #include <functional>
 
-#include "ints.h"
-#include "shell.h"
-#include "experimental/structure_gpu.h"
+// #include "ints.h"
+// #include "shell.h"
+// #include "experimental/structure_gpu.h"
 
 namespace lible
 {
@@ -12,7 +12,7 @@ namespace lible
     // {
     //     template <ints::Option1El option>
     //     void oneElIntKernel(const int &la, const int &lb, const std::size_t &n_ao,
-    //                         const std::vector<Shells::ShellPair> &shell_pairs,
+    //                         const std::vector<shells::ShellPair> &shell_pairs,
     //                         std::vector<double> &one_el_ints);
     //     // TODO: change this to smth like:
     //     // void oneElIntKernel(const int &la, const int &lb,        

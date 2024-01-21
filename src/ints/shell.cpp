@@ -1,13 +1,12 @@
-#include "kernels_1el_ints.h"
-#include "shell.h"
-#include "spherical_trafo.h"
+#include <lible/shell.h>
+#include <lible/spherical_trafo.h>
 
 using namespace lible;
 using std::array;
 using std::size_t;
 using std::vector;
 
-vector<double> Shells::calcShellNormalization(const int &angmom,
+vector<double> shells::calcShellNormalization(const int &angmom,
                                               const vector<double> &contraction_coeffs,
                                               const vector<double> &contraction_exps,
                                               const vector<array<int, 3>> &cartesian_exps)

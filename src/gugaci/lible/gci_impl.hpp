@@ -20,13 +20,11 @@ namespace lible
 	{
 		class GCI::Impl
 		{
-			/*
-			 * TODO:: since its a nested PIMPL class that is forward-declared in "gci.h", maybe called it just Impl??
-			 */
 		public:
 			Impl(const int &n_orbs, const int &n_els,
 				 const int &n_roots, const int &multiplicity,
-				 const vec2d &one_el_ints, const vec4d &two_el_ints);
+				 const vec2d &one_el_ints, const vec4d &two_el_ints,
+				 const double &core_energy);
 			~Impl();
 
 			Impl(const Impl &) = delete;
@@ -50,15 +48,18 @@ namespace lible
 			// 					 std::vector<double> &ci_energies_out,
 			// 					 std::vector<std::vector<double>> &ci_vectors_out);
 
-			// void runFromCSFsFile(const std::string &csfs_fname,
-			// 					 std::vector<double> &ci_energies_out,
-			// 					 std::vector<std::vector<double>> &ci_vectors_out);
+			void runFromCSFsFile(const std::string &csfs_fname,
+								 std::vector<double> &ci_energies_out,
+								 std::vector<std::vector<double>> &ci_vectors_out);
 
 			void calc1RDM(std::vector<double> &one_rdm_out);
+
 			void calc2RDM(std::vector<double> &two_rdm_out);
+
 			void calcSpin1RDM(std::vector<double> &one_srdm_out);
 
 			std::vector<double> calcSigma(const std::vector<double> &trial);
+			
 			std::vector<double> calcSigma(const vec2d &aux_1el_ints,
 										  const vec4d &aux_2el_ints,
 										  const std::vector<double> &trial);
@@ -92,7 +93,9 @@ namespace lible
 									   double s, int i, std::string sf,
 									   std::map<int, std::set<std::string>> &sfs);
 
-			void runKernel(std::vector<double> &ci_energies,
+			void readCSFs(const std::string &csfs_fname);
+
+			void runDriver(std::vector<double> &ci_energies,
 						   std::vector<std::vector<double>> &ci_vectors,
 						   std::vector<std::vector<double>> &energies_per_iter,
 						   std::vector<std::unordered_map<std::string, double>> &previous_ci_coeffs_map);
@@ -113,6 +116,7 @@ namespace lible
 			std::unique_ptr<PrefixAlgorithm> prefix_algorithm;
 
 			/* Member variables */
+			double core_energy;
 			double spin;
 			int iter_sci;
 			int min_nue;
@@ -130,6 +134,7 @@ namespace lible
 
 			std::set<std::string> cfgs_new;
 
+			vec2d one_el_ham;
 			vec2d one_el_ints;
 			vec4d two_el_ints;
 
@@ -144,11 +149,6 @@ namespace lible
 			connection_map_dia connections_dia;
 
 			wfn_ptr wave_function;
-
-#ifdef _USE_MPI_
-			MPI_Comm world;
-			MPI_Comm outworld;
-#endif
 		};
 	}
 }

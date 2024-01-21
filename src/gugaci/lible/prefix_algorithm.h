@@ -6,8 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include <lible/guga_sci.h>
-#include <lible/guga_sci.h>
+#include <lible/gci_impl.hpp>
 
 namespace lible
 {
@@ -19,7 +18,7 @@ namespace lible
             /*
              * Wrapper struct for hiding the ugly details of the prefix algorithm.
              */
-            PrefixAlgorithm(Impl *sci_) : impl(sci_)
+            PrefixAlgorithm(Impl *impl_) : impl(impl_)
             {
                 spin = impl->spin;
                 min_nue = impl->min_nue;
@@ -34,11 +33,11 @@ namespace lible
 
             std::vector<std::string> prefixBonanza(const std::set<std::string> &cfgs);
 
-            void generateConfsAndConnections(const std::vector<std::string> &prefixes,
-                                             const std::vector<std::vector<
-                                                 std::pair<std::string, arma::dvec>>> &generators_by_roots,
-                                             const wfn_ptr &wfn_right,
-                                             DataFOIS &data_fois, DataVar &data_var);
+            void generateCFGsAndConnections(const std::vector<std::string> &prefixes,
+                                            const std::vector<std::vector<
+                                                std::pair<std::string, arma::dvec>>> &generators_by_roots,
+                                            const wfn_ptr &wfn_right,
+                                            DataFOIS &data_fois, DataVar &data_var);
 
             std::vector<std::string> findConnectedSFs1El(const std::vector<std::string> &sfs_right,
                                                          const quintet &info_cc);

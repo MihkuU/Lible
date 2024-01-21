@@ -1,4 +1,4 @@
-#include "spherical_trafo.h"
+#include <lible/spherical_trafo.h>
 
 using namespace lible;
 

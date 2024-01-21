@@ -24,14 +24,15 @@ void GCI::Impl::Connections::constructConnections(const std::set<std::string> &c
         connection_map_2el connections_2el_omp;
         connection_map_dia connections_dia_omp;
 
+        int rank_total, size_total;
 #ifdef _USE_MPI_
         // int rank_total = returnTotalRank(impl->world);
         // int size_total = returnTotalSize(impl->world);
-        int rank_total = omp_get_thread_num(); // TMP
-        int size_total = omp_get_num_threads(); // TMP
+        rank_total = omp_get_thread_num(); // TMP
+        size_total = omp_get_num_threads(); // TMP
 #else
-        int rank_total = omp_get_thread_num();
-        int size_total = omp_get_num_threads();
+        rank_total = omp_get_thread_num();
+        size_total = omp_get_num_threads();
 #endif
 
         int ipal = 0;
