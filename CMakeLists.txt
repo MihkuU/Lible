@@ -40,8 +40,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_library(lible SHARED)
 set_target_properties(lible PROPERTIES PREFIX "")
 
-add_subdirectory(extern)
-add_subdirectory(src)
+add_subdirectory("${CMAKE_SOURCE_DIR}/extern")
+add_subdirectory("${CMAKE_SOURCE_DIR}/src")
 
 find_package(OpenMP REQUIRED)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
