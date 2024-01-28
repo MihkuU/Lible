@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include <lible/configuration.h>
-#include <lible/configurationtree.h>
+#include <lible/configuration.hpp>
+#include <lible/configurationtree.hpp>
 
 namespace lible
 {

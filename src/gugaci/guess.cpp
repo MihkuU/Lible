@@ -1,15 +1,14 @@
 #include <lible/gci_impl.hpp>
-#include <lible/gci_settings.h>
-#include <lible/connections.h>
-#include <lible/coupling_coeffs.h>
+#include <lible/gci_settings.hpp>
+#include <lible/connections.hpp>
+#include <lible/coupling_coeffs.hpp>
 #include <lible/util.h>
 
 #include <armadillo>
 #include <omp.h>
 
 #ifdef _USE_MPI_
-// #include <boost/mpi.hpp>
-// namespace mpi = boost::mpi;
+#include <lible/brain.hpp>
 #endif
 
 using namespace lible;
@@ -149,19 +148,16 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
 
 #pragma omp parallel
     {
-        // int thread_num = omp_get_thread_num();
-        // int num_threads = omp_get_num_threads();
-
         int rank_total, size_total;
 #ifdef _USE_MPI_
-        // int rank_total = returnTotalRank(world);
-        // int size_total = returnTotalSize(world);
-        rank_total = omp_get_thread_num(); // TMP
-        size_total = omp_get_num_threads(); // TMP
+        rank_total = Brain::returnTotalRank();
+        size_total = Brain::returnTotalSize();
 #else
         rank_total = omp_get_thread_num();
         size_total = omp_get_num_threads();
 #endif
+        int thread_num = omp_get_thread_num();
+        int num_threads = omp_get_num_threads();
 
         arma::dmat guess_hamiltonian_omp(dim_guess, dim_guess, arma::fill::zeros);
 
@@ -208,7 +204,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
         ipal = 0;
         for (const auto &[key, connections] : connections_1el)
         {
-            if (ipal % size_total != rank_total)
+            if (ipal % num_threads != thread_num)
             {
                 ipal++;
                 continue;
@@ -274,7 +270,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
         ipal = 0;
         for (const auto &[key, connections] : connections_dia)
         {
-            if (ipal % size_total != rank_total)
+            if (ipal % num_threads != thread_num)
             {
                 ipal++;
                 continue;
@@ -307,7 +303,7 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
         ipal = 0;
         for (const auto &[key, connections] : connections_2el)
         {
-            if (ipal % size_total != rank_total)
+            if (ipal % num_threads != thread_num)
             {
                 ipal++;
                 continue;
@@ -352,9 +348,13 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
             guess_hamiltonian += guess_hamiltonian_omp;
         }
     }
+
 #ifdef _USE_MPI_
-    // mpi::all_reduce(mpi::communicator(world, mpi::comm_duplicate),
-    //                 guess_hamiltonian, guess_hamiltonian, std::plus<arma::dmat>());
+    mpl::contiguous_layout<double> layout(guess_hamiltonian.n_elem);
+
+    Brain::comm_nodes.allreduce([](auto a, auto b)
+                                { return a + b; },
+                                guess_hamiltonian.memptr(), layout);
 #endif
 
     arma::dmat eigenvectors_guess(dim_guess, dim_guess, arma::fill::zeros);

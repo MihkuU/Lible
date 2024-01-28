@@ -1,4 +1,4 @@
-#include <lible/configuration.h>
+#include <lible/configuration.hpp>
 
 #include <algorithm>
 #include <stdexcept>

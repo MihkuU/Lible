@@ -7,6 +7,11 @@ namespace lible
         class Settings
         {
         public:
+            static bool getQuiet()
+            {
+                return quiet;
+            }
+
             static double getTolDiscard()
             {
                 return tol_discard;
@@ -30,6 +35,11 @@ namespace lible
             static int getMaxNTrialRoot()
             {
                 return max_n_trial;
+            }
+
+            static void setQuiet(const bool &q)
+            {
+                quiet = q;
             }
 
             static void setTolDiscard(const double &t)
@@ -60,6 +70,7 @@ namespace lible
             Settings() = delete;
 
         private:
+            static inline bool quiet = false;
             static inline double tol_discard = 1e-7;
             static inline double tol_residual = 1e-5;
             static inline int max_iter = 50;

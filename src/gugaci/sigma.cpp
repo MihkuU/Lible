@@ -1,9 +1,8 @@
-#include <lible/brain.hpp>
 #include <lible/gci_impl.hpp>
 #include <lible/util.h>
 
 #ifdef _USE_MPI_
-#include <mpl/mpl.hpp>
+#include <lible/brain.hpp>
 #endif
 
 using namespace lible;
@@ -15,235 +14,249 @@ using std::vector;
 
 vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
 {
-    arma::dvec sigma(trial.size(), arma::fill::zeros);
+    vector<double> sigma_out;
+
+    // TODO: this function has gotten out of hands a bit, decompose it into smaller functions.
+
+#ifdef _USE_MPI_
+    if (Brain::comm_nodes.is_valid())
+    {
+#endif
+
+        arma::dvec sigma(trial.size(), arma::fill::zeros);
 
 #pragma omp parallel
-    {
-        arma::dvec sigma_omp(wave_function->getNumCSFs(), arma::fill::zeros);
-        arma::dvec trial_omp = arma::conv_to<arma::dvec>::from(trial);
+        {
+            arma::dvec sigma_omp(wave_function->getNumCSFs(), arma::fill::zeros);
+            arma::dvec trial_omp = arma::conv_to<arma::dvec>::from(trial);
 
-        int thread_num = omp_get_thread_num();
-        int num_threads = omp_get_num_threads();
-
-        int rank_total, size_total;
+            int rank_total, size_total;
 #ifdef _USE_MPI_
-        // int rank_total = returnTotalRank(world);
-        // int size_total = returnTotalSize(world);
-        rank_total = omp_get_thread_num(); // TMP
-        size_total = omp_get_num_threads(); // TMP
+            rank_total = Brain::returnTotalRank();
+            size_total = Brain::returnTotalSize();
 #else
         rank_total = omp_get_thread_num();
         size_total = omp_get_num_threads();
 #endif
 
-        /* No excitation (diagonal) */
-        int ipal = 0;
-        for (size_t icfg = 0; icfg < wave_function->getNumCFGs(); icfg++)
-        {
-            if (ipal % size_total != rank_total)
+            /* No excitation (diagonal) */
+            int ipal = 0;
+            for (size_t icfg = 0; icfg < wave_function->getNumCFGs(); icfg++)
             {
-                ipal++;
-                continue;
-            }
-            ipal++;
-
-            CFG *cfg = wave_function->getCFGPtr(icfg);
-            string onv = cfg->getONV();
-
-            double val = 0;
-            for (size_t p = 0; p < n_orbs; p++)
-            {
-                int p_occ = onv[p] - '0';
-                if (p_occ == 0)
+                if (ipal % size_total != rank_total)
+                {
+                    ipal++;
                     continue;
-
-                val += p_occ * (one_el_ints(p, p) + 0.5 * p_occ * two_el_ints(p, p, p, p));
-
-                for (size_t q = p + 1; q < n_orbs; q++)
-                {
-                    int q_occ = onv[q] - '0';
-                    if (q_occ == 0)
-                        continue;
-
-                    val += p_occ * q_occ * two_el_ints(p, p, q, q);
                 }
-            }
-
-            size_t dim = wave_function->getDim(icfg);
-            size_t pos = wave_function->getPos(icfg);
-
-            for (size_t mu = 0; mu < dim; mu++)
-                sigma_omp(pos + mu) += val * trial_omp(pos + mu);
-        }
-
-        /* One-electron excitations */
-        ipal = 0;
-        for (const auto &[key, connections] : connections_1el)
-        {
-            if (ipal % size_total != rank_total)
-            {
                 ipal++;
-                continue;
-            }
-            ipal++;
-
-            cc_map ccs = ccs_1el.at(key);
-
-            // int nue_right = get<2>(key);
-            // int max_sf_dim = weylFormula(spin, nue_right);
-            // flat_cc_map ccs_flat = ccs_1el_flat.at(key);
-
-            for (const auto &[icfg_left, icfg_right, pq, phase] : connections)
-            {
-                auto [p, q] = pq1DTo2D(pq, n_orbs);
-
-                CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
-                CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
-
-                string onv_left = cfg_left->getONV();
-                string onv_right = cfg_right->getONV();
-
-                double contrib = one_el_ints(p, q);
-                for (size_t r = 0; r < n_orbs; r++)
-                {
-                    int r_occ = onv_right[r] - '0';
-                    if (r_occ == 0)
-                        continue;
-
-                    contrib += 0.5 * r_occ * two_el_ints(p, q, r, r);
-                }
-
-                for (size_t r = 0; r < n_orbs; r++)
-                {
-                    int r_occ = onv_left[r] - '0';
-                    if (r_occ == 0)
-                        continue;
-
-                    contrib += 0.5 * r_occ * two_el_ints(r, r, p, q);
-                }
-
-                double fac = 1;
-                if (phase)
-                    fac = -1;
-                contrib *= fac;
-
-                size_t pos_left = wave_function->getPos(icfg_left);
-                size_t pos_right = wave_function->getPos(icfg_right);
-
-                vector<int> sf_idxs_left = cfg_left->getSFIdxs();
-                vector<int> sf_idxs_right = cfg_right->getSFIdxs();
-                for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
-                    for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
-                    {
-                        double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
-                        // double cc = ccs_flat.at(sf_idxs_left[mu] * max_sf_dim + sf_idxs_right[nu]);
-                        sigma_omp(pos_left + mu) += contrib * cc * trial_omp(pos_right + nu);
-                        sigma_omp(pos_right + nu) += contrib * cc * trial_omp(pos_left + mu);
-                    }
-            }
-        }
-
-        /* Excitations to RI-space and back (conf-diagonal) */
-        ipal = 0;
-        for (const auto &[key, connections] : connections_dia)
-        {
-            if (ipal % size_total != rank_total)
-            {
-                ipal++;
-                continue;
-            }
-            ipal++;
-
-            cc_map ccs = ccs_dia.at(key);
-
-            // int nue_right = get<2>(key);
-            // int max_sf_dim = weylFormula(spin, nue_right);
-            // flat_cc_map ccs_flat = ccs_dia_flat.at(key);
-
-            for (const auto &[icfg, pqqp] : connections)
-            {
-                auto [p, q, r, s] = pqrs1DTo4D(pqqp, n_orbs);
-                double two_el_int = 0.5 * two_el_ints(p, q, q, p);
-
-                size_t pos = wave_function->getPos(icfg);
 
                 CFG *cfg = wave_function->getCFGPtr(icfg);
+                string onv = cfg->getONV();
 
-                vector<int> sf_idxs = cfg->getSFIdxs();
-                for (size_t mu = 0; mu < sf_idxs.size(); mu++)
-                    for (size_t nu = 0; nu < sf_idxs.size(); nu++)
+                double val = 0;
+                for (size_t p = 0; p < n_orbs; p++)
+                {
+                    int p_occ = onv[p] - '0';
+                    if (p_occ == 0)
+                        continue;
+
+                    val += p_occ * (one_el_ints(p, p) + 0.5 * p_occ * two_el_ints(p, p, p, p));
+
+                    for (size_t q = p + 1; q < n_orbs; q++)
                     {
-                        double cc = ccs.at(sf_idxs[mu]).at(sf_idxs[nu]);
-                        // double cc = ccs_flat.at(sf_idxs[mu] * max_sf_dim + sf_idxs[nu]);
-                        sigma_omp(pos + mu) += two_el_int * cc * trial_omp(pos + nu);
-                    }
-            }
-        }
+                        int q_occ = onv[q] - '0';
+                        if (q_occ == 0)
+                            continue;
 
-        /* Two-electron excitations */
-        ipal = 0;
-        for (const auto &[key, connections] : connections_2el)
-        {
-            if (ipal % size_total != rank_total)
+                        val += p_occ * q_occ * two_el_ints(p, p, q, q);
+                    }
+                }
+
+                size_t dim = wave_function->getDim(icfg);
+                size_t pos = wave_function->getPos(icfg);
+
+                for (size_t mu = 0; mu < dim; mu++)
+                    sigma_omp(pos + mu) += val * trial_omp(pos + mu);
+            }
+
+            int thread_num = omp_get_thread_num();
+            int num_threads = omp_get_num_threads();
+
+            /* One-electron excitations */
+            ipal = 0;
+            for (const auto &[key, connections] : connections_1el)
             {
+                if (ipal % num_threads != thread_num)
+                {
+                    ipal++;
+                    continue;
+                }
                 ipal++;
-                continue;
-            }
-            ipal++;
 
-            cc_map ccs = ccs_2el.at(key);
+                cc_map ccs = ccs_1el.at(key);
 
-            // int nue_right = get<4>(key);
-            // int max_sf_dim = weylFormula(spin, nue_right);
-            // flat_cc_map ccs_flat = ccs_2el_flat.at(key);
+                // int nue_right = get<2>(key);
+                // int max_sf_dim = weylFormula(spin, nue_right);
+                // flat_cc_map ccs_flat = ccs_1el_flat.at(key);
 
-            for (const auto &[icfg_left, icfg_right, pqrs, phase, two_el_ex] : connections)
-            {
-                size_t pos_left = wave_function->getPos(icfg_left);
-                size_t pos_right = wave_function->getPos(icfg_right);
+                for (const auto &[icfg_left, icfg_right, pq, phase] : connections)
+                {
+                    auto [p, q] = pq1DTo2D(pq, n_orbs);
 
-                double fac = 0.5;
-                if (two_el_ex)
-                    fac = 1.0;
-                if (phase)
-                    fac *= -1;
+                    CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
+                    CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
 
+                    string onv_left = cfg_left->getONV();
+                    string onv_right = cfg_right->getONV();
 
-                auto [p, q, r, s] = pqrs1DTo4D(pqrs, n_orbs);
-                double contrib = two_el_ints(p, q, r, s);
-                contrib *= fac;
-
-                CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
-                CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
-
-                vector<int> sf_idxs_left = cfg_left->getSFIdxs();
-                vector<int> sf_idxs_right = cfg_right->getSFIdxs();
-                for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
-                    for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
+                    double contrib = one_el_ints(p, q);
+                    for (size_t r = 0; r < n_orbs; r++)
                     {
-                        double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
-                        // double cc = ccs_flat.at(sf_idxs_left[mu] * max_sf_dim + sf_idxs_right[nu]);
-                        sigma_omp(pos_left + mu) += contrib * cc * trial_omp(pos_right + nu);
-                        sigma_omp(pos_right + nu) += contrib * cc * trial_omp(pos_left + mu);
+                        int r_occ = onv_right[r] - '0';
+                        if (r_occ == 0)
+                            continue;
+
+                        contrib += 0.5 * r_occ * two_el_ints(p, q, r, r);
                     }
+
+                    for (size_t r = 0; r < n_orbs; r++)
+                    {
+                        int r_occ = onv_left[r] - '0';
+                        if (r_occ == 0)
+                            continue;
+
+                        contrib += 0.5 * r_occ * two_el_ints(r, r, p, q);
+                    }
+
+                    double fac = 1;
+                    if (phase)
+                        fac = -1;
+                    contrib *= fac;
+
+                    size_t pos_left = wave_function->getPos(icfg_left);
+                    size_t pos_right = wave_function->getPos(icfg_right);
+
+                    vector<int> sf_idxs_left = cfg_left->getSFIdxs();
+                    vector<int> sf_idxs_right = cfg_right->getSFIdxs();
+                    for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
+                        for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
+                        {
+                            double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                            // double cc = ccs_flat.at(sf_idxs_left[mu] * max_sf_dim + sf_idxs_right[nu]);
+                            sigma_omp(pos_left + mu) += contrib * cc * trial_omp(pos_right + nu);
+                            sigma_omp(pos_right + nu) += contrib * cc * trial_omp(pos_left + mu);
+                        }
+                }
             }
-        }
+
+            /* Excitations to RI-space and back (conf-diagonal) */
+            ipal = 0;
+            for (const auto &[key, connections] : connections_dia)
+            {
+                if (ipal % num_threads != thread_num)
+                {
+                    ipal++;
+                    continue;
+                }
+                ipal++;
+
+                cc_map ccs = ccs_dia.at(key);
+
+                // int nue_right = get<2>(key);
+                // int max_sf_dim = weylFormula(spin, nue_right);
+                // flat_cc_map ccs_flat = ccs_dia_flat.at(key);
+
+                for (const auto &[icfg, pqqp] : connections)
+                {
+                    auto [p, q, r, s] = pqrs1DTo4D(pqqp, n_orbs);
+                    double two_el_int = 0.5 * two_el_ints(p, q, q, p);
+
+                    size_t pos = wave_function->getPos(icfg);
+
+                    CFG *cfg = wave_function->getCFGPtr(icfg);
+
+                    vector<int> sf_idxs = cfg->getSFIdxs();
+                    for (size_t mu = 0; mu < sf_idxs.size(); mu++)
+                        for (size_t nu = 0; nu < sf_idxs.size(); nu++)
+                        {
+                            double cc = ccs.at(sf_idxs[mu]).at(sf_idxs[nu]);
+                            // double cc = ccs_flat.at(sf_idxs[mu] * max_sf_dim + sf_idxs[nu]);
+                            sigma_omp(pos + mu) += two_el_int * cc * trial_omp(pos + nu);
+                        }
+                }
+            }
+
+            /* Two-electron excitations */
+            ipal = 0;
+            for (const auto &[key, connections] : connections_2el)
+            {
+                if (ipal % num_threads != thread_num)
+                {
+                    ipal++;
+                    continue;
+                }
+                ipal++;
+
+                cc_map ccs = ccs_2el.at(key);
+
+                // int nue_right = get<4>(key);
+                // int max_sf_dim = weylFormula(spin, nue_right);
+                // flat_cc_map ccs_flat = ccs_2el_flat.at(key);
+
+                for (const auto &[icfg_left, icfg_right, pqrs, phase, two_el_ex] : connections)
+                {
+                    size_t pos_left = wave_function->getPos(icfg_left);
+                    size_t pos_right = wave_function->getPos(icfg_right);
+
+                    double fac = 0.5;
+                    if (two_el_ex)
+                        fac = 1.0;
+                    if (phase)
+                        fac *= -1;
+
+                    auto [p, q, r, s] = pqrs1DTo4D(pqrs, n_orbs);
+                    double contrib = two_el_ints(p, q, r, s);
+                    contrib *= fac;
+
+                    CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
+                    CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
+
+                    vector<int> sf_idxs_left = cfg_left->getSFIdxs();
+                    vector<int> sf_idxs_right = cfg_right->getSFIdxs();
+                    for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
+                        for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
+                        {
+                            double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                            // double cc = ccs_flat.at(sf_idxs_left[mu] * max_sf_dim + sf_idxs_right[nu]);
+                            sigma_omp(pos_left + mu) += contrib * cc * trial_omp(pos_right + nu);
+                            sigma_omp(pos_right + nu) += contrib * cc * trial_omp(pos_left + mu);
+                        }
+                }
+            }
 
 #pragma omp critical
-        {
-            sigma += sigma_omp;
+            {
+                sigma += sigma_omp;
+            }
         }
-    }
 
 #ifdef _USE_MPI_
-    // mpl::contiguous_layout<double> layout(sigma.n_elem);
-    // // TODO: make this use the local communicator.
-    // Para::comm_world.allreduce([](auto a, auto b)
-    //                            { return a + b; },
-    //                            sigma.memptr(), layout);
+        mpl::contiguous_layout<double> layout(sigma.n_elem);
+
+        Brain::comm_nodes.allreduce([](auto a, auto b)
+                                    { return a + b; },
+                                    sigma.memptr(), layout);
+
+        sigma_out = arma::conv_to<vector<double>>::from(sigma);
+    } // comm_nodes
+
+    sigma_out = Brain::bcastVector(0, Brain::comm_nodes, sigma_out);
+
+#else
+        sigma_out = arma::conv_to<vector<double>>::from(sigma);
 #endif
 
-    return arma::conv_to<vector<double>>::from(sigma);
+    return sigma_out;
 }
 
 vector<double> GCI::Impl::calcSigma(const vec2d &aux_1el_ints,

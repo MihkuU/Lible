@@ -6,9 +6,9 @@
 #include <utility>
 #include <vector>
 
-#include <lible/gci.h>
-#include <lible/gci_settings.h>
-#include <lible/gci_util.h>
+#include <lible/gci.hpp>
+#include <lible/gci_settings.hpp>
+#include <lible/gci_util.hpp>
 
 #ifdef _USE_MPI_
 #include <mpi.h>
@@ -149,6 +149,17 @@ namespace lible
 			connection_map_dia connections_dia;
 
 			wfn_ptr wave_function;
+
+
+			// Temporary timing variables
+			double t_solveCI = 0, t_constructCCs = 0, t_connections_construction = 0,
+				   t_connections_merge = 0, t_diagonalize = 0;
+
+			double t_selection_setup = 0, t_generateCFGsAndConnections = 0, t_appendSpinFunctions = 0,
+				   t_setUpCIPSIWaveFunction = 0, t_constructSFPairs = 0, t_sel_constructCCs = 0,
+				   t_doCIPSIPruning = 0, t_appendCFGsAndCSFs = 0, t_selection_total = 0;
+
+			double t_constructCCs1 = 0, t_ccs_1el = 0, t_ccs_2el = 0, t_ccs_dia = 0;
 		};
 	}
 }

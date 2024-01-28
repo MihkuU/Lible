@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <lible/davidson_settings.h>
-#include <lible/gci_settings.h>
+#include <lible/gci_settings.hpp>
 #include <lible/types.h>
 
 namespace lible
@@ -47,7 +47,7 @@ namespace lible
         std::pair<vec2d, vec4d> calc12RDMs(const GCI &gci, const size_t &iroot,
                                            const size_t &jroot);
 
-        std::vector<double> calcSigma();
+        std::vector<double> calcSigma(const GCI &gci);
 
         std::vector<std::vector<std::tuple<std::string, std::string, double>>>
         returnSignificantCSFs(const GCI &gci);

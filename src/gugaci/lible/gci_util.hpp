@@ -7,8 +7,8 @@
 #include <tuple>
 #include <vector>
 
-#include <lible/configuration.h>
-#include <lible/wave_function.h>
+#include <lible/configuration.hpp>
+#include <lible/wave_function.hpp>
 
 #include <armadillo>
 #include <robin_hood.h>

@@ -33,12 +33,12 @@ bool checkConvergence(const double &max_res_norm,
         if (std::abs(diff_eigval) > max_eigval_diff)
             max_eigval_diff = diff_eigval;
         if (iroot >= 1)
-            palPrint(fmt::format("{:12}\n", " "));
+            palPrint(fmt::format("{:12}\n", " "), LD::Settings::getQuiet());
 
         string msg = fmt::format("{:>6}  {:>18.10f}  {:>18.10f}  {:>18.10f}",
                                  iroot, eigenvalues_G(iroot), diff_eigval,
                                  res_norms[iroot]);
-        palPrint(msg);
+        palPrint(msg, LD::Settings::getQuiet());
     }
 
     if (max_res_norm < LD::Settings::getTolResidual())
@@ -111,7 +111,8 @@ auto initialize(const size_t &n_roots,
                 const function<vector<vector<double>>(const vector<double> &diag)> &calcGuess,
                 const function<arma::dvec(const arma::dvec)> &calcSigma)
 {
-    palPrint(fmt::format("      Calculating the diagonal...                             "));
+    palPrint(fmt::format("      Calculating the diagonal...                             "),
+             LD::Settings::getQuiet());
     auto start{std::chrono::steady_clock::now()};
 
     vector<double> diag_raw = calcDiag();
@@ -119,9 +120,11 @@ auto initialize(const size_t &n_roots,
 
     auto end(std::chrono::steady_clock::now());
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()),
+             LD::Settings::getQuiet());
 
-    palPrint(fmt::format("      Calculating the guess...                                "));
+    palPrint(fmt::format("      Calculating the guess...                                "),
+             LD::Settings::getQuiet());
     start = std::chrono::steady_clock::now();
 
     vector<vector<double>> trial_vectors_raw = calcGuess(diag_raw);
@@ -135,9 +138,11 @@ auto initialize(const size_t &n_roots,
 
     end = std::chrono::steady_clock::now();
     duration = std::chrono::duration<double>(end - start);
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()),
+             LD::Settings::getQuiet());
 
-    palPrint(fmt::format("      Calculating initial sigma vectors...                    "));
+    palPrint(fmt::format("      Calculating initial sigma vectors...                    "),
+             LD::Settings::getQuiet());
     start = std::chrono::steady_clock::now();
 
     vector<arma::dvec> sigma_vectors(trial_vectors.size());
@@ -146,7 +151,7 @@ auto initialize(const size_t &n_roots,
 
     end = std::chrono::steady_clock::now();
     duration = std::chrono::duration<double>(end - start);
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()), LD::Settings::getQuiet());
 
     return std::make_tuple(diag, trial_vectors, sigma_vectors);
 }
@@ -249,7 +254,7 @@ auto createNewTrialVecs(const size_t &n_roots,
             }
             else
                 palPrint(fmt::format("   Trial vector is discarded, norm ({:.2e}) below threshold ({:.2e})!",
-                                     norm_trial_new, LD::Settings::getTolDiscard()));
+                                     norm_trial_new, LD::Settings::getTolDiscard()), LD::Settings::getQuiet());
         }
     }
 
@@ -270,9 +275,8 @@ LD::diagonalize(const size_t &n_roots,
     /*
      * Implementation of the Davidson algorithm, based on Section 3.2.1 in
      * https://doi.org/10.1016/S0065-3276(08)60532-8.
-     *
      */
-    palPrint(fmt::format("\n   Lible::Davidson diagonalization\n\n"));
+    palPrint(fmt::format("\n   Lible::Davidson diagonalization\n\n"), LD::Settings::getQuiet());
 
     std::function<arma::dvec(const arma::dvec)> calcSigmaAux = [&](const arma::dvec &trial)
     {
@@ -289,7 +293,8 @@ LD::diagonalize(const size_t &n_roots,
         string msg = fmt::format("Lible::Davidson max_iter is set to {}! "
                                  "Increase the maximum number of iterations:\n"
                                  "      lible::davidson::setMaxIter()\n",
-                                 Settings::getMaxIter());
+                                 Settings::getMaxIter(), LD::Settings::getQuiet());
+
         throw std::runtime_error(msg);
     }
 
@@ -302,13 +307,13 @@ LD::diagonalize(const size_t &n_roots,
     string msg = fmt::format("\n{:6}{:>6}{:>6}{:>20}{:>20}{:>20}{:>20}\n",
                              " ", "Iter", "Root", "E [Ha]",
                              "E-diff", "R-norm", "t [s]");
-    palPrint(msg);
+    palPrint(msg, LD::Settings::getQuiet());
 
     size_t iter = 0;
     for (; iter < Settings::getMaxIter(); iter++)
     {
         auto start{std::chrono::steady_clock::now()};
-        palPrint(fmt::format("{:6}{:>6}", " ", (iter + 1)));
+        palPrint(fmt::format("{:6}{:>6}", " ", (iter + 1)), LD::Settings::getQuiet());
 
         /* Diagonalize H in the basis of trial vectors */
         auto [eigenvalues_G, eigenvectors_G] = diagonalizeSubHam(sigma_vectors,
@@ -348,10 +353,11 @@ LD::diagonalize(const size_t &n_roots,
             auto end(std::chrono::steady_clock::now());
             std::chrono::duration<double> duration{end - start};
             msg = fmt::format("{:>20.2e}\n", duration.count());
-            palPrint(msg);
+            palPrint(msg, LD::Settings::getQuiet());
 
             palPrint(fmt::format("{:6}{:^92s}\n", " ",
-                                 "*** Convergence of Residuals reached ***"));
+                                 "*** Convergence of Residuals reached ***"),
+                     LD::Settings::getQuiet());
 
             break;
         }
@@ -384,7 +390,7 @@ LD::diagonalize(const size_t &n_roots,
         auto end(std::chrono::steady_clock::now());
         std::chrono::duration<double> duration{end - start};
         msg = fmt::format("{:>20.2e}\n", duration.count());
-        palPrint(msg);
+        palPrint(msg, LD::Settings::getQuiet());
     }
 
     auto end(std::chrono::steady_clock::now());
@@ -392,7 +398,10 @@ LD::diagonalize(const size_t &n_roots,
     if (converged)
     {
         std::chrono::duration<double> duration{end - start};
-        palPrint(fmt::format("\n   Lible::Davidson complete {:.2e} s\n", duration.count()));
+        palPrint(fmt::format("\n   Lible::Davidson complete {:.2e} s\n", duration.count()),
+                 LD::Settings::getQuiet());
+        
+        Aux::n_iters = iter + 1;
         return eig_vals_vecs;
     }
     else
@@ -402,15 +411,17 @@ LD::diagonalize(const size_t &n_roots,
                           "      lible::davidson::setMaxIter()\n",
                           iter);
 
+        Aux::n_iters = iter + 1;
+
         throw std::runtime_error(msg);
     }
 }
 
-pair<vector<double>, vector<vector<double>>>
-LD::diagonalize(const size_t &n_roots,
-                const function<vector<double>()> &calcDiag,
-                const function<vector<vector<double>>(const vector<double> &diag)> &calcGuess,
-                const function<vector<double>(const vector<double> &trial)> &calcSigma,
-                const function<vector<double>()> &preConditioner)
-{
-}
+// pair<vector<double>, vector<vector<double>>>
+// LD::diagonalize(const size_t &n_roots,
+//                 const function<vector<double>()> &calcDiag,
+//                 const function<vector<vector<double>>(const vector<double> &diag)> &calcGuess,
+//                 const function<vector<double>(const vector<double> &trial)> &calcSigma,
+//                 const function<vector<double>()> &preConditioner)
+// {
+// }

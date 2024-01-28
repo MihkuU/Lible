@@ -1,5 +1,9 @@
-#include <lible/connections.h>
+#include <lible/connections.hpp>
 #include <lible/util.h>
+
+#ifdef _USE_MPI_
+#include <lible/brain.hpp>
+#endif
 
 #include <algorithm>
 #include <omp.h>
@@ -26,10 +30,8 @@ void GCI::Impl::Connections::constructConnections(const std::set<std::string> &c
 
         int rank_total, size_total;
 #ifdef _USE_MPI_
-        // int rank_total = returnTotalRank(impl->world);
-        // int size_total = returnTotalSize(impl->world);
-        rank_total = omp_get_thread_num(); // TMP
-        size_total = omp_get_num_threads(); // TMP
+        rank_total = Brain::returnTotalRank();
+        size_total = Brain::returnTotalSize();
 #else
         rank_total = omp_get_thread_num();
         size_total = omp_get_num_threads();
@@ -105,7 +107,7 @@ void GCI::Impl::Connections::constructConnections(const std::set<std::string> &c
 
 void GCI::Impl::Connections::constructConnections_Epq(const int &icfg_right, const string &cfg_right,
                                                       const wfn_ptr &wfn_left, connection_map_1el &connections_1el)
-{   
+{
     size_t nue_right = std::count(cfg_right.begin(), cfg_right.end(), '1');
 
     for (size_t q = 0; q < n_orbs; q++)

@@ -1,4 +1,4 @@
-#include <lible/gci.h>
+#include <lible/gci.hpp>
 
 #include <lible/util.h>
 #include <lible/gci_impl.hpp>
@@ -72,7 +72,7 @@ LG::calc12RDMs(const GCI &gci, const size_t &iroot, const size_t &jroot)
 {
 }
 
-std::vector<double> LG::calcSigma()
+std::vector<double> LG::calcSigma(const GCI &gci)
 {
 }
 

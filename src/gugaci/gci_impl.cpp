@@ -1,8 +1,8 @@
 #include <lible/brain.hpp>
-#include <lible/cipsi.h>
-#include <lible/connections.h>
-#include <lible/coupling_coeffs.h>
-#include <lible/prefix_algorithm.h>
+#include <lible/cipsi.hpp>
+#include <lible/connections.hpp>
+#include <lible/coupling_coeffs.hpp>
+#include <lible/prefix_algorithm.hpp>
 #include <lible/gci_impl.hpp>
 #include <lible/davidson.h>
 #include <lible/util.h>
@@ -12,9 +12,12 @@
 
 #include <fmt/core.h>
 
+namespace LD = lible::davidson;
+
 using namespace lible;
 using namespace lible::guga;
 using namespace lible::guga::util;
+using namespace std::chrono;
 
 using std::map;
 using std::set;
@@ -59,6 +62,8 @@ GCI::Impl::Impl(const int &n_orbs_, const int &n_els_,
         coupling_coeffs = std::make_unique<CouplingCoeffs>(this);
         prefix_algorithm = std::make_unique<PrefixAlgorithm>(this);
 
+        LD::Settings::setQuiet(Settings::getQuiet());
+
 #ifdef _USE_MPI_
     }
 #endif
@@ -76,10 +81,14 @@ void GCI::Impl::run(vector<double> &ci_energies_out,
     if (Brain::comm_nodes.is_valid())
     {
 #endif
-        palPrint("\nLible::GCI calculation\n");
+        if (Settings::getQuiet())
+            palPrint("\nLible::GCI calculation (Starting from HF configuration)\n");
+        else 
+            palPrint("\nLible::GCI calculation\n");
+
         auto start{std::chrono::steady_clock::now()};
 
-        palPrint("   Starting from the HF-configuration. \n");
+        palPrint("   Starting from the HF configuration. \n", Settings::getQuiet());
 
         createHFConf(cfgs_new, wave_function, spin_functions,
                      sfs_map__idx_to_sf, sfs_map__sf_to_idx);
@@ -88,15 +97,16 @@ void GCI::Impl::run(vector<double> &ci_energies_out,
                   energies_per_iter,
                   previous_ci_coeffs_map);
 
-        ci_energies_out = ci_energies;
-        ci_vectors_out = ci_vectors;
+        ci_energies_out = ci_energies; // bcast these
+        ci_vectors_out = ci_vectors; // bcast these
 
         auto end{std::chrono::steady_clock::now()};
         std::chrono::duration<double> duration{end - start};
-        palPrint(fmt::format("\nLible::GCI complete {:.2e} s\n", duration.count()));
+        palPrint(fmt::format("\nLible::GCI complete {:.2e} s\n", duration.count()));        
 
-#ifdef _USE_MPI_
+#ifdef _USE_MPI_        
     }
+    Brain::comm_world.barrier();//tmp
 #endif
 }
 
@@ -190,10 +200,14 @@ void GCI::Impl::runFromCSFsFile(const string &csfs_fname,
     if (Brain::comm_nodes.is_valid())
     {
 #endif
-        palPrint("\nLible::GCI calculation\n");
+        if (Settings::getQuiet())
+            palPrint(fmt::format("\nLible::GCI calculation (Starting CSFs from {})\n", csfs_fname));
+        else
+            palPrint("\nLible::GCI calculation\n");
+
         auto start{std::chrono::steady_clock::now()};
 
-        palPrint(fmt::format("   Reading starting CSFs from a file: {}\n", csfs_fname));
+        palPrint(fmt::format("   Reading starting CSFs from a file: {}\n", csfs_fname), Settings::getQuiet());
 
         readCSFs(csfs_fname);
 
@@ -207,6 +221,8 @@ void GCI::Impl::runFromCSFsFile(const string &csfs_fname,
         auto end{std::chrono::steady_clock::now()};
         std::chrono::duration<double> duration{end - start};
         palPrint(fmt::format("\nLible::GCI complete {:.2e} s\n", duration.count()));
+
+        exit(1); // tmp
 
 #ifdef _USE_MPI_
     }
@@ -394,7 +410,10 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
                           vector<unordered_map<string, double>> &previous_ci_coeffs_map)
 
 {
+    // TODO: think about splitting the function to quiet and regular
+    
     auto start = std::chrono::steady_clock::now();
+    auto start_quiet = start;
     string msg;
 
     solveCI(ci_energies,
@@ -402,24 +421,42 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
             energies_per_iter,
             previous_ci_coeffs_map);
 
-    palPrint(fmt::format("\n      #CFGs: {:10}\n", wave_function->getNumCFGs()));
-    palPrint(fmt::format("      #CSFs: {:10}\n", wave_function->getNumCSFs()));
-    for (size_t iroot = 0; iroot < n_roots; iroot++)
-        palPrint(fmt::format("      E_var[root {:3}] = {:16.12}\n", iroot, ci_energies[iroot]));
+    auto end_quiet = std::chrono::steady_clock::now();
+
+    if (Settings::getQuiet())
+    {
+        std::chrono::duration<double> duration_quiet{end_quiet - start_quiet};
+        msg = fmt::format("   {:>10}{:>14}{:>14}{:>14}{:>18}{:>10}\n",
+                          "Iteration", "N (CFGs)", "N (CSFs)",
+                          "N (D-iters)", "E_0 [Ha]", "t [s]"); // TODO: print out over roots in the end at quiet mode
+        palPrint(msg);
+        msg = fmt::format("{:>13}  {:>12}  {:>12}  {:>12}  {:>16.10f}  {:>.2e}\n",
+                          0, wave_function->getNumCFGs(), wave_function->getNumCSFs(),
+                          LD::Aux::n_iters, ci_energies[0], duration_quiet.count());
+        palPrint(msg);
+    }
+    else
+    {
+        palPrint(fmt::format("\n      #CFGs: {:10}\n", wave_function->getNumCFGs()));
+        palPrint(fmt::format("      #CSFs: {:10}\n", wave_function->getNumCSFs()));
+        for (size_t iroot = 0; iroot < n_roots; iroot++)
+            palPrint(fmt::format("      E_var[root {:3}] = {:16.12}\n", iroot, ci_energies[iroot]));
+    }
 
     for (iter_sci = 1; iter_sci <= Settings::getMaxIter(); iter_sci++)
     {
-        palPrint(fmt::format("\n   Lible::GCI iteration {:>2}\n", iter_sci));
-        // palPrint(fmt::format("\n============================|  GCI iteration %3d  |============================\n", iter_sci));
+        start_quiet = std::chrono::steady_clock::now();
 
-        palPrint(fmt::format("\n   Selecting CFGs and CSFs (HCI+CIPSI)...                "));
+        palPrint(fmt::format("\n   Lible::GCI iteration {:>2}\n", iter_sci), Settings::getQuiet());
 
-        auto start = std::chrono::steady_clock::now();
+        palPrint(fmt::format("\n   Selecting CFGs and CSFs (HCI+CIPSI)...                "), Settings::getQuiet());
+
+        auto start = std::chrono::steady_clock::now();        
         cfgs_new = cipsi->selectCFGsAndCSFs(wave_function);
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> duration{end - start};
-        palPrint(fmt::format(" done {:.2e} s\n", duration.count()));
+        palPrint(fmt::format(" done {:.2e} s\n", duration.count()), Settings::getQuiet());
 
         size_t n_cfgs_new = cfgs_new.size(); // TODO: handle no new CSFs or CFGs
         size_t n_csfs_new = cipsi->getNCSFsNew();
@@ -428,11 +465,11 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
         msg = fmt::format("{:3}{:>6}{:>16}{:>16}{:>16}{:>16}\n", " ", "Nr:",
                           "generators", "prefixes",
                           "selected CFGs", "selected CSFs");
-        palPrint(msg);
+        palPrint(msg, Settings::getQuiet());
 
         msg = fmt::format("{:9}{:>16}{:>16}{:>16}{:>16}\n\n", " ",
                           n_generators, n_prefixes, n_cfgs_new, n_csfs_new);
-        palPrint(msg);
+        palPrint(msg, Settings::getQuiet());
 
         // palPrint(fmt::format("      Nr. of generator CFGs: {:12}\n", n_generators));
         // palPrint(fmt::format("      Nr. of CFG prefixes: {:14}\n", n_prefixes));
@@ -441,7 +478,18 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
 
         if (n_csfs_new == 0)
         {
-            palPrint(fmt::format("\n   GCI converged, no new CSFs were found!\n"));
+            palPrint(fmt::format("\n   GCI converged, no new CSFs were found!\n"), Settings::getQuiet());
+
+            if (Settings::getQuiet())
+            {
+                auto end_quiet = start_quiet = std::chrono::steady_clock::now();
+                std::chrono::duration<double> duration_quiet{end_quiet - start_quiet};
+                msg = fmt::format("{:>13}  {:>12}  {:>12}  {:>12}  {:>16.10f}  {:>.2e}\n",
+                                  iter_sci, wave_function->getNumCFGs(), wave_function->getNumCSFs(),
+                                  LD::Aux::n_iters, ci_energies[0], duration_quiet.count());
+                palPrint(msg);
+            }
+
             break;
         }
 
@@ -452,10 +500,11 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
 
         size_t n_cfgs = wave_function->getNumCFGs();
         size_t n_csfs = wave_function->getNumCSFs();
-        palPrint(fmt::format("\n      #CFGs: {:9}\n", n_cfgs));
-        palPrint(fmt::format("      #CSFs: {:9}\n", n_csfs));
+        palPrint(fmt::format("\n      #CFGs: {:9}\n", n_cfgs), Settings::getQuiet());
+        palPrint(fmt::format("      #CSFs: {:9}\n", n_csfs), Settings::getQuiet());
         for (size_t iroot = 0; iroot < n_roots; iroot++)
-            palPrint(fmt::format("      E_var[root {:3}] = {:16.12}\n", iroot, ci_energies[iroot]));
+            palPrint(fmt::format("      E_var[root {:3}] = {:16.12}\n", iroot, ci_energies[iroot]),
+                     Settings::getQuiet());
 
         arma::dvec energy_diff(n_roots);
         for (size_t iroot = 0; iroot < n_roots; iroot++)
@@ -466,10 +515,21 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
             if (std::abs(energy_diff[iroot]) < Settings::getEnergyTol())
                 converged = true;
 
+        if (Settings::getQuiet())
+        {
+            end_quiet = std::chrono::steady_clock::now();
+            std::chrono::duration<double> duration_quiet{end_quiet - start_quiet};
+            msg = fmt::format("{:>13}  {:>12}  {:>12}  {:>12}  {:>16.10f}  {:>.2e}\n",
+                              iter_sci, wave_function->getNumCFGs(), wave_function->getNumCSFs(),
+                              LD::Aux::n_iters, ci_energies[0], duration_quiet.count());
+            palPrint(msg);
+        }
+
         if (converged)
         {
             palPrint(fmt::format("\n   GCI converged - E_diff = {:.2e} less than E_tol = {:.2e}\n",
-                                 arma::min(arma::abs(energy_diff)), Settings::getEnergyTol()));
+                                 arma::min(arma::abs(energy_diff)), Settings::getEnergyTol()),
+                     Settings::getQuiet());
             break;
         }
     }
@@ -477,10 +537,138 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> duration{end - start};
 
-    palPrint(fmt::format("\n      Final CFG-dimension: {:9d}\n", wave_function->getNumCFGs()));
-    palPrint(fmt::format("      Final CSF-dimension: {:9d}\n", wave_function->getNumCSFs()));
+    palPrint(fmt::format("\n      Final CFG-dimension: {:9d}\n", wave_function->getNumCFGs()), Settings::getQuiet());
+    palPrint(fmt::format("      Final CSF-dimension: {:9d}\n", wave_function->getNumCSFs()), Settings::getQuiet());
 
-    // palPrint(fmt::format("\n\n    Duration of variational part: {:6.4} s\n", duration.count()));
+    /*
+     * TODO: final printout in quiet mode.
+     */
+    // But first, massive timing printout bonanza
+
+    palPrint("   Performance measurements:\n");
+    // palPrint(fmt::format("       t_connections_construction: {:.3e}\n", t_connections_construction));
+    // palPrint(fmt::format("              t_connections_merge: {:.3e}\n", t_connections_merge));
+
+    // palPrint(fmt::format("\n                    t_ccs_total: {:.3e}\n", t_ccs_total));
+    // palPrint(fmt::format("                 t_ccs_critical: {:.3e}\n", t_ccs_critical));
+    // palPrint(fmt::format("       t_returnCFGPrototypes1El: {:.3e}\n", t_returnCFGPrototypes1El));
+    // palPrint(fmt::format("       t_returnCFGPrototypes2El: {:.3e}\n", t_returnCFGPrototypes2El));
+    // palPrint(fmt::format("       t_returnCFGPrototypesDia: {:.3e}\n", t_returnCFGPrototypesDia));
+    // palPrint(fmt::format("       t_calcCCs1El: {:.3e}\n", t_calcCCs1El));
+    // palPrint(fmt::format("       t_calcCCs2El: {:.3e}\n", t_calcCCs2El));
+    // palPrint(fmt::format("       t_calcCCsDia: {:.3e}\n", t_calcCCsDia));
+
+
+
+    palPrint(fmt::format("\n                        t_solveCI: {:.3e}\n", t_solveCI));
+    palPrint(fmt::format("                   t_constructCCs: {:.3e}\n", t_constructCCs));
+    palPrint(fmt::format("       t_connections_construction: {:.3e}\n", t_connections_construction));
+    palPrint(fmt::format("              t_connections_merge: {:.3e}\n", t_connections_merge));
+    palPrint(fmt::format("                    t_diagonalize: {:.3e}\n", t_diagonalize));
+
+    palPrint(fmt::format("\n       t_constructCCs1: {:.3e}\n", t_constructCCs1));
+    palPrint(fmt::format("             t_ccs_1el: {:.3e}\n", t_ccs_1el));
+    palPrint(fmt::format("             t_ccs_2el: {:.3e}\n", t_ccs_2el));
+    palPrint(fmt::format("             t_ccs_dia: {:.3e}\n", t_ccs_dia));
+
+    palPrint(fmt::format("\n                  t_selection_total: {:.3e}\n", t_selection_total));
+    palPrint(fmt::format("                  t_selection_setup: {:.3e}\n", t_selection_setup));
+    palPrint(fmt::format("       t_generateCFGsAndConnections: {:.3e}\n", t_generateCFGsAndConnections));
+    palPrint(fmt::format("              t_appendSpinFunctions: {:.3e}\n", t_appendSpinFunctions));
+    palPrint(fmt::format("           t_setUpCIPSIWaveFunction: {:.3e}\n", t_setUpCIPSIWaveFunction));
+    palPrint(fmt::format("                 t_constructSFPairs: {:.3e}\n", t_constructSFPairs));
+    palPrint(fmt::format("                 t_sel_constructCCs: {:.3e}\n", t_sel_constructCCs));
+    palPrint(fmt::format("                   t_doCIPSIPruning: {:.3e}\n", t_doCIPSIPruning));
+    palPrint(fmt::format("                t_appendCFGsAndCSFs: {:.3e}\n", t_appendCFGsAndCSFs));
+
+    size_t n_bytes_1el_conn = 0, n_bytes_2el_conn = 0, n_bytes_dia_conn = 0;
+
+    for (auto &[key, connections] : connections_1el)
+    {
+        n_bytes_1el_conn += sizeof(key);
+        for (auto &item : connections)
+            n_bytes_1el_conn += sizeof(item);
+    }
+
+    for (auto &[key, connections] : connections_2el)
+    {
+        n_bytes_2el_conn += sizeof(key);
+        for (auto &item : connections)
+            n_bytes_2el_conn += sizeof(item);
+    }
+    
+    for (auto &[key, connections] : connections_dia)
+    {
+        n_bytes_dia_conn += sizeof(key);
+        for (auto &item : connections)
+            n_bytes_dia_conn += sizeof(item);
+    }
+
+    size_t n_bytes_1el_ccs = 0, n_bytes_2el_ccs = 0, n_bytes_dia_ccs = 0;
+
+    for (auto &[key1, map1] : ccs_1el)
+    {
+        n_bytes_1el_ccs += sizeof(key1);
+        n_bytes_1el_ccs += sizeof(map1);
+        for (auto &[key2, map2] : map1)
+        {
+            n_bytes_1el_ccs += sizeof(key2);
+            n_bytes_1el_ccs += sizeof(map2);
+            for (auto &[key3, val] : map2)
+            {
+                n_bytes_1el_ccs += sizeof(key3);
+                n_bytes_1el_ccs += sizeof(val);
+            }
+        }
+    }
+
+    for (auto &[key1, map1] : ccs_2el)
+    {
+        n_bytes_2el_ccs += sizeof(key1);
+        n_bytes_2el_ccs += sizeof(map1);
+        for (auto &[key2, map2] : map1)
+        {
+            n_bytes_2el_ccs += sizeof(key2);
+            n_bytes_2el_ccs += sizeof(map2);
+            for (auto &[key3, val] : map2)
+            {
+                n_bytes_2el_ccs += sizeof(key3);
+                n_bytes_2el_ccs += sizeof(val);
+            }
+        }
+    }
+
+    for (auto &[key1, map1] : ccs_dia)
+    {
+        n_bytes_dia_ccs += sizeof(key1);
+        n_bytes_dia_ccs += sizeof(map1);
+        for (auto &[key2, map2] : map1)
+        {
+            n_bytes_dia_ccs += sizeof(key2);
+            n_bytes_dia_ccs += sizeof(map2);
+            for (auto &[key3, val] : map2)
+            {
+                n_bytes_dia_ccs += sizeof(key3);
+                n_bytes_dia_ccs += sizeof(val);
+            }
+        }
+    }
+
+    double n_gb_1el_conn = double(n_bytes_1el_conn) / std::pow(1024, 3);
+    double n_gb_2el_conn = double(n_bytes_2el_conn) / std::pow(1024, 3);
+    double n_gb_dia_conn = double(n_bytes_dia_conn) / std::pow(1024, 3);
+
+    double n_gb_1el_ccs = double(n_bytes_1el_ccs) / std::pow(1024, 3);
+    double n_gb_2el_ccs = double(n_bytes_2el_ccs) / std::pow(1024, 3);
+    double n_gb_dia_ccs = double(n_bytes_dia_ccs) / std::pow(1024, 3);    
+
+    palPrint("\n   Memory footprint\n");
+    palPrint(fmt::format("      n_gb_1el_conn: {:.3e} GB\n", n_gb_1el_conn));
+    palPrint(fmt::format("      n_gb_2el_conn: {:.3e} GB\n", n_gb_2el_conn));
+    palPrint(fmt::format("      n_gb_dia_conn: {:.3e} GB\n", n_gb_dia_conn));
+    palPrint(fmt::format("      n_gb_1el_ccs: {:.3e} GB\n", n_gb_1el_ccs));
+    palPrint(fmt::format("      n_gb_2el_ccs: {:.3e} GB\n", n_gb_2el_ccs));
+    palPrint(fmt::format("      n_gb_dia_ccs: {:.3e} GB\n", n_gb_dia_ccs));    
 }
 
 void GCI::Impl::solveCI(vector<double> &ci_energies,
@@ -488,7 +676,8 @@ void GCI::Impl::solveCI(vector<double> &ci_energies,
                         vector<vector<double>> &energies_per_iter,
                         vector<unordered_map<string, double>> &previous_ci_coeffs_map)
 {
-    palPrint("   Constructing configuration connections...              ");
+    auto start_total{std::chrono::steady_clock::now()}; // tmp
+    palPrint("   Constructing configuration connections...              ", Settings::getQuiet());
 
     auto start{std::chrono::steady_clock::now()};
     connection_map_2el connections_2el_new;
@@ -499,10 +688,12 @@ void GCI::Impl::solveCI(vector<double> &ci_energies,
                                       connections_dia_new);
 
     auto end(std::chrono::steady_clock::now());
-    std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    std::chrono::duration<double> duration{end - start}; 
+    t_connections_construction += duration.count(); // TMP
 
-    palPrint("   Constructing coupling coefficients...                  ");
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()), Settings::getQuiet());
+
+    palPrint("   Constructing coupling coefficients...                  ", Settings::getQuiet());
     start = std::chrono::steady_clock::now();
 
     coupling_coeffs->constructCCs(connections_1el_new, connections_2el_new,
@@ -511,11 +702,20 @@ void GCI::Impl::solveCI(vector<double> &ci_energies,
 
     end = std::chrono::steady_clock::now();
     duration = std::chrono::duration<double>(end - start);
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    t_constructCCs += duration.count(); // tmp
 
-    mergeConnections(connections_1el_new, connections_1el); // TODO incorporate timing measurement
-    mergeConnections(connections_2el_new, connections_2el); // TODO incorporate timing measurement
-    mergeConnections(connections_dia_new, connections_dia); // TODO incorporate timing measurement
+
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()), Settings::getQuiet());
+
+    start = steady_clock::now(); // TMP
+
+    mergeConnections(connections_1el_new, connections_1el); // TODO: incorporate timing measurement
+    mergeConnections(connections_2el_new, connections_2el); // TODO: incorporate timing measurement
+    mergeConnections(connections_dia_new, connections_dia); // TODO: incorporate timing measurement
+    
+    end = steady_clock::now(); // TMP
+    duration = std::chrono::duration<double>(end - start); // tmp
+    t_connections_merge += duration.count(); // TMP
 
     // printf("\nconnections_1el.size() = %d", connections_1el.size());
     // printf("\nconnections_2el.size() = %d", connections_2el.size());
@@ -526,6 +726,7 @@ void GCI::Impl::solveCI(vector<double> &ci_energies,
     /*
      * Diagonalizing the Hamiltonian
      */
+    start = std::chrono::steady_clock::now();
     auto [eigenvalues, eigenvectors] = lible::davidson::diagonalize(
         n_roots,
         [this]()
@@ -541,4 +742,11 @@ void GCI::Impl::solveCI(vector<double> &ci_energies,
     energies_per_iter.push_back(ci_energies);
 
     previous_ci_coeffs_map = mapPreviousCIVector(ci_vectors);
+    end = steady_clock::now(); // TMP
+    duration = std::chrono::duration<double>(end - start); // tmp
+    t_diagonalize += duration.count();
+
+    auto end_total{std::chrono::steady_clock::now()}; // tmp
+    duration = std::chrono::duration<double>(end_total - start_total);
+    t_solveCI += duration.count();
 }

@@ -1,8 +1,9 @@
-#include <lible/prefix_algorithm.h>
-#include <lible/gci_util.h>
+#include <lible/gci_util.hpp>
+#include <lible/prefix_algorithm.hpp>
 
 #ifdef _USE_MPI_
-#include <mpi.h>
+#include <lible/brain.hpp>
+#include <lible/gci_para.hpp>
 #endif
 
 namespace LG = lible::guga;
@@ -38,14 +39,11 @@ vector<string> GCI::Impl::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs
     set<string> prefixes_excited;
     vector<string> prefixes_vec;
 
-    vector<string> prefixes_scattered;
+    vector<string> prefixes_out;
 
 #ifdef _USE_MPI_
-    // int rank;
-    // MPI_Comm_rank(impl->world, &rank);
-
-    // if (rank == 0)
-    // {
+    if (Brain::comm_nodes.rank() == 0)
+    {
 #endif
         for (const string &cfg : cfgs)
         {
@@ -286,38 +284,27 @@ vector<string> GCI::Impl::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs
                 }
             }
         }
-        for (const string &prefix : prefixes_excited)
-            prefixes_vec.push_back(prefix);
+
+        prefixes_vec.assign(prefixes_excited.begin(), prefixes_excited.end());
         std::random_shuffle(prefixes_vec.begin(), prefixes_vec.end());
+
 #ifdef _USE_MPI_
-    // }
+    }
 #endif
 
 #ifdef _USE_MPI_
-    // int size;
-    // MPI_Comm_size(impl->world, &size);
-    // vector<vector<string>> prefixes_scatter(size);
-    // for (size_t ipref = 0; ipref < prefixes_vec.size(); ipref++)
-    // {
-    //     int rank = ipref % size;
-    //     prefixes_scatter[rank].push_back(prefixes_vec[ipref]);
-    // }
+    prefixes_out = LG::scatterStrings(0, Brain::comm_nodes, prefixes_vec);
 #else
-    for (size_t ipref = 0; ipref < prefixes_vec.size(); ipref++)
-        prefixes_scattered.push_back(prefixes_vec[ipref]);
+        prefixes_out = prefixes_vec;
 #endif
 
-#ifdef _USE_MPI__
-    // mpi::scatter(impl->world, prefixes_scatter, prefixes_scattered, 0);
-#endif
-
-    return prefixes_scattered;
+    return prefixes_out;
 }
 
 void GCI::Impl::PrefixAlgorithm::generateCFGsAndConnections(const vector<string> &prefixes,
-                                                             const vector<vector<pair<string, arma::dvec>>> &generators_by_roots,
-                                                             const wfn_ptr &wfn_right,
-                                                             DataFOIS &data_fois, DataVar &data_var)
+                                                            const vector<vector<pair<string, arma::dvec>>> &generators_by_roots,
+                                                            const wfn_ptr &wfn_right,
+                                                            DataFOIS &data_fois, DataVar &data_var)
 {
     for (const string &prefix : prefixes)
     {

@@ -2,8 +2,7 @@
 #include <lible/util.h>
 
 #ifdef _USE_MPI_
-// #include <boost/mpi.hpp>
-// namespace mpi = boost::mpi;
+#include <lible/brain.hpp>
 #endif
 
 using namespace lible;
@@ -95,18 +94,17 @@ vector<double> GCI::Impl::calcCCXDiag(const int &p, const int &q, const CFG *cfg
 }
 
 vector<double> GCI::Impl::calcDiag()
-{
+{    
+    vector<double> diag_out;
+
     arma::dvec diag(wave_function->getNumCSFs(), arma::fill::zeros);
 
 #pragma omp parallel
     {
-
         int rank_total, size_total;
 #ifdef _USE_MPI_
-        // int rank_total = returnTotalRank(world);
-        // int size_total = returnTotalSize(world);
-        rank_total = omp_get_thread_num(); // TMP
-        size_total = omp_get_num_threads(); // TMP
+        rank_total = Brain::returnTotalRank();
+        size_total = Brain::returnTotalSize();
 #else
         rank_total = omp_get_thread_num();
         size_total = omp_get_num_threads();
@@ -186,11 +184,19 @@ vector<double> GCI::Impl::calcDiag()
     }
 
 #ifdef _USE_MPI_
-    // mpi::all_reduce(mpi::communicator(world, mpi::comm_duplicate),
-    //                 diag, diag, std::plus<arma::dvec>());
+    mpl::contiguous_layout<double> layout(diag.n_elem);
+
+    Brain::comm_nodes.allreduce([](auto a, auto b)
+                                { return a + b; },
+                                diag.memptr(), layout);
+
+    diag_out = arma::conv_to<vector<double>>::from(diag);
+    diag_out = Brain::bcastVector(0, Brain::comm_nodes, diag_out);                                
+#else
+    diag_out = arma::conv_to<vector<double>>::from(diag);
 #endif
 
-    return arma::conv_to<vector<double>>::from(diag);
+    return diag_out;
 }
 
 vector<double> GCI::Impl::calcDiag(const WaveFunction *wave_function)

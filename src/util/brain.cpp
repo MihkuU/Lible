@@ -1,9 +1,12 @@
 #include <lible/brain.hpp>
 
-#include <omp.h>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <omp.h>
 
 using LB = lible::Brain;
 
@@ -12,6 +15,34 @@ using std::string;
 using std::vector;
 
 #ifdef _USE_MPI_
+
+/*
+ * Some code adopted from https://rabauke.github.io/mpl/html/examples/stl_container.html.
+ * Later put them in some utils file?
+ */
+
+// send an STL container
+// template <typename T>
+// void LB::isend(const int &rank, const mpl::communicator &comm, const T &x)
+// {
+//     mpl::irequest r{comm.isend(x, rank)};
+//     r.wait();
+// }
+
+// // receive an STL container
+// template <typename T>
+// T LB::irecv(const int &rank, const mpl::communicator &comm)
+// {
+//     using value_type = mpl::detail::remove_const_from_members_t<typename T::value_type>;
+//     T x;
+//     mpl::irequest r{comm.irecv(x, 0)};
+//     mpl::status_t s{r.wait()};
+//     return x;
+// }
+
+/*
+ *
+ */
 
 static pair<string, string> splitStrByLast(const string &str, const char &delimiter)
 {
@@ -24,31 +55,6 @@ static pair<string, string> splitStrByLast(const string &str, const char &delimi
     string part2 = str.substr(pos_last + 1, str.size() - (pos_last + 1));
 
     return {part1, part2};
-}
-
-int LB::returnTotalRank()
-{
-    int num_threads = 1, thread_num = 1;
-#pragma omp parallel
-    {
-        num_threads = omp_get_num_threads();
-        thread_num = omp_get_thread_num();
-    }
-
-    int rank = comm_nodes.rank();
-
-    return num_threads * rank + thread_num;
-}
-
-int LB::returnTotalSize()
-{
-    int num_threads = 1;
-#pragma omp parallel
-    {
-        num_threads = omp_get_num_threads();
-    }
-
-    return num_threads * comm_nodes.size();
 }
 
 vector<int> LB::returnNodeRanks()
@@ -117,5 +123,102 @@ mpl::communicator LB::returnNodesComm()
 
     return mpl::communicator(mpl::communicator::comm_collective, comm_world, group_nodes);
 }
+
+int LB::returnTotalRank()
+{
+    // TODO: documentation - to be called inside omp parallel regions
+    int num_threads = omp_get_num_threads();
+    int thread_num = omp_get_thread_num();
+    int rank = comm_nodes.rank();
+
+    // if (!omp_in_parallel())
+    //     throw std::runtime_error("returnTotalRank() not called inside parallel region!");    
+
+    return num_threads * rank + thread_num;
+}
+
+int LB::returnTotalSize()
+{
+    // TODO: documentation - to be called inside omp parallel regions
+    int num_threads = omp_get_num_threads();
+
+    // if (!omp_in_parallel())
+    //     throw std::runtime_error("returnTotalSize() not called inside parallel region!");
+
+    return num_threads * comm_nodes.size();
+}
+
+vector<double> LB::bcastVector(const int &root_rank,
+                               const mpl::communicator &comm,
+                               const vector<double> &in)
+{
+    size_t n_elem;
+    if (comm.rank() == root_rank)
+        n_elem = in.size();
+
+    comm.bcast(root_rank, n_elem);
+
+    vector<double> out;
+    if (comm.rank() == root_rank)
+        out = in;
+    else
+        out.resize(n_elem);
+
+    mpl::contiguous_layout<double> layout(n_elem);
+    comm.bcast(root_rank, out.data(), layout);
+
+    return out;
+}
+
+// vector<string> LB::scatterStrings(const int &root_rank,
+//                                   const mpl::communicator &comm,
+//                                   const vector<string> &in)
+// {
+//     /*
+//     TODO: move to gci_para.hpp
+//     */
+
+//     string chunk;    
+//     vector<size_t> sizes;
+//     if (root_rank == comm.rank())
+//     {
+//         vector<string> chunks(comm.size(), "");
+//         for (size_t i = 0; i < in.size(); i++)
+//             chunks[i % comm.size()] += in[i];
+
+//         chunk = chunks[root_rank];
+
+//         vector<vector<size_t>> sizes_per_proc(comm.size());
+//         for (size_t i = 0; i < in.size(); i++)
+//             sizes_per_proc[i % comm.size()].push_back(in[i].size());
+
+//         sizes = sizes_per_proc[root_rank];
+
+//         for (int i = 0; i < comm.size(); i++)
+//             if (i != root_rank)
+//             {
+//                 isend(i, comm, chunks[i]);
+//                 isend(i, comm, sizes_per_proc[i]);
+//             }
+//     }
+
+//     if (root_rank != comm.rank())
+//     {
+//         chunk = irecv<string>(root_rank, comm);
+//         sizes = irecv<vector<size_t>>(root_rank, comm);
+//     }
+
+//     vector<string> out(sizes.size());
+//     for (size_t i = 0, idx = 0; i < sizes.size(); i++)
+//     {
+//         string item(sizes[i], ' ');
+//         for (size_t j = 0; j < sizes[i]; j++, idx++)
+//             item[j] = chunk[idx];
+
+//         out[i] = item;
+//     }
+
+//     return out;
+// }
 
 #endif

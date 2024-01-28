@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 
-#include <lible/csftree.h>
+#include <lible/csftree.hpp>
 
 namespace lible
 {

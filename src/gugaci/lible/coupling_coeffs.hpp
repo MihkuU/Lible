@@ -4,7 +4,7 @@
 #include <set>
 
 #include <lible/gci_impl.hpp>
-#include <lible/gci_util.h>
+#include <lible/gci_util.hpp>
 
 namespace lible
 {

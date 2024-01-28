@@ -1,4 +1,4 @@
-#include <lible/coupling_coeffs.h>
+#include <lible/coupling_coeffs.hpp>
 
 #include <armadillo>
 #include <omp.h>
@@ -112,12 +112,17 @@ void GCI::Impl::CouplingCoeffs::constructCCs(const connection_map_1el &connectio
                                              map<quintet, cc_map> &ccs_1el,
                                              map<quintet, cc_map> &ccs_dia)
 {
+    auto start_total{std::chrono::steady_clock::now()}; // tmp
+    std::chrono::duration<double> duration;
+
     sf_pair_map_1el sf_pairs_1el_tmp = sf_pairs_1el;
     sf_pair_map_2el sf_pairs_2el_tmp = sf_pairs_2el;
     sf_pair_map_1el sf_pairs_dia_tmp = sf_pairs_dia;
 
 #pragma omp parallel
     {
+        auto start{std::chrono::steady_clock::now()}; // tmp
+        
         map<quintet, cc_map> ccs_1el_omp;
         sf_pair_map_1el sf_pairs_1el_omp;
 
@@ -157,12 +162,18 @@ void GCI::Impl::CouplingCoeffs::constructCCs(const connection_map_1el &connectio
 #pragma omp critical
         {
             mergeCCs(ccs_1el_omp, ccs_1el);
-            mergeSFPairs(sf_pairs_1el_omp, sf_pairs_1el);
+            mergeSFPairs(sf_pairs_1el_omp, sf_pairs_1el);           
         }
+
+        auto end{std::chrono::steady_clock::now()};      // tmp
+        duration = std::chrono::duration<double>(end - start); // tmp
+        impl->t_ccs_1el += duration.count();                   // tmp        
     }
 
 #pragma omp parallel
     {
+        auto start{std::chrono::steady_clock::now()}; // tmp
+
         map<nonet, cc_map> ccs_2el_omp;
         sf_pair_map_2el sf_pairs_2el_omp;
 
@@ -204,10 +215,16 @@ void GCI::Impl::CouplingCoeffs::constructCCs(const connection_map_1el &connectio
             mergeCCs(ccs_2el_omp, ccs_2el);
             mergeSFPairs(sf_pairs_2el_omp, sf_pairs_2el);
         }
+
+        auto end{std::chrono::steady_clock::now()};      // tmp
+        duration = std::chrono::duration<double>(end - start); // tmp
+        impl->t_ccs_2el += duration.count();                   // tmp
     }
 
 #pragma omp parallel
     {
+        auto start{std::chrono::steady_clock::now()}; // tmp
+
         map<quintet, cc_map> ccs_dia_omp;
         sf_pair_map_1el sf_pairs_dia_omp;
 
@@ -246,9 +263,17 @@ void GCI::Impl::CouplingCoeffs::constructCCs(const connection_map_1el &connectio
 #pragma omp critical
         {
             mergeCCs(ccs_dia_omp, ccs_dia);
-            mergeSFPairs(sf_pairs_dia_omp, sf_pairs_dia);
+            mergeSFPairs(sf_pairs_dia_omp, sf_pairs_dia);          
         }
+        
+        auto end{std::chrono::steady_clock::now()};          // tmp
+        std::chrono::duration<double> duration{end - start}; // tmp
+        impl->t_ccs_dia += duration.count();              // tmp              
     }
+
+    auto end_total{std::chrono::steady_clock::now()}; // tmp
+    duration = std::chrono::duration<double>(end_total - start_total); // tmp
+    impl->t_constructCCs1 += duration.count();// tmp
 }
 
 sfs_pair_t GCI::Impl::CouplingCoeffs::returnNewSFPair(const sfs_pair_t &sfs_pair_trial,
@@ -410,6 +435,7 @@ sfs_pair_t GCI::Impl::CouplingCoeffs::returnSFPair(const set<int> &sfs_left,
 proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair_t &sfs_pair,
                                                                   const quintet &key)
 {
+    // auto start{std::chrono::steady_clock::now()}; // tmp
     proto_1el_tuple cfg_prototypes;
 
     size_t exctype = get<0>(key);
@@ -448,6 +474,11 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
 
         CFGProto cfg_left(spin, left, sfs_left);
         CFGProto cfg_right(spin, right, sfs_right);
+
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; // tmp
+        // impl->t_returnCFGPrototypes1El += duration.count(); // tmp
+
         return std::make_tuple(std::move(cfg_left), std::move(cfg_right));
     }
     else if (exctype == ExcType::DV)
@@ -464,6 +495,11 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
         
         CFGProto cfg_left(spin, left, sfs_left);
         CFGProto cfg_right(spin, right, sfs_right);
+
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; // tmp
+        // impl->t_returnCFGPrototypes1El += duration.count(); // tmp
+
         return std::make_tuple(std::move(cfg_left), std::move(cfg_right));
     }
     else if (exctype == ExcType::SS)
@@ -480,6 +516,11 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
 
         CFGProto cfg_left(spin, left, sfs_left);
         CFGProto cfg_right(spin, right, sfs_right);
+
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; //tmp
+        // impl->t_returnCFGPrototypes1El += duration.count(); // tmp
+
         return std::make_tuple(std::move(cfg_left), std::move(cfg_right));
     }
     else if (exctype == ExcType::SV)
@@ -503,7 +544,12 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
         right[p] = '0';
 
         CFGProto cfg_left(spin, left, sfs_left);
-        CFGProto cfg_right(spin, right, sfs_right);
+        CFGProto cfg_right(spin, right, sfs_right);    
+
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; //tmp
+        // impl->t_returnCFGPrototypes1El += duration.count(); // tmp
+
         return std::make_tuple(std::move(cfg_left), std::move(cfg_right));
     }
     else
@@ -513,6 +559,7 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes1El(const sfs_pair
 proto_2el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair_t &sfs_pair,
                                                                   const nonet &key)
 {
+    // auto start{std::chrono::steady_clock::now()}; // tmp
     proto_2el_tuple cfg_prototypes;
 
     vector<string> connected_sfs_right;
@@ -709,6 +756,10 @@ proto_2el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair
     cfg_ri_right.createCSFsFromSFs(sfs_intersection);
     cfg_ri_left.createCSFsFromSFs(sfs_intersection);
 
+    // auto end{std::chrono::steady_clock::now()}; // tmp
+    // std::chrono::duration<double> duration{end - start}; //tmp
+    // impl->t_returnCFGPrototypes2El += duration.count(); // tmp
+
     return std::make_tuple(std::move(cfg_left), std::move(cfg_ri_left),
                            std::move(cfg_ri_right), std::move(cfg_right));
 }
@@ -716,6 +767,7 @@ proto_2el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypes2El(const sfs_pair
 proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair_t &sfs_pair,
                                                                   const quintet &key)
 {
+    // auto start{std::chrono::steady_clock::now()}; // tmp
     proto_1el_tuple cfg_prototypes;
 
     size_t exctype = get<0>(key);
@@ -753,6 +805,10 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair
         vector<string> sfs_ri = findConnectedSFs_DOMOSOMO(p, q, cfg_right);
         CFGProto cfg_ri(spin, left, sfs_ri);
 
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; // tmp
+        // impl->t_returnCFGPrototypesDia += duration.count(); // tmp
+
         return std::make_tuple(std::move(cfg_ri), std::move(cfg_right));
     }
     else if (exctype == ExcType::DV)
@@ -770,6 +826,9 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair
         CFGProto cfg_right(spin, right, sfs_right);
         vector<string> sfs_ri = findConnectedSFs_DOMOVirtual(q, p, cfg_right);
         CFGProto cfg_ri(spin, left, sfs_ri);
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; //tmp
+        // impl->t_returnCFGPrototypesDia += duration.count(); // tmp        
 
         return std::make_tuple(std::move(cfg_ri), std::move(cfg_right));
     }
@@ -788,6 +847,10 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair
         CFGProto cfg_right(spin, right, sfs_right);
         vector<string> sfs_ri = findConnectedSFs_SOMOSOMO(p, q, cfg_right);
         CFGProto cfg_ri(spin, left, sfs_ri);
+
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; // tmp
+        // impl->t_returnCFGPrototypesDia += duration.count(); // tmp        
 
         return std::make_tuple(std::move(cfg_ri), std::move(cfg_right));
     }
@@ -815,6 +878,10 @@ proto_1el_tuple GCI::Impl::CouplingCoeffs::returnCFGPrototypesDia(const sfs_pair
         vector<string> sfs_ri = findConnectedSFs_SOMOVirtual(p, q, cfg_right);
         CFGProto cfg_ri(spin, left, sfs_ri);
 
+        // auto end{std::chrono::steady_clock::now()}; // tmp
+        // std::chrono::duration<double> duration{end - start}; // tmp
+        // impl->t_returnCFGPrototypesDia += duration.count(); // tmp
+
         return std::make_tuple(std::move(cfg_ri), std::move(cfg_right));
     }
     else
@@ -826,6 +893,8 @@ void GCI::Impl::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
                                            const quintet &key,
                                            std::map<quintet, cc_map> &ccs_1el)
 {
+    // auto start{std::chrono::steady_clock::now()}; // tmp
+
     int exctype = get<0>(key);
     int prel = get<3>(key);
     int qrel = get<4>(key);
@@ -858,6 +927,10 @@ void GCI::Impl::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
         }
         i++;
     }
+
+    // auto end{std::chrono::steady_clock::now()};          // tmp
+    // std::chrono::duration<double> duration{end - start}; // tmp
+    // impl->t_calcCCs1El += duration.count();              // tmp
 }
 
 void GCI::Impl::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
@@ -865,6 +938,8 @@ void GCI::Impl::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
                                            const nonet &key,
                                            std::map<nonet, cc_map> &ccs_2el)
 {
+    // auto start{std::chrono::steady_clock::now()}; // tmp
+
     int exctype1 = get<0>(key);
     int exctype2 = get<1>(key);
     int prel1 = get<5>(key);
@@ -966,6 +1041,10 @@ void GCI::Impl::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
         }
         i++;
     }
+
+    // auto end{std::chrono::steady_clock::now()};          // tmp
+    // std::chrono::duration<double> duration{end - start}; // tmp
+    // impl->t_calcCCs2El += duration.count();              // tmp    
 }
 
 void GCI::Impl::CouplingCoeffs::calcCCsDia(const sfs_pair_t &sfs_pair,
@@ -973,6 +1052,8 @@ void GCI::Impl::CouplingCoeffs::calcCCsDia(const sfs_pair_t &sfs_pair,
                                            const quintet &key,
                                            std::map<quintet, cc_map> &ccs_dia)
 {
+    // auto start{std::chrono::steady_clock::now()}; // tmp
+
     int exctype = get<0>(key);
     int prel = get<3>(key);
     int qrel = get<4>(key);
@@ -999,4 +1080,8 @@ void GCI::Impl::CouplingCoeffs::calcCCsDia(const sfs_pair_t &sfs_pair,
         }
         i++;
     }
+
+    // auto end{std::chrono::steady_clock::now()};          // tmp
+    // std::chrono::duration<double> duration{end - start}; // tmp
+    // impl->t_calcCCsDia += duration.count();              // tmp        
 }

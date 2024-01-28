@@ -18,9 +18,9 @@ namespace lible
                 return do_pt2;
             }
 
-            static bool getVerbose()
+            static bool getQuiet()
             {
-                return verbose;
+                return quiet;
             }
 
             static double getEnergyTol()
@@ -58,9 +58,9 @@ namespace lible
                 do_pt2 = d;
             }
 
-            static void setVerbose(const bool &v)
+            static void setQuiet(const bool &q)
             {
-                verbose = v;
+                quiet = q;
             }
 
             static void setEnergyTol(const double &e)
@@ -93,9 +93,11 @@ namespace lible
                 max_iter = m;
             }
 
+            Settings() = delete;
+
         private:
             static inline bool do_pt2 = false;
-            static inline bool verbose = false;
+            static inline bool quiet = false;            
             static inline double energy_tol = 1e-5;
             static inline double epsilon_gen = 1e-2;
             static inline double epsilon_var = 1e-5;

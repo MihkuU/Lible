@@ -1,12 +1,16 @@
-#include <lible/cipsi.h>
-#include <lible/coupling_coeffs.h>
-#include <lible/prefix_algorithm.h>
-#include <lible/gci_settings.h>
+#include <lible/cipsi.hpp>
+#include <lible/coupling_coeffs.hpp>
+#include <lible/prefix_algorithm.hpp>
+#include <lible/gci_settings.hpp>
 
 #include <omp.h>
 
 #ifdef _USE_MPI_
+#include <lible/brain.hpp>
+#include <lible/gci_para.hpp>
 #endif
+
+namespace LG = lible::guga;
 
 using namespace lible::guga;
 using namespace lible::guga::util;
@@ -20,6 +24,9 @@ using std::vector;
 
 set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
 {
+    auto start_total{std::chrono::steady_clock::now()}; // tmp
+    auto start{std::chrono::steady_clock::now()}; // tmp
+
     vector<vector<pair<string, dvec>>> generators_by_roots = generateGenerators(n_generators);
     set<string> generators;
     for (auto &item1 : generators_by_roots)
@@ -29,11 +36,10 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     }
 
     vector<string> prefixes_scattered = impl->prefix_algorithm->prefixBonanza(generators);
-    n_prefixes = prefixes_scattered.size();        
+    n_prefixes = prefixes_scattered.size();
 
 #ifdef _USE_MPI_
-    // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
-    //                 n_prefixes, n_prefixes, std::plus<size_t>());
+    Brain::comm_nodes.allreduce(mpl::plus<size_t>(), n_prefixes, n_prefixes);
 #endif
 
     int num_threads;
@@ -43,11 +49,12 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     }
 
     vector<vector<string>> prefixes_para(num_threads);
-    for (size_t iprefix = 0; iprefix < prefixes_scattered.size(); iprefix++)
-    {
-        size_t ipal = iprefix % num_threads;
-        prefixes_para[ipal].push_back(prefixes_scattered[iprefix]);
-    }
+    for (size_t iprefix = 0; iprefix < prefixes_scattered.size(); iprefix++)            
+        prefixes_para[iprefix % num_threads].push_back(prefixes_scattered[iprefix]);    
+
+    auto end{std::chrono::steady_clock::now()};          // tmp
+    std::chrono::duration<double> duration{end - start}; // tmp
+    impl->t_selection_setup += duration.count();         // tmp
 
     // TODO: improve wording and move the comment upwards.
     /*
@@ -65,6 +72,7 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
     vector<DataVar> data_var_para(num_threads);
     map<string, set<string>> onvs_sfs_reduced;
 
+    start = std::chrono::steady_clock::now(); // tmp
 #pragma omp parallel
     {
         int thread_num = omp_get_thread_num();
@@ -87,50 +95,93 @@ set<string> GCI::Impl::CIPSI::selectCFGsAndCSFs(wfn_ptr &wave_function)
         }
     }
 
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_generateCFGsAndConnections += duration.count(); // tmp    
+
     // auto [onvs_sfs_dia, connections_dia] = findONVsCSFsDia(generators_by_roots);
     // onvs_sfs_reduced.insert(onvs_sfs_dia.begin(), onvs_sfs_dia.begin());
 
     /*
      * Next is a crucial section where the new spin-functions are appended to the current ones.
      */
+    start = std::chrono::steady_clock::now(); // tmp
+
     appendSpinFunctions(onvs_sfs_reduced,
                         impl->sfs_map__idx_to_sf,
                         impl->sfs_map__sf_to_idx);
+
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_appendSpinFunctions += duration.count(); // tmp                            
 
     /*
      * Setting up the wave function for CIPSI-pruning. Essentially we transfer the HCI-wave function
      * by adding appropriate spin function positions from the global branching-diagrams map.
      */
     // WaveFunction wfn_cipsi_dia = setUpCIPSIWaveFunctionDia(onvs_sfs_dia);
+    start = std::chrono::steady_clock::now(); // tmp
+
     vector<wfn_ptr> wfn_cipsi_para = setUpCIPSIWaveFunction(data_fois_para);
+
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_setUpCIPSIWaveFunction += duration.count(); // tmp      
 
     /*
      * Constructing SF-pairs for calculating CCs
      */
+    start = std::chrono::steady_clock::now(); // tmp
+
     sf_pair_map_1el sf_pairs_1el_cipsi;
     sf_pair_map_2el sf_pairs_2el_cipsi;
     constructSFPairs(wave_function, data_fois_para, data_var_para,
                      wfn_cipsi_para, sf_pairs_1el_cipsi, sf_pairs_2el_cipsi);
 
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_constructSFPairs += duration.count(); // tmp                          
+
     /*
      * Almost there.. now calculating CCs.
      */
+    start = std::chrono::steady_clock::now(); // tmp
+
     impl->coupling_coeffs->constructCCs(sf_pairs_1el_cipsi, sf_pairs_2el_cipsi,
                                        impl->ccs_2el, impl->ccs_1el);
+
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_sel_constructCCs += duration.count(); // tmp                                          
 
     /*
      * Finally do the CIPSI-pruning....
      */
+    start = std::chrono::steady_clock::now(); // tmp
+
     map<string, vector<int>> selected_cfgs_sfs = doCIPSIPruning(wfn_cipsi_para, data_fois_para);
+
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_doCIPSIPruning += duration.count(); // tmp    
 
     n_csfs_new = 0;
     for (auto &item : selected_cfgs_sfs)
         n_csfs_new += item.second.size();
 
-    //     // map<string, vector<size_t>> selected_cfgs_sfs_var = doCIPSIPruningOnVarSpace();
-
     set<string> selected_cfgs;    
+
+    start = std::chrono::steady_clock::now(); // tmp
+
     appendCFGsAndCSFs(selected_cfgs_sfs, selected_cfgs, wave_function);
+
+    end = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end - start); // tmp
+    impl->t_appendCFGsAndCSFs += duration.count(); // tmp   
+
+    auto end_total = std::chrono::steady_clock::now(); // tmp
+    duration = std::chrono::duration<double>(end_total - start_total); // tmp
+    impl->t_selection_total += duration.count(); // tmp   
 
     return selected_cfgs;
 }
@@ -205,9 +256,9 @@ void GCI::Impl::CIPSI::appendSpinFunctions(const map<string, set<string>> &onvs_
         size_t nue = count(cfg.begin(), cfg.end(), '1');
         sfs_reduced[nue].insert(item.second.begin(), item.second.end());
     }
+    
 #ifdef _USE_MPI_
-    // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
-    //                 sfs_reduced, sfs_reduced, addAndReturnMaps());
+    sfs_reduced = LG::allReduceMaps(Brain::comm_nodes, sfs_reduced);
 #endif
 
     for (auto &item : sfs_reduced)
@@ -426,8 +477,7 @@ GCI::Impl::CIPSI::doCIPSIPruning(const vector<wfn_ptr> &wfn_cipsi_para,
     }
 
 #ifdef _USE_MPI_
-    // mpi::all_reduce(mpi::communicator(impl->world, mpi::comm_duplicate),
-    //                 selected_cfgs_sfs, selected_cfgs_sfs, mergeAndReturnMaps());
+    selected_cfgs_sfs = LG::allReduceMaps(Brain::comm_nodes, selected_cfgs_sfs);
 #endif
 
     return selected_cfgs_sfs;

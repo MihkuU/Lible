@@ -44,6 +44,7 @@ add_subdirectory(extern)
 add_subdirectory(src)
 
 find_package(OpenMP REQUIRED)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 target_link_libraries(lible PUBLIC ${OpenMP_CXX_LIBRARIES})
 
 # miscellaneous
@@ -56,8 +57,8 @@ list(APPEND lible_public_headers "src/util/lible/vec2d.h")
 list(APPEND lible_public_headers "src/util/lible/vec3d.h")
 list(APPEND lible_public_headers "src/util/lible/vec4d.h")
 
-list(APPEND lible_public_headers "src/gugaci/lible/gci.h")
-list(APPEND lible_public_headers "src/gugaci/lible/gci_settings.h")
+list(APPEND lible_public_headers "src/gugaci/lible/gci.hpp")
+list(APPEND lible_public_headers "src/gugaci/lible/gci_settings.hpp")
 list(APPEND lible_public_headers "src/davidson/lible/davidson_settings.h")
 
 list(APPEND lible_public_headers "src/ints/lible/mcmurchie_davidson.h")
