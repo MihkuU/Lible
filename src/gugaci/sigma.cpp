@@ -141,7 +141,8 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
                     for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                         for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                         {
-                            double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                            // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);                            
+                            double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                             // double cc = ccs_flat.at(sf_idxs_left[mu] * max_sf_dim + sf_idxs_right[nu]);
                             sigma_omp(pos_left + mu) += contrib * cc * trial_omp(pos_right + nu);
                             sigma_omp(pos_right + nu) += contrib * cc * trial_omp(pos_left + mu);
@@ -179,7 +180,8 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
                     for (size_t mu = 0; mu < sf_idxs.size(); mu++)
                         for (size_t nu = 0; nu < sf_idxs.size(); nu++)
                         {
-                            double cc = ccs.at(sf_idxs[mu]).at(sf_idxs[nu]);
+                            // double cc = ccs.at(sf_idxs[mu]).at(sf_idxs[nu]);                            
+                            double cc = ccs.at(std::make_pair(sf_idxs[mu], sf_idxs[nu]));
                             // double cc = ccs_flat.at(sf_idxs[mu] * max_sf_dim + sf_idxs[nu]);
                             sigma_omp(pos + mu) += two_el_int * cc * trial_omp(pos + nu);
                         }
@@ -221,12 +223,13 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
                     CFG *cfg_left = wave_function->getCFGPtr(icfg_left);
                     CFG *cfg_right = wave_function->getCFGPtr(icfg_right);
 
-                    vector<int> sf_idxs_left = cfg_left->getSFIdxs();
-                    vector<int> sf_idxs_right = cfg_right->getSFIdxs();
+                    vector<int> sf_idxs_left = cfg_left->getSFIdxs(); // TODO: get a pointer
+                    vector<int> sf_idxs_right = cfg_right->getSFIdxs(); // TODO: get a pointer
                     for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                         for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                         {
-                            double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                            // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);                            
+                            double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                             // double cc = ccs_flat.at(sf_idxs_left[mu] * max_sf_dim + sf_idxs_right[nu]);
                             sigma_omp(pos_left + mu) += contrib * cc * trial_omp(pos_right + nu);
                             sigma_omp(pos_right + nu) += contrib * cc * trial_omp(pos_left + mu);
@@ -253,7 +256,7 @@ vector<double> GCI::Impl::calcSigma(const vector<double> &trial)
     sigma_out = Brain::bcastVector(0, Brain::comm_nodes, sigma_out);
 
 #else
-        sigma_out = arma::conv_to<vector<double>>::from(sigma);
+    sigma_out = arma::conv_to<vector<double>>::from(sigma);
 #endif
 
     return sigma_out;
@@ -400,7 +403,8 @@ vector<double> GCI::Impl::calcSigma(const vec2d &aux_1el_ints,
                 for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                     {
-                        double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                        // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);                        
+                        double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                         sigma_omp(pos_left + mu) += contrib1 * cc * trial_omp(pos_right + nu);
                         sigma_omp(pos_right + nu) += contrib2 * cc * trial_omp(pos_left + mu);
                     }
@@ -432,7 +436,8 @@ vector<double> GCI::Impl::calcSigma(const vec2d &aux_1el_ints,
                 for (size_t mu = 0; mu < sf_idxs.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs.size(); nu++)
                     {
-                        double cc = ccs.at(sf_idxs[mu]).at(sf_idxs[nu]);
+                        // double cc = ccs.at(sf_idxs[mu]).at(sf_idxs[nu]);                        
+                        double cc = ccs.at(std::make_pair(sf_idxs[mu], sf_idxs[nu]));
                         sigma_omp(pos + mu) += two_el_int * cc * trial_omp(pos + nu);
                     }
             }
@@ -492,7 +497,8 @@ vector<double> GCI::Impl::calcSigma(const vec2d &aux_1el_ints,
                 for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                     {
-                        double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                        // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);                        
+                        double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                         sigma_omp(pos_left + mu) += contrib1 * cc * trial_omp(pos_right + nu);
                         sigma_omp(pos_right + nu) += contrib2 * cc * trial_omp(pos_left + mu);
                     }
@@ -539,7 +545,8 @@ vector<double> GCI::Impl::calcSigma(const DataFOIS &data_fois,
             for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                 for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                 {
-                    double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                    // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                    double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                     sigma[pos_left + mu] += contrib * cc * ci_vector[pos_right + nu];
                 }
         }
@@ -576,7 +583,8 @@ vector<double> GCI::Impl::calcSigma(const DataFOIS &data_fois,
                 for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                     {
-                        double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                        // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                        double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                         sigma[pos_left + mu] += two_el_int * cc * ci_vector[pos_right + nu];
                     }
             }
@@ -614,7 +622,8 @@ vector<double> GCI::Impl::calcSigma(const DataFOIS &data_fois,
                 for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                     for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                     {
-                        double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                        // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                        double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                         sigma[pos_left + mu] += two_el_int * cc * ci_vector[pos_right + nu];
                     }
             }
@@ -647,7 +656,8 @@ vector<double> GCI::Impl::calcSigma(const DataFOIS &data_fois,
             for (size_t mu = 0; mu < sf_idxs_left.size(); mu++)
                 for (size_t nu = 0; nu < sf_idxs_right.size(); nu++)
                 {
-                    double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                    // double cc = ccs.at(sf_idxs_left[mu]).at(sf_idxs_right[nu]);
+                    double cc = ccs.at(std::make_pair(sf_idxs_left[mu], sf_idxs_right[nu]));
                     sigma[pos_left + mu] += contrib * cc * ci_vector[pos_right + nu];
                 }
         }

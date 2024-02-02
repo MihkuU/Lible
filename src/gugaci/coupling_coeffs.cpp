@@ -922,7 +922,8 @@ void GCI::Impl::CouplingCoeffs::calcCCs1El(const sfs_pair_t &sfs_pair,
         size_t j = 0;
         for (auto &nu : sfs_pair.second)
         {
-            ccs_1el[key][mu][nu] = ccs(i, j);
+            // ccs_1el[key][mu][nu] = ccs(i, j);
+            ccs_1el[key][std::make_pair(mu, nu)] = ccs(i, j);
             j++;
         }
         i++;
@@ -1036,7 +1037,8 @@ void GCI::Impl::CouplingCoeffs::calcCCs2El(const sfs_pair_t &sfs_pair,
         size_t j = 0;
         for (auto &nu : sfs_pair.second)
         {
-            ccs_2el[key][mu][nu] = ccs(i, j);
+            // ccs_2el[key][mu][nu] = ccs(i, j);
+            ccs_2el[key][std::make_pair(mu, nu)] = ccs(i, j);
             j++;
         }
         i++;
@@ -1075,7 +1077,8 @@ void GCI::Impl::CouplingCoeffs::calcCCsDia(const sfs_pair_t &sfs_pair,
         size_t j = 0;
         for (auto &nu : sfs_pair.second)
         {
-            ccs_dia[key][mu][nu] = ccs(i, j);
+            // ccs_dia[key][mu][nu] = ccs(i, j);
+            ccs_dia[key][std::make_pair(mu, nu)] = ccs(i, j);
             j++;
         }
         i++;

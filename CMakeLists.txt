@@ -47,6 +47,9 @@ find_package(OpenMP REQUIRED)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 target_link_libraries(lible PUBLIC ${OpenMP_CXX_LIBRARIES})
 
+find_package(unordered_dense CONFIG REQUIRED)
+target_link_libraries(lible PRIVATE unordered_dense::unordered_dense)
+
 # miscellaneous
 add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
 

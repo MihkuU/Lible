@@ -1844,15 +1844,19 @@ void GU::mergeCCs(const T &ccs_in, T &ccs_out)
             //     }
             // }
 
-            for (auto &item1 : item.second)
+            // for (auto &item1 : item.second)
+            // {
+            //     size_t idx_left = item1.first;
+            //     for (auto &item2 : item1.second)
+            //     {
+            //         size_t idx_right = item2.first;
+            //         map_inner[idx_left][idx_right] = item2.second;
+            //     }
+            // }
+            for (auto &[key, val] : item.second)
             {
-                size_t idx_left = item1.first;
-                for (auto &item2 : item1.second)
-                {
-                    size_t idx_right = item2.first;
-                    map_inner[idx_left][idx_right] = item2.second;
-                }
-            }
+                map_inner[key] = val;
+            }            
 
             ccs_out[key] = move(map_inner);
             // ccs_out.emplace(key, move(map_inner));

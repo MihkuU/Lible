@@ -606,53 +606,53 @@ void GCI::Impl::runDriver(vector<double> &ci_energies,
 
     size_t n_bytes_1el_ccs = 0, n_bytes_2el_ccs = 0, n_bytes_dia_ccs = 0;
 
-    for (auto &[key1, map1] : ccs_1el)
-    {
-        n_bytes_1el_ccs += sizeof(key1);
-        n_bytes_1el_ccs += sizeof(map1);
-        for (auto &[key2, map2] : map1)
-        {
-            n_bytes_1el_ccs += sizeof(key2);
-            n_bytes_1el_ccs += sizeof(map2);
-            for (auto &[key3, val] : map2)
-            {
-                n_bytes_1el_ccs += sizeof(key3);
-                n_bytes_1el_ccs += sizeof(val);
-            }
-        }
-    }
+    // for (auto &[key1, map1] : ccs_1el)
+    // {
+    //     n_bytes_1el_ccs += sizeof(key1);
+    //     n_bytes_1el_ccs += sizeof(map1);
+    //     for (auto &[key2, map2] : map1)
+    //     {
+    //         n_bytes_1el_ccs += sizeof(key2);
+    //         n_bytes_1el_ccs += sizeof(map2);
+    //         for (auto &[key3, val] : map2)
+    //         {
+    //             n_bytes_1el_ccs += sizeof(key3);
+    //             n_bytes_1el_ccs += sizeof(val);
+    //         }
+    //     }
+    // }
 
-    for (auto &[key1, map1] : ccs_2el)
-    {
-        n_bytes_2el_ccs += sizeof(key1);
-        n_bytes_2el_ccs += sizeof(map1);
-        for (auto &[key2, map2] : map1)
-        {
-            n_bytes_2el_ccs += sizeof(key2);
-            n_bytes_2el_ccs += sizeof(map2);
-            for (auto &[key3, val] : map2)
-            {
-                n_bytes_2el_ccs += sizeof(key3);
-                n_bytes_2el_ccs += sizeof(val);
-            }
-        }
-    }
+    // for (auto &[key1, map1] : ccs_2el)
+    // {
+    //     n_bytes_2el_ccs += sizeof(key1);
+    //     n_bytes_2el_ccs += sizeof(map1);
+    //     for (auto &[key2, map2] : map1)
+    //     {
+    //         n_bytes_2el_ccs += sizeof(key2);
+    //         n_bytes_2el_ccs += sizeof(map2);
+    //         for (auto &[key3, val] : map2)
+    //         {
+    //             n_bytes_2el_ccs += sizeof(key3);
+    //             n_bytes_2el_ccs += sizeof(val);
+    //         }
+    //     }
+    // }
 
-    for (auto &[key1, map1] : ccs_dia)
-    {
-        n_bytes_dia_ccs += sizeof(key1);
-        n_bytes_dia_ccs += sizeof(map1);
-        for (auto &[key2, map2] : map1)
-        {
-            n_bytes_dia_ccs += sizeof(key2);
-            n_bytes_dia_ccs += sizeof(map2);
-            for (auto &[key3, val] : map2)
-            {
-                n_bytes_dia_ccs += sizeof(key3);
-                n_bytes_dia_ccs += sizeof(val);
-            }
-        }
-    }
+    // for (auto &[key1, map1] : ccs_dia)
+    // {
+    //     n_bytes_dia_ccs += sizeof(key1);
+    //     n_bytes_dia_ccs += sizeof(map1);
+    //     for (auto &[key2, map2] : map1)
+    //     {
+    //         n_bytes_dia_ccs += sizeof(key2);
+    //         n_bytes_dia_ccs += sizeof(map2);
+    //         for (auto &[key3, val] : map2)
+    //         {
+    //             n_bytes_dia_ccs += sizeof(key3);
+    //             n_bytes_dia_ccs += sizeof(val);
+    //         }
+    //     }
+    // }
 
     double n_gb_1el_conn = double(n_bytes_1el_conn) / std::pow(1024, 3);
     double n_gb_2el_conn = double(n_bytes_2el_conn) / std::pow(1024, 3);

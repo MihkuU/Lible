@@ -258,7 +258,8 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
                     for (size_t nu = 0; nu < pos_csf_right.size(); nu++)
                     {
                         // double cc = ccs[pos_csf_left[mu]][pos_csf_right[nu]];
-                        double cc = ccs.at(pos_csf_left[mu]).at(pos_csf_right[nu]);
+                        // double cc = ccs.at(pos_csf_left[mu]).at(pos_csf_right[nu]);
+                        double cc = ccs.at(std::make_pair(pos_csf_left[mu], pos_csf_right[nu]));
                         guess_hamiltonian_omp(pos_left + mu, pos_right + nu) += contrib * cc;
                         guess_hamiltonian_omp(pos_right + nu, pos_left + mu) += contrib * cc;
                     }
@@ -293,7 +294,8 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
                     for (size_t nu = 0; nu < pos_csf.size(); nu++)
                     {
                         // double cc = ccs[pos_csf[mu]][pos_csf[nu]];
-                        double cc = ccs.at(pos_csf[mu]).at(pos_csf[nu]);
+                        // double cc = ccs.at(pos_csf[mu]).at(pos_csf[nu]);
+                        double cc = ccs.at(std::make_pair(pos_csf[mu], pos_csf[nu]));
                         guess_hamiltonian_omp(pos + mu, pos + nu) += two_el_int * cc;
                     }
             }
@@ -336,7 +338,8 @@ vector<vector<double>> GCI::Impl::calcGuess(const vector<double> &diag)
                     for (size_t nu = 0; nu < pos_csf_right.size(); nu++)
                     {
                         // double cc = ccs[pos_csf_left[mu]][pos_csf_right[nu]];
-                        double cc = ccs.at(pos_csf_left[mu]).at(pos_csf_right[nu]);
+                        // double cc = ccs.at(pos_csf_left[mu]).at(pos_csf_right[nu]);
+                        double cc = ccs.at(std::make_pair(pos_csf_left[mu], pos_csf_right[nu]));
                         guess_hamiltonian_omp(pos_left + mu, pos_right + nu) += contrib * cc;
                         guess_hamiltonian_omp(pos_right + nu, pos_left + mu) += contrib * cc;
                     }
