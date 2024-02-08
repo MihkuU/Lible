@@ -21,5 +21,5 @@ The 3. step in Installation ensures that the Lible can be conveniently incorpora
   ```
 For the find_package() to work, your CMake project configuration has to find Lible. That means, you need to provide the path to the directory, where it was installed:
 ```
-  -DCMAKE_PREFIX_PATH=<Path to where you built Lible during 'Installation'>
+  -DCMAKE_PREFIX_PATH=<Path to where you installed Lible in 'Installation'>
 ```
