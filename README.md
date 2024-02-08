@@ -14,7 +14,7 @@
   ```
 ** Using Lible **
 
-The 3. step in the Installation ensures that the Lible can be conveniently incorporated in your CMake project using the 'find_package()' function call. In your 'CMakeLists.txt' file you could write:
+The 3. step in Installation ensures that the Lible can be conveniently incorporated in your CMake project using the 'find_package()' function call. In your 'CMakeLists.txt' file you can write:
   ```
   find_package(Lible REQUIRED)
   target_link_libraries(YourProject PRIVATE Lible::lible)
