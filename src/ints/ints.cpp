@@ -1,6 +1,5 @@
-#include <lible/ints.h>
-#include <lible/oneel_impl.h>
-#include <lible/structure.h>
+#include <lible/ints.hpp>
+#include <lible/oneel_impl.hpp>
 
 namespace LI = lible::ints;
 namespace LIO = lible::ints::one;
@@ -16,7 +15,7 @@ vec2d LI::kineticEnergy(const Structure &structure)
 {
 }
 
-vec2d LI::coulombAttraction(const Structure &structure)
+vec2d LI::nuclearAttraction(const Structure &structure)
 {
 }
 

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(Lible VERSION 0.0.0 LANGUAGES CXX)
 
-if (PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
    message(FATAL_ERROR "In-source builds are not allowed, specify another build directory")
 endif()
 
@@ -11,7 +11,14 @@ if(NOT((CMAKE_BUILD_TYPE STREQUAL "Debug") OR (CMAKE_BUILD_TYPE STREQUAL "Releas
                          -DCMAKE_BUILD_TYPE=<build type>")
 endif()
 
-# TODO: compile which submodule of the library.
+### TMP
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_BINARY_DIR}/extern/arma/build/lib/") 
+# ...SOB that was hard. Tried by following: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+# TODO: figure out a better organization for it in the future.
+### TMP
+
 ### options
 option(BUILD_DAVIDSON "" ON)
 option(BUILD_GEOMOPT  "" ON)
@@ -28,7 +35,6 @@ if(USE_MPI)
 else()
 	set(CMAKE_CXX_COMPILER g++)
 endif()
-
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -60,11 +66,17 @@ list(APPEND lible_public_headers "src/util/lible/vec2d.h")
 list(APPEND lible_public_headers "src/util/lible/vec3d.h")
 list(APPEND lible_public_headers "src/util/lible/vec4d.h")
 
-list(APPEND lible_public_headers "src/gugaci/lible/gci.hpp")
-list(APPEND lible_public_headers "src/gugaci/lible/gci_settings.hpp")
-list(APPEND lible_public_headers "src/davidson/lible/davidson_settings.h")
+if(BUILD_GCI)
+	list(APPEND lible_public_headers "src/gugaci/lible/gci.hpp")
+	list(APPEND lible_public_headers "src/gugaci/lible/gci_settings.hpp")
+	list(APPEND lible_public_headers "src/davidson/lible/davidson_settings.h")
+endif()
 
-list(APPEND lible_public_headers "src/ints/lible/mcmurchie_davidson.h")
+if(BUILD_INTS)
+	list(APPEND lible_public_headers "src/ints/lible/ints.hpp")
+	list(APPEND lible_public_headers "src/ints/lible/shell.hpp")
+	list(APPEND lible_public_headers "src/ints/lible/structure.hpp")
+endif()
 
 set_target_properties(lible PROPERTIES
 	PUBLIC_HEADER "${lible_public_headers}"

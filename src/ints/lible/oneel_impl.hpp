@@ -1,6 +1,8 @@
 #pragma once
 
-#include <lible/ints.h>
+#include <lible/ints.hpp>
+#include <lible/mcmurchie_davidson.hpp>
+#include <lible/shell_pair_data.hpp>
 #include <lible/types.h>
 #include <lible/util.h>
 
@@ -8,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 
+#include <armadillo>
 #include <fmt/core.h>
 
 namespace lible
@@ -42,6 +45,11 @@ namespace lible
             }
 
             template <Option opt>
+            void kernel(const ShellPairData &shell_pair_data,
+                        const std::vector<std::vector<arma::dmat>> &h_coeffs,
+                        vec2d &ints_out);
+
+            template <Option opt>
             vec2d calc(const Structure &structure)
             {
                 auto start{std::chrono::steady_clock::now()};
@@ -55,19 +63,31 @@ namespace lible
                 vec2d ints(n_ao, n_ao, 0);
                 for (int la = l_max; la >= 0; la--)
                 {
-                    /*
-                     * Stage the shell-pairs/calculate Hermite exp. coeffs
-                     */
-                    continue;
+                    auto shell_pair_data = ShellPairData(la, la, structure);
+
+                    // auto shells = structure.shells.at(la); //tmp
+                    // printf("la = %d\n", la);
+                    // for (auto shell : shells)
+                    //     for (auto &n : shell.normalization)
+                    //         printf("n = %16.12lf\n", n);
+                    //     // for (auto &d : shell.contraction_coeffs)
+                    //     //     printf("d = %16.12lf\n", d);
+
+                    std::vector<std::vector<arma::dmat>> h_coeffs;
+                    MD::calcHCoeffs(la, la, shell_pair_data, h_coeffs);
+                                        
+                    kernel<opt>(shell_pair_data, h_coeffs, ints);
                 }
 
                 for (int la = l_max; la >= 0; la--)
                     for (int lb = la - 1; lb >= 0; lb--)
                     {
-                        /*
-                         * Stage the shell-pairs/calculate Hermite exp. coeffs
-                         */
-                        continue;
+                        auto shell_pair_data = ShellPairData(la, lb, structure);
+
+                        std::vector<std::vector<arma::dmat>> h_coeffs;
+                        MD::calcHCoeffs(la, lb, shell_pair_data, h_coeffs);
+
+                        kernel<opt>(shell_pair_data, h_coeffs, ints);                        
                     }
 
                 auto end(std::chrono::steady_clock::now());
@@ -75,11 +95,6 @@ namespace lible
                 palPrint(fmt::format(" {:.2e} s\n", duration.count()));
 
                 return ints;
-            }
-
-            template <Option opt>
-            void kernel()
-            {
             }
         }
     }

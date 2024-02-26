@@ -5,7 +5,7 @@
 
 namespace lible
 {
-    namespace IntsDefs
+    namespace ints
     {
         // constexpr double bohr_to_ang = 0.5291772490; // Source: "https://www.unitconverters.net/length/bohr-radius-to-angstrom.htm"
         constexpr double bohr_to_ang = 0.5291772083; // Source: Molblock, testing

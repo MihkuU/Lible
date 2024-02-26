@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lible/types.h>
-#include <lible/structure.h>
+#include <lible/structure.hpp>
 
 #include <cassert>
 #include <memory>
@@ -17,20 +17,20 @@ namespace lible
 
         vec2d kineticEnergy(const Structure &structure);
 
-        vec2d coulombAttraction(const Structure &structure);
+        vec2d nuclearAttraction(const Structure &structure);
 
         vec2d dipoleMoment(const Structure &structure);
 
-        namespace kernels
-        {
-            void overlap();
+        // namespace kernels
+        // {
+        //     void overlap();
 
-            void kineticEnergy();
+        //     void kineticEnergy();
 
-            void coulombAttraction();
+        //     void coulombAttraction();
 
-            void dipoleMoment();
-        }
+        //     void dipoleMoment();
+        // }
     }
 
     // class ints

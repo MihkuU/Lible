@@ -1,18 +1,71 @@
-#include <lible/oneel_impl.h>
+#include <lible/oneel_impl.hpp>
+#include <lible/ints_util.hpp>
+#include <lible/spherical_trafo.hpp>
 
-namespace LI = lible::ints;
+#include <math.h>
+
 namespace LIO = lible::ints::one;
-
-using namespace lible;
 
 using std::array;
 using std::size_t;
 using std::vector;
 
-template<>
-void LIO::kernel<LIO::Option::OVERLAP>()
+template <>
+void LIO::kernel<LIO::Option::OVERLAP>(const ShellPairData &shell_pair_data,
+                                       const vector<vector<arma::dmat>> &h_coeffs,
+                                       vec2d &ints_out)
 {
+    int dim_a_cart = dimCartesians(shell_pair_data.la);
+    int dim_b_cart = dimCartesians(shell_pair_data.lb);
 
+    arma::dmat sph_trafo1 = returnSphericalTrafo(shell_pair_data.la);
+    arma::dmat sph_trafo2 = returnSphericalTrafo(shell_pair_data.lb);
+    sph_trafo2 = sph_trafo2.t();
+
+    arma::dmat ints_contracted(dim_a_cart, dim_b_cart);
+    arma::dmat ints_sph;
+    for (size_t ipair = 0; ipair < shell_pair_data.n_pairs; ipair++)
+    {
+        ints_contracted.zeros();
+
+        auto &exps = shell_pair_data.exps[ipair];
+        auto &coeffs = shell_pair_data.coeffs[ipair];
+
+        size_t ka = exps.first.size();
+        size_t kb = exps.second.size();
+
+        const vector<arma::dmat> &h_coeffs_pair = h_coeffs[ipair];
+
+        // if (!(shell_pair_data.la == 3 and shell_pair_data.lb == 3)) // TMP
+        //     continue;
+        // if (shell_pair_data.la == 3 or shell_pair_data.lb == 3) // TMP
+        //     continue;        
+            
+        size_t iab = 0;
+        for (size_t ia = 0; ia < ka; ia++)
+            for (size_t ib = 0; ib < kb; ib++)
+            {
+                double a = exps.first[ia];
+                double b = exps.second[ib];
+                double da = coeffs.first[ia];
+                double db = coeffs.second[ib];
+
+                double p = a + b;
+                double da_x_db = da * db;
+
+                double fac = da_x_db * std::pow(M_PI / p, 1.5);
+
+                for (int mu = 0; mu < dim_a_cart; mu++)
+                    for (int nu = 0; nu < dim_b_cart; nu++)
+                        ints_contracted(mu, nu) += fac * h_coeffs_pair[iab](mu, nu);
+
+                iab++;
+            }
+            
+        ints_sph = sph_trafo1 * ints_contracted * sph_trafo2;
+
+        transferIntegrals(ipair, shell_pair_data, ints_sph, ints_out);
+    }
 }
 
 // template <>
@@ -40,8 +93,8 @@ void LIO::kernel<LIO::Option::OVERLAP>()
 //     vector<double> one_el_ints_sph_cart(dim_sph_a * dim_cart_b, 0);
 //     vector<double> one_el_ints_sph(dim_sph_a * dim_sph_b, 0);
 
-//     vector<trafo_coeff_tuple> spherical_trafo_first = SphericalTrafo::returnSphericalTrafo(la);
-//     vector<trafo_coeff_tuple> spherical_trafo_second = SphericalTrafo::returnSphericalTrafo(lb);
+//     vector<trafo_coeff_tuple> spherical_trafo_first = spherical_trafo::returnSphericalTrafo(la);
+//     vector<trafo_coeff_tuple> spherical_trafo_second = spherical_trafo::returnSphericalTrafo(lb);
 //     for (size_t ishell_pair = 0; ishell_pair < shell_pairs.size(); ishell_pair++)
 //     {
 //         auto shell_pair = shell_pairs[ishell_pair];
@@ -105,14 +158,14 @@ void LIO::kernel<LIO::Option::OVERLAP>()
 //             }
 //         }
 
-//         SphericalTrafo::transformCartesianIntsToSpherical(shell_pair,
+//         spherical_trafo::transformCartesianIntsToSpherical(shell_pair,
 //                                                           one_el_ints_cart,
 //                                                           spherical_trafo_first,
 //                                                           spherical_trafo_second,
 //                                                           one_el_ints_sph_cart,
 //                                                           one_el_ints_sph);
 
-//         SphericalTrafo::transferSphericalInts(n_ao,
+//         spherical_trafo::transferSphericalInts(n_ao,
 //                                               shell_pair,
 //                                               one_el_ints_sph,
 //                                               one_el_ints);
