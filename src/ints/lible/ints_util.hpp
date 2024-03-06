@@ -67,5 +67,7 @@ namespace lible
 
             return cartesian_exps;
         }
+
+        std::string returnBasisPath(const std::string &basis_set);       
     }
 }
