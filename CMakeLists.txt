@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-project(Lible VERSION 0.0.0 LANGUAGES CXX)
+project(lible
+	VERSION      0.0.0 
+	LANGUAGES    CXX
+	DESCRIPTION  "A C++ quantum chemistry library with various usable gadgets."
+	HOMEPAGE_URL "https://github.com/MihkuU/Lible"
+)
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
    message(FATAL_ERROR "In-source builds are not allowed, specify another build directory")
@@ -44,6 +49,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 ### the main target
 add_library(lible SHARED)
+add_library(lible::lible ALIAS lible)
+
 set_target_properties(lible PROPERTIES PREFIX "")
 
 message(${CMAKE_CURRENT_BINARY_DIR}) #TMP
@@ -86,14 +93,14 @@ set_target_properties(lible PROPERTIES
 
 include(GNUInstallDirs)
 install(TARGETS lible
-	EXPORT LibleTargets
+	EXPORT libleTargets
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible
 )
 
-install(EXPORT LibleTargets
-	FILE LibleTargets.cmake
-	NAMESPACE Lible::
+install(EXPORT libleTargets
+	FILE libleTargets.cmake
+	NAMESPACE lible::
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible
 )
 
