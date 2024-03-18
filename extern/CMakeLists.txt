@@ -7,9 +7,9 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 #   - json, https://github.com/nlohmann/json
 #   - mpl, https://github.com/rabauke/mpl
 
-configure_file(${CMAKE_SOURCE_DIR}/extern/CMakeLists.txt.in ${CMAKE_BINARY_DIR}/extern/CMakeLists.txt @ONLY)
-execute_process(COMMAND "${CMAKE_COMMAND}" . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/extern)
-execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/extern)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/extern/CMakeLists.txt @ONLY)
+execute_process(COMMAND "${CMAKE_COMMAND}" . WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/extern)
+execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/extern)
 
 target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/include)
 if(EXISTS "${CMAKE_BINARY_DIR}/extern/arma/build/lib")
