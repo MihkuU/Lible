@@ -1,4 +1,4 @@
-#include <lible/types.h>
+#include <lible/types.hpp>
 
 using namespace lible;
 using namespace std;

@@ -13,9 +13,9 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY ${CMAKE_B
 
 target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/include)
 if(EXISTS "${CMAKE_BINARY_DIR}/extern/arma/build/lib")
-    target_link_libraries(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/lib/libarmadillo.so)
+    target_link_libraries(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/lib/libarmadillo.a)
 elseif(EXISTS "${CMAKE_BINARY_DIR}/extern/arma/build/lib64")
-    target_link_libraries(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/lib64/libarmadillo.so)
+    target_link_libraries(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/arma/build/lib64/libarmadillo.a)
 endif()
 
 
@@ -27,7 +27,10 @@ target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/fmt/include)
 target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/json/include)
 
 # TODO: figure what to do about this one
-target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/robinhood/src/include/)
+#target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/robinhood/src/include/)
+#target_include_directories(lible PRIVATE ${CMAKE_BINARY_DIR}/extern/)
+find_package(unordered_dense CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR}/extern/unordered_dense/build/lib/cmake/unordered_dense)
+target_link_libraries(lible PRIVATE unordered_dense::unordered_dense)
 
 # mpl
 if(USE_MPI)

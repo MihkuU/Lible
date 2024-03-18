@@ -1,5 +1,5 @@
 #include <lible/gci_impl.hpp>
-#include <lible/util.h>
+#include <lible/util.hpp>
 
 #ifdef _USE_MPI_
 #include <lible/brain.hpp>

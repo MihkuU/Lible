@@ -10,10 +10,8 @@
 #include <lible/configuration.hpp>
 #include <lible/wave_function.hpp>
 
+#include <ankerl/unordered_dense.h> 
 #include <armadillo>
-#include <robin_hood.h>
-
-#include <ankerl/unordered_dense.h> // TMP
 
 namespace lible
 {
@@ -33,7 +31,6 @@ namespace lible
                                                std::map<std::tuple<int, int, bool>,
                                                         std::vector<std::tuple<int, int>>>>;
 
-        // using cc_map = robin_hood::unordered_map<int, robin_hood::unordered_map<int, double>>;
         using cc_map = ankerl::unordered_dense::map<std::pair<int, int>, double>;
 
         using proto_1el_tuple = std::tuple<CFGProto, CFGProto>;

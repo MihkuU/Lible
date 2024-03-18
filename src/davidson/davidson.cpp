@@ -1,5 +1,6 @@
-#include <lible/davidson.h>
-#include <lible/util.h>
+#include <lible/davidson.hpp>
+#include <lible/davidson_settings.hpp>
+#include <lible/util.hpp>
 
 #include <armadillo>
 #include <fmt/core.h>

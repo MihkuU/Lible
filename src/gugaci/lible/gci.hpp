@@ -5,9 +5,9 @@
 #include <utility>
 #include <vector>
 
-#include <lible/davidson_settings.h>
+#include <lible/davidson_settings.hpp>
 #include <lible/gci_settings.hpp>
-#include <lible/types.h>
+#include <lible/types.hpp>
 
 namespace lible
 {

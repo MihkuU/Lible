@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lible/shell_pair_data.hpp>
-#include <lible/types.h>
+#include <lible/types.hpp>
 
 #include <armadillo>
 

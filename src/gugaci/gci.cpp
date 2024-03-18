@@ -1,6 +1,6 @@
 #include <lible/gci.hpp>
 
-#include <lible/util.h>
+#include <lible/util.hpp>
 #include <lible/gci_impl.hpp>
 
 namespace LG = lible::guga;

@@ -2,7 +2,7 @@
 #include <lible/gci_settings.hpp>
 #include <lible/connections.hpp>
 #include <lible/coupling_coeffs.hpp>
-#include <lible/util.h>
+#include <lible/util.hpp>
 
 #include <armadillo>
 #include <omp.h>

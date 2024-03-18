@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lible/types.h>
+#include <lible/types.hpp>
 #include <lible/structure.hpp>
 
 #include <cassert>

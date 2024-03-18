@@ -4,8 +4,8 @@
 #include <lible/coupling_coeffs.hpp>
 #include <lible/prefix_algorithm.hpp>
 #include <lible/gci_impl.hpp>
-#include <lible/davidson.h>
-#include <lible/util.h>
+#include <lible/davidson.hpp>
+#include <lible/util.hpp>
 
 #include <iostream>
 #include <chrono>

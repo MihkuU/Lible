@@ -3,8 +3,8 @@
 #include <lible/ints.hpp>
 #include <lible/mcmurchie_davidson.hpp>
 #include <lible/shell_pair_data.hpp>
-#include <lible/types.h>
-#include <lible/util.h>
+#include <lible/types.hpp>
+#include <lible/util.hpp>
 
 #include <chrono>
 #include <stdexcept>

@@ -14,7 +14,7 @@ ExternalProject_Add(arma
     CONFIGURE_COMMAND 
 		${CMAKE_COMMAND} -E env "${arma_dir}/configure" "${arma_dir}/"
 	BUILD_COMMAND     
-		${CMAKE_COMMAND} ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build
+		${CMAKE_COMMAND} ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build -DBUILD_SHARED_LIBS=OFF
     TEST_COMMAND      ""
 	BUILD_ALWAYS	  		   OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
@@ -63,14 +63,17 @@ if(@USE_MPI@)
 	)
 endif()
 
-set(robinhood_dir "@CMAKE_BINARY_DIR@/extern/robinhood")
-ExternalProject_Add(robinhood
-    URL                        "@CMAKE_SOURCE_DIR@/extern/robin-hood-hashing-master.zip"
-    SOURCE_DIR                 "${robinhood_dir}"
-    CONFIGURE_COMMAND          ""
-    BUILD_COMMAND              ""
-    INSTALL_COMMAND            ""
-    TEST_COMMAND               ""
-    BUILD_ALWAYS               OFF
-    DOWNLOAD_EXTRACT_TIMESTAMP OFF
+set(ankerl_dense_dir "@CMAKE_BINARY_DIR@/extern/unordered_dense")
+ExternalProject_Add(ankerl_dense
+	URL						   "@CMAKE_SOURCE_DIR@/extern/unordered_dense-main.zip"
+	SOURCE_DIR				   "${ankerl_dense_dir}"
+	CONFIGURE_COMMAND
+		${CMAKE_COMMAND} -S "${ankerl_dense_dir}" -B "${ankerl_dense_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${ankerl_dense_dir}/build
+	BUILD_COMMAND
+		${CMAKE_COMMAND} --build "${ankerl_dense_dir}/build"
+	INSTALL_COMMAND
+		${CMAKE_COMMAND} --install "${ankerl_dense_dir}/build"
+	TEST_COMMAND
+	BUILD_ALWAYS               OFF
+	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 )

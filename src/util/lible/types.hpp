@@ -5,9 +5,9 @@
  *
  */
 
-#include <lible/vec2d.h>
-#include <lible/vec3d.h>
-#include <lible/vec4d.h>
+#include <lible/vec2d.hpp>
+#include <lible/vec3d.hpp>
+#include <lible/vec4d.hpp>
 
 #include <array>
 #include <vector>

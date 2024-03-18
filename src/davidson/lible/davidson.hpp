@@ -4,8 +4,6 @@
 #include <utility>
 #include <vector>
 
-#include <lible/davidson_settings.h>
-
 namespace lible
 {
     namespace davidson

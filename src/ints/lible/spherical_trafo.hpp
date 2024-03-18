@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lible/types.h>
+#include <lible/types.hpp>
 #include <lible/shell.hpp>
 #include <lible/shell_pair_data.hpp>
 
