@@ -48,9 +48,16 @@ set_target_properties(lible PROPERTIES PREFIX "")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/extern")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
+# OMP
 find_package(OpenMP REQUIRED)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 target_link_libraries(lible PUBLIC ${OpenMP_CXX_LIBRARIES})
+
+# BLAS/LAPACK
+find_package(BLAS REQUIRED)
+find_package(LAPACK REQUIRED)
+
+target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 # miscellaneous # TODO: manage this
 add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
