@@ -31,17 +31,6 @@ namespace lible
 
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
         returnBasisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
-
-        // namespace kernels
-        // {
-        //     void overlap();
-
-        //     void kineticEnergy();
-
-        //     void coulombAttraction();
-
-        //     void dipoleMoment();
-        // }
     }
 
     // class ints

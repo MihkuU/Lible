@@ -7,12 +7,12 @@ namespace lible
 {
     namespace ints
     {
-        // constexpr double bohr_to_ang = 0.5291772490; // Source: "https://www.unitconverters.net/length/bohr-radius-to-angstrom.htm"
-        constexpr double bohr_to_ang = 0.5291772083; // Source: Molblock, testing
-        // constexpr double ang_to_bohr = 1.8897259886; // Source: "https://www.unitconverters.net/length/angstrom-to-bohr-radius.htm"
-        constexpr double ang_to_bohr = 1.0 / bohr_to_ang; // Source: Molblock, testing
+        // constexpr double _bohr_to_ang_ = 0.5291772490; // Source: "https://www.unitconverters.net/length/bohr-radius-to-angstrom.htm"
+        constexpr double _bohr_to_ang_ = 0.5291772083; // Source: Molblock, testing
+        // constexpr double _ang_to_bohr_ = 1.8897259886; // Source: "https://www.unitconverters.net/length/angstrom-to-bohr-radius.htm"
+        constexpr double _ang_to_bohr_ = 1.0 / _bohr_to_ang_; // Source: Molblock, testing
 
-        constexpr int max_angular_momentum = 6;
+        constexpr int _max_angular_momentum_ = 6;
 
         const std::map<int, std::string> angmom_to_label{
             {0, "s"},

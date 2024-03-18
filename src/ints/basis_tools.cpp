@@ -25,7 +25,7 @@ LI::returnBasisForAtom(const int atomic_nr, const string &basis_set)
 {
     /*
      *
-     *
+     * // TODO: handle Pople or not? Handle cc contraction bullshit?
      */
 
     string basis_path = returnBasisPath(basis_set);
@@ -47,23 +47,38 @@ LI::returnBasisForAtom(const int atomic_nr, const string &basis_set)
         auto exps_json = shell.at("exponents");
         auto coeffs_json = shell.at("coefficients");
 
+        vector<double> exps_tmp;
+        for (const string &exp : exps_json)
+            exps_tmp.push_back(std::stod(exp));
+
+        vector<vector<double>> coeffs_tmp;
+        for (auto &coeffs : coeffs_json)
+        {
+            vector<double> coeffs_tmp_tmp;
+            for (const string &coeff : coeffs)
+                coeffs_tmp_tmp.push_back(std::stod(coeff));
+
+            coeffs_tmp.push_back(coeffs_tmp_tmp);
+        }
+
         vector<shell_exps_coeffs_t> exp_coeff_pairs(n_coeff_sets);
         for (size_t icoeffs = 0; icoeffs < n_coeff_sets; icoeffs++)
         {
             vector<double> exps;
             vector<double> coeffs;
+
             for (size_t iexp = 0; iexp < n_exps; iexp++)
-                if (coeffs_json[icoeffs][iexp] != 0)
+                if (coeffs_tmp[icoeffs][iexp] != 0)
                 {
-                    exps.push_back(exps_json[iexp]);
-                    coeffs.push_back(coeffs_json[icoeffs][iexp]);
+                    exps.push_back(exps_tmp[iexp]);
+                    coeffs.push_back(coeffs_tmp[icoeffs][iexp]);
                 }
 
             exp_coeff_pairs[icoeffs] = std::make_pair(exps, coeffs);
         }
 
         basis_atom[angmom].insert(basis_atom[angmom].end(), exp_coeff_pairs.begin(),
-                                  exp_coeff_pairs.end());
+                                  exp_coeff_pairs.end());        
     }
 
     return basis_atom;
@@ -71,7 +86,12 @@ LI::returnBasisForAtom(const int atomic_nr, const string &basis_set)
 
 map<int, map<int, vector<LI::shell_exps_coeffs_t>>>
 LI::returnBasisForAtoms(const set<int> &atomic_nrs, const string &basis_set)
-{    
+{
+    /*
+     *
+     *
+     */
+
     map<int, map<int, vector<shell_exps_coeffs_t>>> basis_atoms;   
     for (const int atomic_nr : atomic_nrs)
     {

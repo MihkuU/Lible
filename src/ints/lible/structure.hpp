@@ -15,8 +15,12 @@ namespace lible
              * several data members. What is meant to be used 'internally' is declared private.
              */
 
-            Structure(const std::string &basis_set,                      
+            Structure(const std::string &basis_set,
                       const std::vector<int> &atomic_nrs,
+                      const std::vector<double> &coordinates_angstroem);
+
+            Structure(const std::string &basis_set,
+                      const std::vector<std::string> &elements,
                       const std::vector<double> &coordinates_angstroem);
 
             int max_angular_momentum;
@@ -31,10 +35,14 @@ namespace lible
             std::vector<int> atomic_nrs;
             std::vector<std::string> elements;
 
-            // std::string returnBasisPath(const std::string &basis_set);
-            std::vector<Shell> parseBasisJSONFile(const std::string &basis_path); // TODO: remove
-            void constructShells(std::map<int, std::vector<Shell>> &shells);
-            void readBasis(const std::string &basis_set, std::map<int, std::vector<Shell>> &shells);
+            void constructShells(int &max_angular_momentum,
+                                 size_t &n_atomic_orbitals,
+                                 std::map<int, std::vector<Shell>> &shells);
+
+            void readBasis(const std::string &basis_set,
+                           int &max_angular_momentum,
+                           size_t &n_atomic_orbitals,
+                           std::map<int, std::vector<Shell>> &shells);
         };
     }
 }

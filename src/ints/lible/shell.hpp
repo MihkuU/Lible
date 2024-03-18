@@ -28,8 +28,7 @@ namespace lible
             const std::vector<double> &coeffs,
             const std::vector<double> &coeffs_raw,
             const std::vector<double> &exps,
-            const std::vector<double> &norms,
-            const std::vector<std::array<int, 3>> cartesian_exps)
+            const std::vector<double> &norms)
           : angular_momentum(angular_momentum),
             atomic_number(atomic_number),
             dim_cartesian(dim_cartesian),
@@ -39,8 +38,7 @@ namespace lible
             coeffs(coeffs),
             coeffs_raw(coeffs_raw),
             exps(exps),
-            norms(norms),
-            cartesian_exps(cartesian_exps)
+            norms(norms)
       {
       }
 
@@ -56,8 +54,7 @@ namespace lible
             coeffs({}),
             coeffs_raw({}),
             exps({}),
-            norms({}),
-            cartesian_exps({})
+            norms({})
       {
       }
 
@@ -71,7 +68,6 @@ namespace lible
       const std::vector<double> coeffs_raw;
       const std::vector<double> exps;
       const std::vector<double> norms;
-      const std::vector<std::array<int, 3>> cartesian_exps; // remove?
     };
 
     std::vector<double> calcShellNormalization(const int &angmom,

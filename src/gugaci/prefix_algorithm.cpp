@@ -232,7 +232,7 @@ vector<string> GCI::Impl::PrefixAlgorithm::prefixBonanza(const set<string> &cfgs
                     {
                         if (p == q)
                             continue;
-                        if (new_prefix1[q] == '-')
+                        if (new_prefix1[q] == '0')
                             continue;
                         string new_prefix2 = new_prefix1;
                         new_prefix2[q] -= 1;
