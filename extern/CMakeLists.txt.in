@@ -14,7 +14,7 @@ ExternalProject_Add(arma
     CONFIGURE_COMMAND 
 		${CMAKE_COMMAND} -E env "${arma_dir}/configure" "${arma_dir}/"
 	BUILD_COMMAND     
-		${CMAKE_COMMAND} ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build ### -DBUILD_SHARED_LIBS=OFF
+		${CMAKE_COMMAND} ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build -DBUILD_SHARED_LIBS=OFF
     TEST_COMMAND      ""
 	BUILD_ALWAYS	  		   OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
