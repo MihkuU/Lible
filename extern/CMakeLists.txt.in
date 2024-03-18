@@ -7,9 +7,9 @@ include(ExternalProject)
 cmake_host_system_information(RESULT nprocs QUERY NUMBER_OF_PHYSICAL_CORES)
 
 # armadillo library
-set(arma_dir "@CMAKE_BINARY_DIR@/extern/arma")
+set(arma_dir "@CMAKE_CURRENT_BINARY_DIR@/arma")
 ExternalProject_Add(arma
-	URL 					   "@CMAKE_SOURCE_DIR@/extern/armadillo-12.4.1.tar.xz"
+	URL 					   "@CMAKE_CURRENT_SOURCE_DIR@/armadillo-12.4.1.tar.xz"
 	SOURCE_DIR 		           "${arma_dir}"
     CONFIGURE_COMMAND 
 		${CMAKE_COMMAND} -E env "${arma_dir}/configure" "${arma_dir}/"
@@ -21,9 +21,9 @@ ExternalProject_Add(arma
 )
 
 # fmt library
-set(fmt_dir "@CMAKE_BINARY_DIR@/extern/fmt")
+set(fmt_dir "@CMAKE_CURRENT_BINARY_DIR@/fmt")
 ExternalProject_Add(fmt
-	URL 			           "@CMAKE_SOURCE_DIR@/extern/fmt-master.zip"
+	URL 			           "@CMAKE_CURRENT_SOURCE_DIR@/fmt-master.zip"
 	SOURCE_DIR                 "${fmt_dir}"
 	CONFIGURE_COMMAND          ""
 	BUILD_COMMAND 	           ""
@@ -34,9 +34,9 @@ ExternalProject_Add(fmt
 )
 
 # json library
-set(json_dir "@CMAKE_BINARY_DIR@/extern/json")
+set(json_dir "@CMAKE_CURRENT_BINARY_DIR@/json")
 ExternalProject_Add(json
-	URL                        "@CMAKE_SOURCE_DIR@/extern/json-develop.zip"
+	URL                        "@CMAKE_CURRENT_SOURCE_DIR@/json-develop.zip"
 	SOURCE_DIR                 "${json_dir}"
 	CONFIGURE_COMMAND          ""
 	BUILD_COMMAND              ""
@@ -48,9 +48,9 @@ ExternalProject_Add(json
 
 # mpl library
 if(@USE_MPI@)
-	set(mpl_dir "@CMAKE_BINARY_DIR@/extern/mpl")
+	set(mpl_dir "@CMAKE_CURRENT_BINARY_DIR@/mpl")
 	ExternalProject_Add(mpl
-		URL	                       "@CMAKE_SOURCE_DIR@/extern/mpl-master.zip"
+		URL	                       "@CMAKE_CURRENT_SOURCE_DIR@/mpl-master.zip"
     	SOURCE_DIR                 "${mpl_dir}"
 	    CONFIGURE_COMMAND          
 			${CMAKE_COMMAND} -S "${mpl_dir}" -B "${mpl_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${mpl_dir}/build
@@ -63,9 +63,9 @@ if(@USE_MPI@)
 	)
 endif()
 
-set(ankerl_dense_dir "@CMAKE_BINARY_DIR@/extern/unordered_dense")
+set(ankerl_dense_dir "@CMAKE_CURRENT_BINARY_DIR@/unordered_dense")
 ExternalProject_Add(ankerl_dense
-	URL						   "@CMAKE_SOURCE_DIR@/extern/unordered_dense-main.zip"
+	URL						   "@CMAKE_CURRENT_SOURCE_DIR@/unordered_dense-main.zip"
 	SOURCE_DIR				   "${ankerl_dense_dir}"
 	CONFIGURE_COMMAND
 		${CMAKE_COMMAND} -S "${ankerl_dense_dir}" -B "${ankerl_dense_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${ankerl_dense_dir}/build

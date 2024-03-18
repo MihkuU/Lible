@@ -21,7 +21,7 @@ list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_BINARY_DIR}/extern/arma/build/lib/")
 
 ### options
 option(BUILD_DAVIDSON "" ON)
-option(BUILD_GEOMOPT  "" ON)
+option(BUILD_GEOMOPT  "" OFF)
 option(BUILD_GCI      "" ON)
 option(BUILD_INTS     "" ON)
 option(BUILD_GPUINTS  "" OFF)
@@ -46,6 +46,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_library(lible SHARED)
 set_target_properties(lible PROPERTIES PREFIX "")
 
+message(${CMAKE_CURRENT_BINARY_DIR}) #TMP
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/extern")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
