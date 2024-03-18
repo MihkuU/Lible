@@ -14,9 +14,11 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY ${CMAKE_C
 
 target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/include)
 if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib")
-    target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib/libarmadillo.a)
+    target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib/libarmadillo.so)
+    #target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib/libarmadillo.a)
 elseif(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64")
-    target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64/libarmadillo.a)
+    target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64/libarmadillo.so)
+    #target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64/libarmadillo.a)
 endif()
 
 # fmt
