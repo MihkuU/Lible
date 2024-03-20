@@ -8,16 +8,8 @@ project(lible
 )
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
-   message(FATAL_ERROR "In-source builds are not allowed, specify another build directory")
+   message(FATAL_ERROR "In-source builds are not allowed, specify another build directory!")
 endif()
-
-### TMP
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_BINARY_DIR}/extern/arma/build/lib/") 
-# ...SOB that was hard. Tried by following: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
-# TODO: figure out a better organization for it in the future.
-### TMP
 
 ### options
 option(BUILD_DAVIDSON "" ON)
@@ -69,13 +61,15 @@ else()
 	set(lible_is_top_level FALSE)
 endif()
 
-##### TODO: put the installation details into an appropriate file, e.g. lible_installation.cmake
 if(lible_is_top_level)
 	set(lible_public_headers "src/util/lible/util.hpp")
 	list(APPEND lible_public_headers "src/util/lible/types.hpp")
-	list(APPEND lible_public_headers "src/util/lible/vec2d.hpp")
-	list(APPEND lible_public_headers "src/util/lible/vec3d.hpp")
-	list(APPEND lible_public_headers "src/util/lible/vec4d.hpp")
+	list(APPEND lible_public_headers "src/util/lible/vec2d.hpp") # TODO: put in one header file
+	list(APPEND lible_public_headers "src/util/lible/vec3d.hpp") # TODO: put in one header file 
+	list(APPEND lible_public_headers "src/util/lible/vec4d.hpp") # TODO: put in one header file
+
+	if(BUILD_DAVIDSON)
+	endif()
 
 	if(BUILD_GCI)
 		list(APPEND lible_public_headers "src/gugaci/lible/gci.hpp")
