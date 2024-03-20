@@ -3,7 +3,7 @@
 ** Prerequisites **
   - A C++17-capable compiler
   - A form of BLAS/LAPACK is probably required. IntelMKL is preferable, otherwise get OpenBLAS.
-
+[!NOTE]
 ** Installation **
   - Pull the repo as usual
   - Then run:
