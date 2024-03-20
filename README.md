@@ -4,6 +4,8 @@
   - A C++17-capable compiler
   - A form of BLAS/LAPACK is probably required. IntelMKL is preferable, otherwise get OpenBLAS.
 [!NOTE]
+Highlights information that users should take into account, even when skimming
+
 ** Installation **
   - Pull the repo as usual
   - Then run:
