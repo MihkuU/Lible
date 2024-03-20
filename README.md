@@ -24,6 +24,9 @@ For the find_package() to work, your CMake project configuration has to find Lib
   -DCMAKE_PREFIX_PATH=<Path to where you installed Lible in 'Installation'>
 ```
 
+> [!NOTE]
+> Highlights information that users should take into account, even when skimming.
+
 > [!IMPORTANT]
 > Crucial information necessary for users to succeed.
 
