@@ -23,3 +23,4 @@ For the find_package() to work, your CMake project configuration has to find Lib
 ```
   -DCMAKE_PREFIX_PATH=<Path to where you installed Lible in 'Installation'>
 ```
+[![please replace with alt text](https://img.shields.io/badge/anytext-youlike-blue)](https://example.org)
