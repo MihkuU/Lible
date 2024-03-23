@@ -4,11 +4,17 @@ project(lible
 	VERSION      0.0.0 
 	LANGUAGES    CXX
 	DESCRIPTION  "A C++ quantum chemistry library with various usable gadgets."
-	HOMEPAGE_URL "https://github.com/MihkuU/Lible"
-)
+	HOMEPAGE_URL "https://github.com/MihkuU/Lible")
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
    message(FATAL_ERROR "In-source builds are not allowed, specify another build directory!")
+endif()
+
+### Check whether it's the main project for later usage
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	set(lible_is_top_level TRUE)
+else()
+	set(lible_is_top_level FALSE)
 endif()
 
 ### options
@@ -17,6 +23,8 @@ option(BUILD_GEOMOPT  "" OFF)
 option(BUILD_GCI      "" ON)
 option(BUILD_INTS     "" ON)
 option(BUILD_GPUINTS  "" OFF)
+
+option(BUILD_LIBLE_DOCS "" OFF)
 
 option(USE_MPI "" OFF)
 
@@ -54,14 +62,15 @@ target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # miscellaneous # TODO: manage this
 add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
 
-### installation
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-	set(lible_is_top_level TRUE)
-else()
-	set(lible_is_top_level FALSE)
+### Documentation
+if(lible_is_top_level AND BUILD_LIBLE_DOCS)
+	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/docs")
 endif()
 
+### installation
 if(lible_is_top_level)
+
+	# TODO: put in a file and include for better organization?
 	set(lible_public_headers "src/util/lible/util.hpp")
 	list(APPEND lible_public_headers "src/util/lible/types.hpp")
 	list(APPEND lible_public_headers "src/util/lible/vec2d.hpp") # TODO: put in one header file
@@ -84,23 +93,20 @@ if(lible_is_top_level)
 	endif()
 
 	set_target_properties(lible PROPERTIES
-		PUBLIC_HEADER "${lible_public_headers}"
-	)
+		PUBLIC_HEADER "${lible_public_headers}")
 
 	include(GNUInstallDirs)
 	install(TARGETS lible
 		EXPORT libleTargets
 		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-		PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible
-	)
+		PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible)
 
 	install(EXPORT libleTargets
 		FILE libleTargets.cmake
 		NAMESPACE lible::
-		DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible
-	)
+		DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible)
 
 	install(FILES "src/libleConfig.cmake"
-		DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible
-	)
+		DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible)
 endif()
+

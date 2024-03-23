@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
+# TODO: build based on options
+
 file(GLOB util_sources "util/*.cpp")
 target_sources(lible PRIVATE ${util_sources})
 target_include_directories(lible PUBLIC
@@ -36,6 +38,3 @@ target_include_directories(lible PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ints>
 	$<INSTALL_INTERFACE:include>
 )
-
-#target_sources(le PRIVATE experimental/overlap_ints_gpu.cpp)
-#target_sources(le PRIVATE experimental/structure_gpu.cpp)
