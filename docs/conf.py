@@ -37,7 +37,8 @@ def configureDoxyfile(input_dir, output_dir):
 	filedata = filedata.replace('@doxygen_output_dir@', output_dir)
 
 	print("configureDoxyfile() called:")
-	print(os.listdir())
+	print("os.listdir(): ", os.listdir())
+	print("input_dir: ", input_dir,)
 
 	with open('Doxyfile', 'w') as file:
 		file.write(filedata)
