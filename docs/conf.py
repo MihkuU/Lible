@@ -30,7 +30,7 @@ html_theme = 'sphinx_rtd_theme'
 import subprocess, os
 
 def configureDoxyfile(input_dir, output_dir):
-	wite open('Doxyfile.in', 'r') as file:
+	with open('Doxyfile.in', 'r') as file:
 		filedata = file.read()
 
 	filedata = filedata.replace('@doxygen_input_dir@', input_dir)
