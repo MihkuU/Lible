@@ -47,7 +47,7 @@ breathe_projects = {}
 print(os.getcwd())
 
 if read_the_docs_build:
-	input_dir = '..Lible'
+	input_dir = '../Lible'
 	output_dir = 'build'
 	configureDoxyfile(input_dir, output_dir)
 	subprocess.call('doxygen', shell=True)
