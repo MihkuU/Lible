@@ -35,10 +35,37 @@ find_package(Sphinx REQUIRED)
 
 set(sphinx_source ${CMAKE_CURRENT_SOURCE_DIR})
 set(sphinx_build ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
+set(sphinx_index_file ${sphinx_build}/index.html)
 
+# Only regenerate Sphinx when:
+# - Doxygen has rerun
+# - Our doc files have been updated
+# - The Sphinx config has been updated
+add_custom_command(OUTPUT ${sphinx_index_file}
+	COMMAND
+		${SPHINX_EXECUTABLE} -b html
+		-Dbreathe_projects.Lible=${doxygen_output_dir}/xml
+		${sphinx_source} ${sphinx_build}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	DEPENDS
+		${CMAKE_CURRENT_SOURCE_DIR}/index.rst
+		${doxygen_index_file}
+	MAIN_DEPENDENCY   ${sphinx_source}/conf.py
+	COMMENT           "Generating documentation with Sphinx")
+
+add_custom_target(Sphinx ALL DEPENDS ${sphinx_index_file})
+
+# Add an install target to install the docs
+include(GNUInstallDirs)
+install(DIRECTORY ${SPHINX_BUILD}
+DESTINATION ${CMAKE_INSTALL_DOCDIR})
+
+#[=[
 add_custom_target(Sphinx ALL
-	COMMAND           ${SPHINX_EXECUTABLE} -b html
-	-Dbreathe_projects.Lible=${doxygen_output_dir}/xml # Tell Breathe where to find the Doxygen output
-	${sphinx_source} ${sphinx_build}
+	COMMAND           
+		${SPHINX_EXECUTABLE} -b html
+		-Dbreathe_projects.Lible=${doxygen_output_dir}/xml # Tell Breathe where to find the Doxygen output
+		${sphinx_source} ${sphinx_build}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT           "Generating docs with Sphinx")
+#]=]
