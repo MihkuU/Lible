@@ -36,10 +36,13 @@ def configureDoxyfile(input_dir, output_dir):
 	filedata = filedata.replace('@doxygen_input_dir@', input_dir)
 	filedata = filedata.replace('@doxygen_output_dir@', output_dir)
 
+	print("configureDoxyfile() called:")
+	print(os.listdir())
+
 	with open('Doxyfile', 'w') as file:
 		file.write(filedata)
 
-# Check if we\re running on 'Read the Docs' servers
+# Check if we're running on 'Read the Docs' servers
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 breathe_projects = {}
