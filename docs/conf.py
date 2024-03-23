@@ -59,4 +59,4 @@ if read_the_docs_build:
 	output_dir = 'build'
 	configureDoxyfile(input_dir, output_dir)
 	subprocess.call('doxygen', shell=True)
-	breathe_projects['../src/ints/lible/ints.hpp'] = output_dir + '/xml'
+	breathe_projects['Lible'] = output_dir + '/xml'
