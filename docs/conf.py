@@ -45,9 +45,10 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 breathe_projects = {}
 
 print(os.getcwd())
+print("sitavahe")
 
 if read_the_docs_build:
-	input_dir = '../src'
+	input_dir = '/src/ints/lible/ints.hpp'
 	output_dir = 'build'
 	configureDoxyfile(input_dir, output_dir)
 	subprocess.call('doxygen', shell=True)
