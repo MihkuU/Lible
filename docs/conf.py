@@ -47,7 +47,7 @@ breathe_projects = {}
 print(os.getcwd())
 
 if read_the_docs_build:
-	input_dir = '../docs'
+	input_dir = '../src'
 	output_dir = 'build'
 	configureDoxyfile(input_dir, output_dir)
 	subprocess.call('doxygen', shell=True)
