@@ -59,13 +59,3 @@ add_custom_target(Sphinx ALL DEPENDS ${sphinx_index_file})
 include(GNUInstallDirs)
 install(DIRECTORY ${SPHINX_BUILD}
 DESTINATION ${CMAKE_INSTALL_DOCDIR})
-
-#[=[
-add_custom_target(Sphinx ALL
-	COMMAND           
-		${SPHINX_EXECUTABLE} -b html
-		-Dbreathe_projects.Lible=${doxygen_output_dir}/xml # Tell Breathe where to find the Doxygen output
-		${sphinx_source} ${sphinx_build}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	COMMENT           "Generating docs with Sphinx")
-#]=]
