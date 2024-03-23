@@ -44,6 +44,8 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 breathe_projects = {}
 
+print(os.getcwd())
+
 if read_the_docs_build:
 	input_dir = '../Lible'
 	output_dir = 'build'
