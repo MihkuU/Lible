@@ -25,3 +25,28 @@ breathe_default_project = "Lible"
 
 html_theme = 'sphinx_rtd_theme'
 #html_static_path = ['_static']
+
+# -- Read the Docs Shenanigans -----------------------------------------------
+import subprocess, os
+
+def configureDoxyfile(input_dir, output_dir):
+	wite open('Doxyfile.in', 'r') as file:
+		filedata = file.read()
+
+	filedata = filedata.replace('@doxygen_input_dir@', input_dir)
+	filedata = filedata.replace('@doxygen_output_dir@', output_dir)
+
+	with open('Doxyfile', 'w') as file:
+		file.write(filedata)
+
+# Check if we\re running on 'Read the Docs' servers
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+breathe_projects = {}
+
+if read_the_docs_build:
+	input_dir = '../Lible'
+	output_dir = 'build'
+	configureDoxyFile(input_dir, output_dir)
+	subprocess.call('doxygen', shell=True)
+	breathe_projects['Lible'] = output_dir + '/xml'
