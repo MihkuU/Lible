@@ -27,6 +27,7 @@ enough here. Thus, the overall documentation is split into two parts:
 1. User guide
 2. Developer guide
 
+
 .. toctree::
    :hidden:
    :maxdepth: 2
