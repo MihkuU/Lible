@@ -18,7 +18,11 @@ extensions = ['breathe', 'sphinx_rtd_theme']
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-breathe_default_project = "Lible"
+#breathe_default_project = "Lible"
+
+source_suffic = '.rst'
+
+master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
