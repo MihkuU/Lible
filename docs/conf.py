@@ -48,12 +48,6 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 breathe_projects = {}
 
-print("sitavahe algus")
-print("os.getcwd():", os.getcwd())
-print("os.listdir():", os.listdir())
-print("os.listdir(..):", os.listdir(".."))
-print("sitavahe l6pp")
-
 if read_the_docs_build:
 	input_dir = '../src/ints/lible/ints.hpp'
 	output_dir = 'build'
