@@ -13,7 +13,7 @@ various concepts in quantum chemistry:
 * calculation of molecular integrals
 * geometry optimization
 * configuration interaction
-* etc...
+* etc.
 
 Therefore, Lible is designed in a modular manner, where each of these ideas is represented by
 a separate programming interface, or *namespace*, to be specific. 

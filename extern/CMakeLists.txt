@@ -33,6 +33,6 @@ find_package(unordered_dense CONFIG REQUIRED PATHS ${CMAKE_CURRENT_BINARY_DIR}/u
 target_link_libraries(lible PRIVATE unordered_dense::unordered_dense)
 
 # mpl
-if(USE_MPI)
+if(LIBLE_USE_MPI)
 	target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/mpl/build/include)
 endif()

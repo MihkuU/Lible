@@ -9,7 +9,6 @@ namespace lible
 		class Logger
 		{
 		public:
-
 			static void writeToLog(const std::string &message);
 
 			static bool getWriteLog()

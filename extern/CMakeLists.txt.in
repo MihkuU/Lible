@@ -47,7 +47,7 @@ ExternalProject_Add(json
 )
 
 # mpl library
-if(@USE_MPI@)
+if(@LIBLE_USE_MPI@)
 	set(mpl_dir "@CMAKE_CURRENT_BINARY_DIR@/mpl")
 	ExternalProject_Add(mpl
 		URL	                       "@CMAKE_CURRENT_SOURCE_DIR@/mpl-master.zip"

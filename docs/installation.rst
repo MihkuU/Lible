@@ -103,7 +103,22 @@ all you have to do is write::
 
 when configuring your project and CMake finds the configuration file from there.
 
-.. _My target:
-
 Compile options
 ---------------
+
+When setting up Lible, few additional Lible-specific options can be manipulated in order to customize
+the build of the library. Here is a table of those options:
+
+
++----------------+--------------------------------------+-----------------+
+|**Option**      |**Description**                       |**Default value**|
++----------------+--------------------------------------+-----------------+
+|LIBLE_BUILD_DOCS|Enables building sphinx-documentation |OFF              |
++----------------+--------------------------------------+-----------------+
+|LIBLE_USE_MPI   |Enables compiling with the MPI wrapper|OFF              |
++----------------+--------------------------------------+-----------------+
+
+These work like the conventional cmake ``-D``-options do. For example, to allow the use of MPI, you 
+can write in the configuration of the project::
+
+   cmake -S <your_lible_root_dir> . -B <your_build_dir> -DCMAKE_USE_MPI=ON

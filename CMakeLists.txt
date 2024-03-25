@@ -17,18 +17,19 @@ else()
 	set(lible_is_top_level FALSE)
 endif()
 
-### options
-option(BUILD_DAVIDSON "" ON)
-option(BUILD_GEOMOPT  "" OFF)
-option(BUILD_GCI      "" ON)
-option(BUILD_INTS     "" ON)
-option(BUILD_GPUINTS  "" OFF)
+### Options
 
-option(BUILD_LIBLE_DOCS "" OFF)
+option(LIBLE_BUILD_DOCS "Enables building sphinx-documentation" OFF)
+option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" OFF)
 
-option(USE_MPI "" OFF)
+### Modules
+option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" ON)
+option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" OFF)
+option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" ON)
+option(LIBLE_BUILD_INTS     "BUILD and install the molecular integrals module" ON)
+option(LIBLE_BUILD_GPUINTS  "BUILD and install the GPU molecular integrals module" OFF)
 
-if(USE_MPI)
+if(LIBLE_USE_MPI)
 	find_package(MPI REQUIRED)
 	set(CMAKE_CXX_COMPILER mpic++)
 	add_definitions(-D_USE_MPI_)
@@ -63,7 +64,7 @@ target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
 
 ### Documentation
-if(lible_is_top_level AND BUILD_LIBLE_DOCS)
+if(lible_is_top_level AND LIBLE_BUILD_DOCS)
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/docs")
 endif()
 
@@ -73,20 +74,20 @@ if(lible_is_top_level)
 	# TODO: put in a file and include for better organization?
 	set(lible_public_headers "src/util/lible/util.hpp")
 	list(APPEND lible_public_headers "src/util/lible/types.hpp")
-	list(APPEND lible_public_headers "src/util/lible/vec2d.hpp") # TODO: put in one header file
-	list(APPEND lible_public_headers "src/util/lible/vec3d.hpp") # TODO: put in one header file 
-	list(APPEND lible_public_headers "src/util/lible/vec4d.hpp") # TODO: put in one header file
+	list(APPEND lible_public_headers "src/util/lible/vec2d.hpp") 
+	list(APPEND lible_public_headers "src/util/lible/vec3d.hpp") 
+	list(APPEND lible_public_headers "src/util/lible/vec4d.hpp") 
 
-	if(BUILD_DAVIDSON)
+	if(LIBLE_BUILD_DAVIDSON)
 	endif()
 
-	if(BUILD_GCI)
+	if(LIBLE_BUILD_GCI)
 		list(APPEND lible_public_headers "src/gugaci/lible/gci.hpp")
 		list(APPEND lible_public_headers "src/gugaci/lible/gci_settings.hpp")
 		list(APPEND lible_public_headers "src/davidson/lible/davidson_settings.hpp")
 	endif()
 
-	if(BUILD_INTS)
+	if(LIBLE_BUILD_INTS)
 		list(APPEND lible_public_headers "src/ints/lible/ints.hpp")
 		list(APPEND lible_public_headers "src/ints/lible/shell.hpp")
 		list(APPEND lible_public_headers "src/ints/lible/structure.hpp")
