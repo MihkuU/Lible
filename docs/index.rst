@@ -6,9 +6,9 @@
 Lible overview
 ==============
 
-Lible is a modern C++ library that aims to enhance the development of quantum chemical methods. 
-Its primary goal is to provide thin-grained utilities in the form of functions and types that cover
-various concepts in quantum chemistry:
+`Lible <https://github.com/MihkuU/Lible/>`_ is a modern C++ library that aims to enhance the 
+development of quantum chemical methods. Its primary goal is to provide thin-grained utilities
+in the form of functions and types that cover various concepts in quantum chemistry:
 
 * calculation of molecular integrals
 * geometry optimization
@@ -19,10 +19,10 @@ Therefore, Lible is designed in a modular manner, where each of these ideas is r
 a separate programming interface, or *namespace*, to be specific. 
 
 Another goal is to make the esoteric knowledge of quantum chemists more accessible to the people,
-and especially especially newcomers, who are working in the this field. To achieve that, the 
-documentation of the project aims to be `tutorial-driven <https://coderefinery.github.io/documentation/summary/>`_ 
-as much as possible. A mere "Wham bam, thank you, Mam!" automatically generated doxygen C++ API is not 
-enough here. Thus, the overall documentation is split into two parts:
+and especially newcomers, who are working in this field. To achieve that, the documentation of the
+project aims to be `tutorial-driven <https://coderefinery.github.io/documentation/summary/>`_ 
+as much as possible. A bare "Wham bam, thank you, Mam!" automatically generated doxygen C++ API is 
+not enough here. Thus, the overall documentation is split into two parts:
 
 1. User guide
 2. Developer guide

@@ -26,9 +26,7 @@ namespace lible
              */
 
             void testFun();
-        };
-
-        typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
+        };        
 
         vec2d overlap(const Structure &structure);
 
@@ -37,6 +35,8 @@ namespace lible
         vec2d nuclearAttraction(const Structure &structure);
 
         vec2d dipoleMoment(const Structure &structure);
+
+        typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
 
         std::map<int, std::vector<shell_exps_coeffs_t>>
         returnBasisForAtom(const int atomic_nr, const std::string &basis_set);

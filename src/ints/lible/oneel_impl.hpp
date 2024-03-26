@@ -54,6 +54,7 @@ namespace lible
             {
                 auto start{std::chrono::steady_clock::now()};
 
+                // TODO: log instead of print, fcks sake
                 std::string msg = returnPreamble(opt);
                 palPrint(fmt::format("Lible::{:<40}", msg));
 
@@ -64,14 +65,6 @@ namespace lible
                 for (int la = l_max; la >= 0; la--)
                 {
                     auto shell_pair_data = ShellPairData(la, la, structure);
-
-                    // auto shells = structure.shells.at(la); //tmp
-                    // printf("la = %d\n", la);
-                    // for (auto shell : shells)
-                    //     for (auto &n : shell.normalization)
-                    //         printf("n = %16.12lf\n", n);
-                    //     // for (auto &d : shell.contraction_coeffs)
-                    //     //     printf("d = %16.12lf\n", d);
 
                     std::vector<std::vector<arma::dmat>> h_coeffs;
                     MD::calcHCoeffs(la, la, shell_pair_data, h_coeffs);

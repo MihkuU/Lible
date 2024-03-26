@@ -1,7 +1,17 @@
 .. _Set up:
 
 Set up
-============
+======
+
+If you're a user interested in directly incorporating Lible into your project, it is recommended 
+to follow the section on :ref:`FetchContent-label`.
+
+If you have an interest in playing around, or fiddling with the source code, it is advised to read 
+the steps in :ref:`Manual-installation-label`.
+
+In either case, it is appropriate to first review the :ref:`Prerequisites-label`.
+
+.. _Prerequisites-label:
 
 Prerequisites
 -------------
@@ -16,7 +26,9 @@ and LAPACK must be available to compile the library. Some possible BLAS/LAPACK i
 `CMake <https://cmake.org/>`_ with a version of 3.20 or newer. Optionally, if distributed memory 
 parallelization (i.e., across multiple nodes) is desired, a version of MPI must be installed and 
 accessible. An `OpenMPI <https://www.open-mpi.org/>`_ version since 3.0 is recommended. To toggle 
-the use of MPI, please refer to the **Compile options** section below.
+the use of MPI, please refer to the :ref:`Compile-options-label` section below.
+
+.. _FetchContent-label:
 
 CMake integration
 -----------------
@@ -43,14 +55,16 @@ project::
 This automatically downloads Lible and makes its sources part of your CMake project. When you build
 your project, Lible now gets built along with. No additional effort or installation is required, and
 you may proceed with using what the library offers. Note that a specific git tag for ``xxxxxx`` has 
-to be provided to choose a particular version of a commit from the repo. A tag typically looks like 
-this on the git webpage:
+to be provided in order to choose a particular version of a commit from the repo. A tag typically 
+looks like this on the git webpage:
 
 .. image:: git_tag.png
 
 .. note::
    This approach supports setting or disabiling options that enable certain features from the library,
-   such as using MPI. An example will be provided below.
+   such as using MPI. An example will be provided below in :ref:`Compile-options-label`.
+
+.. _Manual-installation-label:
 
 Manual installation
 -------------------
@@ -63,7 +77,7 @@ or clone the repo into your location of preference::
 
 In the next step, configure the project::
 
-   cmake -S <your_lible_root_dir> -B <your_build_dir>
+   cmake -S <lible_root_dir> -B <lible_build_dir>
 
 Here, various possible options can be given to CMake to yield the desired configuration. This will 
 be elaborated on more in the next section. For now, consider the two popular 
@@ -79,11 +93,11 @@ options. For achieving high performance, choosing ``-DCMAKE_BUILD_TYPE=Release``
 
 Next, build and install the library by running::
 
-   1. cmake --build <your_build_dir> -j <nprocs>
-   2. cmake --install <your_build_dir> --prefix "<your_install_dir>"
+   1. cmake --build <lible_build_dir> -j <nprocs>
+   2. cmake --install <lible_build_dir> --prefix "<lible_install_dir>"
 
 The second command puts the appropriate Lible files into the directories ``include/`` and ``lib/``,
-starting from ``"<your_install_dir>"`` (the installation prefix). After a successful installation, 
+starting from ``"<lible_install_dir>"`` (the installation prefix). After a successful installation, 
 Lible can be used by including the corresponding ``include/``-directory and linking against the 
 library file in ``lib/``. 
 
@@ -96,19 +110,20 @@ In the CMakeLists.txt file in your project, you can write::
 
 For this to work, cmake must find the Lible-configuration file, ``libleConfig.cmake``. For the sake 
 of completeness, it should be mentioned that this file gets typically placed in the directory 
-``<your_lible_install_dir>/lib/cmake/lible`` during installation. To include the Lible libraries, 
-all you have to do is write::
+``<lible_install_dir>/lib/cmake/lible`` during installation. To include the Lible libraries, all 
+you have to do is write::
 
    -DCMAKE_PREFIX_PATH=<your_lible_install_dir> 
 
-when configuring your project and CMake finds the configuration file from there.
+when configuring your project, and CMake finds the configuration file from there.
+
+.. _Compile-options-label:
 
 Compile options
 ---------------
 
 When setting up Lible, few additional Lible-specific options can be manipulated in order to customize
 the build of the library. Here is a table of those options:
-
 
 +----------------+--------------------------------------+-----------------+
 |**Option**      |**Description**                       |**Default value**|
@@ -118,7 +133,25 @@ the build of the library. Here is a table of those options:
 |LIBLE_USE_MPI   |Enables compiling with the MPI wrapper|OFF              |
 +----------------+--------------------------------------+-----------------+
 
-These work like the conventional cmake ``-D``-options do. For example, to allow the use of MPI, you 
-can write in the configuration of the project::
+These work like the conventional cmake ``-D`` option does in CMake. For example, to allow the use of
+MPI, you can write in the configuration of the project::
 
    cmake -S <your_lible_root_dir> . -B <your_build_dir> -DCMAKE_USE_MPI=ON
+
+These options can be enabled if Lible is incorporated via the FetchContent (:ref:`FetchContent-label`) 
+approach as well. To do that, give the corresponding variable (option) a `true` value in the 
+CMakeLists.txt file of your project, for example::
+
+   # Toggle the MPI-usage
+   set(LIBLE_USE_MPI ON)
+
+   # Declare the Lible dependencies to be fetched
+   FetchContent_Declare(lible
+       GIT_REPOSITORY https://github.com/MihkuU/Lible
+       GIT_TAG        xxxxxx)
+   
+   ...
+
+.. note::
+   The ``LIBLE_BUILD_DOCS`` flag cannot be used this way with FetchContent. It is assumed that building
+   the documents is of no interest to someone who wants to use the library as a dependency.
