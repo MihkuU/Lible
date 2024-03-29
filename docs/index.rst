@@ -22,10 +22,11 @@ Another goal is to make the esoteric knowledge of quantum chemists more accessib
 and especially newcomers, who are working in this field. To achieve that, the documentation of the
 project aims to be `tutorial-driven <https://coderefinery.github.io/documentation/summary/>`_ 
 as much as possible. A bare "Wham bam, thank you, Mam!" automatically generated doxygen C++ API is 
-not enough here. Thus, the overall documentation is split into two parts:
+not enough here. Thus, the overall documentation is split into three parts:
 
-1. User guide
-2. Developer guide
+1. Introduction. Gives a basic overview of setting up the library, its usage and the available features.
+2. User guide. Explains the theoretical background behind the modules and how to use them.
+3. Developer API. Provides the full documentation of the library utilities.
 
 .. toctree::
    :hidden:
@@ -41,13 +42,14 @@ not enough here. Thus, the overall documentation is split into two parts:
    :maxdepth: 2
    :caption: User guide
 
-   dox_test
+   molecular_integrals
 
 .. toctree::
    :hidden:
    :maxdepth: 2
-   :caption: Developer guide
+   :caption: Programming interface
 
+   utilities
 ..
    Docs
    ====

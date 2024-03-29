@@ -1,7 +1,12 @@
 #[=[ 
-	Based on the blogpost:
+	Based on:
 	1) https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
 	2) https://coderefinery.github.io/documentation/
+
+    Influential examples:
+	1) http://ceres-solver.org/index.html
+    2) https://rabauke.github.io/mpl/html/
+    3) https://xtb-docs.readthedocs.io/en/latest/
 #]=]
 
 # The main header corresponding to the lible-ints module
