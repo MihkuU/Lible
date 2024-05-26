@@ -19,11 +19,20 @@ namespace lible
          * cartesian gaussian functions.
          */
 
-        arma::dmat returnSphericalTrafo(const int &angmom);
+        arma::dmat returnSphericalTrafo(const int angmom);
 
-        void transferIntegrals(const size_t &ipair,
+        void sphericalTrafo(const arma::dmat &trafo_a, const arma::dmat &trafo_b,
+                            const arma::dmat &trafo_c, const arma::dmat &trafo_d,
+                            const vec4d &eri4_shells_cart, vec4d &eri4_shells_sph);
+
+        void transferIntegrals(const size_t ipair,
                                const ShellPairData &shell_pair_data,
                                const arma::dmat &ints_sph,
-                               vec2d &ints_out);
+                               vec2d &ints);
+
+        void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
+                               const ShellPairData &shell_pair_data_ab,
+                               const ShellPairData &shell_pair_data_cd,
+                               const vec4d &eri4_shells_sph, vec4d &eri4);
     }
 }

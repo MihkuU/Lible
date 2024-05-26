@@ -21,8 +21,7 @@ namespace lible
             data.resize(dim * dim * dim, val);
         }
 
-        Vec3D(const size_t &dim1, const size_t &dim2, const size_t &dim3,
-              const T &val)
+        Vec3D(const size_t &dim1, const size_t &dim2, const size_t &dim3, const T &val)
         {
             dims = {dim1, dim2, dim3};
             data.resize(dim1 * dim2 * dim3, val);

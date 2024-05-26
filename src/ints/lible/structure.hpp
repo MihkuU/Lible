@@ -24,25 +24,36 @@ namespace lible
                       const std::vector<std::string> &elements,
                       const std::vector<double> &coordinates_angstroem);
 
-            int max_angular_momentum;
-            std::size_t n_atomic_orbitals;
-            std::map<int, std::vector<Shell>> shells;
+            int getMaxL() const;
+
+            int getZ(const size_t iatom) const;
+
+            size_t getDimAO() const;
+
+            size_t getNAtoms() const;
+
+            std::array<double, 3> getCoordsAtom(const size_t iatom) const;
+
+            std::vector<Shell> getShellsL(const int l) const;
+
+            std::map<int, std::vector<Shell>> getShells() const;
 
         private:
             // TODO: in the future, different atoms must have the capability to have different basis.
-            std::size_t n_atoms;
+            int max_l;
+            size_t dim_ao;
+            size_t n_atoms;
             std::string basis_set;
-            std::vector<double> coordinates;
+            std::vector<double> coordinates;            
             std::vector<int> atomic_nrs;
+            std::vector<std::array<double, 3>> coordinates_xyz;
             std::vector<std::string> elements;
+            std::map<int, std::vector<Shell>> shells;
 
-            void constructShells(int &max_angular_momentum,
-                                 size_t &n_atomic_orbitals,
+            void constructShells(int &max_l, size_t &dim_ao,
                                  std::map<int, std::vector<Shell>> &shells);
 
-            void readBasis(const std::string &basis_set,
-                           int &max_angular_momentum,
-                           size_t &n_atomic_orbitals,
+            void readBasis(const std::string &basis_set, int &max_l, size_t &dim_ao,
                            std::map<int, std::vector<Shell>> &shells);
         };
     }

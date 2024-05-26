@@ -1,4 +1,5 @@
 #include <lible/structure.hpp>
+#include <lible/basis_sets.hpp>
 #include <lible/ints.hpp>
 #include <lible/ints_defs.hpp>
 #include <lible/ints_util.hpp>
@@ -26,13 +27,18 @@ LI::Structure::Structure(const string &basis_set,
     n_atoms = atomic_nrs.size();
 
     elements.resize(n_atoms);
-    for (size_t iatom = 0; iatom < atomic_nrs.size(); iatom)
+    for (size_t iatom = 0; iatom < n_atoms; iatom)
         elements[iatom] = atomic_symbols.at(atomic_nrs[iatom]);
 
     for (size_t i = 0; i < coordinates.size(); i++)
         coordinates[i] *= _ang_to_bohr_;
 
-    readBasis(basis_set, this->max_angular_momentum, this->n_atomic_orbitals, this->shells);
+    coordinates_xyz.resize(n_atoms);
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
+        coordinates_xyz[iatom] = {coordinates[3 * iatom], coordinates[3 * iatom + 1],
+                                  coordinates[3 * iatom + 2]};
+
+    readBasis(basis_set, this->max_l, this->dim_ao, this->shells);
 }
 
 LI::Structure::Structure(const string &basis_set,
@@ -59,11 +65,50 @@ LI::Structure::Structure(const string &basis_set,
     for (size_t i = 0; i < coordinates.size(); i++)
         coordinates[i] *= _ang_to_bohr_;
 
-    readBasis(basis_set, this->max_angular_momentum, this->n_atomic_orbitals, this->shells);
+    coordinates_xyz.resize(n_atoms);
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
+        coordinates_xyz[iatom] = {coordinates[3 * iatom], coordinates[3 * iatom + 1],
+                                  coordinates[3 * iatom + 2]};        
+
+    readBasis(basis_set, this->max_l, this->dim_ao, this->shells);
 }
 
-void LI::Structure::constructShells(int &max_angular_momentum,
-                                    size_t &n_atomic_orbitals,
+int LI::Structure::getMaxL() const 
+{
+    return max_l;
+}
+
+int LI::Structure::getZ(const size_t iatom) const
+{
+    return atomic_nrs[iatom];
+}
+
+size_t LI::Structure::getDimAO() const
+{
+    return dim_ao;
+}
+
+size_t LI::Structure::getNAtoms() const
+{
+    return n_atoms;
+}
+
+array<double, 3> LI::Structure::getCoordsAtom(const size_t iatom) const 
+{
+    return coordinates_xyz[iatom];
+}
+
+vector<LI::Shell> LI::Structure::getShellsL(const int l) const 
+{
+    return shells.at(l);
+}
+
+map<int, vector<LI::Shell>> LI::Structure::getShells() const 
+{
+    return shells;
+}
+
+void LI::Structure::constructShells(int &max_l, size_t &dim_ao,
                                     map<int, vector<Shell>> &shells)
 {
     set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
@@ -97,7 +142,7 @@ void LI::Structure::constructShells(int &max_angular_momentum,
                 for (size_t i = 0; i < exps.size(); i++)
                     coeffs[i] *= calcPurePrimitiveNorm(angmom, exps[i]);
 
-                vector<double> norms = calcShellNormalization(angmom, coeffs, exps);
+                vector<double> norms = calcShellNorms(angmom, coeffs, exps);
 
                 Shell shell(angmom, atomic_nr,
                             dim_cart, dim_sphe,
@@ -112,16 +157,14 @@ void LI::Structure::constructShells(int &max_angular_momentum,
         }
     }
 
-    n_atomic_orbitals = pos;
-    max_angular_momentum = max_angmom;
+    dim_ao = pos;
+    max_l = max_angmom;
 }
 
-void LI::Structure::readBasis(const string &basis_set,
-                              int &max_angular_momentum,
-                              size_t &n_atomic_orbitals,
+void LI::Structure::readBasis(const string &basis_set, int &max_l, size_t &dim_ao,
                               map<int, vector<Shell>> &shells)
 {
     string basis_path = returnBasisPath(basis_set);
 
-    constructShells(max_angular_momentum, n_atomic_orbitals, shells);
+    constructShells(max_l, dim_ao, shells);
 }

@@ -33,8 +33,10 @@ endif()
 if(LIBLE_BUILD_INTS)
 	file(GLOB ints_sources "ints/*.cpp")
 	file(GLOB ints_1el_sources "ints/one_el_ints/*.cpp")
+	file(GLOB ints_2el_sources "ints/two_el_ints/*.cpp")
 	target_sources(lible PRIVATE ${ints_sources})
 	target_sources(lible PRIVATE ${ints_1el_sources})
+	target_sources(lible PRIVATE ${ints_2el_sources})
 	target_include_directories(lible PUBLIC 
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ints>
 		$<INSTALL_INTERFACE:include>)

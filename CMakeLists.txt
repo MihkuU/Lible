@@ -61,7 +61,8 @@ find_package(LAPACK REQUIRED)
 target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 # miscellaneous # TODO: manage this
-add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
+#add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis_sets")
+add_definitions(-DBASIS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/ints/basis")
 
 ### Documentation
 if(lible_is_top_level AND LIBLE_BUILD_DOCS)

@@ -10,16 +10,34 @@ namespace lible
 {
     namespace ints
     {
-        double calcPurePrimitiveNorm(int l, double exp);
+        /**
+         *
+         */
+        double calcPurePrimitiveNorm(const int l, const double exp);
 
-        double doubleFactorial(int n);
+        /**
+         *
+         */
+        double doubleFactorial(const int n);
 
-        int dimCartesians(int l);
+        /**
+         *
+         */
+        int dimCartesians(const int l);
 
-        int dimSphericals(int l);
+        /**
+         *
+         */
+        int dimSphericals(const int l);
 
-        std::vector<std::array<int, 3>> returnCartesianExps(int l);
+        /**
+         *
+         */
+        std::vector<std::array<int, 3>> returnCartesianExps(const int l);
 
-        std::string returnBasisPath(const std::string &basis_set);
+        /**
+         *
+         */
+        std::vector<std::pair<int, int>> returnLPairs(const int l_max);
     }
 }

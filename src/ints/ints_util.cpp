@@ -2,7 +2,7 @@
 
 namespace LI = lible::ints;
 
-double LI::calcPurePrimitiveNorm(int l, double exp)
+double LI::calcPurePrimitiveNorm(const int l, const double exp)
 {
     double partial_norm = std::sqrt(std::pow(2 * exp / M_PI, 1.5) *
                                     std::pow(4 * exp, l) /
@@ -11,7 +11,7 @@ double LI::calcPurePrimitiveNorm(int l, double exp)
     return partial_norm;
 }
 
-double LI::doubleFactorial(int n)
+double LI::doubleFactorial(const int n)
 {
     /*
      * Definition from DOI:10.1002/9781119019572 in eq. (6.5.10) without the odd negative values.
@@ -34,17 +34,17 @@ double LI::doubleFactorial(int n)
     return double_factorial;
 }
 
-int LI::dimCartesians(int l)
+int LI::dimCartesians(const int l)
 {
     return (l + 1) * (l + 2) / 2;
 }
 
-int LI::dimSphericals(int l)
+int LI::dimSphericals(const int l)
 {
     return 2 * l + 1;
 }
 
-std::vector<std::array<int, 3>> LI::returnCartesianExps(int l)
+std::vector<std::array<int, 3>> LI::returnCartesianExps(const int l)
 {
     std::size_t dim_cart = dimCartesians(l);
 
@@ -58,4 +58,16 @@ std::vector<std::array<int, 3>> LI::returnCartesianExps(int l)
         }
 
     return cartesian_exps;
+}
+
+std::vector<std::pair<int, int>> LI::returnLPairs(const int l_max)
+{
+    int n_pairs = (l_max + 1) * (l_max + 2) / 2;
+    std::vector<std::pair<int, int>> l_pairs(n_pairs);
+
+    for (int la = l_max, idx = n_pairs - 1; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--, idx--)
+            l_pairs[idx] = std::make_pair(la, lb);
+
+    return l_pairs;
 }

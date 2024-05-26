@@ -8,15 +8,14 @@ namespace LIMD = lible::ints::MD;
 
 using std::array, std::size_t, std::vector;
 
-vector<double> LI::calcShellNormalization(const int &angmom,
-                                          const vector<double> &coeffs,
-                                          const vector<double> &exps)
+vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
+                                  const vector<double> &exps)
 {
-    int dim_cart = dimCartesians(angmom);
-    int dim_sph = dimSphericals(angmom);
+    int dim_cart = dimCartesians(l);
+    int dim_sph = dimSphericals(l);
 
     vector<arma::dmat> h_coeffs;
-    LIMD::calcHCoeffs(angmom, exps, h_coeffs);
+    LIMD::calcECoeffs(l, exps, h_coeffs);
 
     arma::dmat ints_contracted(dim_cart, dim_cart, arma::fill::zeros);
 
@@ -43,7 +42,7 @@ vector<double> LI::calcShellNormalization(const int &angmom,
             iab++;
         }
 
-    arma::dmat sph_trafo1 = returnSphericalTrafo(angmom);
+    arma::dmat sph_trafo1 = returnSphericalTrafo(l);
     arma::dmat sph_trafo2 = sph_trafo1.t();
     arma::dmat ints_sph = sph_trafo1 * ints_contracted * sph_trafo2;
 
