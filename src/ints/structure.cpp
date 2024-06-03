@@ -27,7 +27,7 @@ LI::Structure::Structure(const string &basis_set,
     n_atoms = atomic_nrs.size();
 
     elements.resize(n_atoms);
-    for (size_t iatom = 0; iatom < n_atoms; iatom)
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
         elements[iatom] = atomic_symbols.at(atomic_nrs[iatom]);
 
     for (size_t i = 0; i < coordinates.size(); i++)
@@ -55,7 +55,7 @@ LI::Structure::Structure(const string &basis_set,
         std::transform(atomic_symbol.begin(), atomic_symbol.end(), atomic_symbol.begin(),
                        [](unsigned char c)
                        { return std::tolower(c); });
-                       
+
         atomic_symbol[0] = std::toupper(atomic_symbol[0]);
         this->elements[iatom] = atomic_symbol;
 
@@ -68,12 +68,12 @@ LI::Structure::Structure(const string &basis_set,
     coordinates_xyz.resize(n_atoms);
     for (size_t iatom = 0; iatom < n_atoms; iatom++)
         coordinates_xyz[iatom] = {coordinates[3 * iatom], coordinates[3 * iatom + 1],
-                                  coordinates[3 * iatom + 2]};        
+                                  coordinates[3 * iatom + 2]};
 
     readBasis(basis_set, this->max_l, this->dim_ao, this->shells);
 }
 
-int LI::Structure::getMaxL() const 
+int LI::Structure::getMaxL() const
 {
     return max_l;
 }
@@ -93,17 +93,17 @@ size_t LI::Structure::getNAtoms() const
     return n_atoms;
 }
 
-array<double, 3> LI::Structure::getCoordsAtom(const size_t iatom) const 
+array<double, 3> LI::Structure::getCoordsAtom(const size_t iatom) const
 {
     return coordinates_xyz[iatom];
 }
 
-vector<LI::Shell> LI::Structure::getShellsL(const int l) const 
+vector<LI::Shell> LI::Structure::getShellsL(const int l) const
 {
     return shells.at(l);
 }
 
-map<int, vector<LI::Shell>> LI::Structure::getShells() const 
+map<int, vector<LI::Shell>> LI::Structure::getShells() const
 {
     return shells;
 }

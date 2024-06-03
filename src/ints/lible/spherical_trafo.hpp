@@ -27,12 +27,16 @@ namespace lible
 
         void transferIntegrals(const size_t ipair,
                                const ShellPairData &shell_pair_data,
-                               const arma::dmat &ints_sph,
-                               vec2d &ints);
+                               const arma::dmat &ints_sph, vec2d &ints);
 
         void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
                                const ShellPairData &shell_pair_data_ab,
                                const ShellPairData &shell_pair_data_cd,
                                const vec4d &eri4_shells_sph, vec4d &eri4);
+
+        void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
+                               const ShellPairData &shell_pair_data_ab,
+                               const ShellPairData &shell_pair_data_cd,
+                               const arma::dmat &eri4_shells_sph, vec4d &eri4);
     }
 }

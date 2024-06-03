@@ -55,28 +55,28 @@ LG::GCI LG::runFromCSFsFile(const int &n_orbs, const int &n_els,
     return GCI(std::move(impl));
 }
 
-vec2d LG::calc1RDM(const GCI &gci, const size_t &iroot, const size_t &jroot)
-{
-}
+// vec2d LG::calc1RDM(const GCI &gci, const size_t &iroot, const size_t &jroot)
+// {
+// }
 
-vec2d LG::calc1SRDM(const GCI &gci, const size_t &iroot)
-{
-}
+// vec2d LG::calc1SRDM(const GCI &gci, const size_t &iroot)
+// {
+// }
 
-vec4d LG::calc2RDM(const GCI &gci, const size_t &iroot, const size_t &jroot)
-{
-}
+// vec4d LG::calc2RDM(const GCI &gci, const size_t &iroot, const size_t &jroot)
+// {
+// }
 
-std::pair<vec2d, vec4d>
-LG::calc12RDMs(const GCI &gci, const size_t &iroot, const size_t &jroot)
-{
-}
+// std::pair<vec2d, vec4d>
+// LG::calc12RDMs(const GCI &gci, const size_t &iroot, const size_t &jroot)
+// {
+// }
 
-std::vector<double> LG::calcSigma(const GCI &gci)
-{
-}
+// std::vector<double> LG::calcSigma(const GCI &gci)
+// {
+// }
 
-std::vector<std::vector<std::tuple<std::string, std::string, double>>>
-LG::returnSignificantCSFs(const GCI &gci)
-{
-}
+// std::vector<std::vector<std::tuple<std::string, std::string, double>>>
+// LG::returnSignificantCSFs(const GCI &gci)
+// {
+// }

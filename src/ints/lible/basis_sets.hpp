@@ -9,7 +9,8 @@ namespace lible
     {
         enum class BasisFamily
         {
-            ahlrichs
+            ahlrichs,
+            sto
         };
 
         std::string returnBasisFamily(const std::string &basis_set);

@@ -1785,7 +1785,7 @@ void GU::mergeSFPairs(T &sf_pairs_in, T &sf_pairs_out)
     {
         auto key = item.first;
         if (sf_pairs_out.find(key) == sf_pairs_out.end())
-            sf_pairs_out.emplace(key, move(item.second));
+            sf_pairs_out.emplace(key, std::move(item.second));
         else
         {
             sf_pairs_out[key].first.merge(sf_pairs_in[key].first);
@@ -1804,7 +1804,7 @@ void GU::mergeConnections(const T &connections_in, T &connections_out)
         auto key = item.first;
         // TODO: Take the reference of a map here
         if (connections_out.find(key) == connections_out.end())
-            connections_out.emplace(key, move(item.second));
+            connections_out.emplace(key, std::move(item.second));
         else
             connections_out[key].insert(connections_out[key].end(),
                                         make_move_iterator(item.second.begin()), make_move_iterator(item.second.end()));
@@ -1858,7 +1858,7 @@ void GU::mergeCCs(const T &ccs_in, T &ccs_out)
                 map_inner[key] = val;
             }            
 
-            ccs_out[key] = move(map_inner);
+            ccs_out[key] = std::move(map_inner);
             // ccs_out.emplace(key, move(map_inner));
         }
     }

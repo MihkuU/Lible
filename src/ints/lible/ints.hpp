@@ -63,6 +63,16 @@ namespace lible
          */
         vec4d eri4(const Structure &structure);
 
+        /**
+         *
+         */
+        vec4d eri4Shark(const Structure &structure);
+
+        /**
+         *
+         */
+        void eri4Benchmark(const Structure &structure);
+
         typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
 
         /**
@@ -82,12 +92,14 @@ namespace lible
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
         returnBasisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
 
+#ifdef _LIBLE_USE_HIP_
         namespace gpu
         {
             /**
              *
              */
-            vec2d overlap();
+            vec2d overlap(const Structure &structure);
         }
+#endif        
     }
 }

@@ -28,7 +28,13 @@ static unordered_map<string, LI::BasisFamily>
                    {"def2-tzvpd", LI::BasisFamily::ahlrichs},
                    {"def2-tzvppd", LI::BasisFamily::ahlrichs},
                    {"def2-tzvpp", LI::BasisFamily::ahlrichs},
-                   {"def2-tzvp", LI::BasisFamily::ahlrichs}};
+                   {"def2-tzvp", LI::BasisFamily::ahlrichs},
+                   {"sto-2g", LI::BasisFamily::sto},
+                   {"sto-3g", LI::BasisFamily::sto},
+                   {"sto-3g*", LI::BasisFamily::sto},
+                   {"sto-4g", LI::BasisFamily::sto},
+                   {"sto-5g", LI::BasisFamily::sto},
+                   {"sto-6g", LI::BasisFamily::sto}};
 
 set<string> LI::returnAvailableBasisSets()
 {
@@ -38,7 +44,6 @@ set<string> LI::returnAvailableBasisSets()
 
     return basis_sets;
 }
-
 
 string LI::returnBasisFamily(const string &basis_set)
 {
@@ -56,6 +61,8 @@ string LI::returnBasisFamily(const string &basis_set)
         {
         case BasisFamily::ahlrichs:
             return "ahlrichs";
+        case BasisFamily::sto:
+            return "sto";
         default:
             throw std::runtime_error("");
         }

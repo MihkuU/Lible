@@ -21,6 +21,10 @@ elseif(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64")
     target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64/libarmadillo.a)
 endif()
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_definitions(lible PRIVATE ARMA_NO_DEBUG)
+endif()
+
 # fmt
 target_compile_definitions(lible PRIVATE FMT_HEADER_ONLY)
 target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fmt/include)

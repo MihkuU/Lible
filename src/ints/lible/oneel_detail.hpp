@@ -69,7 +69,7 @@ namespace lible
                 vec2d ints(dim_ao, dim_ao, 0);
                 for (int la = l_max; la >= 0; la--)
                 {
-                    auto shell_pair_data = ShellPairData(la, la, structure);
+                    ShellPairData shell_pair_data = ShellPairData(la, la, structure);
 
                     kernel<opt>(la, la, shell_pair_data, ints);
                 }
@@ -77,7 +77,7 @@ namespace lible
                 for (int la = l_max; la >= 0; la--)
                     for (int lb = la - 1; lb >= 0; lb--)
                     {
-                        auto shell_pair_data = ShellPairData(la, lb, structure);
+                        ShellPairData shell_pair_data = ShellPairData(la, lb, structure);
 
                         kernel<opt>(la, lb, shell_pair_data, ints);
                     }

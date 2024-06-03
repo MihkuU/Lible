@@ -40,4 +40,8 @@ if(LIBLE_BUILD_INTS)
 	target_include_directories(lible PUBLIC 
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ints>
 		$<INSTALL_INTERFACE:include>)
+	if(LIBLE_BUILD_GPUINTS)
+		file(GLOB ints_gpu_sources "ints/experimental/*.cpp")
+		target_sources(lible PRIVATE ${ints_gpu_sources})
+	endif()
 endif()
