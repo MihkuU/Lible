@@ -17,7 +17,10 @@ namespace lible
             int la;
             int lb;
             size_t n_pairs;
+            size_t n_prim_pairs;
 
+            std::vector<size_t> offsets_ecoeffs;
+            std::vector<size_t> offsets_prims;
             std::vector<std::pair<size_t, size_t>> offsets;
             std::vector<std::pair<std::array<double, 3>, std::array<double, 3>>> coords;
             std::vector<std::pair<std::vector<double>, std::vector<double>>> ccoeffs;

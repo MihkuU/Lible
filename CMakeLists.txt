@@ -60,10 +60,16 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 target_link_libraries(lible PRIVATE ${OpenMP_CXX_LIBRARIES})
 
 # BLAS/LAPACK
-find_package(BLAS REQUIRED)
-find_package(LAPACK REQUIRED)
-
-target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+find_package(MKL)
+if (MKL_FOUND)
+	add_definitions(-D_LIBLE_USE_MKL_)
+    target_include_directories(lible PRIVATE ${MKL_ROOT}/include)
+    target_link_libraries(lible PRIVATE ${MKL_ROOT}/lib/intel64/libmkl_rt.so)
+else()
+	set(BLA_VENDOR OpenBLAS)
+	find_package(BLAS REQUIRED)
+	target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES})
+endif()
 
 # miscellaneous # TODO: manage this
 add_definitions(-DBASIS_DIR="${src_dir}/src/lible/ints/basis")

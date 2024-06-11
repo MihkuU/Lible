@@ -71,7 +71,22 @@ namespace lible
         /**
          *
          */
+        vec4d eri4SharkFlat(const Structure &structure);        
+
+        /**
+         *
+         */
         void eri4Benchmark(const Structure &structure);
+
+        /**
+         *
+         */
+        void eri4BenchmarkShark(const Structure &structure);
+
+        /**
+         *
+         */
+        void eri4BenchmarkSharkFlat(const Structure &structure);
 
         typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
 
