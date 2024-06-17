@@ -24,6 +24,7 @@ namespace lible
 
             void calcERI4BenchmarkSharkFlat(const Structure &structure);
 
+            // TODO: perhaps declare the functions in the x.cpp file.
             void kernelERI4(const int lab, const int lcd,
                             const size_t ipair_ab, const size_t ipair_cd,
                             const std::vector<std::vector<vec4d>> &ecoeffs_lalb,
@@ -54,7 +55,9 @@ namespace lible
                                      const std::vector<MD::IdxsTUV> &idxs_tuv_cd,
                                      const ShellPairData &shell_pair_data_ab,
                                      const ShellPairData &shell_pair_data_cd,
-                                     const BoysF &boys_f, std::vector<double> &eri4_shells_sph);
+                                     const BoysF &boys_f, std::vector<double> &eri4_shells_sph,
+                                     std::vector<double> &rints, std::vector<double> &fnx,
+                                     vec4d &rints_tmp);
         }
     }
 }

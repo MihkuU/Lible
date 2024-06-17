@@ -255,9 +255,9 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
     int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
     int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
     arma::dmat rints(dim_tuv_ab, dim_tuv_cd, arma::fill::zeros);
-
-    int dim_sph_ab = Exyz_ab[0].n_rows;
-    vector<arma::dmat> X(kc * kd, arma::zeros(dim_sph_ab, dim_tuv_cd));
+    
+    int dim_sph_cd = Exyz_cd[0].n_rows;    
+    vector<arma::dmat> X(ka * kb, arma::zeros(dim_tuv_ab, dim_sph_cd));
 
     for (size_t ia = 0, iab = 0; ia < ka; ia++)
         for (size_t ib = 0; ib < kb; ib++, iab++)
@@ -285,11 +285,12 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
                                   rints_tmp, rints);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));                    
-
-                    X[icd] += fac * Exyz_ab[iab] * rints;
+                    
+                    X[iab] += fac * rints * Exyz_cd[icd].t();
                 }
 
-    for (size_t ic = 0, icd = 0; ic < kc; ic++)
-        for (size_t id = 0; id < kd; id++, icd++)
-            eri4_shells_sph += X[icd] * Exyz_cd[icd].t();
+
+    for (size_t ia = 0, iab = 0; ia < ka; ia++)
+        for (size_t ib = 0; ib < kb; ib++, iab++)
+            eri4_shells_sph += Exyz_ab[iab] * X[iab];
 }

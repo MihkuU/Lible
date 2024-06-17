@@ -301,7 +301,8 @@ void LIMD::calcECoeffsSpherical(const int la, const int lb,
 
 void LIMD::calcECoeffsSpherical(const int la, const int lb,
                                 const ShellPairData &shell_pair_data,
-                                vector<double> &ecoeffs_out)
+                                vector<double> &ecoeffs_out,
+                                vector<double> &ecoeffs_t_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -317,6 +318,7 @@ void LIMD::calcECoeffsSpherical(const int la, const int lb,
     int dim_b_cart = dimCartesians(lb);
     int dim_a_sph = dimSphericals(la);
     int dim_b_sph = dimSphericals(lb);
+    int dim_ab = dim_a_sph * dim_b_sph;
 
     int lab = la + lb;
     int dim_tuv = (lab + 1) * (lab + 2) * (lab + 3) / 6;
@@ -377,12 +379,19 @@ void LIMD::calcECoeffsSpherical(const int la, const int lb,
                         for (int nu_ = 0; nu_ < dim_b_cart; nu_++)
                             for (int tuv = 0; tuv < dim_tuv; tuv++)
                             {
-                                int idx = offset_ecoeffs + munu * dim_tuv + tuv;
-                                ecoeffs_out[idx] += da * db *
-                                                   ecoeffs_ppair_sc(mu, nu_, tuv) *
-                                                   sph_trafo_b(nu, nu_);
+                                double ecoeff = da * db *
+                                                ecoeffs_ppair_sc(mu, nu_, tuv) *
+                                                sph_trafo_b(nu, nu_);
+
+                                int idx = offset_ecoeffs + munu * dim_tuv + tuv; // RM
+                                // int idx = offset_ecoeffs + tuv * dim_ab + munu; // CM
+                                ecoeffs_out[idx] += ecoeff;                                
+
+                                int idx_t = offset_ecoeffs + tuv * dim_ab + munu; // RM
+                                // int idx_t = offset_ecoeffs + munu * dim_tuv + tuv; // CM
+                                ecoeffs_t_out[idx_t] += ecoeff;                                
                             }
-                iprim++;                                
+                iprim++;
             }
     }
 }
@@ -443,9 +452,8 @@ void LIMD::calcRInts(const int la, const int lb, const double p, const arma::vec
 }
 
 void LIMD::calcRInts(const int la, const int lb, const double p,
-                     const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
-                     const std::vector<IdxsTUV> &tuv_idxs_a,
-                     const std::vector<IdxsTUV> &tuv_idxs_b,
+                     const arma::vec::fixed<3> &RPC, const vector<double> &fnx,
+                     const vector<IdxsTUV> &tuv_idxs_a, const vector<IdxsTUV> &tuv_idxs_b,
                      vec4d &rints_tmp, arma::dmat &rints_out)
 {
     rints_tmp.set(0);
@@ -512,8 +520,7 @@ void LIMD::calcRInts(const int la, const int lb, const double p,
 
 void LIMD::calcRInts(const int la, const int lb, const double p,
                      const arma::vec::fixed<3> &RPC, const vector<double> &fnx,
-                     const vector<IdxsTUV> &tuv_idxs_a,
-                     const vector<IdxsTUV> &tuv_idxs_b,
+                     const vector<IdxsTUV> &tuv_idxs_a, const vector<IdxsTUV> &tuv_idxs_b,
                      vec4d &rints_tmp, vector<double> &rints_out)
 {
     rints_tmp.set(0);    
@@ -575,6 +582,77 @@ void LIMD::calcRInts(const int la, const int lb, const double p,
                 sign = -1.0;
 
             rints_out[i * dim_tuv_b + j] = sign * rints_tmp(0, t + t_, u + u_, v + v_);
+        }
+    }
+}
+
+void LIMD::calcRInts(const int la, const int lb, const double p, const double fac,
+                     const arma::vec::fixed<3> &RPC, const vector<double> &fnx,
+                     const vector<IdxsTUV> &tuv_idxs_a, const vector<IdxsTUV> &tuv_idxs_b,
+                     vec4d &rints_tmp, vector<double> &rints_out)
+{
+    rints_tmp.set(0);    
+    std::fill(rints_out.begin(), rints_out.end(), 0);
+
+    rints_tmp(0, 0, 0, 0) = fnx[0];
+
+    int lab = la + lb;
+    double x = -2 * p;
+    double y = x;
+    for (int n = 1; n <= lab; n++)
+    {
+        rints_tmp(n, 0, 0, 0) = fnx[n] * y;
+        y *= x;
+    }
+
+    // This clever loop is taken from HUMMR:
+    for (int n = lab - 1; n >= 0; n--)
+    {
+        int n_ = lab - n;
+        for (int t = 0; t <= n_; t++)
+            for (int u = 0; u <= n_ - t; u++)
+                for (int v = 0; v <= n_ - t - u; v++)
+                {
+                    if (t > 0)
+                    {
+                        rints_tmp(n, t, u, v) = RPC(0) * rints_tmp(n + 1, t - 1, u, v);
+                        if (t > 1)
+                            rints_tmp(n, t, u, v) += (t - 1) * rints_tmp(n + 1, t - 2, u, v);
+                    }
+                    else
+                    {
+                        if (u > 0)
+                        {
+                            rints_tmp(n, t, u, v) = RPC(1) * rints_tmp(n + 1, t, u - 1, v);
+                            if (u > 1)
+                                rints_tmp(n, t, u, v) += (u - 1) * rints_tmp(n + 1, t, u - 2, v);
+                        }
+                        else if (v > 0)
+                        {
+                            rints_tmp(n, t, u, v) = RPC(2) * rints_tmp(n + 1, t, u, v - 1);
+                            if (v > 1)
+                                rints_tmp(n, t, u, v) += (v - 1) * rints_tmp(n + 1, t, u, v - 2);
+                        }
+                    }
+                }
+    }
+
+    int dim_tuv_b = (lb + 1) * (lb + 2) * (lb + 3) / 6;
+    // int dim_tuv_a = (la + 1) * (la + 2) * (la + 3) / 6; // CM
+    for (size_t j = 0; j < tuv_idxs_b.size(); j++)
+    {
+        auto [t_, u_, v_] = tuv_idxs_b[j];
+
+        double sign = 1.0;
+        if ((t_ + u_ + v_) % 2 != 0)
+            sign = -1.0;
+
+        for (size_t i = 0; i < tuv_idxs_a.size(); i++)
+        {
+            auto [t, u, v] = tuv_idxs_a[i];
+
+            rints_out[i * dim_tuv_b + j] = sign * fac * rints_tmp(0, t + t_, u + u_, v + v_); // RM
+            // rints_out[j * dim_tuv_a + i] = sign * fac * rints_tmp(0, t + t_, u + u_, v + v_); // CM
         }
     }
 }

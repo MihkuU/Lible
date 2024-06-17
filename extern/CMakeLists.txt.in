@@ -33,19 +33,6 @@ ExternalProject_Add(fmt
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 )
 
-# json library
-set(json_dir "@CMAKE_CURRENT_BINARY_DIR@/json")
-ExternalProject_Add(json
-	URL                        "@CMAKE_CURRENT_SOURCE_DIR@/json-develop.zip"
-	SOURCE_DIR                 "${json_dir}"
-	CONFIGURE_COMMAND          ""
-	BUILD_COMMAND              ""
-	INSTALL_COMMAND            ""
-	TEST_COMMAND               ""
-	BUILD_ALWAYS			   OFF
-	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
-)
-
 # mpl library
 if(@LIBLE_USE_MPI@)
 	set(mpl_dir "@CMAKE_CURRENT_BINARY_DIR@/mpl")

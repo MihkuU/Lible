@@ -72,7 +72,8 @@ namespace lible
              */
             void calcECoeffsSpherical(const int la, const int lb,
                                       const ShellPairData &shell_pair_data,
-                                      std::vector<double> &ecoeffs_out);
+                                      std::vector<double> &ecoeffs_out,
+                                      std::vector<double> &ecoeffs_t_out);
 
             /**
              *
@@ -98,6 +99,12 @@ namespace lible
                            const std::vector<IdxsTUV> &tuv_idxs_a,
                            const std::vector<IdxsTUV> &tuv_idxs_b,
                            vec4d &rints_tmp, std::vector<double> &rints_out);
+
+            void calcRInts(const int la, const int lb, const double p, const double fac,
+                           const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                           const std::vector<IdxsTUV> &tuv_idxs_a,
+                           const std::vector<IdxsTUV> &tuv_idxs_b,
+                           vec4d &rints_tmp, std::vector<double> &rints_out);                                       
 
             void coeffs(const double a, const double b, const double PA, const double PB,
                         const double one_o_2p, const int la, const int lb, vec3d &E);
