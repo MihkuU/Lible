@@ -2,6 +2,8 @@
 
 namespace LI = lible::ints;
 
+using std::vector;
+
 double LI::calcPurePrimitiveNorm(const int l, const double exp)
 {
     double partial_norm = std::sqrt(std::pow(2 * exp / M_PI, 1.5) *
@@ -70,4 +72,26 @@ std::vector<std::pair<int, int>> LI::returnLPairs(const int l_max)
             l_pairs[idx] = std::make_pair(la, lb);
 
     return l_pairs;
+}
+
+lible::vec3i LI::returnTUVPoss(const int l)
+{
+    vec3i tuv_poss(l + 1, l + 1, l + 1, -1);
+    for (int t = 0, tuv = 0; t <= l; t++)
+        for (int u = 0; u <= l - t; u++)
+            for (int v = 0; v <= l - t - u; v++, tuv++)
+                tuv_poss(t, u, v) = tuv;
+
+    return tuv_poss;
+}
+
+vector<LI::IdxsTUV> LI::returnIdxsTUV(const int l)
+{
+    vector<IdxsTUV> idxs_tuv((l + 1) * (l + 2) * (l + 3) / 6);
+    for (int t = 0, tuv = 0; t <= l; t++)
+        for (int u = 0; u <= l - t; u++)
+            for (int v = 0; v <= l - t - u; v++, tuv++)
+                idxs_tuv[tuv] = {t, u, v};
+
+    return idxs_tuv;
 }

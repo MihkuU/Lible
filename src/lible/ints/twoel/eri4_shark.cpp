@@ -74,8 +74,8 @@ lible::vec4d LIT::calcERI4Shark(const Structure &structure)
             size_t n_pairs_ab = shell_pair_data_ab.n_pairs;
             size_t n_pairs_cd = shell_pair_data_cd.n_pairs;
 
-            vector<MD::IdxsTUV> idxs_tuv_ab = MD::returnIdxsTUV(lab);
-            vector<MD::IdxsTUV> idxs_tuv_cd = MD::returnIdxsTUV(lcd);
+            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
+            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
 
             if (lalb == lcld)
                 for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
@@ -172,8 +172,8 @@ void LIT::calcERI4BenchmarkShark(const Structure &structure)
             size_t n_pairs_ab = shell_pair_data_ab.n_pairs;
             size_t n_pairs_cd = shell_pair_data_cd.n_pairs;
 
-            vector<MD::IdxsTUV> idxs_tuv_ab = MD::returnIdxsTUV(lab);
-            vector<MD::IdxsTUV> idxs_tuv_cd = MD::returnIdxsTUV(lcd);
+            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
+            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
 
             size_t n_shells_abcd = 0;
             if (lalb == lcld)
@@ -219,8 +219,8 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
                           const size_t ipair_ab, const size_t ipair_cd,
                           const vector<vector<arma::dmat>> &ecoeffs_lalb,
                           const vector<vector<arma::dmat>> &ecoeffs_lcld,
-                          const vector<MD::IdxsTUV> &idxs_tuv_ab,
-                          const vector<MD::IdxsTUV> &idxs_tuv_cd,
+                          const vector<IdxsTUV> &idxs_tuv_ab,
+                          const vector<IdxsTUV> &idxs_tuv_cd,
                           const ShellPairData &shell_pair_data_ab,
                           const ShellPairData &shell_pair_data_cd,
                           const BoysF &boys_f, arma::dmat &eri4_shells_sph)
@@ -249,8 +249,8 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
     vec4d rints_tmp(labcd + 1, 0);
     vec3d rints_3d_tmp(labcd + 1, 0);
 
-    vec3i tuv_poss_ab = MD::returnTUVPoss(lab);
-    vec3i tuv_poss_cd = MD::returnTUVPoss(lcd);
+    vec3i tuv_poss_ab = returnTUVPoss(lab);
+    vec3i tuv_poss_cd = returnTUVPoss(lcd);
     
     int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
     int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;

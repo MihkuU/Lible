@@ -20,6 +20,22 @@ namespace LIOG = lible::ints::one_gpu;
 
 using std::vector;
 
+__global__ void devKernelS00(const int n_shell_pairs, const double *ccoeffs, const double *exps,
+                             const double *coords, const double *norms, const int *dims,
+                             const int *offsets, const int *poss_cntrs, const int *poss_norms,
+                             double *sints_out)
+{
+
+    for (int ipair = 0; ipair < n_shell_pairs; ipair++)
+    {
+        int dim_a = dims[2 * ipair];
+        int dim_b = dims[2 * ipair + 1];
+
+        int pos_cntr_a = poss_cntrs[2 * ipair];
+        int pos_cntr_b = poss_cntrs[2 * ipair + 1];
+    }
+}
+
 lible::vec2d LIOG::calculateS_L0(const Structure &structure)
 {
     printf("LIOG::calculateS_L0\n");

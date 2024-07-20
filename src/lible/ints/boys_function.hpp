@@ -25,6 +25,7 @@ namespace lible
         private:
             int max_n;
 
+            double boys_f_threshold = 1e-16;
             double interval_size = 0.01;
             double large_x = 30;
 

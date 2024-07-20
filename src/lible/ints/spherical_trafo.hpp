@@ -9,8 +9,7 @@
 
 namespace lible
 {
-
-    typedef std::tuple<std::size_t, std::size_t, double> trafo_coeff_tuple; // TODO is this place appropriate??
+    // typedef std::tuple<std::size_t, std::size_t, double> trafo_coeff_tuple; // TODO is this place appropriate??
 
     namespace ints
     {
@@ -39,9 +38,20 @@ namespace lible
                                const ShellPairData &shell_pair_data_cd,
                                const arma::dmat &eri4_shells_sph, vec4d &eri4);
 
-        void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
-                               const ShellPairData &shell_pair_data_ab,
-                               const ShellPairData &shell_pair_data_cd,
-                               const std::vector<double> &eri4_shells_sph, vec4d &eri4);
+        /**
+         * Transfers the two-electron integrals for a shell quartet in a column-major ordering.
+         */
+        void transferIntegralsCM(const size_t ipair_ab, const size_t ipair_cd,
+                                 const ShellPairData &shell_pair_data_ab,
+                                 const ShellPairData &shell_pair_data_cd,
+                                 const std::vector<double> &eri4_shells_sph, vec4d &eri4);
+
+        /**
+         * Transfers the two-electron integrals for a shell quartet in a row-major ordering.
+         */
+        void transferIntegralsRM(const size_t ipair_ab, const size_t ipair_cd,
+                                 const ShellPairData &shell_pair_data_ab,
+                                 const ShellPairData &shell_pair_data_cd,
+                                 const std::vector<double> &eri4_shells_sph, vec4d &eri4);
     }
 }

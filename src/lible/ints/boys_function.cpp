@@ -2,10 +2,10 @@
 
 namespace LI = lible::ints;
 
-namespace lible::ints
-{
-    static double boys_f_threshold = 1e-16;
-}
+// namespace lible::ints
+// {
+//     static double boys_f_threshold = 1e-16;
+// }
 
 void LI::BoysF::preEvaluate(arma::dmat &fnx_grid)
 {

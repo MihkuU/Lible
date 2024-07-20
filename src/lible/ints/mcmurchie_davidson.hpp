@@ -1,7 +1,8 @@
 #pragma once
 
-#include <lible/ints/shell_pair_data.hpp>
 #include <lible/types.hpp>
+#include <lible/ints/shell_pair_data.hpp>
+#include <lible/ints/ints_util.hpp>
 
 #include <armadillo>
 
@@ -11,28 +12,6 @@ namespace lible
     {
         namespace MD
         {
-            /**
-             *
-             */
-            struct IdxsTUV
-            {
-                int t, u, v;
-            };
-
-            struct IdxsCart
-            {
-                int i, j, k;
-            };
-
-            /**
-             *
-             */
-            vec3i returnTUVPoss(const int l);
-
-            /**
-             *
-             */
-            std::vector<IdxsTUV> returnIdxsTUV(const int l);
 
             /**
              *
@@ -67,13 +46,17 @@ namespace lible
                                       const ShellPairData &shell_pair_data,
                                       std::vector<std::vector<arma::dmat>> &ecoeffs_out);
 
-            /**
-             *
-             */
-            void calcECoeffsSpherical(const int la, const int lb,
-                                      const ShellPairData &shell_pair_data,
-                                      std::vector<double> &ecoeffs_out,
-                                      std::vector<double> &ecoeffs_t_out);
+            /** Calculates the Hermite expansion coefficients in a column-major order. */
+            void calcECoeffsSphericalCM(const int la, const int lb,
+                                        const ShellPairData &shell_pair_data,
+                                        std::vector<double> &ecoeffs_out,
+                                        std::vector<double> &ecoeffs_tsp_out);
+
+            /** Calculates the Hermite expansion coefficients ina row-major order. */
+            void calcECoeffsSphericalRM(const int la, const int lb,
+                                        const ShellPairData &shell_pair_data,
+                                        std::vector<double> &ecoeffs_out,
+                                        std::vector<double> &ecoeffs_tsp_out);
 
             /**
              *
@@ -100,11 +83,19 @@ namespace lible
                            const std::vector<IdxsTUV> &tuv_idxs_b,
                            vec4d &rints_tmp, std::vector<double> &rints_out);
 
-            void calcRInts(const int la, const int lb, const double p, const double fac,
-                           const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
-                           const std::vector<IdxsTUV> &tuv_idxs_a,
-                           const std::vector<IdxsTUV> &tuv_idxs_b,
-                           vec4d &rints_tmp, std::vector<double> &rints_out);                                       
+            /** Calculates the Hermite Coulomb integrals in a column-major order. */
+            void calcRIntsCM(const int la, const int lb, const double p, const double fac,
+                             const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                             const std::vector<IdxsTUV> &tuv_idxs_a,
+                             const std::vector<IdxsTUV> &tuv_idxs_b,
+                             vec4d &rints_tmp, std::vector<double> &rints_out);
+
+            /** Calculates the Hermite Coulomb integrals in a row-major order. */
+            void calcRIntsRM(const int la, const int lb, const double p, const double fac,
+                             const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                             const std::vector<IdxsTUV> &tuv_idxs_a,
+                             const std::vector<IdxsTUV> &tuv_idxs_b,
+                             vec4d &rints_tmp, std::vector<double> &rints_out);
 
             void coeffs(const double a, const double b, const double PA, const double PB,
                         const double one_o_2p, const int la, const int lb, vec3d &E);
@@ -112,15 +103,6 @@ namespace lible
             void coeffs(const double a, const double b, const int la, const int lb,
                         const std::array<double, 3> &A, const std::array<double, 3> &B,
                         const std::array<double, 3> &Kab, vec3d &Ex, vec3d &Ey, vec3d &Ez);
-
-            // void coeffs(const double one_o_2p, const int la, const int lb,
-            //             const arma::vec::fixed<3> &A, const arma::vec::fixed<3> &B,
-            //             const std::array<double, 3> &Kab,
-            //             vec4d &E);
-
-            void coeffsSpherical(); // TODO: future
-
-            void test(); // TODO: remove
         }
     }
 }

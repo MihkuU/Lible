@@ -12,11 +12,17 @@ namespace lible
     {
         namespace two
         {
+            vec2d calcERI2(const Structure &structure);
+
+            vec3d calcERI3(const Structure &structure);
+
             vec4d calcERI4(const Structure &structure);
+
+            // TODO: fix the names of the following functions once everything has matured enough
 
             vec4d calcERI4Shark(const Structure &structure);
 
-            vec4d calcERI4SharkFlat(const Structure &structure);
+            vec4d calcERI4SharkFlat(const Structure &structure);            
 
             void calcERI4Benchmark(const Structure &structure);
 
@@ -41,23 +47,23 @@ namespace lible
                                  const size_t ipair_ab, const size_t ipair_cd,
                                  const std::vector<std::vector<arma::dmat>> &ecoeffs_lalb,
                                  const std::vector<std::vector<arma::dmat>> &ecoeffs_lcld,
-                                 const std::vector<MD::IdxsTUV> &idxs_tuv_ab,
-                                 const std::vector<MD::IdxsTUV> &idxs_tuv_cd,
+                                 const std::vector<IdxsTUV> &idxs_tuv_ab,
+                                 const std::vector<IdxsTUV> &idxs_tuv_cd,
                                  const ShellPairData &shell_pair_data_ab,
                                  const ShellPairData &shell_pair_data_cd,
                                  const BoysF &boys_f, arma::dmat &eri4_shells_sph);
 
-            void kernelERI4SharkFlat(const int lab, const int lcd,
-                                     const size_t ipair_ab, const size_t ipair_cd,
-                                     const std::vector<double> &ecoeffs_lalb,
-                                     const std::vector<double> &ecoeffs_lcld,
-                                     const std::vector<MD::IdxsTUV> &idxs_tuv_ab,
-                                     const std::vector<MD::IdxsTUV> &idxs_tuv_cd,
-                                     const ShellPairData &shell_pair_data_ab,
-                                     const ShellPairData &shell_pair_data_cd,
-                                     const BoysF &boys_f, std::vector<double> &eri4_shells_sph,
-                                     std::vector<double> &rints, std::vector<double> &fnx,
-                                     vec4d &rints_tmp);
+            // void kernelERI4SharkFlat(const int lab, const int lcd,
+            //                          const size_t ipair_ab, const size_t ipair_cd,
+            //                          const std::vector<double> &ecoeffs_lalb,
+            //                          const std::vector<double> &ecoeffs_lcld,
+            //                          const std::vector<MD::IdxsTUV> &idxs_tuv_ab,
+            //                          const std::vector<MD::IdxsTUV> &idxs_tuv_cd,
+            //                          const ShellPairData &shell_pair_data_ab,
+            //                          const ShellPairData &shell_pair_data_cd,
+            //                          const BoysF &boys_f, std::vector<double> &eri4_shells_sph,
+            //                          std::vector<double> &rints, std::vector<double> &fnx,
+            //                          vec4d &rints_tmp);
         }
     }
 }

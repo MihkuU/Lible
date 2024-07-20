@@ -6,10 +6,28 @@
 #include <stdexcept>
 #include <vector>
 
+#include <lible/types.hpp>
+
 namespace lible
 {
     namespace ints
     {
+        /**
+         *
+         */
+        struct IdxsTUV
+        {
+            int t, u, v;
+        };
+
+        /**
+         *
+         */
+        struct IdxsCart
+        {
+            int i, j, k;
+        };
+
         /**
          *
          */
@@ -39,5 +57,15 @@ namespace lible
          *
          */
         std::vector<std::pair<int, int>> returnLPairs(const int l_max);
+
+        /**
+         *
+         */
+        vec3i returnTUVPoss(const int l);
+
+        /**
+         *
+         */
+        std::vector<IdxsTUV> returnIdxsTUV(const int l);
     }
 }

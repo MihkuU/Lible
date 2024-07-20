@@ -7,6 +7,8 @@
 
 namespace LI = lible::ints;
 
+using std::vector;
+
 arma::dmat LI::returnSphericalTrafo(const int angmom)
 {
     int dim_cart = dimCartesians(angmom);
@@ -368,10 +370,53 @@ void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
                 }
 }
 
-void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
-                           const ShellPairData &shell_pair_data_ab,
-                           const ShellPairData &shell_pair_data_cd,
-                           const std::vector<double> &eri4_shells_sph, vec4d &eri4)
+void LI::transferIntegralsCM(const size_t ipair_ab, const size_t ipair_cd,
+                             const ShellPairData &shell_pair_data_ab,
+                             const ShellPairData &shell_pair_data_cd,
+                             const vector<double> &eri4_shells_sph, vec4d &eri4)
+{
+    auto [pos_a, pos_b] = shell_pair_data_ab.offsets[ipair_ab];
+    auto [pos_c, pos_d] = shell_pair_data_cd.offsets[ipair_cd];
+
+    const auto &[norms_a, norms_b] = shell_pair_data_ab.norms[ipair_ab];
+    const auto &[norms_c, norms_d] = shell_pair_data_cd.norms[ipair_cd];
+
+    size_t dim_a = norms_a.size();
+    size_t dim_b = norms_b.size();    
+    size_t dim_c = norms_c.size();
+    size_t dim_d = norms_d.size();
+    size_t dim_ab = dim_a * dim_b;
+
+    for (size_t mu = 0, munu = 0; mu < dim_a; mu++)
+        for (size_t nu = 0; nu < dim_b; nu++, munu++)
+            for (size_t ka = 0, kata = 0; ka < dim_c; ka++)
+                for (size_t ta = 0; ta < dim_d; ta++, kata++)
+                {                                                       
+                    size_t katamunu = kata * dim_ab + munu;
+                    double normalized_int = eri4_shells_sph[katamunu] *
+                                            norms_a[mu] * norms_b[nu] *
+                                            norms_c[ka] * norms_d[ta];
+
+                    size_t a = pos_a + mu;
+                    size_t b = pos_b + nu;
+                    size_t c = pos_c + ka;
+                    size_t d = pos_d + ta;
+
+                    eri4(a, b, c, d) = normalized_int;
+                    eri4(a, b, d, c) = normalized_int;
+                    eri4(b, a, c, d) = normalized_int;
+                    eri4(b, a, d, c) = normalized_int;
+                    eri4(c, d, a, b) = normalized_int;
+                    eri4(c, d, b, a) = normalized_int;
+                    eri4(d, c, a, b) = normalized_int;
+                    eri4(d, c, b, a) = normalized_int;
+                }
+}
+
+void LI::transferIntegralsRM(const size_t ipair_ab, const size_t ipair_cd,
+                             const ShellPairData &shell_pair_data_ab,
+                             const ShellPairData &shell_pair_data_cd,
+                             const vector<double> &eri4_shells_sph, vec4d &eri4)
 {
     auto [pos_a, pos_b] = shell_pair_data_ab.offsets[ipair_ab];
     auto [pos_c, pos_d] = shell_pair_data_cd.offsets[ipair_cd];
@@ -383,12 +428,15 @@ void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
     size_t dim_b = norms_b.size();
     size_t dim_c = norms_c.size();
     size_t dim_d = norms_d.size();
+    int dim_cd = dim_c * dim_d;
 
-    for (size_t mu = 0, munu = 0, munukata = 0; mu < dim_a; mu++)
+    for (size_t mu = 0, munu = 0; mu < dim_a; mu++)
         for (size_t nu = 0; nu < dim_b; nu++, munu++)
             for (size_t ka = 0, kata = 0; ka < dim_c; ka++)
-                for (size_t ta = 0; ta < dim_d; ta++, kata++, munukata++)
-                {
+                for (size_t ta = 0; ta < dim_d; ta++, kata++)
+                {                    
+                    size_t munukata = munu * dim_cd + kata;
+
                     double normalized_int = eri4_shells_sph[munukata] *
                                             norms_a[mu] * norms_b[nu] *
                                             norms_c[ka] * norms_d[ta];
