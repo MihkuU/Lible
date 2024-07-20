@@ -21,13 +21,14 @@ endif()
 
 option(LIBLE_BUILD_DOCS "Enables building sphinx-documentation" OFF)
 option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" ON)
+option(LIBLE_USE_LIBXSMM "Enables using libxsmm for fast small matrix multiplication" ON)
 
 ### Modules
 option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" ON)
 option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" ON)
 option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" ON)
-option(LIBLE_BUILD_INTS     "BUILD and install the molecular integrals module" ON)
-option(LIBLE_BUILD_GPUINTS  "BUILD and install the GPU molecular integrals module" OFF)
+option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
+option(LIBLE_BUILD_GPUINTS  "Build and install the GPU molecular integrals module" OFF)
 
 if(LIBLE_USE_MPI)
 	find_package(MPI REQUIRED)
@@ -35,6 +36,10 @@ if(LIBLE_USE_MPI)
 	add_definitions(-D_LIBLE_USE_MPI_)
 else()
 	set(CMAKE_CXX_COMPILER g++)
+endif()
+
+if(LIBLE_USE_LIBXSMM)
+	add_definitions(-D_LIBLE_USE_LIBXSMM)
 endif()
 
 if(LIBLE_BUILD_GPUINTS)
