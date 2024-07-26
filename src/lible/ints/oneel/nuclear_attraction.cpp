@@ -1,6 +1,8 @@
 #include <lible/ints/oneel/oneel_detail.hpp>
 #include <lible/ints/boys_function.hpp>
 #include <lible/ints/cart_exps.hpp>
+#include <lible/ints/ecoeffs.hpp>
+#include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
 
 namespace LIO = lible::ints::one;
@@ -19,7 +21,7 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
     vector<double> fnx(lab + 1, 0);
 
     vector<vector<vec4d>> ecoeffs;
-    MD::calcECoeffs(la, lb, shell_pair_data, ecoeffs);
+    calcECoeffs(la, lb, shell_pair_data, ecoeffs);
 
     BoysF boys_f(lab);
 
@@ -72,7 +74,7 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
 
                     boys_f.calcFnx(lab, x, fnx);
 
-                    MD::calcRInts(la, lb, p, RPC, fnx, rints_tmp, rints);
+                    calcRInts(la, lb, p, RPC, fnx, rints_tmp, rints);
 
                     for (int t = 0; t <= lab; t++)
                         for (int u = 0; u <= lab; u++)

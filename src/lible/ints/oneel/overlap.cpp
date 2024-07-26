@@ -1,6 +1,6 @@
 #include <lible/ints/oneel/oneel_detail.hpp>
 #include <lible/ints/cart_exps.hpp>
-#include <lible/ints/mcmurchie_davidson.hpp>
+#include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/spherical_trafo.hpp>
 
 #include <math.h>
@@ -14,7 +14,7 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
                                        const ShellPairData &shell_pair_data, vec2d &ints_out)
 {
     vector<vector<vec3d>> ecoeffs;
-    MD::calcECoeffs(la, lb, shell_pair_data, ecoeffs);
+    calcECoeffs(la, lb, shell_pair_data, ecoeffs);
 
     int dim_a_cart = dimCartesians(shell_pair_data.la);
     int dim_b_cart = dimCartesians(shell_pair_data.lb);

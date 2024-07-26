@@ -2,7 +2,6 @@
 
 /*
  * Header file for general utilities including MPI parallelization.
- * Please be nice and include this file only in the .cpp files.
  */
 
 #include <iostream>

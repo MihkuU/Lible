@@ -1,10 +1,9 @@
 #include <lible/ints/shell.hpp>
-#include <lible/ints/ints_util.hpp>
-#include <lible/ints/mcmurchie_davidson.hpp>
+#include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/spherical_trafo.hpp>
+#include <lible/ints/util.hpp>
 
 namespace LI = lible::ints;
-namespace LIMD = lible::ints::MD;
 
 using std::array, std::size_t, std::vector;
 
@@ -15,7 +14,7 @@ vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
     int dim_sph = dimSphericals(l);
 
     vector<arma::dmat> h_coeffs;
-    LIMD::calcECoeffs(l, exps, h_coeffs);
+    calcECoeffs(l, exps, h_coeffs);
 
     arma::dmat ints_contracted(dim_cart, dim_cart, arma::fill::zeros);
 

@@ -2,7 +2,7 @@
 #include <lible/util.hpp>
 #include <lible/ints/shell_pair_data.hpp>
 
-#include <fmt/core.h>
+// #include <fmt/core.h>
 #include <hip/hip_runtime.h>
 
 #define hipCheck(call)                                                                              \

@@ -15,34 +15,35 @@ namespace lible
             data.resize(0);
         }
 
-        Vec3D(const size_t &dim, const T &val)
+        Vec3D(const std::size_t &dim, const T &val)
         {
             dims = {dim, dim, dim};
             data.resize(dim * dim * dim, val);
         }
 
-        Vec3D(const size_t &dim1, const size_t &dim2, const size_t &dim3, const T &val)
+        Vec3D(const std::size_t &dim1, const std::size_t &dim2, const std::size_t &dim3,
+              const T &val)
         {
             dims = {dim1, dim2, dim3};
             data.resize(dim1 * dim2 * dim3, val);
         }
 
-        T &operator()(const size_t &i, const size_t &j, const size_t &k)
+        T &operator()(const std::size_t &i, const std::size_t &j, const std::size_t &k)
         {
             return data[i * dims[1] * dims[2] + j * dims[2] + k];
         }
 
-        const T &operator()(const size_t &i, const size_t &j, const size_t &k) const
+        const T &operator()(const std::size_t &i, const std::size_t &j, const std::size_t &k) const
         {
             return data[i * dims[1] * dims[2] + j * dims[2] + k];
         }
 
-        size_t getDim(const size_t &i) const
+        std::size_t getDim(const std::size_t &i) const
         {
             return dims.at(i);
         }
 
-        size_t getSize() const
+        std::size_t getSize() const
         {
             return data.size();
         }
@@ -63,7 +64,7 @@ namespace lible
         }
 
     private:
-        std::array<size_t, 3> dims;
+        std::array<std::size_t, 3> dims;
         std::vector<T> data;
     };
 }

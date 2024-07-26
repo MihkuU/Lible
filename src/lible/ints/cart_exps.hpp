@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lible/ints/ints_util.hpp>
+#include <lible/ints/util.hpp>
 
 namespace lible
 {

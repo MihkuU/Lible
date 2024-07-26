@@ -1,7 +1,9 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
 #include <lible/util.hpp>
-#include <lible/ints/ints_util.hpp>
+#include <lible/ints/ecoeffs.hpp>
+#include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
+#include <lible/ints/util.hpp>
 
 #include <fmt/core.h>
 
@@ -31,7 +33,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
     {
         auto [la, lb] = l_pairs[ipair];
         vector<vector<vec4d>> ecoeffs_ipair;
-        MD::calcECoeffs(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
+        calcECoeffs(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
     }
 
@@ -145,7 +147,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
     {
         auto [la, lb] = l_pairs[ipair];
         vector<vector<vec4d>> ecoeffs_ipair;
-        MD::calcECoeffs(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
+        calcECoeffs(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
     }  
 
@@ -299,7 +301,7 @@ void LIT::kernelERI4(const int lab, const int lcd,
 
                     boys_f.calcFnx(labcd, x, fnx);
 
-                    MD::calcRInts(lab, lcd, alpha, RPQ, fnx, rints_tmp, rints);
+                    calcRInts(lab, lcd, alpha, RPQ, fnx, rints_tmp, rints);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q))) *
                                  ccoeffs_a[ia] * ccoeffs_b[ib] * ccoeffs_c[ic] * ccoeffs_d[id];

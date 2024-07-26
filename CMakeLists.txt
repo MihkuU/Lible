@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(lible
 	VERSION      0.0.0 
-	LANGUAGES    CXX
+	#LANGUAGES    CXX
 	DESCRIPTION  "A C++ quantum chemistry library with various usable gadgets."
 	HOMEPAGE_URL "https://github.com/MihkuU/Lible")
 
@@ -17,37 +17,64 @@ else()
 	set(lible_is_top_level FALSE)
 endif()
 
-### Options
-
-option(LIBLE_BUILD_DOCS "Enables building sphinx-documentation" OFF)
-option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" ON)
-option(LIBLE_USE_LIBXSMM "Enables using libxsmm for fast small matrix multiplication" ON)
-
-### Modules
+# Modules
 option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" ON)
+option(LIBLE_BUILD_DOCS "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" ON)
 option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" ON)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
 option(LIBLE_BUILD_GPUINTS  "Build and install the GPU molecular integrals module" OFF)
 
-if(LIBLE_USE_MPI)
-	find_package(MPI REQUIRED)
-	set(CMAKE_CXX_COMPILER mpic++)
-	add_definitions(-D_LIBLE_USE_MPI_)
-else()
-	set(CMAKE_CXX_COMPILER g++)
-endif()
-
-if(LIBLE_USE_LIBXSMM)
-	add_definitions(-D_LIBLE_USE_LIBXSMM)
-endif()
-
-if(LIBLE_BUILD_GPUINTS)
-	add_definitions(-D_LIBLE_USE_HIP_)
-endif()
+### Options
+option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+if(LIBLE_BUILD_GPUINTS)
+	### TODO!!!!! 
+	###	There is some serious cluster fuck with how the GPU-ints are currently handled. This mess is also
+	### in the src/CMakeLists.txt file. Figure out eventually how to organize this. Right now this just
+	### seems to work on my laptop with an nvidia GPU.
+
+    #target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
+    #target_link_libraries(lible PRIVATE lible_gpuints)
+	add_compile_options(-fPIC)
+
+    # Based on the boilerplate that I found from AMDs HIP course
+    if(NOT CMAKE_GPU_RUNTIME)
+        set(GPU_RUNTIME "ROCM" CACHE STRING "Switches between ROCM and CUDA")
+    else()
+        set(GPU_RUNTIME "${CMAKE_GPU_RUNTIME}" CACHE STRING "Switches between ROCM and CUDA")
+    endif()
+
+    # Should only be ROCM or CUDA, but allowing HIP because it is the currently built-in option
+    # Select with e.g., -DGPU_RUNTIME=ROCM
+    set(GPU_RUNTIMES "ROCM" "CUDA" "HIP")
+    if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
+        set(ERROR_MESSAGE
+            "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP, ROCM, or CUDA.")
+        message(FATAL_ERROR ${ERROR_MESSAGE})
+    endif()
+
+    # GPU_RUNTIME should really be ROCM for AMD GPUs, so manually resetting to HIP if ROCM is selected
+    if(${GPU_RUNTIME} MATCHES "ROCM")
+        set(GPU_RUNTIME "HIP")
+    endif()
+    set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+    enable_language(${GPU_RUNTIME})
+    set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
+    set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+
+    set(ROCMCC_FLAGS "${ROCMCC_FLAGS} ")
+    set(CUDACC_FLAGS "${CUDACC_FLAGS} ")
+    if(${GPU_RUNTIME} MATCHES "HIP")
+        set(HIPCC_FLAGS "${ROCMCC_FLAGS}")
+    else()
+        set(HIPCC_FLAGS "${CUDACC_FLAGS}")
+    endif()
+
+endif()
 
 ### the main target
 add_library(lible SHARED)
@@ -55,19 +82,68 @@ add_library(lible::lible ALIAS lible)
 
 set_target_properties(lible PROPERTIES PREFIX "")
 
+### Dependencies/Sources 
 set(src_dir ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory("${src_dir}/extern")
 add_subdirectory("${src_dir}/src")
 
+if(LIBLE_USE_MPI)
+	#find_package(MPI REQUIRED)
+	#set(CMAKE_CXX_COMPILER mpic++)
+	#target_compile_definitions(lible PRIVATE _LIBLE_USE_MPI_)
+else()
+	#set(CMAKE_CXX_COMPILER g++)
+endif()
+
+if(LIBLE_BUILD_GPUINTS)
+	target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
+	#target_compile_definitions(lible PRIVATE -fPIC)
+	target_link_libraries(lible PRIVATE lible_gpuints)
+#[=[
+    # Based on the boilerplate that I found from AMDs HIP course
+    if(NOT CMAKE_GPU_RUNTIME)
+        set(GPU_RUNTIME "ROCM" CACHE STRING "Switches between ROCM and CUDA")
+    else()
+        set(GPU_RUNTIME "${CMAKE_GPU_RUNTIME}" CACHE STRING "Switches between ROCM and CUDA")
+    endif()
+
+    # Should only be ROCM or CUDA, but allowing HIP because it is the currently built-in option
+    # Select with e.g., -DGPU_RUNTIME=ROCM
+    set(GPU_RUNTIMES "ROCM" "CUDA" "HIP")
+    if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
+        set(ERROR_MESSAGE
+            "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP, ROCM, or CUDA.")
+        message(FATAL_ERROR ${ERROR_MESSAGE})
+    endif()
+
+    # GPU_RUNTIME should really be ROCM for AMD GPUs, so manually resetting to HIP if ROCM is selected
+    if(${GPU_RUNTIME} MATCHES "ROCM")
+        set(GPU_RUNTIME "HIP")
+    endif()
+    set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+    enable_language(${GPU_RUNTIME})
+    set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
+    set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+
+    set(ROCMCC_FLAGS "${ROCMCC_FLAGS} ")
+    set(CUDACC_FLAGS "${CUDACC_FLAGS} ")
+    if(${GPU_RUNTIME} MATCHES "HIP")
+        set(HIPCC_FLAGS "${ROCMCC_FLAGS}")
+    else()
+        set(HIPCC_FLAGS "${CUDACC_FLAGS}")
+    endif()
+#]=]
+endif()
+
 # OMP
 find_package(OpenMP REQUIRED)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 target_link_libraries(lible PRIVATE ${OpenMP_CXX_LIBRARIES})
 
 # BLAS/LAPACK
-find_package(MKL)
+find_package(MKL QUIET)
 if (MKL_FOUND)
-	add_definitions(-D_LIBLE_USE_MKL_)
+	target_compile_definitions(lible PRIVATE _LIBLE_USE_MKL_)
     target_include_directories(lible PRIVATE ${MKL_ROOT}/include)
     target_link_libraries(lible PRIVATE ${MKL_ROOT}/lib/intel64/libmkl_gf_lp64.so)
     target_link_libraries(lible PRIVATE ${MKL_ROOT}/lib/intel64/libmkl_core.so)
@@ -75,16 +151,18 @@ if (MKL_FOUND)
 else()
 	set(BLA_VENDOR OpenBLAS)
 	find_package(BLAS REQUIRED)
+	get_filename_component(blas_root_path ${BLAS_LIBRARIES} DIRECTORY)
+	target_include_directories(lible PRIVATE ${blas_root_path})
 	target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES})
 endif()
 
 # miscellaneous # TODO: manage this
-add_definitions(-DBASIS_DIR="${src_dir}/src/lible/ints/basis")
+target_compile_definitions(lible PRIVATE BASIS_DIR="${src_dir}/src/lible/ints/basis")
 
-### Documentation
-if(lible_is_top_level AND LIBLE_BUILD_DOCS)
-	add_subdirectory("${src_dir}/docs")
-endif()
+### Dependencies/Sources 
+#set(src_dir ${CMAKE_CURRENT_SOURCE_DIR})
+#add_subdirectory("${src_dir}/extern")
+#add_subdirectory("${src_dir}/src")
 
 ### installation
 if(lible_is_top_level)

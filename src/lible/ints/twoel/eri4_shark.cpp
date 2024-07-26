@@ -1,7 +1,9 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
 #include <lible/util.hpp>
-#include <lible/ints/ints_util.hpp>
+#include <lible/ints/ecoeffs.hpp>
+#include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
+#include <lible/ints/util.hpp>
 
 #include <fmt/core.h>
 
@@ -36,7 +38,7 @@ lible::vec4d LIT::calcERI4Shark(const Structure &structure)
     {
         auto [la, lb] = l_pairs[ipair];
         vector<vector<arma::dmat>> ecoeffs_ipair;
-        MD::calcECoeffsSpherical(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
+        calcECoeffsSpherical(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
     }
     auto stop_ecoeffs{std::chrono::steady_clock::now()};
@@ -123,7 +125,7 @@ void LIT::calcERI4BenchmarkShark(const Structure &structure)
     int l_max = structure.getMaxL();
 
     vector<pair<int, int>> l_pairs = returnLPairs(l_max);
-    
+
     vector<ShellPairData> shell_pair_datas(l_pairs.size());
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
@@ -136,7 +138,7 @@ void LIT::calcERI4BenchmarkShark(const Structure &structure)
     {
         auto [la, lb] = l_pairs[ipair];
         vector<vector<arma::dmat>> ecoeffs_ipair;
-        MD::calcECoeffsSpherical(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
+        calcECoeffsSpherical(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
     }
 
@@ -212,7 +214,7 @@ void LIT::calcERI4BenchmarkShark(const Structure &structure)
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));    
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
 }
 
 void LIT::kernelERI4Shark(const int lab, const int lcd,
@@ -233,7 +235,7 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
     const auto &[xyz_c, xyz_d] = shell_pair_data_cd.coords[ipair_cd];
 
     const vector<arma::dmat> &Exyz_ab = ecoeffs_lalb[ipair_ab];
-    const vector<arma::dmat> &Exyz_cd = ecoeffs_lcld[ipair_cd];  
+    const vector<arma::dmat> &Exyz_cd = ecoeffs_lcld[ipair_cd];
 
     size_t ka = exps_a.size();
     size_t kb = exps_b.size();
@@ -251,12 +253,12 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
 
     vec3i tuv_poss_ab = returnTUVPoss(lab);
     vec3i tuv_poss_cd = returnTUVPoss(lcd);
-    
+
     int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
     int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
     arma::dmat rints(dim_tuv_ab, dim_tuv_cd, arma::fill::zeros);
-    
-    int dim_sph_cd = Exyz_cd[0].n_rows;    
+
+    int dim_sph_cd = Exyz_cd[0].n_rows;
     vector<arma::dmat> X(ka * kb, arma::zeros(dim_tuv_ab, dim_sph_cd));
 
     for (size_t ia = 0, iab = 0; ia < ka; ia++)
@@ -281,14 +283,13 @@ void LIT::kernelERI4Shark(const int lab, const int lcd,
 
                     boys_f.calcFnx(labcd, x, fnx);
 
-                    MD::calcRInts(lab, lcd, alpha, RPQ, fnx, idxs_tuv_ab, idxs_tuv_cd,
-                                  rints_tmp, rints);
+                    calcRInts(lab, lcd, alpha, RPQ, fnx, idxs_tuv_ab, idxs_tuv_cd,
+                              rints_tmp, rints);
 
-                    double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));                    
-                    
+                    double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
+
                     X[iab] += fac * rints * Exyz_cd[icd].t();
                 }
-
 
     for (size_t ia = 0, iab = 0; ia < ka; ia++)
         for (size_t ib = 0; ib < kb; ib++, iab++)

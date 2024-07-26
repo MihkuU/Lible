@@ -3,8 +3,9 @@
 #include <lible/types.hpp>
 #include <lible/ints/boys_function.hpp>
 #include <lible/ints/cart_exps.hpp>
-#include <lible/ints/mcmurchie_davidson.hpp>
 #include <lible/ints/shell_pair_data.hpp>
+
+#include <armadillo>
 
 namespace lible
 {

@@ -1,12 +1,50 @@
 #pragma once
 
+#include <lible/ints/util.hpp>
+
 #include <array>
 #include <vector>
+
+#include <armadillo>
 
 namespace lible
 {
     namespace ints
     {
+        /**
+         *
+         */
+        void calcRInts(const int la, const int lb, const double p,
+                       const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                       vec4d &rints_tmp, vec3d &rints_out);
+
+        /**
+         *
+         */
+        void calcRInts(const int la, const int lb, const double p,
+                       const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                       const std::vector<IdxsTUV> &tuv_idxs_a,
+                       const std::vector<IdxsTUV> &tuv_idxs_b,
+                       vec4d &rints_tmp, arma::dmat &rints_out);
+
+        /**
+         *
+         */
+        void calcRInts(const int la, const int lb, const double p,
+                       const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                       const std::vector<IdxsTUV> &tuv_idxs_a,
+                       const std::vector<IdxsTUV> &tuv_idxs_b,
+                       vec4d &rints_tmp, std::vector<double> &rints_out);
+
+        /**
+         *
+         */
+        void calcRInts(const int la, const int lb, const double p, const double fac,
+                       const arma::vec::fixed<3> &RPC, const std::vector<double> &fnx,
+                       const std::vector<IdxsTUV> &tuv_idxs_a,
+                       const std::vector<IdxsTUV> &tuv_idxs_b,
+                       vec4d &rints_tmp, std::vector<double> &rints_out);
+
         /**
          *
          */

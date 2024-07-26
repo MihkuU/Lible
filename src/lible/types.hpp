@@ -1,10 +1,5 @@
 #pragma once
 
-/*
- *
- *
- */
-
 #include <lible/vec2d.hpp>
 #include <lible/vec3d.hpp>
 #include <lible/vec4d.hpp>

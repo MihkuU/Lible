@@ -1,7 +1,7 @@
 #include <lible/ints/basis_sets.hpp>
+#include <lible/ints/defs.hpp>
 #include <lible/ints/ints.hpp>
-#include <lible/ints/ints_defs.hpp>
-#include <lible/ints/ints_util.hpp>
+#include <lible/ints/util.hpp>
 
 #include <cassert>
 #include <filesystem>
