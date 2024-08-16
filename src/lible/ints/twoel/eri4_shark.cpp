@@ -3,7 +3,7 @@
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
-#include <lible/ints/util.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <fmt/core.h>
 

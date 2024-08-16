@@ -1,6 +1,6 @@
 #include <lible/ints/spherical_trafo.hpp>
 #include <lible/ints/defs.hpp>
-#include <lible/ints/util.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <cassert>
 #include <stdexcept>

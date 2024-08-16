@@ -24,6 +24,7 @@ namespace lible
 				  const std::size_t &dim_cartesian,
 				  const std::size_t &dim_spherical,
 				  const std::size_t &pos,
+				  const std::size_t &pos_cart,
 				  const std::array<double, 3> &xyz_coords,
 				  const std::vector<double> &coeffs,
 				  const std::vector<double> &coeffs_raw,
@@ -34,6 +35,7 @@ namespace lible
 				  dim_cartesian(dim_cartesian),
 				  dim_spherical(dim_spherical),
 				  pos(pos),
+				  pos_cart(pos_cart),
 				  xyz_coords(xyz_coords),
 				  coeffs(coeffs),
 				  coeffs_raw(coeffs_raw),
@@ -50,6 +52,7 @@ namespace lible
 				  dim_cartesian(dim_cartesian),
 				  dim_spherical(dim_spherical),
 				  pos(0),
+				  pos_cart(0),
 				  xyz_coords({}),
 				  coeffs({}),
 				  coeffs_raw({}),
@@ -63,6 +66,7 @@ namespace lible
 			const std::size_t dim_cartesian;
 			const std::size_t dim_spherical;
 			const std::size_t pos;
+			const std::size_t pos_cart;
 			const std::array<double, 3> xyz_coords;
 			const std::vector<double> coeffs;
 			const std::vector<double> coeffs_raw;

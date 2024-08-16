@@ -2,7 +2,7 @@
 #include <lible/ints/basis_sets.hpp>
 #include <lible/ints/defs.hpp>
 #include <lible/ints/ints.hpp>
-#include <lible/ints/util.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -38,7 +38,7 @@ LI::Structure::Structure(const string &basis_set,
         coordinates_xyz[iatom] = {coordinates[3 * iatom], coordinates[3 * iatom + 1],
                                   coordinates[3 * iatom + 2]};
 
-    readBasis(basis_set, this->max_l, this->dim_ao, this->shells);
+    readBasis(basis_set, this->max_l, this->dim_ao, this->dim_ao_cart, this->shells);
 }
 
 LI::Structure::Structure(const string &basis_set,
@@ -70,7 +70,7 @@ LI::Structure::Structure(const string &basis_set,
         coordinates_xyz[iatom] = {coordinates[3 * iatom], coordinates[3 * iatom + 1],
                                   coordinates[3 * iatom + 2]};
 
-    readBasis(basis_set, this->max_l, this->dim_ao, this->shells);
+    readBasis(basis_set, this->max_l, this->dim_ao, this->dim_ao_cart, this->shells);
 }
 
 int LI::Structure::getMaxL() const
@@ -86,6 +86,11 @@ int LI::Structure::getZ(const size_t iatom) const
 size_t LI::Structure::getDimAO() const
 {
     return dim_ao;
+}
+
+size_t LI::Structure::getDimAOCart() const
+{
+    return dim_ao_cart;
 }
 
 size_t LI::Structure::getNAtoms() const
@@ -108,14 +113,14 @@ map<int, vector<LI::Shell>> LI::Structure::getShells() const
     return shells;
 }
 
-void LI::Structure::constructShells(int &max_l, size_t &dim_ao,
+void LI::Structure::constructShells(int &max_l, size_t &dim_ao, size_t &dim_ao_cart,
                                     map<int, vector<Shell>> &shells)
 {
     set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
 
     auto basis_atoms = returnBasisForAtoms(atomic_nrs_set, basis_set);
 
-    int max_angmom = 0, pos = 0;
+    int max_angmom = 0, pos = 0, pos_cart = 0;
     for (size_t iatom = 0; iatom < n_atoms; iatom++)
     {
         int atomic_nr = atomic_nrs[iatom];
@@ -146,25 +151,28 @@ void LI::Structure::constructShells(int &max_l, size_t &dim_ao,
 
                 Shell shell(angmom, atomic_nr,
                             dim_cart, dim_sphe,
-                            pos, xyz_coordinates,
+                            pos, pos_cart, 
+                            xyz_coordinates,
                             coeffs, coeffs_raw,
                             exps, norms);
 
                 shells[angmom].push_back(shell);
 
                 pos += dim_sphe;
+                pos_cart += dim_cart;
             }
         }
     }
 
     dim_ao = pos;
+    dim_ao_cart = pos_cart;
     max_l = max_angmom;
 }
 
 void LI::Structure::readBasis(const string &basis_set, int &max_l, size_t &dim_ao,
-                              map<int, vector<Shell>> &shells)
+                              size_t &dim_ao_cart, map<int, vector<Shell>> &shells)
 {
     string basis_path = returnBasisPath(basis_set);
 
-    constructShells(max_l, dim_ao, shells);
+    constructShells(max_l, dim_ao, dim_ao_cart, shells);
 }

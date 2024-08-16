@@ -18,6 +18,7 @@ namespace lible
     {
         namespace one
         {
+            /** */
             enum class Option
             {
                 dipole_moment,
@@ -42,14 +43,6 @@ namespace lible
                     throw std::runtime_error("Inappropriate one-electron integral option.\n");
                 }
             }
-
-            // template <Option opt>
-            // void kernel(const ShellPairData &shell_pair_data,
-            //             const std::vector<std::vector<arma::dmat>> &ecoeffs, vec2d &ints_out);
-
-            // template <Option opt>
-            // std::vector<std::vector<arma::dmat>> calcECoeffs(const int la, const int lb,
-            //                                                  const ShellPairData &shell_pair_data);
 
             template <Option opt>
             void kernel(const int la, const int lb, const ShellPairData &shell_pair_data,

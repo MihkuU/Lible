@@ -113,7 +113,12 @@ namespace lible
             /**
              *
              */
-            vec2d overlap(const Structure &structure);
+            vec2d overlap0(const Structure &structure);
+
+            /**
+             *
+             */
+            vec2d overlap(const Structure &structure);            
         }
 #endif        
     }

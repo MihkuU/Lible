@@ -1,7 +1,7 @@
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/cart_exps.hpp>
 #include <lible/ints/spherical_trafo.hpp>
-#include <lible/ints/util.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <array>
 

@@ -21,6 +21,7 @@ LI::ShellPairData::ShellPairData(const int la, const int lb, const Structure &st
         n_pairs = size_a * (size_a + 1) / 2;
 
         offsets.reserve(n_pairs);
+        offsets_cart.reserve(n_pairs);
         coords.reserve(n_pairs);
         ccoeffs.reserve(n_pairs);
         exps.reserve(n_pairs);
@@ -31,6 +32,9 @@ LI::ShellPairData::ShellPairData(const int la, const int lb, const Structure &st
             {
                 offsets.push_back(std::make_pair(shells_a[ishell].pos,
                                                  shells_a[jshell].pos));
+
+                offsets_cart.push_back(std::make_pair(shells_a[ishell].pos_cart,
+                                                      shells_a[jshell].pos_cart));
 
                 coords.push_back(std::make_pair(shells_a[ishell].xyz_coords,
                                                 shells_a[jshell].xyz_coords));
@@ -78,6 +82,7 @@ LI::ShellPairData::ShellPairData(const int la, const int lb, const Structure &st
         n_pairs = size_a * size_b;
 
         offsets.reserve(n_pairs);
+        offsets_cart.reserve(n_pairs);
         coords.reserve(n_pairs);
         ccoeffs.reserve(n_pairs);
         exps.reserve(n_pairs);
@@ -88,6 +93,9 @@ LI::ShellPairData::ShellPairData(const int la, const int lb, const Structure &st
             {
                 offsets.push_back(std::make_pair(shells_a[ishell].pos,
                                                  shells_b[jshell].pos));
+
+                offsets_cart.push_back(std::make_pair(shells_a[ishell].pos_cart,
+                                                      shells_b[jshell].pos_cart));                                                 
 
                 coords.push_back(std::make_pair(shells_a[ishell].xyz_coords,
                                                 shells_b[jshell].xyz_coords));

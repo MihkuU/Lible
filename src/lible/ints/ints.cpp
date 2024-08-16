@@ -3,7 +3,7 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
 
 #ifdef _LIBLE_USE_HIP_
-#include <lible/ints/experimental/oneel_detail_gpu.hpp>
+#include <lible/ints/gpu/gpuints.hpp>
 #endif
 
 namespace LI = lible::ints;
@@ -57,10 +57,14 @@ void LI::eri4BenchmarkSharkFlat(const Structure &structure)
 
 #ifdef _LIBLE_USE_HIP_
 namespace LIG = lible::ints::gpu;
-namespace LIOG = lible::ints::one_gpu;
+
+lible::vec2d LIG::overlap0(const Structure &structure)
+{
+    return LIG::calculateS_L0(structure);
+}
 
 lible::vec2d LIG::overlap(const Structure &structure)
 {
-    return LIOG::calculateS_L0(structure);
+    return LIG::calculate<LIG::Option::overlap>(structure);
 }
 #endif

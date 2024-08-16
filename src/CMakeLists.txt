@@ -57,18 +57,23 @@ if(LIBLE_BUILD_INTS)
 		"${src_dir}/lible/ints/twoel/*.cpp"
 		"${src_dir}/lible/ints/twoel/*.hpp")
 
-	set_source_files_properties(${ints_sources} PROPERTIES LANGUAGE ${GPU_RUNTIME})
+	#set_source_files_properties(${ints_sources} PROPERTIES LANGUAGE ${GPU_RUNTIME})
 	target_sources(lible PRIVATE ${ints_sources})
 	
 	if(LIBLE_BUILD_GPUINTS)
    		#target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_) # Does it work here???
 
+		set(CMAKE_CXX_STANDARD 17)
+		set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+		#file(GLOB ints_sources_gpu CONFIGURE_DEPENDS
+		#	"${src_dir}/lible/ints/gpu/*.cpp"
+		#	"${src_dir}/lible/ints/gpu/*.hpp")
 		file(GLOB ints_sources_gpu CONFIGURE_DEPENDS
-			"${src_dir}/lible/ints/experimental/*.cpp")
-			#"${src_dir}/lible/ints/experimental/*.hpp")
+			"${src_dir}/lible/ints/gpu/*.cpp")
 
 		add_library(lible_gpuints OBJECT)
-		#target_compile_definitions(lible_gpuints PRIVATE "-fPIC")
+		target_compile_options(lible_gpuints PRIVATE -fPIC) # Customize for AMD?
 		target_include_directories(lible_gpuints PRIVATE ${src_dir})
 
 		# Based on the boilerplate that I found from AMDs HIP course
@@ -105,16 +110,14 @@ if(LIBLE_BUILD_INTS)
 	    endif()
 
     	set_source_files_properties(${ints_sources_gpu} PROPERTIES LANGUAGE ${GPU_RUNTIME})
-	    #set_source_files_properties(${ints_sources_gpu} PROPERTIES COMPILE_FLAGS ${HIPCC_FLAGS})
-
-		message("CMAKE_HIP_PLATFORM: ${CMAKE_HIP_PLATFORM}")
+	    set_source_files_properties(${ints_sources_gpu} PROPERTIES COMPILE_FLAGS ${HIPCC_FLAGS})
 
 		target_sources(lible_gpuints PRIVATE ${ints_sources_gpu})
-		#target_link_libraries(lible PRIVATE lible_gpuints)
 
-	    #target_include_directories(lible PUBLIC
-    	#    $<BUILD_INTERFACE:${src_dir}>
-        #	$<INSTALL_INTERFACE:include>)
+		# fmt
+		target_compile_definitions(lible_gpuints PRIVATE FMT_HEADER_ONLY)
+		target_include_directories(lible_gpuints PRIVATE ${CMAKE_BINARY_DIR}/extern/fmt/include)
+
 	endif()
 
 	target_include_directories(lible PUBLIC 

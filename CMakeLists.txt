@@ -39,7 +39,7 @@ if(LIBLE_BUILD_GPUINTS)
 
     #target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
     #target_link_libraries(lible PRIVATE lible_gpuints)
-	add_compile_options(-fPIC)
+	#add_compile_options(-fPIC)
 
     # Based on the boilerplate that I found from AMDs HIP course
     if(NOT CMAKE_GPU_RUNTIME)
@@ -73,7 +73,6 @@ if(LIBLE_BUILD_GPUINTS)
     else()
         set(HIPCC_FLAGS "${CUDACC_FLAGS}")
     endif()
-
 endif()
 
 ### the main target
@@ -97,42 +96,8 @@ endif()
 
 if(LIBLE_BUILD_GPUINTS)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
-	#target_compile_definitions(lible PRIVATE -fPIC)
+	#target_compile_options(lible PRIVATE -fPIC -fgpu-rdc --hip-link) # TODO: give optional compiler-flags
 	target_link_libraries(lible PRIVATE lible_gpuints)
-#[=[
-    # Based on the boilerplate that I found from AMDs HIP course
-    if(NOT CMAKE_GPU_RUNTIME)
-        set(GPU_RUNTIME "ROCM" CACHE STRING "Switches between ROCM and CUDA")
-    else()
-        set(GPU_RUNTIME "${CMAKE_GPU_RUNTIME}" CACHE STRING "Switches between ROCM and CUDA")
-    endif()
-
-    # Should only be ROCM or CUDA, but allowing HIP because it is the currently built-in option
-    # Select with e.g., -DGPU_RUNTIME=ROCM
-    set(GPU_RUNTIMES "ROCM" "CUDA" "HIP")
-    if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-        set(ERROR_MESSAGE
-            "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP, ROCM, or CUDA.")
-        message(FATAL_ERROR ${ERROR_MESSAGE})
-    endif()
-
-    # GPU_RUNTIME should really be ROCM for AMD GPUs, so manually resetting to HIP if ROCM is selected
-    if(${GPU_RUNTIME} MATCHES "ROCM")
-        set(GPU_RUNTIME "HIP")
-    endif()
-    set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
-    enable_language(${GPU_RUNTIME})
-    set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-    set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
-
-    set(ROCMCC_FLAGS "${ROCMCC_FLAGS} ")
-    set(CUDACC_FLAGS "${CUDACC_FLAGS} ")
-    if(${GPU_RUNTIME} MATCHES "HIP")
-        set(HIPCC_FLAGS "${ROCMCC_FLAGS}")
-    else()
-        set(HIPCC_FLAGS "${CUDACC_FLAGS}")
-    endif()
-#]=]
 endif()
 
 # OMP

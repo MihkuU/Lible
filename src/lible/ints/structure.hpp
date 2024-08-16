@@ -30,6 +30,8 @@ namespace lible
 
             size_t getDimAO() const;
 
+            size_t getDimAOCart() const;
+
             size_t getNAtoms() const;
 
             std::array<double, 3> getCoordsAtom(const size_t iatom) const;
@@ -42,6 +44,7 @@ namespace lible
             // TODO: in the future, different atoms must have the capability to have different basis.
             int max_l;
             size_t dim_ao;
+            size_t dim_ao_cart;
             size_t n_atoms;
             std::string basis_set;
             std::vector<double> coordinates;            
@@ -50,11 +53,11 @@ namespace lible
             std::vector<std::string> elements;
             std::map<int, std::vector<Shell>> shells;
 
-            void constructShells(int &max_l, size_t &dim_ao,
+            void constructShells(int &max_l, size_t &dim_ao, size_t &dim_ao_cart,
                                  std::map<int, std::vector<Shell>> &shells);
 
             void readBasis(const std::string &basis_set, int &max_l, size_t &dim_ao,
-                           std::map<int, std::vector<Shell>> &shells);
+                           size_t &dim_ao_cart, std::map<int, std::vector<Shell>> &shells);
         };
     }
 }

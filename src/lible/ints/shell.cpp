@@ -1,7 +1,7 @@
 #include <lible/ints/shell.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/spherical_trafo.hpp>
-#include <lible/ints/util.hpp>
+#include <lible/ints/utils.hpp>
 
 namespace LI = lible::ints;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lible/ints/util.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <array>
 #include <vector>
