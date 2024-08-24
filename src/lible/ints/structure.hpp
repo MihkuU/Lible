@@ -9,13 +9,12 @@ namespace lible
 {
     namespace ints
     {
+        /**
+         * Struct for representing the atomic structure. Note that the access is public for
+         * several data members. What is meant to be used 'internally' is declared private.
+         */
         struct Structure
         {
-            /*
-             * Struct for representing the atomic structure. Note that the access is public for
-             * several data members. What is meant to be used 'internally' is declared private.
-             */
-
             Structure(const std::string &basis_set,
                       const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coordinates_angstroem);

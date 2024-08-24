@@ -1,5 +1,5 @@
 #include <lible/ints/gpu/gpuints.hpp>
-#include <lible/ints/gpu/kernels_ecoeffs.hpp>
+#include <lible/ints/gpu/dev_ecoeffs.hpp>
 #include <lible/ints/gpu/utils.hpp>
 #include <lible/ints/shell_pair_data.hpp>
 #include <lible/util.hpp>
@@ -11,310 +11,225 @@ namespace LIG = lible::ints::gpu;
 
 using std::vector;
 
-// namespace lible::ints::gpu
-// {
-//     __global__ void overlap(const int dim_ao_cart, const int la, const int lb,
-//                             const int n_shell_pairs, const int *cart_idxs_poss_a,
-//                             const int *cart_idxs_poss_b, const int *cdepths,
-//                             const int *eoffsets, const int *offsets_cart,
-//                             const int *poss_cntrs, const double *ccoeffs,
-//                             const double *exps, const double *ecoeffs,
-//                             double *sints_cart)
-//     {
-//         int id = blockDim.x * blockIdx.x + threadIdx.x;
-//         if (id < n_shell_pairs)
-//         {
-//             int ipair = id;
-
-//             int d2 = lb + 1;
-//             int d3 = la + lb + 1;
-//             int d23 = d2 * d3;
-//             int n_ecoeffs = (la + 1) * (lb + 1) * (la + lb + 1);
-//             int n_ecoeffs_3x = 3 * n_ecoeffs;
-
-//             int dim_cart_idxs_a = dimCartIdxs(la);
-//             int dim_cart_idxs_b = dimCartIdxs(lb);
-//             int dim_cntr_a = cdepths[2 * ipair];
-//             int dim_cntr_b = cdepths[2 * ipair + 1];
-
-//             int offset_a = offsets_cart[2 * ipair];
-//             int offset_b = offsets_cart[2 * ipair + 1];
-
-//             int pos_cntr_a = poss_cntrs[2 * ipair];
-//             int pos_cntr_b = poss_cntrs[2 * ipair + 1];
-
-//             for (int mu = 0; mu < dim_cart_idxs_a; mu++)
-//                 for (int nu = 0; nu < dim_cart_idxs_b; nu++)
-//                 {
-//                     int pos_a = offset_a + mu;
-//                     int pos_b = offset_b + nu;
-//                     int pos_ab = pos_a * dim_ao_cart + pos_b;
-//                     sints_cart[pos_ab] = 0;
-//                 }
-
-//             for (int ia = 0, iab = 0; ia < dim_cntr_a; ia++)
-//                 for (int ib = 0; ib < dim_cntr_b; ib++, iab++)
-//                 {
-//                     double a = exps[pos_cntr_a + ia];
-//                     double b = exps[pos_cntr_b + ib];
-//                     double p = a + b;
-
-//                     int pos_ecoeffs = eoffsets[id] + iab * n_ecoeffs_3x;
-//                     int pos_x = pos_ecoeffs;
-//                     int pos_y = pos_ecoeffs + n_ecoeffs;
-//                     int pos_z = pos_ecoeffs + 2 * n_ecoeffs;
-
-//                     double val = pow(M_PI / p, 1.5);
-
-//                     for (int mu = 0; mu < dim_cart_idxs_a; mu++)
-//                     {
-//                         int i = cart_idxs_poss_a[3 * mu];
-//                         int j = cart_idxs_poss_a[3 * mu + 1];
-//                         int k = cart_idxs_poss_a[3 * mu + 2];
-
-//                         for (int nu = 0; nu < dim_cart_idxs_b; nu++)
-//                         {
-//                             int i_ = cart_idxs_poss_b[3 * nu];
-//                             int j_ = cart_idxs_poss_b[3 * nu + 1];
-//                             int k_ = cart_idxs_poss_b[3 * nu + 2];
-
-//                             double ecoeff = ecoeffs[idxE(d3, d23, i, i_, 0, pos_x)] *
-//                                             ecoeffs[idxE(d3, d23, j, j_, 0, pos_y)] *
-//                                             ecoeffs[idxE(d3, d23, k, k_, 0, pos_z)];
-
-//                             int mu_ = offset_a + mu;
-//                             int nu_ = offset_b + nu;
-//                             int idx = mu_ * dim_ao_cart + nu_;
-//                             sints_cart[idx] += ccoeffs[pos_cntr_a + ia] * ccoeffs[pos_cntr_b + ib] *
-//                                                ecoeff * val;
-//                         }
-//                     }
-//                 }
-//         }
-//     }
-// }
-
 template <>
 lible::vec2d LIG::calculate<LIG::Option::overlap>(const Structure &structure)
 {
-    // // Make shell pair datas
-    // // Collect info about dimensions
-    // // Preallocate CPU/GPU data
-    // // Copy stuff on GPU and call kernels
+    // Make shell pair datas
+    // Collect info about dimensions
+    // Preallocate CPU/GPU data
+    // Copy stuff on GPU and call kernels
 
-    // printf("LIG::calculateS\n");
+    printf("LIG::calculateS\n");
 
-    // auto t0_total = std::chrono::steady_clock::now();
+    auto t0_total = std::chrono::steady_clock::now();
 
-    // int l_max = structure.getMaxL();
-    // int l_pairs = (l_max + 1) * (l_max + 2) / 2;
+    int l_max = structure.getMaxL();
+    int n_l_pairs = (l_max + 1) * (l_max + 2) / 2;
 
-    // vector<ShellPairData> shell_pair_datas(l_pairs);
-    // for (int la = l_max, idx = 0; la >= 0; la--)
-    //     for (int lb = la; lb >= 0; lb--, idx++)
-    //         shell_pair_datas[idx] = ShellPairData(la, lb, structure);
+    vector<ShellPairData> shell_pair_datas(n_l_pairs);
+    for (int la = l_max, idx = 0; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--, idx++)
+            shell_pair_datas[idx] = ShellPairData(la, lb, structure);
 
-    // size_t n_pairs_max{0}, n_pairs_2x_max{0}, n_coords_max{0}, n_ccoeffs_max{0}, n_norms_max{0};
-    // size_t n_ecoeffs_max{0};
-    // for (int la = l_max, idx = 0; la >= 0; la--)
-    //     for (int lb = la; lb >= 0; lb--, idx++)
-    //     {
-    //         const ShellPairData &shell_pair_data{shell_pair_datas[idx]};
+    size_t n_pairs_max{0}, n_pairs_2x_max{0}, n_coords_max{0}, n_ccoeffs_max{0}, n_norms_max{0};
+    size_t n_ecoeffs_max{0};
+    for (int la = l_max, idx = 0; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--, idx++)
+        {
+            const ShellPairData &shell_pair_data{shell_pair_datas[idx]};
 
-    //         size_t n_pairs = shell_pair_data.n_pairs;
-    //         if (n_pairs > n_pairs_max)
-    //             n_pairs_max = n_pairs;
+            size_t n_pairs = shell_pair_data.n_pairs;
+            if (n_pairs > n_pairs_max)
+                n_pairs_max = n_pairs;
 
-    //         size_t n_pairs_2x = 2 * n_pairs;
-    //         if (n_pairs_2x > n_pairs_2x_max)
-    //             n_pairs_2x_max = n_pairs_2x;
+            size_t n_pairs_2x = 2 * n_pairs;
+            if (n_pairs_2x > n_pairs_2x_max)
+                n_pairs_2x_max = n_pairs_2x;
 
-    //         size_t n_coords = 6 * n_pairs;
-    //         if (n_coords > n_coords_max)
-    //             n_coords_max = n_coords;
+            size_t n_coords = 6 * n_pairs;
+            if (n_coords > n_coords_max)
+                n_coords_max = n_coords;
 
-    //         size_t dim_ecoeffs = (la + 1) * (lb + 1) * (la + lb + 1) * 3;
+            size_t dim_ecoeffs = (la + 1) * (lb + 1) * (la + lb + 1) * 3;
+            size_t n_ccoeffs{0}, n_norms{0}, n_ecoeffs{0};
+            for (size_t ipair = 0; ipair < n_pairs; ipair++)
+            {
+                const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
+                const auto &[norms_a, norms_b] = shell_pair_data.norms[ipair];
+                n_ccoeffs += ccoeffs_a.size() + ccoeffs_b.size();
+                n_norms += norms_a.size() + norms_b.size();
+                n_ecoeffs += ccoeffs_a.size() * ccoeffs_b.size() * dim_ecoeffs;
+            }
 
-    //         size_t n_ccoeffs{0}, n_norms{0}, n_ecoeffs{0};
-    //         for (size_t ipair = 0; ipair < n_pairs; ipair++)
-    //         {
-    //             const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
-    //             const auto &[norms_a, norms_b] = shell_pair_data.norms[ipair];
-    //             n_ccoeffs += ccoeffs_a.size() + ccoeffs_b.size();
-    //             n_norms += norms_a.size() + norms_b.size();
-    //             n_ecoeffs += ccoeffs_a.size() * ccoeffs_b.size() * dim_ecoeffs;
-    //         }
+            if (n_ccoeffs > n_ccoeffs_max)
+                n_ccoeffs_max = n_ccoeffs;
 
-    //         if (n_ccoeffs > n_ccoeffs_max)
-    //             n_ccoeffs_max = n_ccoeffs;
+            if (n_norms > n_norms_max)
+                n_norms_max = n_norms;
 
-    //         if (n_norms > n_norms_max)
-    //             n_norms_max = n_norms;
+            if (n_ecoeffs > n_ecoeffs_max)
+                n_ecoeffs_max = n_ecoeffs;
+        }
 
-    //         if (n_ecoeffs > n_ecoeffs_max)
-    //             n_ecoeffs_max = n_ecoeffs;
-    //     }
+    // Allocate CPU data
+    vector<double> ccoeffs(n_ccoeffs_max), coords(n_coords_max), exps(n_ccoeffs_max),
+        norms(n_norms_max);
 
-    // // Allocate CPU data
-    // vector<double> ccoeffs(n_ccoeffs_max), coords(n_coords_max), exps(n_ccoeffs_max),
-    //     norms(n_norms_max);
+    vector<int> cdepths(n_pairs_2x_max), offsets_cart(n_pairs_2x_max),
+        offsets_sph(n_pairs_2x_max), poss_cntrs(n_pairs_2x_max), poss_norms(n_pairs_2x_max);
 
-    // vector<int> cdepths(n_pairs_2x_max), offsets_cart(n_pairs_2x_max),
-    //     offsets_sph(n_pairs_2x_max), poss_cntrs(n_pairs_2x_max), poss_norms(n_pairs_2x_max);
+    vector<int> offsets_ecoeffs(n_pairs_max);
 
-    // vector<int> offsets_ecoeffs(n_pairs_max);
+    // Allocate GPU data
+    double *dev_ccoeffs, *dev_exps, *dev_coords, *dev_norms;
+    int *dev_cdepths, *dev_offsets_cart, *dev_offsets_sph, *dev_poss_cntrs, *dev_poss_norms;
 
-    // // Allocate GPU data
-    // double *dev_ccoeffs, *dev_exps, *dev_coords, *dev_norms;
-    // int *dev_cdepths, *dev_offsets_cart, *dev_offsets_sph, *dev_poss_cntrs, *dev_poss_norms;
-
-    // double *dev_ecoeffs;
-    // int *dev_offsets_ecoeffs;
+    double *dev_ecoeffs;
+    int *dev_offsets_ecoeffs;
 
     size_t dim_ao = structure.getDimAO();
     size_t dim_ao_cart = structure.getDimAOCart();
 
-    // size_t bytes_gpu = n_ccoeffs_max * sizeof(double);
-    // bytes_gpu += n_ccoeffs_max * sizeof(double);
-    // bytes_gpu += n_coords_max * sizeof(double);
-    // bytes_gpu += n_norms_max * sizeof(double);
-    // bytes_gpu += n_pairs_2x_max * sizeof(int);
-    // bytes_gpu += n_pairs_2x_max * sizeof(int);
-    // bytes_gpu += n_pairs_2x_max * sizeof(int);
-    // bytes_gpu += n_pairs_2x_max * sizeof(int);
-    // bytes_gpu += n_pairs_2x_max * sizeof(int);
-    // bytes_gpu += n_ecoeffs_max * sizeof(double);
-    // bytes_gpu += n_pairs_max * sizeof(int);
-    // bytes_gpu += std::pow(dim_ao, 2) * sizeof(double);
-    // bytes_gpu += std::pow(dim_ao_cart, 2) * sizeof(double);
+    size_t bytes_gpu = n_ccoeffs_max * sizeof(double);
+    bytes_gpu += n_ccoeffs_max * sizeof(double);
+    bytes_gpu += n_coords_max * sizeof(double);
+    bytes_gpu += n_norms_max * sizeof(double);
+    bytes_gpu += n_pairs_2x_max * sizeof(int);
+    bytes_gpu += n_pairs_2x_max * sizeof(int);
+    bytes_gpu += n_pairs_2x_max * sizeof(int);
+    bytes_gpu += n_pairs_2x_max * sizeof(int);
+    bytes_gpu += n_pairs_2x_max * sizeof(int);
+    bytes_gpu += n_ecoeffs_max * sizeof(double);
+    bytes_gpu += n_pairs_max * sizeof(int);
+    bytes_gpu += std::pow(dim_ao, 2) * sizeof(double);
+    bytes_gpu += std::pow(dim_ao_cart, 2) * sizeof(double);
 
-    // hipCheck(hipMalloc(&dev_ccoeffs, n_ccoeffs_max * sizeof(double)));
-    // hipCheck(hipMalloc(&dev_exps, n_ccoeffs_max * sizeof(double)));
-    // hipCheck(hipMalloc(&dev_coords, n_coords_max * sizeof(double)));
-    // hipCheck(hipMalloc(&dev_norms, n_norms_max * sizeof(double)));
-    // hipCheck(hipMalloc(&dev_cdepths, n_pairs_2x_max * sizeof(int)));
-    // hipCheck(hipMalloc(&dev_offsets_cart, n_pairs_2x_max * sizeof(int)));
-    // hipCheck(hipMalloc(&dev_offsets_sph, n_pairs_2x_max * sizeof(int)));
-    // hipCheck(hipMalloc(&dev_poss_cntrs, n_pairs_2x_max * sizeof(int)));
-    // hipCheck(hipMalloc(&dev_poss_norms, n_pairs_2x_max * sizeof(int)));
+    hipCheck(hipMalloc(&dev_ccoeffs, n_ccoeffs_max * sizeof(double)));
+    hipCheck(hipMalloc(&dev_exps, n_ccoeffs_max * sizeof(double)));
+    hipCheck(hipMalloc(&dev_coords, n_coords_max * sizeof(double)));
+    hipCheck(hipMalloc(&dev_norms, n_norms_max * sizeof(double)));
+    hipCheck(hipMalloc(&dev_cdepths, n_pairs_2x_max * sizeof(int)));
+    hipCheck(hipMalloc(&dev_offsets_cart, n_pairs_2x_max * sizeof(int)));
+    hipCheck(hipMalloc(&dev_offsets_sph, n_pairs_2x_max * sizeof(int)));
+    hipCheck(hipMalloc(&dev_poss_cntrs, n_pairs_2x_max * sizeof(int)));
+    hipCheck(hipMalloc(&dev_poss_norms, n_pairs_2x_max * sizeof(int)));
 
-    // hipCheck(hipMalloc(&dev_ecoeffs, n_ecoeffs_max * sizeof(double)));
-    // hipCheck(hipMalloc(&dev_offsets_ecoeffs, n_pairs_max * sizeof(int)));
+    hipCheck(hipMalloc(&dev_ecoeffs, n_ecoeffs_max * sizeof(double)));
+    hipCheck(hipMalloc(&dev_offsets_ecoeffs, n_pairs_max * sizeof(int)));
 
     vec2d overlap_ints(dim_ao, dim_ao, 0);
 
-    // double *dev_overlap_ints_cart, *dev_overlap_ints_sph;
-    // hipCheck(hipMalloc(&dev_overlap_ints_sph, std::pow(dim_ao, 2) * sizeof(double)));
-    // hipCheck(hipMalloc(&dev_overlap_ints_cart, std::pow(dim_ao_cart, 2) * sizeof(double)));
+    double *dev_overlap_ints_cart, *dev_overlap_ints_sph;
+    hipCheck(hipMalloc(&dev_overlap_ints_sph, std::pow(dim_ao, 2) * sizeof(double)));
+    hipCheck(hipMalloc(&dev_overlap_ints_cart, std::pow(dim_ao_cart, 2) * sizeof(double)));
 
-    // // Copy data to GPU and call kernels
-    // for (int la = l_max, idx = 0; la >= 0; la--)
-    //     for (int lb = la; lb >= 0; lb--, idx++)
-    //     {
-    //         const ShellPairData &shell_pair_data{shell_pair_datas[idx]};
+    // Copy data to GPU and call kernels
+    for (int la = l_max, idx = 0; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--, idx++)
+        {
+            const ShellPairData &shell_pair_data{shell_pair_datas[idx]};
 
-    //         size_t n_pairs = shell_pair_data.n_pairs;
-    //         size_t n_pairs_2x = 2 * n_pairs;
+            size_t n_pairs = shell_pair_data.n_pairs;
+            size_t n_pairs_2x = 2 * n_pairs;
 
-    //         size_t n_ccoeffs = 0;
-    //         size_t n_coords = 0;
-    //         size_t n_norms = 0;
-    //         size_t pos_cntrs = 0;
-    //         size_t pos_ecoeffs = 0;
-    //         size_t pos_norms = 0;
+            size_t n_ccoeffs = 0;
+            size_t n_coords = 0;
+            size_t n_norms = 0;
+            size_t pos_cntrs = 0;
+            size_t pos_ecoeffs = 0;
+            size_t pos_norms = 0;
 
-    //         // Set up host data
-    //         for (size_t ipair = 0; ipair < n_pairs; ipair++)
-    //         {
-    //             const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
-    //             const auto &[exps_a, exps_b] = shell_pair_data.exps[ipair];
-    //             const auto &[coords_a, coords_b] = shell_pair_data.coords[ipair];
-    //             const auto &[norms_a, norms_b] = shell_pair_data.norms[ipair];
-    //             const auto &[offset_a, offset_b] = shell_pair_data.offsets[ipair];
-    //             const auto &[offset_a_cart, offset_b_cart] = shell_pair_data.offsets_cart[ipair];
+            // Set up host data
+            for (size_t ipair = 0; ipair < n_pairs; ipair++)
+            {
+                const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
+                const auto &[exps_a, exps_b] = shell_pair_data.exps[ipair];
+                const auto &[coords_a, coords_b] = shell_pair_data.coords[ipair];
+                const auto &[norms_a, norms_b] = shell_pair_data.norms[ipair];
+                const auto &[offset_a, offset_b] = shell_pair_data.offsets[ipair];
+                const auto &[offset_a_cart, offset_b_cart] = shell_pair_data.offsets_cart[ipair];
 
-    //             n_ccoeffs += exps_a.size() + exps_b.size();
+                n_ccoeffs += exps_a.size() + exps_b.size();
 
-    //             cdepths[2 * ipair] = exps_a.size();
-    //             cdepths[2 * ipair + 1] = exps_b.size();
+                cdepths[2 * ipair] = exps_a.size();
+                cdepths[2 * ipair + 1] = exps_b.size();
 
-    //             poss_cntrs[2 * ipair] = pos_cntrs;
-    //             for (size_t i = 0; i < exps_a.size(); i++)
-    //             {
-    //                 ccoeffs[pos_cntrs] = ccoeffs_a[i];
-    //                 exps[pos_cntrs] = exps_a[i];
-    //                 pos_cntrs++;
-    //             }
+                poss_cntrs[2 * ipair] = pos_cntrs;
+                for (size_t i = 0; i < exps_a.size(); i++)
+                {
+                    ccoeffs[pos_cntrs] = ccoeffs_a[i];
+                    exps[pos_cntrs] = exps_a[i];
+                    pos_cntrs++;
+                }
 
-    //             poss_cntrs[2 * ipair + 1] = pos_cntrs;
-    //             for (size_t i = 0; i < exps_b.size(); i++)
-    //             {
-    //                 ccoeffs[pos_cntrs] = ccoeffs_b[i];
-    //                 exps[pos_cntrs] = exps_b[i];
-    //                 pos_cntrs++;
-    //             }
+                poss_cntrs[2 * ipair + 1] = pos_cntrs;
+                for (size_t i = 0; i < exps_b.size(); i++)
+                {
+                    ccoeffs[pos_cntrs] = ccoeffs_b[i];
+                    exps[pos_cntrs] = exps_b[i];
+                    pos_cntrs++;
+                }
 
-    //             n_coords += 6;
-    //             coords[6 * ipair] = coords_a[0];
-    //             coords[6 * ipair + 1] = coords_a[1];
-    //             coords[6 * ipair + 2] = coords_a[2];
-    //             coords[6 * ipair] = coords_b[0];
-    //             coords[6 * ipair + 1] = coords_b[1];
-    //             coords[6 * ipair + 2] = coords_b[2];
+                n_coords += 6;
+                coords[6 * ipair] = coords_a[0];
+                coords[6 * ipair + 1] = coords_a[1];
+                coords[6 * ipair + 2] = coords_a[2];
+                coords[6 * ipair] = coords_b[0];
+                coords[6 * ipair + 1] = coords_b[1];
+                coords[6 * ipair + 2] = coords_b[2];
 
-    //             n_norms += norms_a.size() + norms_b.size();
+                n_norms += norms_a.size() + norms_b.size();
 
-    //             poss_norms[2 * ipair] = pos_norms;
-    //             for (size_t i = 0; i < norms_a.size(); i++)
-    //             {
-    //                 norms[pos_norms] = norms_a[i];
-    //                 pos_norms++;
-    //             }
+                poss_norms[2 * ipair] = pos_norms;
+                for (size_t i = 0; i < norms_a.size(); i++)
+                {
+                    norms[pos_norms] = norms_a[i];
+                    pos_norms++;
+                }
 
-    //             poss_norms[2 * ipair + 1] = pos_norms;
-    //             for (size_t i = 0; i < norms_b.size(); i++)
-    //             {
-    //                 norms[pos_norms] = norms_b[i];
-    //                 pos_norms++;
-    //             }
+                poss_norms[2 * ipair + 1] = pos_norms;
+                for (size_t i = 0; i < norms_b.size(); i++)
+                {
+                    norms[pos_norms] = norms_b[i];
+                    pos_norms++;
+                }
 
-    //             offsets_sph[2 * ipair] = offset_a;
-    //             offsets_sph[2 * ipair + 1] = offset_b;
+                offsets_sph[2 * ipair] = offset_a;
+                offsets_sph[2 * ipair + 1] = offset_b;
 
-    //             offsets_cart[2 * ipair] = offset_a_cart;
-    //             offsets_cart[2 * ipair + 1] = offset_b_cart;
+                offsets_cart[2 * ipair] = offset_a_cart;
+                offsets_cart[2 * ipair + 1] = offset_b_cart;
 
-    //             offsets_ecoeffs[ipair] = pos_ecoeffs;
+                offsets_ecoeffs[ipair] = pos_ecoeffs;
+                size_t dim_ecoeffs = (la + 1) * (lb + 1) * (la + lb + 1) * 3;
+                pos_ecoeffs += dim_ecoeffs * ccoeffs_a.size() * ccoeffs_b.size();
+            }
 
-    //             size_t dim_ecoeffs = (la + 1) * (lb + 1) * (la + lb + 1) * 3;
-    //             pos_ecoeffs += dim_ecoeffs * ccoeffs_a.size() * ccoeffs_b.size();
-    //         }
+            printf("n_ccoeffs = %zu\n", n_ccoeffs);
 
-    //         printf("n_ccoeffs = %zu\n", n_ccoeffs);
+            // Copy data from host to CPU
+            hipCheck(hipMemcpy(dev_ccoeffs, ccoeffs.data(), n_ccoeffs * sizeof(double), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_exps, exps.data(), n_ccoeffs * sizeof(double), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_cdepths, cdepths.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_coords, coords.data(), n_coords * sizeof(double), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_norms, norms.data(), n_norms * sizeof(double), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_poss_norms, poss_norms.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_offsets_sph, offsets_sph.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_offsets_cart, offsets_cart.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
+            hipCheck(hipMemcpy(dev_offsets_ecoeffs, offsets_ecoeffs.data(), n_pairs * sizeof(int), hipMemcpyHostToDevice));
 
-    //         // Copy data from host to CPU
-    //         hipCheck(hipMemcpy(dev_ccoeffs, ccoeffs.data(), n_ccoeffs * sizeof(double), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_exps, exps.data(), n_ccoeffs * sizeof(double), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_cdepths, cdepths.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_coords, coords.data(), n_coords * sizeof(double), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_norms, norms.data(), n_norms * sizeof(double), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_poss_norms, poss_norms.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_offsets_sph, offsets_sph.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_offsets_cart, offsets_cart.data(), n_pairs_2x * sizeof(int), hipMemcpyHostToDevice));
-    //         hipCheck(hipMemcpy(dev_offsets_ecoeffs, offsets_ecoeffs.data(), n_pairs * sizeof(int), hipMemcpyHostToDevice));
+            // Call the GPU kernels
+            int n_thr_per_blk = 128; // Choosing this for now, in the future, will use a more flexible approach
+            int n_blk_per_grd = std::ceil(double(n_pairs) / n_thr_per_blk);
 
-    //         // Call the GPU kernels
-    //         int n_thr_per_blk = 128; // Choosing this for now, in the future, will use a more flexible approach
-    //         int n_blk_per_grd = std::ceil(double(n_pairs) / n_thr_per_blk);
+            calcECoeffs<<<n_blk_per_grd, n_thr_per_blk>>>(la, lb, n_pairs, dev_cdepths,
+                                                          dev_offsets_ecoeffs, dev_poss_cntrs,
+                                                          dev_coords, dev_exps, dev_ecoeffs);
 
-    //         calcECoeffs<<<n_blk_per_grd, n_thr_per_blk>>>(la, lb, n_pairs, dev_cdepths,
-    //                                                       dev_offsets_ecoeffs, dev_poss_cntrs,
-    //                                                       dev_coords, dev_exps, dev_ecoeffs);
-
-    //         // 1) overlap ints
-    //         // devKernelOverlap<<<n_blk_per_grd, n_thr_per_blk>>>(dim_ao_cart, la, lb, n_pairs, );
-    //         // 2) spherical trafo
-    //     }
+            // 1) overlap ints
+            // devKernelOverlap<<<n_blk_per_grd, n_thr_per_blk>>>(dim_ao_cart, la, lb, n_pairs, );
+            // 2) spherical trafo
+        }
 
     // // Release GPU data
     // hipCheck(hipFree(dev_ccoeffs));

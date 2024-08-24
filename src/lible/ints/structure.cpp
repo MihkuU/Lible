@@ -22,7 +22,7 @@ using std::array, std::map, std::set, std::string, std::vector;
 LI::Structure::Structure(const string &basis_set,
                          const vector<int> &atomic_nrs,
                          const vector<double> &coordinates_angstroem)
-    : basis_set(basis_set), atomic_nrs(atomic_nrs), coordinates(coordinates_angstroem)
+    : basis_set(basis_set), coordinates(coordinates_angstroem), atomic_nrs(atomic_nrs)
 {
     n_atoms = atomic_nrs.size();
 
@@ -44,7 +44,7 @@ LI::Structure::Structure(const string &basis_set,
 LI::Structure::Structure(const string &basis_set,
                          const vector<string> &elements,
                          const vector<double> &coordinates_angstroem)
-    : basis_set(basis_set), elements(elements), coordinates(coordinates_angstroem)
+    : basis_set(basis_set), coordinates(coordinates_angstroem), elements(elements)
 {
     n_atoms = elements.size();
 
@@ -151,7 +151,7 @@ void LI::Structure::constructShells(int &max_l, size_t &dim_ao, size_t &dim_ao_c
 
                 Shell shell(angmom, atomic_nr,
                             dim_cart, dim_sphe,
-                            pos, pos_cart, 
+                            pos, pos_cart,
                             xyz_coordinates,
                             coeffs, coeffs_raw,
                             exps, norms);

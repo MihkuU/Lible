@@ -19,12 +19,12 @@ namespace lible
 	{
 		struct Shell
 		{
-			Shell(const int &angular_momentum,
-				  const int &atomic_number,
-				  const std::size_t &dim_cartesian,
-				  const std::size_t &dim_spherical,
-				  const std::size_t &pos,
-				  const std::size_t &pos_cart,
+			Shell(const int angular_momentum,
+				  const int atomic_number,
+				  const std::size_t dim_cartesian,
+				  const std::size_t dim_spherical,
+				  const std::size_t pos,
+				  const std::size_t pos_cart,
 				  const std::array<double, 3> &xyz_coords,
 				  const std::vector<double> &coeffs,
 				  const std::vector<double> &coeffs_raw,
@@ -44,9 +44,9 @@ namespace lible
 			{
 			}
 
-			Shell(const int &angular_momentum,
-				  const std::size_t &dim_cartesian,
-				  const std::size_t &dim_spherical)
+			Shell(const int angular_momentum,
+				  const std::size_t dim_cartesian,
+				  const std::size_t dim_spherical)
 				: angular_momentum(angular_momentum),
 				  atomic_number(0),
 				  dim_cartesian(dim_cartesian),
