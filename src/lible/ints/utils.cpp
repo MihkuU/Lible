@@ -46,6 +46,11 @@ int LI::dimSphericals(const int l)
     return 2 * l + 1;
 }
 
+int LI::dimHermiteGaussians(const int l)
+{
+    return (l + 1) * (l + 2) * (l + 3) / 6;
+}
+
 std::vector<std::array<int, 3>> LI::returnCartesianExps(const int l)
 {
     std::size_t dim_cart = dimCartesians(l);

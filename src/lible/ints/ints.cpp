@@ -45,29 +45,9 @@ lible::vec4d LI::eri4(const Structure &structure)
     return LIT::calcERI4(structure);
 }
 
-lible::vec4d LI::eri4Shark(const Structure &structure)
-{
-    return LIT::calcERI4Shark(structure);
-}
-
-lible::vec4d LI::eri4SharkFlat(const Structure &structure)
-{
-    return LIT::calcERI4SharkFlat(structure);
-}
-
 void LI::eri4Benchmark(const Structure &structure)
 {
     LIT::calcERI4Benchmark(structure);
-}
-
-void LI::eri4BenchmarkShark(const Structure &structure)
-{
-    LIT::calcERI4BenchmarkShark(structure);
-}
-
-void LI::eri4BenchmarkSharkFlat(const Structure &structure)
-{
-    LIT::calcERI4BenchmarkSharkFlat(structure);
 }
 
 #ifdef _LIBLE_USE_HIP_

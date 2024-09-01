@@ -163,6 +163,8 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
 
     int dim_sph_a = dimSphericals(la);
     int dim_sph_b = dimSphericals(lb);
+    int dim_herm_gauss = dimHermiteGaussians(la + lb);
+    int n_sph_ecoeffs = dim_sph_a * dim_sph_b * dim_herm_gauss;
 
     int n_coords = 6 * n_pairs;
     int n_norms = (dim_sph_a + dim_sph_b) * n_pairs;
@@ -172,11 +174,10 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
     {
         int cdepth_a = shells_a[ishell].coeffs.size();
         int cdepth_b = shells_b[jshell].coeffs.size();
-
         n_coeffs += cdepth_a + cdepth_b;
     }
 
-    int n_prim_pairs{}; // TODO
+    int n_prim_pairs{0};
 
     std::vector<double> coeffs(n_coeffs);
     std::vector<double> coords(n_coords);
@@ -187,12 +188,12 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
     std::vector<int> coffsets(2 * n_pairs);
 
     std::vector<int> offsets_cart(2 * n_pairs);
-    std::vector<int> offsets_ecoeffs; // TODO
+    std::vector<int> offsets_ecoeffs(n_pairs); 
     std::vector<int> offsets_norms(2 * n_pairs);
     std::vector<int> offsets_primitives; // TODO
     std::vector<int> offsets_sph(2 * n_pairs);
 
-    int pos_coords{0}, pos_coeffs{0}, pos_norms{0};
+    int pos_coords{0}, pos_coeffs{0}, pos_norms{0}, pos_ecoeffs{0};
     for (int ipair = 0; ipair < n_pairs; ipair++)
     {
         auto [ishell, jshell] = shell_pair_idxs[ipair];
@@ -210,6 +211,10 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
 
         int cdepth_a = shell_a.coeffs.size();
         int cdepth_b = shell_b.coeffs.size();
+
+        offsets_ecoeffs[ipair] += pos_ecoeffs;
+        pos_ecoeffs += cdepth_a * cdepth_b * n_sph_ecoeffs;
+        n_prim_pairs += cdepth_a * cdepth_b;
 
         coffsets[2 * ipair + 0] = pos_coeffs;
 

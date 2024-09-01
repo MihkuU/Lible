@@ -7,13 +7,125 @@
 
 #include <fmt/core.h>
 
+#ifdef _LIBLE_USE_MKL_
+#include <mkl_cblas.h>
+#else
+#include <cblas.h>
+#endif
+
 namespace LIT = lible::ints::two;
 
 using std::pair, std::vector;
 
+namespace lible::ints::two
+{
+    void kernelERI4(const int lab, const int lcd,
+                    const size_t ipair_ab, const size_t ipair_cd,
+                    const vector<double> &ecoeffs_lalb,
+                    const vector<double> &ecoeffs_lcld_tsp,
+                    const vector<IdxsTUV> &idxs_tuv_ab,
+                    const vector<IdxsTUV> &idxs_tuv_cd_tsp,
+                    const ShellPairData &shell_pair_data_ab,
+                    const ShellPairData &shell_pair_data_cd,
+                    const BoysF &boys_f, vector<double> &eri4_shells_sph,
+                    vector<double> &rints, vector<double> &fnx,
+                    vec4d &rints_tmp)
+    {
+        int labcd = lab + lcd;
+
+        const auto &[exps_a, exps_b] = shell_pair_data_ab.exps[ipair_ab];
+        const auto &[exps_c, exps_d] = shell_pair_data_cd.exps[ipair_cd];
+        const auto &[xyz_a, xyz_b] = shell_pair_data_ab.coords[ipair_ab];
+        const auto &[xyz_c, xyz_d] = shell_pair_data_cd.coords[ipair_cd];
+
+        const auto &offsets_ecoeffs_ab = shell_pair_data_ab.offsets_ecoeffs;
+        const auto &offsets_ecoeffs_cd_tsp = shell_pair_data_cd.offsets_ecoeffs;
+
+        size_t offset_prim_ab = shell_pair_data_ab.offsets_prims[ipair_ab];
+        size_t offset_prim_cd = shell_pair_data_cd.offsets_prims[ipair_cd];
+
+        size_t ka = exps_a.size();
+        size_t kb = exps_b.size();
+        size_t kc = exps_c.size();
+        size_t kd = exps_d.size();
+
+        arma::vec::fixed<3> A{xyz_a[0], xyz_a[1], xyz_a[2]};
+        arma::vec::fixed<3> B{xyz_b[0], xyz_b[1], xyz_b[2]};
+        arma::vec::fixed<3> C{xyz_c[0], xyz_c[1], xyz_c[2]};
+        arma::vec::fixed<3> D{xyz_d[0], xyz_d[1], xyz_d[2]};
+
+        int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
+        int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
+
+        int la = shell_pair_data_ab.la, lb = shell_pair_data_ab.lb;
+        int lc = shell_pair_data_cd.la, ld = shell_pair_data_cd.lb;
+        int dim_sph_a = dimSphericals(la);
+        int dim_sph_b = dimSphericals(lb);
+        int dim_sph_c = dimSphericals(lc);
+        int dim_sph_d = dimSphericals(ld);
+        int dim_sph_ab = dim_sph_a * dim_sph_b;
+        int dim_sph_cd = dim_sph_c * dim_sph_d;
+        int dim_R_x_E = dim_tuv_ab * dim_sph_cd;
+        vector<double> X(ka * kb * dim_R_x_E, 0);
+
+        for (size_t ia = 0, iab = 0; ia < ka; ia++)
+            for (size_t ib = 0; ib < kb; ib++)
+            {
+                size_t pos_X = iab * dim_R_x_E;
+
+                for (size_t ic = 0, icd = 0; ic < kc; ic++)
+                    for (size_t id = 0; id < kd; id++)
+                    {
+                        double a = exps_a[ia];
+                        double b = exps_b[ib];
+                        double c = exps_c[ic];
+                        double d = exps_d[id];
+
+                        double p = a + b;
+                        double q = c + d;
+                        double alpha = p * q / (p + q);
+
+                        arma::vec::fixed<3> P = (a * A + b * B) / p;
+                        arma::vec::fixed<3> Q = (c * C + d * D) / q;
+                        arma::vec::fixed<3> RPQ = P - Q;
+
+                        double x = alpha * arma::dot(RPQ, RPQ);
+
+                        boys_f.calcFnx(labcd, x, fnx);
+
+                        double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
+                        calcRInts(lab, lcd, alpha, fac, RPQ, fnx, idxs_tuv_ab,
+                                  idxs_tuv_cd_tsp, rints_tmp, rints);
+
+                        size_t iprim_cd = offset_prim_cd + icd;
+                        size_t pos_ecoeffs_cd = offsets_ecoeffs_cd_tsp[iprim_cd];
+                        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_tuv_ab,
+                                    dim_sph_cd, dim_tuv_cd, 1.0, &rints[0], dim_tuv_cd,
+                                    &ecoeffs_lcld_tsp[pos_ecoeffs_cd], dim_sph_cd, 1.0, &X[pos_X],
+                                    dim_sph_cd);
+                        icd++;
+                    }
+                iab++;
+            }
+
+        for (size_t ia = 0, iab = 0; ia < ka; ia++)
+            for (size_t ib = 0; ib < kb; ib++, iab++)
+            {
+                size_t iprim_ab = offset_prim_ab + iab;
+                size_t pos_ecoeffs_ab = offsets_ecoeffs_ab[iprim_ab];
+                size_t pos_X = iab * dim_R_x_E;
+
+                cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_sph_ab,
+                            dim_sph_cd, dim_tuv_ab, 1.0, &ecoeffs_lalb[pos_ecoeffs_ab],
+                            dim_tuv_ab, &X[pos_X], dim_sph_cd, 1.0, &eri4_shells_sph[0],
+                            dim_sph_cd);
+            }
+    }
+}
+
 lible::vec4d LIT::calcERI4(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}", "4-center 2-electron integrals..."));
+    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4 flat..."));
 
     auto start{std::chrono::steady_clock::now()};
 
@@ -28,13 +140,24 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
         shell_pair_datas[ipair] = ShellPairData(la, lb, structure);
     }
 
-    vector<vector<vector<vec4d>>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs(l_pairs.size()), ecoeffs_tsp(l_pairs.size());
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
-        vector<vector<vec4d>> ecoeffs_ipair;
-        calcECoeffs(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
+
+        int lab = la + lb;
+        int n_ecoeffs_sph = (2 * la + 1) * (2 * lb + 1) *
+                            ((lab + 1) * (lab + 2) * (lab + 3) / 6) *
+                            shell_pair_datas[ipair].n_prim_pairs;
+
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph);
+
+        calcECoeffsSpherical(la, lb, shell_pair_datas[ipair], ecoeffs_ipair,
+                             ecoeffs_tsp_ipair);
+
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
     }
 
     size_t dim_ao = structure.getDimAO();
@@ -49,51 +172,46 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
             int lcd = lc + ld;
             int labcd = lab + lcd;
 
-            int dim_a_cart = dimCartesians(la);
-            int dim_b_cart = dimCartesians(lb);
-            int dim_c_cart = dimCartesians(lc);
-            int dim_d_cart = dimCartesians(ld);
-
             int dim_a_sph = dimSphericals(la);
             int dim_b_sph = dimSphericals(lb);
             int dim_c_sph = dimSphericals(lc);
             int dim_d_sph = dimSphericals(ld);
 
+            int dim_ab_sph = dim_a_sph * dim_b_sph;
+            int dim_cd_sph = dim_c_sph * dim_d_sph;
+
             BoysF boys_f(labcd);
 
-            auto cart_exps_a = cart_exps[la];
-            auto cart_exps_b = cart_exps[lb];
-            auto cart_exps_c = cart_exps[lc];
-            auto cart_exps_d = cart_exps[ld];
-
-            const auto &ecoeffs_lalb = ecoeffs[lalb];
-            const auto &ecoeffs_lcld = ecoeffs[lcld];
+            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
 
             const auto &shell_pair_data_ab = shell_pair_datas[lalb];
             const auto &shell_pair_data_cd = shell_pair_datas[lcld];
 
-            arma::dmat sph_trafo_a = returnSphericalTrafo(la);
-            arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
-            arma::dmat sph_trafo_c = returnSphericalTrafo(lc);
-            arma::dmat sph_trafo_d = returnSphericalTrafo(ld);
-
             size_t n_pairs_ab = shell_pair_data_ab.n_pairs;
             size_t n_pairs_cd = shell_pair_data_cd.n_pairs;
 
-            // size_t n_shells_abcd = 0;
+            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
+            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
+
+            int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
+            int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
+
+            vector<double> rints(dim_tuv_ab * dim_tuv_cd, 0);
+            vector<double> fnx(labcd + 1, 0);
+            vec4d rints_tmp(labcd + 1, 0);
+
             if (lalb == lcld)
                 for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (size_t ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
                     {
-                        vec4d eri4_shells_cart(dim_a_cart, dim_b_cart, dim_c_cart, dim_d_cart, 0);
-                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_lalb, ecoeffs_lcld,
-                                   cart_exps_a, cart_exps_b, cart_exps_c, cart_exps_d,
-                                   shell_pair_data_ab, shell_pair_data_cd, boys_f,
-                                   eri4_shells_cart);
-
-                        vec4d eri4_shells_sph(dim_a_sph, dim_b_sph, dim_c_sph, dim_d_sph, 0);
-                        sphericalTrafo(sph_trafo_a, sph_trafo_b, sph_trafo_c, sph_trafo_d,
-                                       eri4_shells_cart, eri4_shells_sph);
+                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd,
+                                   ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd,
+                                   shell_pair_data_ab, shell_pair_data_cd,
+                                   boys_f, eri4_shells_sph,
+                                   rints, fnx, rints_tmp);
 
                         transferIntegrals(ipair_ab, ipair_cd, shell_pair_data_ab,
                                           shell_pair_data_cd, eri4_shells_sph, eri4);
@@ -102,15 +220,13 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
                 for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (size_t ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
                     {
-                        vec4d eri4_shells_cart(dim_a_cart, dim_b_cart, dim_c_cart, dim_d_cart, 0);
-                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_lalb, ecoeffs_lcld,
-                                   cart_exps_a, cart_exps_b, cart_exps_c, cart_exps_d,
-                                   shell_pair_data_ab, shell_pair_data_cd, boys_f,
-                                   eri4_shells_cart);
-
-                        vec4d eri4_shells_sph(dim_a_sph, dim_b_sph, dim_c_sph, dim_d_sph, 0);
-                        sphericalTrafo(sph_trafo_a, sph_trafo_b, sph_trafo_c, sph_trafo_d,
-                                       eri4_shells_cart, eri4_shells_sph);
+                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd,
+                                   ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd,
+                                   shell_pair_data_ab, shell_pair_data_cd,
+                                   boys_f, eri4_shells_sph,
+                                   rints, fnx, rints_tmp);
 
                         transferIntegrals(ipair_ab, ipair_cd, shell_pair_data_ab,
                                           shell_pair_data_cd, eri4_shells_sph, eri4);
@@ -126,7 +242,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
 void LIT::calcERI4Benchmark(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}\n", "ERI4 benchmark..."));
+    palPrint(fmt::format("Lible::{:<40}\n", "ERI4 (Shark flat) benchmark..."));
 
     auto start{std::chrono::steady_clock::now()};
 
@@ -141,17 +257,25 @@ void LIT::calcERI4Benchmark(const Structure &structure)
         shell_pair_datas[ipair] = ShellPairData(la, lb, structure);
     }
 
-    auto t0_ecoeffs{std::chrono::steady_clock::now()};
-    vector<vector<vector<vec4d>>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs(l_pairs.size()), ecoeffs_tsp(l_pairs.size());
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
-        vector<vector<vec4d>> ecoeffs_ipair;
-        calcECoeffs(la, lb, shell_pair_datas[ipair], ecoeffs_ipair);
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-    }  
 
-    size_t dim_ao = structure.getDimAO();
+        int lab = la + lb;
+        int n_ecoeffs_sph = (2 * la + 1) * (2 * lb + 1) *
+                            ((lab + 1) * (lab + 2) * (lab + 3) / 6) *
+                            shell_pair_datas[ipair].n_prim_pairs;
+
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph);
+        calcECoeffsSpherical(la, lb, shell_pair_datas[ipair], ecoeffs_ipair,
+                             ecoeffs_tsp_ipair);
+
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+    }
+
     for (int lalb = l_pairs.size() - 1; lalb >= 0; lalb--)
         for (int lcld = lalb; lcld >= 0; lcld--)
         {
@@ -164,51 +288,47 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             int lcd = lc + ld;
             int labcd = lab + lcd;
 
-            int dim_a_cart = dimCartesians(la);
-            int dim_b_cart = dimCartesians(lb);
-            int dim_c_cart = dimCartesians(lc);
-            int dim_d_cart = dimCartesians(ld);
-
             int dim_a_sph = dimSphericals(la);
             int dim_b_sph = dimSphericals(lb);
             int dim_c_sph = dimSphericals(lc);
             int dim_d_sph = dimSphericals(ld);
 
+            int dim_ab_sph = dim_a_sph * dim_b_sph;
+            int dim_cd_sph = dim_c_sph * dim_d_sph;
+
             BoysF boys_f(labcd);
 
-            auto cart_exps_a = cart_exps[la];
-            auto cart_exps_b = cart_exps[lb];
-            auto cart_exps_c = cart_exps[lc];
-            auto cart_exps_d = cart_exps[ld];
-
-            const auto &ecoeffs_lalb = ecoeffs[lalb];
-            const auto &ecoeffs_lcld = ecoeffs[lcld];
+            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
 
             const auto &shell_pair_data_ab = shell_pair_datas[lalb];
             const auto &shell_pair_data_cd = shell_pair_datas[lcld];
 
-            arma::dmat sph_trafo_a = returnSphericalTrafo(la);
-            arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
-            arma::dmat sph_trafo_c = returnSphericalTrafo(lc);
-            arma::dmat sph_trafo_d = returnSphericalTrafo(ld);
-
             size_t n_pairs_ab = shell_pair_data_ab.n_pairs;
             size_t n_pairs_cd = shell_pair_data_cd.n_pairs;
+
+            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
+            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
+
+            int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
+            int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
+
+            vector<double> rints(dim_tuv_ab * dim_tuv_cd, 0);
+            vector<double> fnx(labcd + 1, 0);
+            vec4d rints_tmp(labcd + 1, 0);
 
             size_t n_shells_abcd = 0;
             if (lalb == lcld)
                 for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (size_t ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
                     {
-                        vec4d eri4_shells_cart(dim_a_cart, dim_b_cart, dim_c_cart, dim_d_cart, 0);
-                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_lalb, ecoeffs_lcld,
-                                   cart_exps_a, cart_exps_b, cart_exps_c, cart_exps_d,
-                                   shell_pair_data_ab, shell_pair_data_cd, boys_f,
-                                   eri4_shells_cart);
-
-                        vec4d eri4_shells_sph(dim_a_sph, dim_b_sph, dim_c_sph, dim_d_sph, 0);
-                        sphericalTrafo(sph_trafo_a, sph_trafo_b, sph_trafo_c, sph_trafo_d,
-                                       eri4_shells_cart, eri4_shells_sph);
+                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd,
+                                   ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd,
+                                   shell_pair_data_ab, shell_pair_data_cd,
+                                   boys_f, eri4_shells_sph,
+                                   rints, fnx, rints_tmp);
 
                         n_shells_abcd += 4;
                     }
@@ -216,15 +336,13 @@ void LIT::calcERI4Benchmark(const Structure &structure)
                 for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (size_t ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
                     {
-                        vec4d eri4_shells_cart(dim_a_cart, dim_b_cart, dim_c_cart, dim_d_cart, 0);
-                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_lalb, ecoeffs_lcld,
-                                   cart_exps_a, cart_exps_b, cart_exps_c, cart_exps_d,
-                                   shell_pair_data_ab, shell_pair_data_cd, boys_f,
-                                   eri4_shells_cart);
-
-                        vec4d eri4_shells_sph(dim_a_sph, dim_b_sph, dim_c_sph, dim_d_sph, 0);
-                        sphericalTrafo(sph_trafo_a, sph_trafo_b, sph_trafo_c, sph_trafo_d,
-                                       eri4_shells_cart, eri4_shells_sph);
+                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd,
+                                   ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd,
+                                   shell_pair_data_ab, shell_pair_data_cd,
+                                   boys_f, eri4_shells_sph,
+                                   rints, fnx, rints_tmp);
 
                         n_shells_abcd += 4;
                     }
@@ -241,94 +359,140 @@ void LIT::calcERI4Benchmark(const Structure &structure)
     palPrint(fmt::format("done {:.2e} s\n", duration.count()));
 }
 
-void LIT::kernelERI4(const int lab, const int lcd,
-                     const size_t ipair_ab, const size_t ipair_cd,
-                     const vector<vector<vec4d>> &ecoeffs_lalb,
-                     const vector<vector<vec4d>> &ecoeffs_lcld,
-                     const vector<CartExps> &cart_exps_a,
-                     const vector<CartExps> &cart_exps_b,
-                     const vector<CartExps> &cart_exps_c,
-                     const vector<CartExps> &cart_exps_d,
-                     const ShellPairData &shell_pair_data_ab,
-                     const ShellPairData &shell_pair_data_cd,
-                     const BoysF &boys_f, vec4d &eri4_shells_cart)
+namespace lible::ints::two
 {
-    int labcd = lab + lcd;
+    void kernelERI4_new(const int lab, const int lcd,
+                        const size_t ipair_ab, const size_t ipair_cd,
+                        const vector<double> &ecoeffs_lalb,
+                        const vector<double> &ecoeffs_lcld_tsp,
+                        const vector<IdxsTUV> &idxs_tuv_ab,
+                        const vector<IdxsTUV> &idxs_tuv_cd_tsp,
+                        const ShellPairData_new &sp_data_ab,
+                        const ShellPairData_new &sp_data_cd,
+                        const BoysF &boys_f, vector<double> &eri4_shells_sph,
+                        vector<double> &rints, vector<double> &fnx,
+                        vec4d &rints_tmp)
+    {
+    }
 
-    const auto &[exps_a, exps_b] = shell_pair_data_ab.exps[ipair_ab];
-    const auto &[exps_c, exps_d] = shell_pair_data_cd.exps[ipair_cd];
-    const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data_ab.ccoeffs[ipair_ab];
-    const auto &[ccoeffs_c, ccoeffs_d] = shell_pair_data_cd.ccoeffs[ipair_cd];
-    const auto &[xyz_a, xyz_b] = shell_pair_data_ab.coords[ipair_ab];
-    const auto &[xyz_c, xyz_d] = shell_pair_data_cd.coords[ipair_cd];
+}
 
-    const vector<vec4d> &Exyz_ab = ecoeffs_lalb[ipair_ab];
-    const vector<vec4d> &Exyz_cd = ecoeffs_lcld[ipair_cd];
+lible::vec4d LIT::calcERI4_new(const Structure &structure)
+{
+    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4 flat..."));
 
-    size_t ka = exps_a.size();
-    size_t kb = exps_b.size();
-    size_t kc = exps_c.size();
-    size_t kd = exps_d.size();
+    auto start{std::chrono::steady_clock::now()};
 
-    arma::vec::fixed<3> A{xyz_a[0], xyz_a[1], xyz_a[2]};
-    arma::vec::fixed<3> B{xyz_b[0], xyz_b[1], xyz_b[2]};
-    arma::vec::fixed<3> C{xyz_c[0], xyz_c[1], xyz_c[2]};
-    arma::vec::fixed<3> D{xyz_d[0], xyz_d[1], xyz_d[2]};
+    int l_max = structure.getMaxL();
 
-    vector<double> fnx(labcd + 1, 0);
-    vec3d rints(labcd + 1, 0);
-    vec4d rints_tmp(labcd + 1, 0);
+    vector<pair<int, int>> l_pairs = returnLPairs(l_max);
 
-    for (size_t ia = 0, iab = 0; ia < ka; ia++)
-        for (size_t ib = 0; ib < kb; ib++, iab++)
-            for (size_t ic = 0, icd = 0; ic < kc; ic++)
-                for (size_t id = 0; id < kd; id++, icd++)
-                {
-                    double a = exps_a[ia];
-                    double b = exps_b[ib];
-                    double c = exps_c[ic];
-                    double d = exps_d[id];
+    vector<ShellPairData_new> sp_datas;
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
+    }
 
-                    double p = a + b;
-                    double q = c + d;
-                    double alpha = p * q / (p + q);
+    vector<vector<double>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
 
-                    arma::vec::fixed<3> P = (a * A + b * B) / p;
-                    arma::vec::fixed<3> Q = (c * C + d * D) / q;
-                    arma::vec::fixed<3> RPQ = P - Q;
+        int lab = la + lb;
+        int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
+                            sp_datas[ipair].n_prim_pairs;
 
-                    double x = alpha * arma::dot(RPQ, RPQ);
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph);
 
-                    boys_f.calcFnx(labcd, x, fnx);
+        calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
 
-                    calcRInts(lab, lcd, alpha, RPQ, fnx, rints_tmp, rints);
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+    }
 
-                    double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q))) *
-                                 ccoeffs_a[ia] * ccoeffs_b[ib] * ccoeffs_c[ic] * ccoeffs_d[id];
+    size_t dim_ao = structure.getDimAO();
+    vec4d eri4(dim_ao, 0);
+    for (int lalb = l_pairs.size() - 1; lalb >= 0; lalb--)
+        for (int lcld = lalb; lcld >= 0; lcld--)
+        {
+            auto [la, lb] = l_pairs[lalb];
+            auto [lc, ld] = l_pairs[lcld];
 
-                    for (const auto [i, j, k, mu] : cart_exps_a)
-                        for (const auto [i_, j_, k_, nu] : cart_exps_b)
-                            for (const auto [l, m, n, kappa] : cart_exps_c)
-                                for (const auto [l_, m_, n_, tau] : cart_exps_d)
-                                    for (int t_ = 0; t_ <= l + l_; t_++)
-                                        for (int u_ = 0; u_ <= m + m_; u_++)
-                                            for (int v_ = 0; v_ <= n + n_; v_++)
-                                            {
-                                                double sign = std::pow(-1.0, t_ + u_ + v_);
-                                                for (int t = 0; t <= i + i_; t++)
-                                                    for (int u = 0; u <= j + j_; u++)
-                                                        for (int v = 0; v <= k + k_; v++)
-                                                        {
-                                                            eri4_shells_cart(mu, nu, kappa, tau) +=
-                                                                fac * sign *
-                                                                Exyz_ab[iab](0, i, i_, t) *
-                                                                Exyz_ab[iab](1, j, j_, u) *
-                                                                Exyz_ab[iab](2, k, k_, v) *
-                                                                Exyz_cd[icd](0, l, l_, t_) *
-                                                                Exyz_cd[icd](1, m, m_, u_) *
-                                                                Exyz_cd[icd](2, n, n_, v_) *
-                                                                rints(t + t_, u + u_, v + v_);
-                                                        }
-                                            }
-                }
+            int lab = la + lb;
+            int lcd = lc + ld;
+            int labcd = lab + lcd;
+
+            int dim_a_sph = dimSphericals(la);
+            int dim_b_sph = dimSphericals(lb);
+            int dim_c_sph = dimSphericals(lc);
+            int dim_d_sph = dimSphericals(ld);
+
+            int dim_ab_sph = dim_a_sph * dim_b_sph;
+            int dim_cd_sph = dim_c_sph * dim_d_sph;
+
+            BoysF boys_f(labcd);
+
+            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+
+            const auto &shell_pair_data_ab = shell_pair_datas[lalb];
+            const auto &shell_pair_data_cd = shell_pair_datas[lcld];
+
+            size_t n_pairs_ab = shell_pair_data_ab.n_pairs;
+            size_t n_pairs_cd = shell_pair_data_cd.n_pairs;
+
+            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
+            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
+
+            int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
+            int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
+
+            vector<double> rints(dim_tuv_ab * dim_tuv_cd, 0);
+            vector<double> fnx(labcd + 1, 0);
+            vec4d rints_tmp(labcd + 1, 0);
+
+            if (lalb == lcld)
+                for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+                    for (size_t ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
+                    {
+                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd,
+                                   ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd,
+                                   shell_pair_data_ab, shell_pair_data_cd,
+                                   boys_f, eri4_shells_sph,
+                                   rints, fnx, rints_tmp);
+
+                        transferIntegrals(ipair_ab, ipair_cd, shell_pair_data_ab,
+                                          shell_pair_data_cd, eri4_shells_sph, eri4);
+                    }
+            else
+                for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+                    for (size_t ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
+                    {
+                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd,
+                                   ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd,
+                                   shell_pair_data_ab, shell_pair_data_cd,
+                                   boys_f, eri4_shells_sph,
+                                   rints, fnx, rints_tmp);
+
+                        transferIntegrals(ipair_ab, ipair_cd, shell_pair_data_ab,
+                                          shell_pair_data_cd, eri4_shells_sph, eri4);
+                    }
+        }
+
+    auto end{std::chrono::steady_clock::now()};
+    std::chrono::duration<double> duration{end - start};
+    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+
+    return eri4;
+}
+
+void LIT::calcERI4Benchmark_new(const Structure &structure)
+{
 }

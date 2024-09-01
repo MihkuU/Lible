@@ -64,18 +64,25 @@ namespace lible
         void calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_data,
                          std::vector<std::vector<vec4d>> &ecoeffs_out); // TODO
 
-        /**
-         *
-         */
-        void calcECoeffsSpherical(const int la, const int lb,
-                                  const ShellPairData &shell_pair_data,
-                                  std::vector<std::vector<arma::dmat>> &ecoeffs_out);
+        // /**
+        //  *
+        //  */
+        // void calcECoeffsSpherical(const int la, const int lb,
+        //                           const ShellPairData &shell_pair_data,
+        //                           std::vector<std::vector<arma::dmat>> &ecoeffs_out);
 
         /**
          *
          */
         void calcECoeffsSpherical(const int la, const int lb,
                                   const ShellPairData &shell_pair_data,
+                                  std::vector<double> &ecoeffs_out,
+                                  std::vector<double> &ecoeffs_tsp_out);
+
+        /**
+         *
+         */
+        void calcECoeffsSpherical(const int la, const int lb, const ShellPairData_new &sp_data,
                                   std::vector<double> &ecoeffs_out,
                                   std::vector<double> &ecoeffs_tsp_out);
     }

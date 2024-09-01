@@ -361,95 +361,95 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_dat
     }
 }
 
+// void LI::calcECoeffsSpherical(const int la, const int lb,
+//                               const ShellPairData &shell_pair_data,
+//                               vector<vector<arma::dmat>> &ecoeffs_out)
+// {
+//     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
+//     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
+//     lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
+
+//     arma::dmat sph_trafo_a = returnSphericalTrafo(la);
+//     arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
+
+//     const auto &cart_exps_a = cart_exps[la];
+//     const auto &cart_exps_b = cart_exps[lb];
+
+//     int dim_a_cart = dimCartesians(la);
+//     int dim_b_cart = dimCartesians(lb);
+//     int dim_a_sph = dimSphericals(la);
+//     int dim_b_sph = dimSphericals(lb);
+
+//     int lab = la + lb;
+//     int dim_tuv = (lab + 1) * (lab + 2) * (lab + 3) / 6;
+
+//     vec3i tuv_poss = returnTUVPoss(lab);
+//     vector<IdxsTUV> idxs_tuv = returnIdxsTUV(lab);
+
+//     ecoeffs_out.resize(shell_pair_data.n_pairs);
+//     for (size_t ipair = 0; ipair < shell_pair_data.n_pairs; ipair++)
+//     {
+//         const auto &[exps_a, exps_b] = shell_pair_data.exps[ipair];
+
+//         const auto &[A, B] = shell_pair_data.coords[ipair];
+
+//         const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
+
+//         size_t ka = exps_a.size();
+//         size_t kb = exps_b.size();
+
+//         vec3d ecoeffs_ppair_cc(dim_a_cart, dim_b_cart, dim_tuv, 0);
+//         vec3d ecoeffs_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+//         vector<arma::dmat> ecoeffs_pair(ka * kb, arma::zeros(dim_a_sph * dim_b_sph, dim_tuv));
+//         for (size_t ia = 0, iab = 0; ia < ka; ia++)
+//             for (size_t ib = 0; ib < kb; ib++, iab++)
+//             {
+//                 double a = exps_a[ia];
+//                 double b = exps_b[ib];
+//                 double mu = a * b / (a + b);
+//                 std::array<double, 3> Kab{std::exp(-mu * std::pow(A[0] - B[0], 2)),
+//                                           std::exp(-mu * std::pow(A[1] - B[1], 2)),
+//                                           std::exp(-mu * std::pow(A[2] - B[2], 2))};
+
+//                 coeffs(a, b, la, lb, A, B, Kab, Ex, Ey, Ez);
+
+//                 ecoeffs_ppair_cc.set(0);
+//                 for (const auto [i, j, k, mu] : cart_exps_a)
+//                     for (const auto [i_, j_, k_, nu] : cart_exps_b)
+//                         for (int t = 0; t <= i + i_; t++)
+//                             for (int u = 0; u <= j + j_; u++)
+//                                 for (int v = 0; v <= k + k_; v++)
+//                                 {
+//                                     int tuv = tuv_poss(t, u, v);
+//                                     ecoeffs_ppair_cc(mu, nu, tuv) =
+//                                         Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
+//                                 }
+
+//                 ecoeffs_ppair_sc.set(0);
+//                 for (int mu = 0; mu < dim_a_sph; mu++)
+//                     for (int mu_ = 0; mu_ < dim_a_cart; mu_++)
+//                         for (int nu = 0; nu < dim_b_cart; nu++)
+//                             for (int tuv = 0; tuv < dim_tuv; tuv++)
+//                                 ecoeffs_ppair_sc(mu, nu, tuv) +=
+//                                     ecoeffs_ppair_cc(mu_, nu, tuv) * sph_trafo_a(mu, mu_);
+
+//                 double da = ccoeffs_a[ia], db = ccoeffs_b[ib];
+//                 for (int mu = 0, munu = 0; mu < dim_a_sph; mu++)
+//                     for (int nu = 0; nu < dim_b_sph; nu++, munu++)
+//                         for (int nu_ = 0; nu_ < dim_b_cart; nu_++)
+//                             for (int tuv = 0; tuv < dim_tuv; tuv++)
+//                                 ecoeffs_pair[iab](munu, tuv) += da * db *
+//                                                                 ecoeffs_ppair_sc(mu, nu_, tuv) *
+//                                                                 sph_trafo_b(nu, nu_);
+//             }
+//         ecoeffs_out[ipair] = ecoeffs_pair;
+//     }
+// }
+
 void LI::calcECoeffsSpherical(const int la, const int lb,
                               const ShellPairData &shell_pair_data,
-                              vector<vector<arma::dmat>> &ecoeffs_out)
-{
-    lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
-    lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
-    lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
-
-    arma::dmat sph_trafo_a = returnSphericalTrafo(la);
-    arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
-
-    const auto &cart_exps_a = cart_exps[la];
-    const auto &cart_exps_b = cart_exps[lb];
-
-    int dim_a_cart = dimCartesians(la);
-    int dim_b_cart = dimCartesians(lb);
-    int dim_a_sph = dimSphericals(la);
-    int dim_b_sph = dimSphericals(lb);
-
-    int lab = la + lb;
-    int dim_tuv = (lab + 1) * (lab + 2) * (lab + 3) / 6;
-
-    vec3i tuv_poss = returnTUVPoss(lab);
-    vector<IdxsTUV> idxs_tuv = returnIdxsTUV(lab);
-
-    ecoeffs_out.resize(shell_pair_data.n_pairs);
-    for (size_t ipair = 0; ipair < shell_pair_data.n_pairs; ipair++)
-    {
-        const auto &[exps_a, exps_b] = shell_pair_data.exps[ipair];
-
-        const auto &[A, B] = shell_pair_data.coords[ipair];
-
-        const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
-
-        size_t ka = exps_a.size();
-        size_t kb = exps_b.size();
-
-        vec3d ecoeffs_ppair_cc(dim_a_cart, dim_b_cart, dim_tuv, 0);
-        vec3d ecoeffs_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
-        vector<arma::dmat> ecoeffs_pair(ka * kb, arma::zeros(dim_a_sph * dim_b_sph, dim_tuv));
-        for (size_t ia = 0, iab = 0; ia < ka; ia++)
-            for (size_t ib = 0; ib < kb; ib++, iab++)
-            {
-                double a = exps_a[ia];
-                double b = exps_b[ib];
-                double mu = a * b / (a + b);
-                std::array<double, 3> Kab{std::exp(-mu * std::pow(A[0] - B[0], 2)),
-                                          std::exp(-mu * std::pow(A[1] - B[1], 2)),
-                                          std::exp(-mu * std::pow(A[2] - B[2], 2))};
-
-                coeffs(a, b, la, lb, A, B, Kab, Ex, Ey, Ez);
-
-                ecoeffs_ppair_cc.set(0);
-                for (const auto [i, j, k, mu] : cart_exps_a)
-                    for (const auto [i_, j_, k_, nu] : cart_exps_b)
-                        for (int t = 0; t <= i + i_; t++)
-                            for (int u = 0; u <= j + j_; u++)
-                                for (int v = 0; v <= k + k_; v++)
-                                {
-                                    int tuv = tuv_poss(t, u, v);
-                                    ecoeffs_ppair_cc(mu, nu, tuv) =
-                                        Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
-                                }
-
-                ecoeffs_ppair_sc.set(0);
-                for (int mu = 0; mu < dim_a_sph; mu++)
-                    for (int mu_ = 0; mu_ < dim_a_cart; mu_++)
-                        for (int nu = 0; nu < dim_b_cart; nu++)
-                            for (int tuv = 0; tuv < dim_tuv; tuv++)
-                                ecoeffs_ppair_sc(mu, nu, tuv) +=
-                                    ecoeffs_ppair_cc(mu_, nu, tuv) * sph_trafo_a(mu, mu_);
-
-                double da = ccoeffs_a[ia], db = ccoeffs_b[ib];
-                for (int mu = 0, munu = 0; mu < dim_a_sph; mu++)
-                    for (int nu = 0; nu < dim_b_sph; nu++, munu++)
-                        for (int nu_ = 0; nu_ < dim_b_cart; nu_++)
-                            for (int tuv = 0; tuv < dim_tuv; tuv++)
-                                ecoeffs_pair[iab](munu, tuv) += da * db *
-                                                                ecoeffs_ppair_sc(mu, nu_, tuv) *
-                                                                sph_trafo_b(nu, nu_);
-            }
-        ecoeffs_out[ipair] = ecoeffs_pair;
-    }
-}
-
-void LI::calcECoeffsSpherical(const int la, const int lb,
-                                const ShellPairData &shell_pair_data,
-                                vector<double> &ecoeffs_out,
-                                vector<double> &ecoeffs_tsp_out)
+                              vector<double> &ecoeffs_out,
+                              vector<double> &ecoeffs_tsp_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -537,6 +537,105 @@ void LI::calcECoeffsSpherical(const int la, const int lb,
                                 ecoeffs_tsp_out[idx_t] += ecoeff;
                             }
                 iprim++;
+            }
+    }
+}
+
+void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData_new &sp_data,
+                              vector<double> &ecoeffs_out, vector<double> &ecoeffs_tsp_out)
+{
+    lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
+
+    arma::dmat sph_trafo_a = returnSphericalTrafo(la);
+    arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    int dim_a_cart = dimCartesians(la);
+    int dim_b_cart = dimCartesians(lb);
+    int dim_a_sph = dimSphericals(la);
+    int dim_b_sph = dimSphericals(lb);
+    int dim_ab = dim_a_sph * dim_b_sph;
+
+    int lab = la + lb;
+    int dim_tuv = dimHermiteGaussians(lab);
+    int n_ecoeffs = dim_ab * dim_tuv;
+
+    vec3i tuv_poss = returnTUVPoss(lab);
+    vector<IdxsTUV> idxs_tuv = returnIdxsTUV(lab);
+
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        int dim_a = sp_data.cdepths[2 * ipair + 0];
+        int dim_b = sp_data.cdepths[2 * ipair + 1];
+        int pos_a = sp_data.coffsets[2 * ipair + 0];
+        int pos_b = sp_data.coffsets[2 * ipair + 1];
+
+        array<double, 3> xyz_a{sp_data.coords[6 * ipair + 0],
+                               sp_data.coords[6 * ipair + 1],
+                               sp_data.coords[6 * ipair + 2]};
+
+        array<double, 3> xyz_b{sp_data.coords[6 * ipair + 3],
+                               sp_data.coords[6 * ipair + 4],
+                               sp_data.coords[6 * ipair + 5]};
+
+        int offset_ecoeffs = sp_data.offsets_ecoeffs[ipair];
+
+        vec3d ecoeffs_ppair_cc(dim_a_cart, dim_b_cart, dim_tuv, 0);
+        vec3d ecoeffs_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
+            {
+                double a = sp_data.exps[pos_a + ia];
+                double b = sp_data.exps[pos_b + ib];
+                double mu = a * b / (a + b);
+
+                std::array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
+
+                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+
+                ecoeffs_ppair_cc.set(0);
+                for (const auto [i, j, k, mu] : cart_exps_a)
+                    for (const auto [i_, j_, k_, nu] : cart_exps_b)
+                        for (int t = 0; t <= i + i_; t++)
+                            for (int u = 0; u <= j + j_; u++)
+                                for (int v = 0; v <= k + k_; v++)
+                                {
+                                    int tuv = tuv_poss(t, u, v);
+                                    ecoeffs_ppair_cc(mu, nu, tuv) =
+                                        Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
+                                }
+
+                ecoeffs_ppair_sc.set(0);
+                for (int mu = 0; mu < dim_a_sph; mu++)
+                    for (int mu_ = 0; mu_ < dim_a_cart; mu_++)
+                        for (int nu = 0; nu < dim_b_cart; nu++)
+                            for (int tuv = 0; tuv < dim_tuv; tuv++)
+                                ecoeffs_ppair_sc(mu, nu, tuv) +=
+                                    ecoeffs_ppair_cc(mu_, nu, tuv) * sph_trafo_a(mu, mu_);
+
+                double da = sp_data.coeffs[pos_a + ia];
+                double db = sp_data.coeffs[pos_b + ib];
+                int pos = offset_ecoeffs + iab * n_ecoeffs;
+                for (int mu = 0, munu = 0; mu < dim_a_sph; mu++)
+                    for (int nu = 0; nu < dim_b_sph; nu++, munu++)
+                        for (int nu_ = 0; nu_ < dim_b_cart; nu_++)
+                            for (int tuv = 0; tuv < dim_tuv; tuv++)
+                            {
+                                double ecoeff = da * db * ecoeffs_ppair_sc(mu, nu_, tuv) *
+                                                sph_trafo_b(nu, nu_);
+
+                                int idx = pos + munu * dim_tuv + tuv;
+                                ecoeffs_out[idx] += ecoeff;
+
+                                int idx_tsp = pos + tuv * dim_ab + munu;
+                                ecoeffs_tsp_out[idx_tsp] += ecoeff;
+                            }
             }
     }
 }
