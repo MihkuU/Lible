@@ -17,31 +17,34 @@ namespace lible
     namespace ints
     {
         /**
-         * Module for calculating molecular integrals.
+         *
          */
-        struct test
-        {
-            /**
-             * Tseburek
-             */
+        vec2d overlap(const Structure &structure); // TODO: remove
 
-            void testFun();
-        };
+        /**
+         * 
+         */
+        vec2d overlap_new(const Structure &structure); // TODO
 
         /**
          *
          */
-        vec2d overlap(const Structure &structure);
+        vec2d kineticEnergy(const Structure &structure); // TODO: remove
 
         /**
          *
          */
-        vec2d kineticEnergy(const Structure &structure);
+        vec2d kineticEnergy_new(const Structure &structure); // TODO        
 
         /**
          *
          */
-        vec2d nuclearAttraction(const Structure &structure);
+        vec2d nuclearAttraction(const Structure &structure); // TODO: remove
+
+        /**
+         * 
+         */
+        vec2d nuclearAttraction_new(const Structure &structure); // TODO
 
         /**
          *
@@ -106,6 +109,12 @@ namespace lible
          */
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
         returnBasisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
+
+        /** */
+        std::vector<std::array<int, 3>> cartExps(const int l);
+
+        /** */
+        std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

@@ -33,8 +33,13 @@ namespace lible
         /**
          *
          */
-        void transferIntegrals(const size_t ipair,
-                               const ShellPairData &shell_pair_data,
+        void transferIntegrals(const size_t ipair, const ShellPairData &sp_data,
+                               const arma::dmat &ints_sph, vec2d &ints);
+
+        /**
+         *
+         */
+        void transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
                                const arma::dmat &ints_sph, vec2d &ints);
 
         /**

@@ -41,14 +41,28 @@ namespace lible
          * pair of Gaussian primitives for each shell pair.
          */
         void calcECoeffs(const int la, const int lb, const ShellPairData &shell_pair_data,
-                         std::vector<std::vector<vec3d>> &ecoeffs_out);
+                         std::vector<std::vector<vec3d>> &ecoeffs_out); // TODO: remove
+
+        /**
+         * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
+         * pair of Gaussian primitives for each shell pair.
+         */
+        void calcECoeffs(const int la, const int lb, const ShellPairData_new &shell_pair_data,
+                         std::vector<std::vector<vec3d>> &ecoeffs_out); // TODO
 
         /**
          * Calculates the Hermite expansion coefficients { E(r, i, j, t) | r = x,y,z && t <= la + lb}
          * for each pair of Gaussian primitives for each shell pair.
          */
         void calcECoeffs(const int la, const int lb, const ShellPairData &shell_pair_data,
-                         std::vector<std::vector<vec4d>> &ecoeffs_out);
+                         std::vector<std::vector<vec4d>> &ecoeffs_out); // TODO: remove
+
+        /**
+         * Calculates the Hermite expansion coefficients { E(r, i, j, t) | r = x,y,z && t <= la + lb}
+         * for each pair of Gaussian primitives for each shell pair.
+         */
+        void calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_data,
+                         std::vector<std::vector<vec4d>> &ecoeffs_out); // TODO
 
         /**
          *

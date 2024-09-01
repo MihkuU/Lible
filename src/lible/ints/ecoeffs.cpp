@@ -200,6 +200,60 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &shell_pair
     }
 }
 
+void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_data,
+                     vector<vector<vec3d>> &ecoeffs_out)
+{
+    lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
+
+    ecoeffs_out.resize(sp_data.n_pairs);
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        array<double, 3> xyz_a{sp_data.coords[6 * ipair + 0],
+                               sp_data.coords[6 * ipair + 1],
+                               sp_data.coords[6 * ipair + 2]};
+
+        array<double, 3> xyz_b{sp_data.coords[6 * ipair + 3],
+                               sp_data.coords[6 * ipair + 4],
+                               sp_data.coords[6 * ipair + 5]};
+
+        int dim_a = sp_data.cdepths[2 * ipair + 0];
+        int dim_b = sp_data.cdepths[2 * ipair + 1];
+        int pos_a = sp_data.coffsets[2 * ipair + 0];
+        int pos_b = sp_data.coffsets[2 * ipair + 1];
+
+        vector<vec3d> ecoeffs_pair(dim_a * dim_b, vec3d(3, la + 1, lb + 1, 0));
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
+            {
+                double a = sp_data.exps[pos_a + ia];
+                double b = sp_data.exps[pos_b + ib];
+                double mu = a * b / (a + b);
+
+                std::array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
+
+                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+
+                for (int i = 0; i <= la; i++)
+                    for (int j = 0; j <= lb; j++)
+                        ecoeffs_pair[iab](0, i, j) = Ex(i, j, 0);
+
+                for (int i = 0; i <= la; i++)
+                    for (int j = 0; j <= lb; j++)
+                        ecoeffs_pair[iab](1, i, j) = Ey(i, j, 0);
+
+                for (int i = 0; i <= la; i++)
+                    for (int j = 0; j <= lb; j++)
+                        ecoeffs_pair[iab](2, i, j) = Ez(i, j, 0);
+            }
+
+        ecoeffs_out[ipair] = ecoeffs_pair;
+    }
+}
+
 void LI::calcECoeffs(const int la, const int lb, const ShellPairData &shell_pair_data,
                      vector<vector<vec4d>> &ecoeffs_out)
 {
@@ -229,6 +283,63 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &shell_pair
                                           std::exp(-mu * std::pow(A[2] - B[2], 2))};
 
                 coeffs(a, b, la, lb, A, B, Kab, Ex, Ey, Ez);
+
+                for (int i = 0; i <= la; i++)
+                    for (int j = 0; j <= lb; j++)
+                        for (int t = 0; t <= i + j; t++)
+                            ecoeffs_pair[iab](0, i, j, t) = Ex(i, j, t);
+
+                for (int i = 0; i <= la; i++)
+                    for (int j = 0; j <= lb; j++)
+                        for (int t = 0; t <= i + j; t++)
+                            ecoeffs_pair[iab](1, i, j, t) = Ey(i, j, t);
+
+                for (int i = 0; i <= la; i++)
+                    for (int j = 0; j <= lb; j++)
+                        for (int t = 0; t <= i + j; t++)
+                            ecoeffs_pair[iab](2, i, j, t) = Ez(i, j, t);
+            }
+
+        ecoeffs_out[ipair] = ecoeffs_pair;
+    }
+}
+
+void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_data,
+                     vector<vector<vec4d>> &ecoeffs_out)
+{
+    lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
+
+    ecoeffs_out.resize(sp_data.n_pairs);
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        array<double, 3> xyz_a{sp_data.coords[6 * ipair + 0],
+                               sp_data.coords[6 * ipair + 1],
+                               sp_data.coords[6 * ipair + 2]};
+
+        array<double, 3> xyz_b{sp_data.coords[6 * ipair + 3],
+                               sp_data.coords[6 * ipair + 4],
+                               sp_data.coords[6 * ipair + 5]};
+
+        int dim_a = sp_data.cdepths[2 * ipair + 0];
+        int dim_b = sp_data.cdepths[2 * ipair + 1];
+        int pos_a = sp_data.coffsets[2 * ipair + 0];
+        int pos_b = sp_data.coffsets[2 * ipair + 1];
+
+        vector<vec4d> ecoeffs_pair(dim_a * dim_b, vec4d(3, la + 1, lb + 1, la + lb + 1, 0));
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
+            {
+                double a = sp_data.exps[pos_a + ia];
+                double b = sp_data.exps[pos_b + ib];
+                double mu = a * b / (a + b);
+
+                std::array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
+
+                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
 
                 for (int i = 0; i <= la; i++)
                     for (int j = 0; j <= lb; j++)

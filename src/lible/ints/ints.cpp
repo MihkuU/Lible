@@ -15,14 +15,29 @@ lible::vec2d LI::overlap(const Structure &structure)
     return LIO::calculate<LIO::Option::overlap>(structure);
 }
 
+lible::vec2d LI::overlap_new(const Structure &structure)
+{
+    return LIO::calculate_new<LIO::Option::overlap>(structure);
+}
+
 lible::vec2d LI::kineticEnergy(const Structure &structure)
 {
     return LIO::calculate<LIO::Option::kinetic_energy>(structure);
 }
 
+lible::vec2d LI::kineticEnergy_new(const Structure &structure)
+{
+    return LIO::calculate_new<LIO::Option::kinetic_energy>(structure);
+}
+
 lible::vec2d LI::nuclearAttraction(const Structure &structure)
 {
     return LIO::calculate<LIO::Option::nuclear_attraction>(structure);
+}
+
+lible::vec2d LI::nuclearAttraction_new(const Structure &structure)
+{
+    return LIO::calculate_new<LIO::Option::nuclear_attraction>(structure);
 }
 
 lible::vec4d LI::eri4(const Structure &structure)

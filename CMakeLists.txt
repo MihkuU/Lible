@@ -18,10 +18,10 @@ else()
 endif()
 
 # Modules
-option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" ON)
+option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" OFF)
 option(LIBLE_BUILD_DOCS "Enables building sphinx-documentation" OFF)
-option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" ON)
-option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" ON)
+option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" OFF)
+option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
 option(LIBLE_BUILD_GPUINTS  "Build and install the GPU molecular integrals module" OFF)
 
@@ -117,9 +117,12 @@ if (MKL_FOUND)
 else()
 	set(BLA_VENDOR OpenBLAS)
 	find_package(BLAS REQUIRED)
-	get_filename_component(blas_root_path ${BLAS_LIBRARIES} DIRECTORY)
-	target_include_directories(lible PRIVATE ${blas_root_path})
-	target_link_libraries(lible PRIVATE ${BLAS_LIBRARIES})
+	target_link_libraries(lible PRIVATE BLAS::BLAS)
+	#message("OpenBLAS_INCLUDE_DIRS: ${BLAS_INCLUDE_DIRS}\n")
+	#message("OpenBLAS_LIBRARIES: ${BLAS_LIBRARIES}\n")
+	#target_include_directories(lible PRIVATE ${OpenBLAS_INCLUDE_DIRS})
+	#target_link_libraries(lible PRIVATE ${OpenBLAS_LIBRARIES})
+	
 endif()
 
 # miscellaneous # TODO: manage this

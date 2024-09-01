@@ -288,6 +288,28 @@ void LI::transferIntegrals(const size_t ipair,
         }
 }
 
+void LI::transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
+                           const arma::dmat &ints_sph, vec2d &ints)
+{
+    int pos_a = sp_data.offsets_sph[2 * ipair];
+    int pos_b = sp_data.offsets_sph[2 * ipair + 1];
+    int pos_norm_a = sp_data.offsets_norms[2 * ipair];
+    int pos_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+
+    for (size_t mu = 0; mu < ints_sph.n_rows; mu++)
+        for (size_t nu = 0; nu < ints_sph.n_cols; nu++)
+        {
+            double norm_a = sp_data.norms[pos_norm_a + mu];
+            double norm_b = sp_data.norms[pos_norm_b + nu];
+            double normalized_int = ints_sph(mu, nu) * norm_a * norm_b;
+
+            // printf("\nnormalized_int = %16.12lf", ints_sph(mu, nu) );
+
+            ints(pos_a + mu, pos_b + nu) = normalized_int;
+            ints(pos_b + nu, pos_a + mu) = normalized_int;
+        }
+}
+
 void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
                            const ShellPairData &shell_pair_data_ab,
                            const ShellPairData &shell_pair_data_cd,

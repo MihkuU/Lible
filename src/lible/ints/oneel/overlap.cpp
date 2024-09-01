@@ -33,7 +33,6 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
 
         const auto &[exps_a, exps_b] = shell_pair_data.exps[ipair];
         const auto &[ccoeffs_a, ccoeffs_b] = shell_pair_data.ccoeffs[ipair];
-        const auto &[xyz_a, xyz_b] = shell_pair_data.coords[ipair];
 
         size_t ka = exps_a.size();
         size_t kb = exps_b.size();
@@ -48,8 +47,8 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
 
                 double fac = dadb * std::pow(M_PI / p, 1.5);
 
-                for (const auto [i, j, k, mu] : cart_exps_a)
-                    for (const auto [i_, j_, k_, nu] : cart_exps_b)
+                for (const auto &[i, j, k, mu] : cart_exps_a)
+                    for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                         ints_contracted(mu, nu) += fac *
                                                    Exyz[iab](0, i, i_) *
                                                    Exyz[iab](1, j, j_) *
@@ -59,5 +58,63 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
         ints_sph = sph_trafo_bra * ints_contracted * sph_trafo_ket;
 
         transferIntegrals(ipair, shell_pair_data, ints_sph, ints_out);
+    }
+}
+
+template <>
+void LIO::kernel_new<LIO::Option::overlap>(const int la, const int lb,
+                                           const ShellPairData_new &sp_data, vec2d &ints_out)
+{
+    vector<vector<vec3d>> ecoeffs;
+    calcECoeffs(la, lb, sp_data, ecoeffs);
+
+    int dim_a_cart = dimCartesians(sp_data.la);
+    int dim_b_cart = dimCartesians(sp_data.lb);
+
+    auto cart_exps_a = cart_exps[la];
+    auto cart_exps_b = cart_exps[lb];
+
+    arma::dmat sph_trafo_bra = returnSphericalTrafo(sp_data.la);
+    arma::dmat sph_trafo_ket = returnSphericalTrafo(sp_data.lb).t();
+
+    arma::dmat ints_contracted(dim_a_cart, dim_b_cart);
+    arma::dmat ints_sph;
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        ints_contracted.zeros();
+
+        int dim_a = sp_data.cdepths[2 * ipair + 0];
+        int dim_b = sp_data.cdepths[2 * ipair + 1];
+        int pos_a = sp_data.coffsets[2 * ipair + 0];
+        int pos_b = sp_data.coffsets[2 * ipair + 1];
+
+        const vector<vec3d> &Exyz = ecoeffs[ipair];
+
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
+            {
+                double a = sp_data.exps[pos_a + ia];
+                double b = sp_data.exps[pos_b + ib];
+                double da = sp_data.coeffs[pos_a + ia];
+                double db = sp_data.coeffs[pos_b + ib];
+
+                double p = a + b;
+                double dadb = da * db;
+                double fac = dadb * std::pow(M_PI / p, 1.5);
+
+                for (const auto &[i, j, k, mu] : cart_exps_a)
+                    for (const auto &[i_, j_, k_, nu] : cart_exps_b)                    
+                        ints_contracted(mu, nu) += fac *
+                                                   Exyz[iab](0, i, i_) *
+                                                   Exyz[iab](1, j, j_) *
+                                                   Exyz[iab](2, k, k_);
+
+            }
+
+        ints_sph = sph_trafo_bra * ints_contracted * sph_trafo_ket;
+
+        // std::cout << ints_sph << "\n";
+        
+        transferIntegrals(ipair, sp_data, ints_sph, ints_out);
     }
 }
