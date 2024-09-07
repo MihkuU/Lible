@@ -17,11 +17,7 @@ namespace lible
 
             vec3d calcERI3(const Structure &structure);
 
-            vec4d calcERI4(const Structure &structure);            
-
             vec4d calcERI4_new(const Structure &structure);
-
-            void calcERI4Benchmark(const Structure &structure);
 
             void calcERI4Benchmark_new(const Structure &structure);
         }

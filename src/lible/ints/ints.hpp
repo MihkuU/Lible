@@ -19,32 +19,17 @@ namespace lible
         /**
          *
          */
-        vec2d overlap(const Structure &structure); // TODO: remove
+        vec2d overlap_new(const Structure &structure);
 
         /**
          *
          */
-        vec2d overlap_new(const Structure &structure); // TODO
+        vec2d kineticEnergy_new(const Structure &structure);
 
         /**
          *
          */
-        vec2d kineticEnergy(const Structure &structure); // TODO: remove
-
-        /**
-         *
-         */
-        vec2d kineticEnergy_new(const Structure &structure); // TODO
-
-        /**
-         *
-         */
-        vec2d nuclearAttraction(const Structure &structure); // TODO: remove
-
-        /**
-         *
-         */
-        vec2d nuclearAttraction_new(const Structure &structure); // TODO
+        vec2d nuclearAttraction_new(const Structure &structure);
 
         /**
          *
@@ -64,22 +49,12 @@ namespace lible
         /**
          *
          */
-        vec4d eri4(const Structure &structure); // TODO: remove
+        vec4d eri4_new(const Structure &structure);
 
         /**
          *
          */
-        vec4d eri4_new(const Structure &structure); // TODO
-
-        /**
-         *
-         */
-        void eri4Benchmark(const Structure &structure); // TODO: remove
-
-        /**
-         *
-         */
-        void eri4Benchmark_new(const Structure &structure); // TODO
+        void eri4Benchmark_new(const Structure &structure);
 
         typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
 

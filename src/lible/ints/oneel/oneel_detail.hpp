@@ -45,44 +45,6 @@ namespace lible
             }
 
             template <Option opt>
-            void kernel(const int la, const int lb, const ShellPairData &shell_pair_data,
-                        vec2d &ints_out);
-
-            template <Option opt>
-            vec2d calculate(const Structure &structure)
-            {
-                auto start{std::chrono::steady_clock::now()};
-
-                std::string msg = returnPreamble(opt);
-                palPrint(fmt::format("Lible::{:<40}", msg));
-
-                int l_max = structure.getMaxL();
-                size_t dim_ao = structure.getDimAO();
-
-                vec2d ints(dim_ao, dim_ao, 0);
-                for (int la = l_max; la >= 0; la--)
-                {
-                    ShellPairData shell_pair_data = ShellPairData(la, la, structure);
-
-                    kernel<opt>(la, la, shell_pair_data, ints);
-                }
-
-                for (int la = l_max; la >= 0; la--)
-                    for (int lb = la - 1; lb >= 0; lb--)
-                    {
-                        ShellPairData shell_pair_data = ShellPairData(la, lb, structure);
-
-                        kernel<opt>(la, lb, shell_pair_data, ints);
-                    }
-
-                auto end{std::chrono::steady_clock::now()};
-                std::chrono::duration<double> duration{end - start};
-                palPrint(fmt::format(" {:.2e} s\n", duration.count()));
-
-                return ints;
-            }
-
-            template <Option opt>
             void kernel_new(const int la, const int lb, const ShellPairData_new &sp_data,
                             vec2d &ints_out);
 
