@@ -19,12 +19,12 @@ using std::pair, std::vector;
 
 namespace lible::ints::two
 {
-    void kernelERI4_new(const int lab, const int lcd, const int ipair_ab, const int ipair_cd,
-                        const vector<double> &ecoeffs_lalb, const vector<double> &ecoeffs_lcld_tsp,
-                        const vector<IdxsTUV> &idxs_tuv_ab, const vector<IdxsTUV> &idxs_tuv_cd_tsp,
-                        const ShellPairData_new &sp_data_ab, const ShellPairData_new &sp_data_cd,
-                        const BoysF &boys_f, vector<double> &eri4_shells_sph, vector<double> &rints,
-                        vector<double> &fnx, vec4d &rints_tmp)
+    void kernelERI4(const int lab, const int lcd, const int ipair_ab, const int ipair_cd,
+                    const vector<double> &ecoeffs_lalb, const vector<double> &ecoeffs_lcld_tsp,
+                    const vector<IdxsTUV> &idxs_tuv_ab, const vector<IdxsTUV> &idxs_tuv_cd_tsp,
+                    const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
+                    const BoysF &boys_f, vector<double> &eri4_shells_sph, vector<double> &rints,
+                    vector<double> &fnx, vec4d &rints_tmp)
     {
         int labcd = lab + lcd;
 
@@ -119,7 +119,7 @@ namespace lible::ints::two
     }
 }
 
-lible::vec4d LIT::calcERI4_new(const Structure &structure)
+lible::vec4d LIT::calcERI4(const Structure &structure)
 {
     palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4 flat..."));
 
@@ -129,7 +129,7 @@ lible::vec4d LIT::calcERI4_new(const Structure &structure)
 
     vector<pair<int, int>> l_pairs = returnLPairs(l_max);
 
-    vector<ShellPairData_new> sp_datas;
+    vector<ShellPairData> sp_datas;
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
@@ -201,9 +201,9 @@ lible::vec4d LIT::calcERI4_new(const Structure &structure)
                     for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
                     {
                         vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
-                        kernelERI4_new(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                       idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
-                                       eri4_shells_sph, rints, fnx, rints_tmp);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
+                                   eri4_shells_sph, rints, fnx, rints_tmp);
 
                         transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
                                           eri4_shells_sph, eri4);
@@ -213,9 +213,9 @@ lible::vec4d LIT::calcERI4_new(const Structure &structure)
                     for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
                     {
                         vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
-                        kernelERI4_new(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                       idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
-                                       eri4_shells_sph, rints, fnx, rints_tmp);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
+                                   eri4_shells_sph, rints, fnx, rints_tmp);
 
                         transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
                                           eri4_shells_sph, eri4);
@@ -229,7 +229,7 @@ lible::vec4d LIT::calcERI4_new(const Structure &structure)
     return eri4;
 }
 
-void LIT::calcERI4Benchmark_new(const Structure &structure)
+void LIT::calcERI4Benchmark(const Structure &structure)
 {
     palPrint(fmt::format("Lible::{:<40}\n", "ERI4 (Shark flat) benchmark..."));
 
@@ -239,7 +239,7 @@ void LIT::calcERI4Benchmark_new(const Structure &structure)
 
     vector<pair<int, int>> l_pairs = returnLPairs(l_max);
 
-    vector<ShellPairData_new> sp_datas;
+    vector<ShellPairData> sp_datas;
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
@@ -312,18 +312,18 @@ void LIT::calcERI4Benchmark_new(const Structure &structure)
                     for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
                     {
                         vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
-                        kernelERI4_new(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                       idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
-                                       eri4_shells_sph, rints, fnx, rints_tmp);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
+                                   eri4_shells_sph, rints, fnx, rints_tmp);
                     }
             else
                 for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
                     {
                         vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
-                        kernelERI4_new(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                       idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
-                                       eri4_shells_sph, rints, fnx, rints_tmp);
+                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                                   idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
+                                   eri4_shells_sph, rints, fnx, rints_tmp);
                     }
 
             auto end{std::chrono::steady_clock::now()};

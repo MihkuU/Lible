@@ -10,9 +10,9 @@ namespace LIO = lible::ints::one;
 using std::array, std::vector;
 
 template <>
-void LIO::kernel_new<LIO::Option::nuclear_attraction>(const int la, const int lb,
-                                                      const ShellPairData_new &sp_data,
-                                                      vec2d &ints_out)
+void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
+                                                  const ShellPairData &sp_data,
+                                                  vec2d &ints_out)
 {
     int lab = la + lb;
     vec3d rints(lab + 1, 0);

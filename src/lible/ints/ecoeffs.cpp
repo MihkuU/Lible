@@ -100,7 +100,7 @@ void LI::calcECoeffs(const int l, const vector<double> &exps,
         }
 }
 
-void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_data,
+void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
                      vector<vector<vec3d>> &ecoeffs_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
@@ -154,7 +154,7 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_dat
     }
 }
 
-void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_data,
+void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
                      vector<vector<vec4d>> &ecoeffs_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
@@ -211,7 +211,7 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData_new &sp_dat
     }
 }
 
-void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData_new &sp_data,
+void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &sp_data,
                               vector<double> &ecoeffs_out, vector<double> &ecoeffs_tsp_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);

@@ -10,9 +10,9 @@ namespace LIO = lible::ints::one;
 using std::vector;
 
 template <>
-void LIO::kernel_new<LIO::Option::kinetic_energy>(const int la, const int lb,
-                                                  const ShellPairData_new &sp_data,
-                                                  vec2d &ints_out)
+void LIO::kernel<LIO::Option::kinetic_energy>(const int la, const int lb,
+                                              const ShellPairData &sp_data,
+                                              vec2d &ints_out)
 {
     // Formula taken from https://gqcg-res.github.io/knowdes/the-mcmurchie-davidson-integral-scheme.html.
 

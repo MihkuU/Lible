@@ -272,7 +272,7 @@ void LI::sphericalTrafo(const arma::dmat &trafo_a, const arma::dmat &trafo_b,
                                                                trafo_a(mu, mu_);
 }
 
-void LI::transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
+void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
                            const arma::dmat &ints_sph, vec2d &ints)
 {
     int pos_a = sp_data.offsets_sph[2 * ipair];
@@ -293,8 +293,8 @@ void LI::transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
 }
 
 void LI::transferIntegrals(const int ipair_ab, const int ipair_cd,
-                           const ShellPairData_new &sp_data_ab,
-                           const ShellPairData_new &sp_data_cd,
+                           const ShellPairData &sp_data_ab,
+                           const ShellPairData &sp_data_cd,
                            const std::vector<double> &eri4_shells_sph, vec4d &eri4)
 {
     int dim_a = dimSphericals(sp_data_ab.la);

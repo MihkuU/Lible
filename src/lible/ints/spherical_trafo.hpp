@@ -33,15 +33,15 @@ namespace lible
         /**
          *
          */
-        void transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
+        void transferIntegrals(const int ipair, const ShellPairData &sp_data,
                                const arma::dmat &ints_sph, vec2d &ints);
 
         /**
          *
          */
         void transferIntegrals(const int ipair_ab, const int ipair_cd,
-                               const ShellPairData_new &sp_data_ab,
-                               const ShellPairData_new &sp_data_cd,
+                               const ShellPairData &sp_data_ab,
+                               const ShellPairData &sp_data_cd,
                                const std::vector<double> &eri4_shells_sph, vec4d &eri4);
     }
 }

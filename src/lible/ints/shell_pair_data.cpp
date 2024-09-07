@@ -5,8 +5,8 @@ namespace LI = lible::ints;
 
 using std::pair, std::vector;
 
-LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
-                                                 const Structure &structure)
+LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
+                                             const Structure &structure)
 {
     const auto &shells_a = structure.getShellsL(la);
     const auto &shells_b = structure.getShellsL(lb);
@@ -56,7 +56,7 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
     std::vector<int> coffsets(2 * n_pairs);
 
     std::vector<int> offsets_cart(2 * n_pairs);
-    std::vector<int> offsets_ecoeffs(n_pairs); 
+    std::vector<int> offsets_ecoeffs(n_pairs);
     std::vector<int> offsets_norms(2 * n_pairs);
     std::vector<int> offsets_sph(2 * n_pairs);
 
@@ -113,12 +113,12 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
         const auto &norms_b = shell_b.norms;
 
         offsets_norms[2 * ipair + 0] = pos_norms;
-        
+
         for (int mu = 0; mu < dim_sph_a; mu++)
         {
             norms[pos_norms] = norms_a[mu];
             pos_norms++;
-        }            
+        }
 
         offsets_norms[2 * ipair + 1] = pos_norms;
 
@@ -141,9 +141,9 @@ LI::ShellPairData_new LI::constructShellPairData(const int la, const int lb,
         atomic_nrs[iatom] = structure.getZ(iatom);
     }
 
-    ShellPairData_new shell_pair_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords,
-                                      coeffs, coords, exps, norms, atomic_nrs, cdepths, coffsets,
-                                      offsets_cart, offsets_ecoeffs, offsets_norms, offsets_sph);
+    ShellPairData sp_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords,
+                          coeffs, coords, exps, norms, atomic_nrs, cdepths, coffsets,
+                          offsets_cart, offsets_ecoeffs, offsets_norms, offsets_sph);
 
-    return shell_pair_data;
+    return sp_data;
 }

@@ -45,11 +45,11 @@ namespace lible
             }
 
             template <Option opt>
-            void kernel_new(const int la, const int lb, const ShellPairData_new &sp_data,
-                            vec2d &ints_out);
+            void kernel(const int la, const int lb, const ShellPairData &sp_data,
+                        vec2d &ints_out);
 
             template <Option opt>
-            vec2d calculate_new(const Structure &structure)
+            vec2d calculate(const Structure &structure)
             {
                 auto start{std::chrono::steady_clock::now()};
 
@@ -62,17 +62,17 @@ namespace lible
                 vec2d ints(dim_ao, dim_ao, 0);
                 for (int la = l_max; la >= 0; la--)
                 {
-                    ShellPairData_new sp_data = constructShellPairData(la, la, structure);
+                    ShellPairData sp_data = constructShellPairData(la, la, structure);
 
-                    kernel_new<opt>(la, la, sp_data, ints);
+                    kernel<opt>(la, la, sp_data, ints);
                 }
 
                 for (int la = l_max; la >= 0; la--)
                     for (int lb = la - 1; lb >= 0; lb--)
                     {
-                        ShellPairData_new sp_data = constructShellPairData(la, lb, structure);
+                        ShellPairData sp_data = constructShellPairData(la, lb, structure);
 
-                        kernel_new<opt>(la, lb, sp_data, ints);
+                        kernel<opt>(la, lb, sp_data, ints);
                     }
 
                 auto end{std::chrono::steady_clock::now()};

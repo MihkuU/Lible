@@ -10,8 +10,8 @@ namespace LIO = lible::ints::one;
 using std::array, std::size_t, std::vector;
 
 template <>
-void LIO::kernel_new<LIO::Option::overlap>(const int la, const int lb,
-                                           const ShellPairData_new &sp_data, vec2d &ints_out)
+void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
+                                       const ShellPairData &sp_data, vec2d &ints_out)
 {
     vector<vector<vec3d>> ecoeffs;
     calcECoeffs(la, lb, sp_data, ecoeffs);
@@ -51,16 +51,15 @@ void LIO::kernel_new<LIO::Option::overlap>(const int la, const int lb,
                 double fac = dadb * std::pow(M_PI / p, 1.5);
 
                 for (const auto &[i, j, k, mu] : cart_exps_a)
-                    for (const auto &[i_, j_, k_, nu] : cart_exps_b)                    
+                    for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                         ints_contracted(mu, nu) += fac *
                                                    Exyz[iab](0, i, i_) *
                                                    Exyz[iab](1, j, j_) *
                                                    Exyz[iab](2, k, k_);
-
             }
 
         ints_sph = sph_trafo_bra * ints_contracted * sph_trafo_ket;
-        
+
         transferIntegrals(ipair, sp_data, ints_sph, ints_out);
     }
 }
