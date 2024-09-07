@@ -48,22 +48,14 @@ namespace lible
         void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
                                const ShellPairData &shell_pair_data_ab,
                                const ShellPairData &shell_pair_data_cd,
-                               const vec4d &eri4_shells_sph, vec4d &eri4);
+                               const std::vector<double> &eri4_shells_sph, vec4d &eri4); // TODO: remove
 
         /**
          *
          */
-        void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
-                               const ShellPairData &shell_pair_data_ab,
-                               const ShellPairData &shell_pair_data_cd,
-                               const arma::dmat &eri4_shells_sph, vec4d &eri4);
-
-        /**
-         *
-         */
-        void transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
-                               const ShellPairData &shell_pair_data_ab,
-                               const ShellPairData &shell_pair_data_cd,
-                               const std::vector<double> &eri4_shells_sph, vec4d &eri4);
+        void transferIntegrals(const int ipair_ab, const int ipair_cd,
+                               const ShellPairData_new &sp_data_ab,
+                               const ShellPairData_new &sp_data_cd,
+                               const std::vector<double> &eri4_shells_sph, vec4d &eri4); // TODO
     }
 }

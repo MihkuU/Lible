@@ -45,9 +45,19 @@ lible::vec4d LI::eri4(const Structure &structure)
     return LIT::calcERI4(structure);
 }
 
+lible::vec4d LI::eri4_new(const Structure &structure)
+{
+    return LIT::calcERI4_new(structure);
+}
+
 void LI::eri4Benchmark(const Structure &structure)
 {
     LIT::calcERI4Benchmark(structure);
+}
+
+void LI::eri4Benchmark_new(const Structure &structure)
+{
+    LIT::calcERI4Benchmark_new(structure);
 }
 
 #ifdef _LIBLE_USE_HIP_

@@ -303,8 +303,6 @@ void LI::transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
             double norm_b = sp_data.norms[pos_norm_b + nu];
             double normalized_int = ints_sph(mu, nu) * norm_a * norm_b;
 
-            // printf("\nnormalized_int = %16.12lf", ints_sph(mu, nu) );
-
             ints(pos_a + mu, pos_b + nu) = normalized_int;
             ints(pos_b + nu, pos_a + mu) = normalized_int;
         }
@@ -313,89 +311,7 @@ void LI::transferIntegrals(const int ipair, const ShellPairData_new &sp_data,
 void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
                            const ShellPairData &shell_pair_data_ab,
                            const ShellPairData &shell_pair_data_cd,
-                           const vec4d &eri4_shells_sph, vec4d &eri4)
-{
-    auto [pos_a, pos_b] = shell_pair_data_ab.offsets[ipair_ab];
-    auto [pos_c, pos_d] = shell_pair_data_cd.offsets[ipair_cd];
-
-    auto [norms_a, norms_b] = shell_pair_data_ab.norms[ipair_ab];
-    auto [norms_c, norms_d] = shell_pair_data_cd.norms[ipair_cd];
-
-    size_t dim_a = eri4_shells_sph.getDim(0);
-    size_t dim_b = eri4_shells_sph.getDim(1);
-    size_t dim_c = eri4_shells_sph.getDim(2);
-    size_t dim_d = eri4_shells_sph.getDim(3);
-
-    for (size_t mu = 0; mu < dim_a; mu++)
-        for (size_t nu = 0; nu < dim_b; nu++)
-            for (size_t kappa = 0; kappa < dim_c; kappa++)
-                for (size_t tau = 0; tau < dim_d; tau++)
-                {
-                    double normalized_int = eri4_shells_sph(mu, nu, kappa, tau) *
-                                            norms_a[mu] * norms_b[nu] *
-                                            norms_c[kappa] * norms_d[tau];
-
-                    size_t a = pos_a + mu;
-                    size_t b = pos_b + nu;
-                    size_t c = pos_c + kappa;
-                    size_t d = pos_d + tau;
-
-                    eri4(a, b, c, d) = normalized_int;
-                    eri4(a, b, d, c) = normalized_int;
-                    eri4(b, a, c, d) = normalized_int;
-                    eri4(b, a, d, c) = normalized_int;
-                    eri4(c, d, a, b) = normalized_int;
-                    eri4(c, d, b, a) = normalized_int;
-                    eri4(d, c, a, b) = normalized_int;
-                    eri4(d, c, b, a) = normalized_int;
-                }
-}
-
-void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
-                           const ShellPairData &shell_pair_data_ab,
-                           const ShellPairData &shell_pair_data_cd,
-                           const arma::dmat &eri4_shells_sph, vec4d &eri4)
-{
-    auto [pos_a, pos_b] = shell_pair_data_ab.offsets[ipair_ab];
-    auto [pos_c, pos_d] = shell_pair_data_cd.offsets[ipair_cd];
-
-    const auto &[norms_a, norms_b] = shell_pair_data_ab.norms[ipair_ab];
-    const auto &[norms_c, norms_d] = shell_pair_data_cd.norms[ipair_cd];
-
-    size_t dim_a = norms_a.size();
-    size_t dim_b = norms_b.size();
-    size_t dim_c = norms_c.size();
-    size_t dim_d = norms_d.size();
-
-    for (size_t mu = 0, munu = 0; mu < dim_a; mu++)
-        for (size_t nu = 0; nu < dim_b; nu++, munu++)
-            for (size_t ka = 0, kata = 0; ka < dim_c; ka++)
-                for (size_t ta = 0; ta < dim_d; ta++, kata++)
-                {
-                    double normalized_int = eri4_shells_sph(munu, kata) *
-                                            norms_a[mu] * norms_b[nu] *
-                                            norms_c[ka] * norms_d[ta];
-
-                    size_t a = pos_a + mu;
-                    size_t b = pos_b + nu;
-                    size_t c = pos_c + ka;
-                    size_t d = pos_d + ta;
-
-                    eri4(a, b, c, d) = normalized_int;
-                    eri4(a, b, d, c) = normalized_int;
-                    eri4(b, a, c, d) = normalized_int;
-                    eri4(b, a, d, c) = normalized_int;
-                    eri4(c, d, a, b) = normalized_int;
-                    eri4(c, d, b, a) = normalized_int;
-                    eri4(d, c, a, b) = normalized_int;
-                    eri4(d, c, b, a) = normalized_int;
-                }
-}
-
-void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
-                             const ShellPairData &shell_pair_data_ab,
-                             const ShellPairData &shell_pair_data_cd,
-                             const vector<double> &eri4_shells_sph, vec4d &eri4)
+                           const vector<double> &eri4_shells_sph, vec4d &eri4)
 {
     auto [pos_a, pos_b] = shell_pair_data_ab.offsets[ipair_ab];
     auto [pos_c, pos_d] = shell_pair_data_cd.offsets[ipair_cd];
@@ -424,6 +340,58 @@ void LI::transferIntegrals(const size_t ipair_ab, const size_t ipair_cd,
                     size_t b = pos_b + nu;
                     size_t c = pos_c + ka;
                     size_t d = pos_d + ta;
+
+                    eri4(a, b, c, d) = normalized_int;
+                    eri4(a, b, d, c) = normalized_int;
+                    eri4(b, a, c, d) = normalized_int;
+                    eri4(b, a, d, c) = normalized_int;
+                    eri4(c, d, a, b) = normalized_int;
+                    eri4(c, d, b, a) = normalized_int;
+                    eri4(d, c, a, b) = normalized_int;
+                    eri4(d, c, b, a) = normalized_int;
+                }
+}
+
+void LI::transferIntegrals(const int ipair_ab, const int ipair_cd,
+                           const ShellPairData_new &sp_data_ab,
+                           const ShellPairData_new &sp_data_cd,
+                           const std::vector<double> &eri4_shells_sph, vec4d &eri4)
+{
+    int dim_a = dimSphericals(sp_data_ab.la);
+    int dim_b = dimSphericals(sp_data_ab.lb);
+    int dim_c = dimSphericals(sp_data_cd.la);
+    int dim_d = dimSphericals(sp_data_cd.lb);
+
+    int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
+    int pos_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
+    int pos_c = sp_data_cd.offsets_sph[2 * ipair_cd];
+    int pos_d = sp_data_cd.offsets_sph[2 * ipair_cd + 1];
+
+    int pos_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+    int pos_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+    int pos_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
+    int pos_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
+
+    int dim_cd = dim_c * dim_d;
+
+    for (int mu = 0, munu = 0; mu < dim_a; mu++)
+        for (int nu = 0; nu < dim_b; nu++, munu++)
+            for (int ka = 0, kata = 0; ka < dim_c; ka++)
+                for (int ta = 0; ta < dim_d; ta++, kata++)
+                {
+                    int munukata = munu * dim_cd + kata;
+
+                    double norm_a = sp_data_ab.norms[pos_norm_a + mu];
+                    double norm_b = sp_data_ab.norms[pos_norm_b + nu];
+                    double norm_c = sp_data_cd.norms[pos_norm_c + ka];
+                    double norm_d = sp_data_cd.norms[pos_norm_d + ta];
+                    double normalized_int = eri4_shells_sph[munukata] * norm_a * norm_b *
+                                            norm_c * norm_d;
+
+                    int a = pos_a + mu;
+                    int b = pos_b + nu;
+                    int c = pos_c + ka;
+                    int d = pos_d + ta;
 
                     eri4(a, b, c, d) = normalized_int;
                     eri4(a, b, d, c) = normalized_int;

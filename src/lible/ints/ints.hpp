@@ -64,17 +64,17 @@ namespace lible
         /**
          *
          */
-        vec4d eri4(const Structure &structure);
+        vec4d eri4(const Structure &structure); // TODO: remove
 
         /**
          *
          */
-        void eri4Benchmark(const Structure &structure);
+        vec4d eri4_new(const Structure &structure); // TODO
 
         /**
          *
          */
-        vec4d eri4_new(const Structure &structure); // TODO: remove
+        void eri4Benchmark(const Structure &structure); // TODO: remove
 
         /**
          *
