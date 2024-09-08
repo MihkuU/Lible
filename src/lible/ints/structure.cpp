@@ -118,7 +118,7 @@ void LI::Structure::constructShells(int &max_l, size_t &dim_ao, size_t &dim_ao_c
 {
     set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
 
-    auto basis_atoms = returnBasisForAtoms(atomic_nrs_set, basis_set);
+    auto basis_atoms = basisForAtoms(atomic_nrs_set, basis_set);
 
     int max_angmom = 0, pos = 0, pos_cart = 0;
     for (size_t iatom = 0; iatom < n_atoms; iatom++)

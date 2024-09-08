@@ -12,7 +12,7 @@ namespace lible
         // constexpr double _ang_to_bohr_ = 1.8897259886; // Source: "https://www.unitconverters.net/length/angstrom-to-bohr-radius.htm"
         constexpr double _ang_to_bohr_ = 1.0 / _bohr_to_ang_; // Source: Molblock, testing
 
-        constexpr int _max_angular_momentum_ = 6;
+        constexpr int _max_angular_momentum_ = 9;
 
         const std::map<int, std::string> angmom_to_label{
             {0, "s"},

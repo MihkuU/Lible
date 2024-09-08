@@ -36,7 +36,7 @@ static unordered_map<string, LI::BasisFamily>
                    {"sto-5g", LI::BasisFamily::sto},
                    {"sto-6g", LI::BasisFamily::sto}};
 
-set<string> LI::returnAvailableBasisSets()
+set<string> LI::availableBasisSets()
 {
     set<string> basis_sets;
     for (auto &item : basis_families)

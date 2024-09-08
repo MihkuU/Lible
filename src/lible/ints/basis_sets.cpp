@@ -21,7 +21,7 @@ using std::map, std::pair, std::set, std::string, std::vector;
 #endif
 
 map<int, vector<LI::shell_exps_coeffs_t>>
-LI::returnBasisForAtom(const int atomic_nr, const string &basis_set)
+LI::basisForAtom(const int atomic_nr, const string &basis_set)
 {
     string basis_path = returnBasisPath(basis_set);
 
@@ -87,12 +87,12 @@ LI::returnBasisForAtom(const int atomic_nr, const string &basis_set)
 }
 
 map<int, map<int, vector<LI::shell_exps_coeffs_t>>>
-LI::returnBasisForAtoms(const set<int> &atomic_nrs, const string &basis_set)
+LI::basisForAtoms(const set<int> &atomic_nrs, const string &basis_set)
 {
     map<int, map<int, vector<shell_exps_coeffs_t>>> basis_atoms;
     for (const int atomic_nr : atomic_nrs)
     {
-        auto basis_atom = returnBasisForAtom(atomic_nr, basis_set);
+        auto basis_atom = basisForAtom(atomic_nr, basis_set);
         basis_atoms[atomic_nr] = basis_atom;
     }
 

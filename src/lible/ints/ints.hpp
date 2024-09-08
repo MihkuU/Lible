@@ -61,19 +61,19 @@ namespace lible
         /**
          *
          */
-        std::set<std::string> returnAvailableBasisSets();
+        std::set<std::string> availableBasisSets();
 
         /**
          *
          */
         std::map<int, std::vector<shell_exps_coeffs_t>>
-        returnBasisForAtom(const int atomic_nr, const std::string &basis_set);
+        basisForAtom(const int atomic_nr, const std::string &basis_set);
 
         /**
          *
          */
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
-        returnBasisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
+        basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
 
         /** */
         std::vector<std::array<int, 3>> cartExps(const int l);
