@@ -15,22 +15,6 @@ namespace lible
         /**
          *
          */
-        struct IdxsTUV
-        {
-            int t, u, v;
-        };
-
-        /**
-         *
-         */
-        struct IdxsCart
-        {
-            int i, j, k;
-        };
-
-        /**
-         *
-         */
         double calcPurePrimitiveNorm(const int l, const double exp);
 
         /**
@@ -56,7 +40,7 @@ namespace lible
         /**
          *
          */
-        std::vector<std::array<int, 3>> returnCartesianExps(const int l);
+        std::vector<std::array<int, 3>> cartExps(const int l);
 
         /**
          * Returns a list of angular momentum pairs {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
@@ -66,11 +50,12 @@ namespace lible
         /**
          *
          */
-        vec3i returnTUVPoss(const int l);
+        vec3i returnHermiteGaussianPositions(const int l);
 
         /**
          *
          */
-        std::vector<IdxsTUV> returnIdxsTUV(const int l);
+        std::vector<std::array<int, 3>> returnHermiteGaussianIdxs(const int l); 
+        
     }
 }

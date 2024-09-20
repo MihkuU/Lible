@@ -35,10 +35,16 @@ void LI::BoysF::preEvaluate(vector<double> &fnx_grid)
 }
 
 void LI::BoysF::calcFnx(const int n, const double x, vector<double> &fnx) const
-{
-    // Adapted from HUMMR
-    if (x > 30.0)
+{    
+    if (x == 0)
     {
+        fnx[0] = 1;
+        for (int k = 1; k <= n; k++)
+            fnx[k] = 1.0 / (2 * k + 1);
+    }
+    else if (x > 30.0)
+    {
+        // Adapted from HUMMR
         fnx[0] = 0.5 * std::sqrt(M_PI / x);
         for (int k = 1; k <= n; k++)
             fnx[k] = fnx[k - 1] * (k - 0.5) / x;

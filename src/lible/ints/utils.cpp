@@ -2,7 +2,7 @@
 
 namespace LI = lible::ints;
 
-using std::vector;
+using std::array, std::vector;
 
 double LI::calcPurePrimitiveNorm(const int l, const double exp)
 {
@@ -51,7 +51,7 @@ int LI::dimHermiteGaussians(const int l)
     return (l + 1) * (l + 2) * (l + 3) / 6;
 }
 
-std::vector<std::array<int, 3>> LI::returnCartesianExps(const int l)
+std::vector<std::array<int, 3>> LI::cartExps(const int l)
 {
     std::size_t dim_cart = dimCartesians(l);
 
@@ -72,14 +72,14 @@ std::vector<std::pair<int, int>> LI::returnLPairs(const int l_max)
     int n_pairs = (l_max + 1) * (l_max + 2) / 2;
     std::vector<std::pair<int, int>> l_pairs(n_pairs);
 
-    for (int la = l_max, idx = n_pairs - 1; la >= 0; la--)
-        for (int lb = la; lb >= 0; lb--, idx--)
+    for (int la = 0, idx = 0; la <= l_max; la++)
+        for (int lb = 0; lb <= la; lb++, idx++)
             l_pairs[idx] = std::make_pair(la, lb);
 
     return l_pairs;
 }
 
-lible::vec3i LI::returnTUVPoss(const int l)
+lible::vec3i LI::returnHermiteGaussianPositions(const int l)
 {
     vec3i tuv_poss(l + 1, l + 1, l + 1, -1);
     for (int t = 0, tuv = 0; t <= l; t++)
@@ -90,9 +90,9 @@ lible::vec3i LI::returnTUVPoss(const int l)
     return tuv_poss;
 }
 
-vector<LI::IdxsTUV> LI::returnIdxsTUV(const int l)
+vector<array<int, 3>> LI::returnHermiteGaussianIdxs(const int l)
 {
-    vector<IdxsTUV> idxs_tuv((l + 1) * (l + 2) * (l + 3) / 6);
+    vector<array<int, 3>> idxs_tuv((l + 1) * (l + 2) * (l + 3) / 6);
     for (int t = 0, tuv = 0; t <= l; t++)
         for (int u = 0; u <= l - t; u++)
             for (int v = 0; v <= l - t - u; v++, tuv++)

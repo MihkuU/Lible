@@ -127,6 +127,7 @@ endif()
 
 # miscellaneous # TODO: manage this
 target_compile_definitions(lible PRIVATE BASIS_DIR="${src_dir}/src/lible/ints/basis")
+target_compile_definitions(lible PRIVATE AUX_BASIS_DIR="${src_dir}/src/lible/ints/aux_basis")
 
 ### Dependencies/Sources 
 #set(src_dir ${CMAKE_CURRENT_SOURCE_DIR})
@@ -137,7 +138,7 @@ target_compile_definitions(lible PRIVATE BASIS_DIR="${src_dir}/src/lible/ints/ba
 if(lible_is_top_level)
 
 	# TODO: put in a file and include for better organization?
-	set(lible_basic_headers "${src_dir}/src/lible/util.hpp")
+	set(lible_basic_headers "${src_dir}/src/lible/utils.hpp")
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/types.hpp")
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vec2d.hpp") 
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vec3d.hpp") 

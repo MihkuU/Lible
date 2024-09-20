@@ -1,4 +1,5 @@
 #include <lible/ints/ints.hpp>
+#include <lible/ints/utils.hpp>
 #include <lible/ints/oneel/oneel_detail.hpp>
 #include <lible/ints/twoel/twoel_detail.hpp>
 
@@ -9,6 +10,11 @@
 namespace LI = lible::ints;
 namespace LIO = lible::ints::one;
 namespace LIT = lible::ints::two;
+
+lible::vec2d LI::eri4Diagonal(const Structure &structure)
+{
+    return LIT::calcERI4Diagonal(structure);
+}
 
 lible::vec2d LI::overlap(const Structure &structure)
 {

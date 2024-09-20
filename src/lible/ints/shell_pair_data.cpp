@@ -5,6 +5,67 @@ namespace LI = lible::ints;
 
 using std::pair, std::vector;
 
+LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
+{
+    assert(structure.getUseRI());
+
+    const auto &shells = structure.getShellsLAux(l);
+    int n_shells = shells.size();
+
+    int n_primitives = 0;
+    for (int ishell = 0; ishell < n_shells; ishell++)
+        n_primitives += shells[ishell].coeffs.size();
+
+    int dim_sph = dimSphericals(l);
+    int dim_herm_gauss = dimHermiteGaussians(l);
+    int n_sph_ecoeffs = dim_sph * dim_herm_gauss;        
+
+    vector<double> coeffs(n_primitives);
+    vector<double> exps(n_primitives);
+    vector<double> norms(n_shells * dim_sph);
+
+    vector<int> cdepths(n_shells);
+    vector<int> coffsets(n_shells);
+
+    vector<int> offsets_ecoeffs(n_shells);
+    vector<int> offsets_norms(n_shells);
+    vector<int> offsets_sph(n_shells);
+
+    int pos_coeffs{0}, pos_ecoeffs{0}, pos_norms{0};
+    for (int ishell = 0; ishell < n_shells; ishell++)
+    {
+        const auto &shell = shells[ishell];
+
+        int cdepth = shell.coeffs.size();
+
+        coffsets[ishell] += pos_coeffs;
+
+        for (int i = 0; i < cdepth; i++)
+        {
+            coeffs[pos_coeffs] = shell.coeffs[i];
+            exps[pos_coeffs]= shell.exps[i];
+            pos_coeffs++;
+        }
+        
+        cdepths[ishell] = cdepth;
+
+        offsets_ecoeffs[ishell] += pos_ecoeffs;
+        pos_ecoeffs += cdepth * n_sph_ecoeffs;
+
+        offsets_norms[ishell] = pos_norms;
+        for (int i = 0; i < dim_sph; i++)
+        {
+            norms[pos_norms] = shell.norms[i];
+            pos_norms++;
+        }
+    }
+
+    ShellData sh_data(l, n_shells, n_primitives, coeffs, exps, norms, cdepths, coffsets,
+                      offsets_ecoeffs, offsets_norms, offsets_sph);
+
+    return sh_data;
+}
+
 LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
                                              const Structure &structure)
 {
@@ -141,9 +202,9 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
         atomic_nrs[iatom] = structure.getZ(iatom);
     }
 
-    ShellPairData sp_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords,
-                          coeffs, coords, exps, norms, atomic_nrs, cdepths, coffsets,
-                          offsets_cart, offsets_ecoeffs, offsets_norms, offsets_sph);
+    ShellPairData sp_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords, coeffs, coords,
+                          exps, norms, atomic_nrs, cdepths, coffsets, offsets_cart,
+                          offsets_ecoeffs, offsets_norms, offsets_sph);
 
     return sp_data;
 }

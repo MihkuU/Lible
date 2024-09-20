@@ -5,7 +5,7 @@
 
 namespace LI = lible::ints;
 
-using std::array, std::size_t, std::vector;
+using std::array, std::vector;
 
 vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
                                   const vector<double> &exps)

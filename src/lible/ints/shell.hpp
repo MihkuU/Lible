@@ -8,7 +8,8 @@
 
 namespace lible
 {
-	/*
+	/**
+	 * TODO: clean it up!
 	 * Here we deal with atomic orbital shells. We follow conventions outlined in https://iodata.readthedocs.io/en/latest/basis.html.
 	 * Definitions:
 	 *   Shell - set of basis functions with the same angular momentum, contraction coefficients and
@@ -19,54 +20,28 @@ namespace lible
 	{
 		struct Shell
 		{
-			Shell(const int angular_momentum,
-				  const int atomic_number,
-				  const std::size_t dim_cartesian,
-				  const std::size_t dim_spherical,
-				  const std::size_t pos,
-				  const std::size_t pos_cart,
-				  const std::array<double, 3> &xyz_coords,
-				  const std::vector<double> &coeffs,
-				  const std::vector<double> &coeffs_raw,
-				  const std::vector<double> &exps,
-				  const std::vector<double> &norms)
-				: angular_momentum(angular_momentum),
-				  atomic_number(atomic_number),
-				  dim_cartesian(dim_cartesian),
-				  dim_spherical(dim_spherical),
-				  pos(pos),
-				  pos_cart(pos_cart),
-				  xyz_coords(xyz_coords),
-				  coeffs(coeffs),
-				  coeffs_raw(coeffs_raw),
-				  exps(exps),
+			Shell(const int l, const int z, const size_t dim_cart, const size_t dim_sph,
+				  const size_t pos, const size_t pos_cart, const std::array<double, 3> &xyz_coords,
+				  const std::vector<double> &coeffs, const std::vector<double> &coeffs_raw,
+				  const std::vector<double> &exps, const std::vector<double> &norms)
+				: l(l), z(z), dim_cart(dim_cart), dim_sph(dim_sph), pos(pos), pos_cart(pos_cart),
+				  xyz_coords(xyz_coords), coeffs(coeffs), coeffs_raw(coeffs_raw), exps(exps),
 				  norms(norms)
 			{
 			}
 
-			Shell(const int angular_momentum,
-				  const std::size_t dim_cartesian,
-				  const std::size_t dim_spherical)
-				: angular_momentum(angular_momentum),
-				  atomic_number(0),
-				  dim_cartesian(dim_cartesian),
-				  dim_spherical(dim_spherical),
-				  pos(0),
-				  pos_cart(0),
-				  xyz_coords({}),
-				  coeffs({}),
-				  coeffs_raw({}),
-				  exps({}),
-				  norms({})
+			Shell(const int l, const size_t dim_cart, const size_t dim_sph)
+				: l(l), z(0), dim_cart(dim_cart), dim_sph(dim_sph), pos(0), pos_cart(0),
+				  xyz_coords({}), coeffs({}), coeffs_raw({}), exps({}), norms({})
 			{
 			}
 
-			const int angular_momentum;
-			const int atomic_number;
-			const std::size_t dim_cartesian;
-			const std::size_t dim_spherical;
-			const std::size_t pos;
-			const std::size_t pos_cart;
+			const int l;
+			const int z;
+			const size_t dim_cart;
+			const size_t dim_sph;
+			const size_t pos;
+			const size_t pos_cart;
 			const std::array<double, 3> xyz_coords;
 			const std::vector<double> coeffs;
 			const std::vector<double> coeffs_raw;

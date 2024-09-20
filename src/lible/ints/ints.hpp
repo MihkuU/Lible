@@ -16,6 +16,8 @@ namespace lible
 {
     namespace ints
     {
+        std::vector<double> eri2Diagonal(const Structure &structure);
+        
         /**
          *
          */
@@ -37,6 +39,11 @@ namespace lible
         vec2d dipoleMoment(const Structure &structure);
 
         /**
+         * 
+         */
+        vec2d eri4Diagonal(const Structure &structure);
+
+        /**
          *
          */
         vec2d eri2();
@@ -56,13 +63,19 @@ namespace lible
          */
         void eri4Benchmark(const Structure &structure);
 
-        typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
-
         /**
          *
          */
         std::set<std::string> availableBasisSets();
 
+        /**
+         *
+         */
+        std::set<std::string> availableBasisSetsAux();
+
+        /** */
+        typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
+        
         /**
          *
          */
@@ -72,13 +85,29 @@ namespace lible
         /**
          *
          */
+        std::map<int, std::vector<shell_exps_coeffs_t>>
+        basisForAtomAux(const int atomic_nr, const std::string &aux_basis_set);        
+
+        /**
+         *
+         */
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
         basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
 
-        /** */
+        /**
+         *
+         */
+        std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
+        basisForAtomsAux(const std::set<int> &atomic_nrs, const std::string &aux_basis_set);
+
+        /**
+         *
+         */
         std::vector<std::array<int, 3>> cartExps(const int l);
 
-        /** */
+        /**
+         *
+         */
         std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
 
 #ifdef _LIBLE_USE_HIP_

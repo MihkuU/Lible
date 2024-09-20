@@ -7,16 +7,16 @@
 
 namespace LI = lible::ints;
 
-using std::vector;
+using std::tuple, std::vector;
 
-arma::dmat LI::returnSphericalTrafo(const int angmom)
+arma::dmat LI::returnSphericalTrafo(const int l)
 {
-    int dim_cart = dimCartesians(angmom);
-    int dim_sph = dimSphericals(angmom);
+    int dim_cart = dimCartesians(l);
+    int dim_sph = dimSphericals(l);
 
     arma::dmat trafo(dim_sph, dim_cart, arma::fill::zeros);
 
-    switch (angmom)
+    switch (l)
     {
     case (0):
     {
@@ -677,44 +677,20 @@ arma::dmat LI::returnSphericalTrafo(const int angmom)
     }
 }
 
-void LI::sphericalTrafo(const arma::dmat &trafo_a, const arma::dmat &trafo_b,
-                        const arma::dmat &trafo_c, const arma::dmat &trafo_d,
-                        const vec4d &eri4_shells_cart, vec4d &eri4_shells_sph)
+vector<tuple<int, int, double>> LI::sphericalTrafo(const int l)
 {
-    vec4d eri4_(trafo_a.n_cols, trafo_b.n_cols, trafo_c.n_cols, trafo_d.n_rows, 0);
-    for (size_t mu_ = 0; mu_ < trafo_a.n_cols; mu_++)
-        for (size_t nu_ = 0; nu_ < trafo_b.n_cols; nu_++)
-            for (size_t kappa_ = 0; kappa_ < trafo_c.n_cols; kappa_++)
-                for (size_t tau_ = 0; tau_ < trafo_d.n_cols; tau_++)
-                    for (size_t tau = 0; tau < trafo_d.n_rows; tau++)
-                        eri4_(mu_, nu_, kappa_, tau) += eri4_shells_cart(mu_, nu_, kappa_, tau_) *
-                                                        trafo_d(tau, tau_);
+    arma::dmat sph_trafo_mat = returnSphericalTrafo(l);
 
-    vec4d eri4__(trafo_a.n_cols, trafo_b.n_cols, trafo_c.n_rows, trafo_d.n_rows, 0);
-    for (size_t mu_ = 0; mu_ < trafo_a.n_cols; mu_++)
-        for (size_t nu_ = 0; nu_ < trafo_b.n_cols; nu_++)
-            for (size_t kappa_ = 0; kappa_ < trafo_c.n_cols; kappa_++)
-                for (size_t kappa = 0; kappa < trafo_c.n_rows; kappa++)
-                    for (size_t tau = 0; tau < trafo_d.n_rows; tau++)
-                        eri4__(mu_, nu_, kappa, tau) += eri4_(mu_, nu_, kappa_, tau) *
-                                                        trafo_c(kappa, kappa_);
+    vector<tuple<int, int, double>> sph_trafo;
+    for (size_t i = 0; i < sph_trafo_mat.n_rows; i++)
+        for (size_t j = 0; j < sph_trafo_mat.n_cols; j++)
+        {
+            double val = sph_trafo_mat(i, j);
+            if (std::fabs(val) != 0)
+                sph_trafo.push_back(std::make_tuple(i, j, val));
+        }
 
-    vec4d eri4___(trafo_a.n_cols, trafo_b.n_rows, trafo_c.n_rows, trafo_d.n_rows, 0);
-    for (size_t mu_ = 0; mu_ < trafo_a.n_cols; mu_++)
-        for (size_t nu_ = 0; nu_ < trafo_b.n_cols; nu_++)
-            for (size_t nu = 0; nu < trafo_b.n_rows; nu++)
-                for (size_t kappa = 0; kappa < trafo_c.n_rows; kappa++)
-                    for (size_t tau = 0; tau < trafo_d.n_rows; tau++)
-                        eri4___(mu_, nu, kappa, tau) += eri4__(mu_, nu_, kappa, tau) *
-                                                        trafo_b(nu, nu_);
-
-    for (size_t mu_ = 0; mu_ < trafo_a.n_cols; mu_++)
-        for (size_t mu = 0; mu < trafo_a.n_rows; mu++)
-            for (size_t nu = 0; nu < trafo_b.n_rows; nu++)
-                for (size_t kappa = 0; kappa < trafo_c.n_rows; kappa++)
-                    for (size_t tau = 0; tau < trafo_d.n_rows; tau++)
-                        eri4_shells_sph(mu, nu, kappa, tau) += eri4___(mu_, nu, kappa, tau) *
-                                                               trafo_a(mu, mu_);
+    return sph_trafo;
 }
 
 void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
@@ -737,10 +713,108 @@ void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
         }
 }
 
+void LI::transferIntegrals(const int ipair_ab, const ShellPairData &sp_data_ab,
+                           const vector<double> &eri4_shells_sph, vec2d &eri4_diagonal)
+{
+    int dim_a = dimSphericals(sp_data_ab.la);
+    int dim_b = dimSphericals(sp_data_ab.lb);
+    int dim_ab = dim_a * dim_b;
+    
+    int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
+    int pos_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
+    int pos_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+    int pos_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+
+    for (int mu = 0, munu = 0; mu < dim_a; mu++)
+        for (int nu = 0; nu < dim_b; nu++, munu++)
+        {
+            int munumunu = munu * dim_ab + munu;
+
+            double norm_a = sp_data_ab.norms[pos_norm_a + mu];
+            double norm_b = sp_data_ab.norms[pos_norm_b + nu];
+
+            // double normalized_int = eri4_shells_sph[munumunu] * norm_a * norm_b;
+            double normalized_int = eri4_shells_sph[munumunu] * norm_a * norm_b * norm_a * norm_b;
+
+            int a = pos_a + mu;
+            int b = pos_b + nu;
+
+            eri4_diagonal(a, b) = normalized_int;
+            eri4_diagonal(b, a) = normalized_int;
+        }        
+}
+
+void LI::transferIntegrals(const int ishell_a, const int ishell_b,
+                           const ShellData &sh_data_a, const ShellData &sh_data_b,
+                           const vector<double> &eri2_shells_sph, vec2d &eri2)
+{
+    int dim_a = dimSphericals(sh_data_a.l);
+    int dim_b = dimSphericals(sh_data_b.l);
+
+    int pos_a = sh_data_a.offsets_sph[ishell_a];
+    int pos_b = sh_data_b.offsets_sph[ishell_b];
+    int pos_norm_a = sh_data_a.offsets_norms[ishell_a];
+    int pos_norm_b = sh_data_a.offsets_norms[ishell_b];
+
+    for (int mu = 0; mu < dim_a; mu++)
+        for (int nu = 0; nu < dim_b; nu++)
+        {
+            int munu = mu * dim_b + nu;
+
+            double norm_a = sh_data_a.norms[pos_norm_a + mu];
+            double norm_b = sh_data_b.norms[pos_norm_b + nu];
+
+            double normalized_int = norm_a * norm_b * eri2_shells_sph[munu];
+
+            int a = pos_a + mu;
+            int b = pos_b + nu;
+
+            eri2(a, b) = normalized_int;
+            eri2(b, a) = normalized_int;
+        }
+}
+
+void LI::transferIntegrals(const int ipair_ab, const int ishell_c,
+                           const ShellData &sh_data_c, const ShellPairData &sp_data_ab,
+                           const vector<double> &eri3_shells_sph, vec3d &eri3)
+{
+    int dim_a = dimSphericals(sp_data_ab.la);
+    int dim_b = dimSphericals(sp_data_ab.lb);
+    int dim_c = dimSphericals(sh_data_c.l);
+
+    int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
+    int pos_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
+    int pos_c = sh_data_c.offsets_sph[ishell_c];
+
+    int pos_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+    int pos_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+    int pos_norm_c = sh_data_c.offsets_norms[ishell_c];
+
+    for (int mu = 0, munu = 0; mu < dim_a; mu++)
+        for (int nu = 0; nu < dim_b; nu++, munu++)
+            for (int ka = 0; ka < dim_c; ka++)
+            {
+                int munuka = munu * dim_c + ka;
+
+                double norm_a = sp_data_ab.norms[pos_norm_a + mu];
+                double norm_b = sp_data_ab.norms[pos_norm_b + nu];
+                double norm_c = sh_data_c.norms[pos_norm_c + ka];
+
+                double normalized_int = eri3_shells_sph[munuka] * norm_a * norm_b * norm_c;
+
+                int a = pos_a + mu;
+                int b = pos_b + nu;
+                int c = pos_c + ka;
+
+                eri3(a, b, c) = normalized_int;
+                eri3(b, a, c) = normalized_int;
+            }
+}
+
 void LI::transferIntegrals(const int ipair_ab, const int ipair_cd,
                            const ShellPairData &sp_data_ab,
                            const ShellPairData &sp_data_cd,
-                           const std::vector<double> &eri4_shells_sph, vec4d &eri4)
+                           const vector<double> &eri4_shells_sph, vec4d &eri4)
 {
     int dim_a = dimSphericals(sp_data_ab.la);
     int dim_b = dimSphericals(sp_data_ab.lb);
@@ -770,8 +844,8 @@ void LI::transferIntegrals(const int ipair_ab, const int ipair_cd,
                     double norm_b = sp_data_ab.norms[pos_norm_b + nu];
                     double norm_c = sp_data_cd.norms[pos_norm_c + ka];
                     double norm_d = sp_data_cd.norms[pos_norm_d + ta];
-                    double normalized_int = eri4_shells_sph[munukata] * norm_a * norm_b *
-                                            norm_c * norm_d;
+                    double normalized_int = eri4_shells_sph[munukata] * norm_a * norm_b * norm_c *
+                                            norm_d;
 
                     int a = pos_a + mu;
                     int b = pos_b + nu;

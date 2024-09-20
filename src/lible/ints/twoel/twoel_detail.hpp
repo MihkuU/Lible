@@ -15,6 +15,8 @@ namespace lible
         {
             vec2d calcERI2(const Structure &structure);
 
+            vec2d calcERI4Diagonal(const Structure &structure);
+
             vec3d calcERI3(const Structure &structure);
 
             vec4d calcERI4(const Structure &structure);

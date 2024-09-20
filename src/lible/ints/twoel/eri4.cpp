@@ -1,5 +1,5 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
-#include <lible/util.hpp>
+#include <lible/utils.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
@@ -15,23 +15,24 @@
 
 namespace LIT = lible::ints::two;
 
-using std::pair, std::vector;
+using std::array, std::pair, std::vector;
 
 namespace lible::ints::two
 {
     void kernelERI4(const int lab, const int lcd, const int ipair_ab, const int ipair_cd,
-                    const vector<double> &ecoeffs_lalb, const vector<double> &ecoeffs_lcld_tsp,
-                    const vector<IdxsTUV> &idxs_tuv_ab, const vector<IdxsTUV> &idxs_tuv_cd_tsp,
+                    const vector<double> &ecoeffs_ab, const vector<double> &ecoeffs_cd_tsp,
+                    const vector<array<int, 3>> &idxs_tuv_ab,
+                    const vector<array<int, 3>> &idxs_tuv_cd_tsp,
                     const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
                     const BoysF &boys_f, vector<double> &eri4_shells_sph, vector<double> &rints,
                     vector<double> &fnx, vec4d &rints_tmp)
     {
         int labcd = lab + lcd;
 
-        int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
-        int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];
-        int cdepth_c = sp_data_cd.cdepths[2 * ipair_cd];
-        int cdepth_d = sp_data_cd.cdepths[2 * ipair_cd + 1];
+        int dim_a = sp_data_ab.cdepths[2 * ipair_ab];
+        int dim_b = sp_data_ab.cdepths[2 * ipair_ab + 1];
+        int dim_c = sp_data_cd.cdepths[2 * ipair_cd];
+        int dim_d = sp_data_cd.cdepths[2 * ipair_cd + 1];
         int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
         int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
         int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
@@ -53,27 +54,27 @@ namespace lible::ints::two
                                   sp_data_cd.coords[6 * ipair_cd + 4],
                                   sp_data_cd.coords[6 * ipair_cd + 5]};
 
-        int dim_a = dimSphericals(sp_data_ab.la);
-        int dim_b = dimSphericals(sp_data_ab.lb);
-        int dim_c = dimSphericals(sp_data_cd.la);
-        int dim_d = dimSphericals(sp_data_cd.lb);
+        int dim_a_sph = dimSphericals(sp_data_ab.la);
+        int dim_b_sph = dimSphericals(sp_data_ab.lb);
+        int dim_c_sph = dimSphericals(sp_data_cd.la);
+        int dim_d_sph = dimSphericals(sp_data_cd.lb);
         int dim_tuv_ab = dimHermiteGaussians(lab);
         int dim_tuv_cd = dimHermiteGaussians(lcd);
-        int dim_sph_ab = dim_a * dim_b;
-        int dim_sph_cd = dim_c * dim_d;
+        int dim_sph_ab = dim_a_sph * dim_b_sph;
+        int dim_sph_cd = dim_c_sph * dim_d_sph;
 
-        int dim_E_ab = dim_sph_ab * dim_tuv_ab;
-        int dim_E_cd = dim_sph_cd * dim_tuv_cd;
-        int dim_R_x_E = dim_sph_cd * dim_tuv_ab;
-        vector<double> X(cdepth_a * cdepth_b * dim_R_x_E, 0);
+        int dim_ecoeffs_ab = dim_sph_ab * dim_tuv_ab;
+        int dim_ecoeffs_cd = dim_sph_cd * dim_tuv_cd;
+        int dim_rints_x_ecoeffs = dim_sph_cd * dim_tuv_ab;
+        vector<double> rints_x_ecoeffs(dim_a * dim_b * dim_rints_x_ecoeffs, 0);
 
-        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
-            for (int ib = 0; ib < cdepth_b; ib++)
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++)
             {
-                int pos_X = iab * dim_R_x_E;
+                int pos_rints_x_ecoeffs = iab * dim_rints_x_ecoeffs;
 
-                for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
-                    for (int id = 0; id < cdepth_d; id++)
+                for (int ic = 0, icd = 0; ic < dim_c; ic++)
+                    for (int id = 0; id < dim_d; id++)
                     {
                         double a = sp_data_ab.exps[pos_a + ia];
                         double b = sp_data_ab.exps[pos_b + ib];
@@ -92,29 +93,31 @@ namespace lible::ints::two
                         boys_f.calcFnx(labcd, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                        calcRInts(lab, lcd, alpha, fac, xyz_pq, fnx, idxs_tuv_ab,
+                        calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab,
                                   idxs_tuv_cd_tsp, rints_tmp, rints);
 
-                        int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] + icd * dim_E_cd;
+                        int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] +
+                                             icd * dim_ecoeffs_cd;
 
                         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_tuv_ab,
                                     dim_sph_cd, dim_tuv_cd, 1.0, &rints[0], dim_tuv_cd,
-                                    &ecoeffs_lcld_tsp[pos_ecoeffs_cd], dim_sph_cd, 1.0, &X[pos_X],
-                                    dim_sph_cd);
+                                    &ecoeffs_cd_tsp[pos_ecoeffs_cd], dim_sph_cd, 1.0,
+                                    &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_cd);
                         icd++;
                     }
                 iab++;
             }
 
-        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
-            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
             {
-                int pos_X = iab * dim_R_x_E;
-                int pos_ecoeffs_ab = sp_data_ab.offsets_ecoeffs[ipair_ab] + iab * dim_E_ab;
+                int pos_rints_x_ecoeffs = iab * dim_rints_x_ecoeffs;
+                int pos_ecoeffs_ab = sp_data_ab.offsets_ecoeffs[ipair_ab] + iab * dim_ecoeffs_ab;
 
                 cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_sph_ab, dim_sph_cd,
-                            dim_tuv_ab, 1.0, &ecoeffs_lalb[pos_ecoeffs_ab], dim_tuv_ab, &X[pos_X],
-                            dim_sph_cd, 1.0, &eri4_shells_sph[0], dim_sph_cd);
+                            dim_tuv_ab, 1.0, &ecoeffs_ab[pos_ecoeffs_ab], dim_tuv_ab,
+                            &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_cd, 1.0,
+                            &eri4_shells_sph[0], dim_sph_cd);
             }
     }
 }
@@ -146,8 +149,8 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
         int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
                             sp_datas[ipair].n_prim_pairs;
 
-        vector<double> ecoeffs_ipair(n_ecoeffs_sph);
-        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph);
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
 
         calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
 
@@ -157,40 +160,38 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(dim_ao, 0);
-    for (int lalb = l_pairs.size() - 1; lalb >= 0; lalb--)
-        for (int lcld = lalb; lcld >= 0; lcld--)
+    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+        for (int lcld = 0; lcld <= lalb; lcld++)
         {
+            const auto &sp_data_ab = sp_datas[lalb];
+            const auto &sp_data_cd = sp_datas[lcld];
+
             auto [la, lb] = l_pairs[lalb];
             auto [lc, ld] = l_pairs[lcld];
 
             int lab = la + lb;
             int lcd = lc + ld;
-            int labcd = lab + lcd;
 
             int dim_a_sph = dimSphericals(la);
             int dim_b_sph = dimSphericals(lb);
             int dim_c_sph = dimSphericals(lc);
             int dim_d_sph = dimSphericals(ld);
-
             int dim_ab_sph = dim_a_sph * dim_b_sph;
             int dim_cd_sph = dim_c_sph * dim_d_sph;
+            int dim_tuv_ab = dimHermiteGaussians(lab);
+            int dim_tuv_cd = dimHermiteGaussians(lcd);            
 
+            int n_pairs_ab = sp_data_ab.n_pairs;
+            int n_pairs_cd = sp_data_cd.n_pairs;
+
+            int labcd = lab + lcd;
             BoysF boys_f(labcd);
 
             const vector<double> &ecoeffs_ab = ecoeffs[lalb];
             const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
 
-            const auto &sp_data_ab = sp_datas[lalb];
-            const auto &sp_data_cd = sp_datas[lcld];
-
-            int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;
-
-            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
-            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
-
-            int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
-            int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
+            vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
+            vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
 
             vector<double> rints(dim_tuv_ab * dim_tuv_cd, 0);
             vector<double> fnx(labcd + 1, 0);
@@ -256,8 +257,8 @@ void LIT::calcERI4Benchmark(const Structure &structure)
         int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
                             sp_datas[ipair].n_prim_pairs;
 
-        vector<double> ecoeffs_ipair(n_ecoeffs_sph);
-        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph);
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
 
         calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
 
@@ -265,39 +266,37 @@ void LIT::calcERI4Benchmark(const Structure &structure)
         ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
     }
 
-    for (int lalb = l_pairs.size() - 1; lalb >= 0; lalb--)
-        for (int lcld = lalb; lcld >= 0; lcld--)
+    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+        for (int lcld = 0; lcld <= lalb; lcld++)
         {
             auto start{std::chrono::steady_clock::now()};
+            const auto &sp_data_ab = sp_datas[lalb];
+            const auto &sp_data_cd = sp_datas[lcld];
 
             auto [la, lb] = l_pairs[lalb];
             auto [lc, ld] = l_pairs[lcld];
 
             int lab = la + lb;
-            int lcd = lc + ld;
-            int labcd = lab + lcd;
+            int lcd = lc + ld;            
 
             int dim_a_sph = dimSphericals(la);
             int dim_b_sph = dimSphericals(lb);
             int dim_c_sph = dimSphericals(lc);
             int dim_d_sph = dimSphericals(ld);
-
             int dim_ab_sph = dim_a_sph * dim_b_sph;
             int dim_cd_sph = dim_c_sph * dim_d_sph;
 
+            int n_pairs_ab = sp_data_ab.n_pairs;
+            int n_pairs_cd = sp_data_cd.n_pairs;            
+
+            int labcd = lab + lcd;
             BoysF boys_f(labcd);
 
             const vector<double> &ecoeffs_ab = ecoeffs[lalb];
             const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
 
-            const auto &sp_data_ab = sp_datas[lalb];
-            const auto &sp_data_cd = sp_datas[lcld];
-
-            int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;
-
-            vector<IdxsTUV> idxs_tuv_ab = returnIdxsTUV(lab);
-            vector<IdxsTUV> idxs_tuv_cd = returnIdxsTUV(lcd);
+            vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
+            vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
 
             int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
             int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;

@@ -38,6 +38,22 @@ void LI::coeffs(const double a, const double b, const double PA, const double PB
         }
 }
 
+void LI::ecoeffsKernel(const double one_o_2a, const int l, vec2d &ecoeffs)
+{
+    for (int i = 1; i <= l; i++)
+    {
+        if (i % 2 == 0)
+            ecoeffs(i, 0) = ecoeffs(i - 1, 1);
+
+        for (int t = 1; t < i; t++)
+            if ((i + t) % 2 == 0)
+                ecoeffs(i, t) = one_o_2a * ecoeffs(i - 1, t - 1) +
+                                (t + 1) * ecoeffs(i - 1, t + 1);
+
+        ecoeffs(i, i) = one_o_2a * ecoeffs(i - 1, i - 1);
+    }
+}
+
 void LI::coeffs(const double a, const double b, const int la, const int lb,
                 const array<double, 3> &A, const array<double, 3> &B,
                 const array<double, 3> &Kab, vec3d &Ex, vec3d &Ey, vec3d &Ez)
@@ -63,6 +79,24 @@ void LI::coeffs(const double a, const double b, const int la, const int lb,
     coeffs(a, b, PA[0], PB[0], one_o_2p, la, lb, Ex);
     coeffs(a, b, PA[1], PB[1], one_o_2p, la, lb, Ey);
     coeffs(a, b, PA[2], PB[2], one_o_2p, la, lb, Ez);
+}
+
+void LI::calcECoeffs(const double a, const int l, vec2d &ecoeffs_x, vec2d &ecoeffs_y,
+                     vec2d &ecoeffs_z)
+{
+    ecoeffs_x.set(0);
+    ecoeffs_y.set(0);
+    ecoeffs_z.set(0);
+
+    ecoeffs_x(0, 0) = 1;
+    ecoeffs_y(0, 0) = 1;
+    ecoeffs_z(0, 0) = 1;
+
+    double one_o_2a = 1.0 / (2 * a);
+
+    ecoeffsKernel(one_o_2a, l, ecoeffs_x);
+    ecoeffsKernel(one_o_2a, l, ecoeffs_y);
+    ecoeffsKernel(one_o_2a, l, ecoeffs_z);
 }
 
 void LI::calcECoeffs(const int l, const vector<double> &exps,
@@ -211,8 +245,130 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
     }
 }
 
+void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out)
+{
+    lible::vec2d ecoeffs_x(l + 1, l + 1, 0);
+    lible::vec2d ecoeffs_y(l + 1, l + 1, 0);
+    lible::vec2d ecoeffs_z(l + 1, l + 1, 0);
+
+    arma::dmat sph_trafo = returnSphericalTrafo(l);
+
+    const auto &cart_exps = cartExps(l);
+
+    int dim_cart = dimCartesians(l);
+    int dim_sph = dimSphericals(l);
+    int dim_tuv = dimHermiteGaussians(l);
+
+    int n_ecoeffs = dim_sph * dim_tuv;
+
+    vec3i tuv_poss = returnHermiteGaussianPositions(l);
+
+    for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
+    {
+        int dim = sh_data.cdepths[ishell];
+        int pos = sh_data.coffsets[ishell];
+
+        int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
+
+        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);        
+        for (int i = 0; i < dim; i++)
+        {
+            double a = sh_data.exps[pos + i];            
+            calcECoeffs(a, l, ecoeffs_x, ecoeffs_y, ecoeffs_z);
+            
+            for (size_t mu = 0; mu < cart_exps.size(); mu++)
+            {
+                auto [i, j, k] = cart_exps[mu];
+                for (int t = 0; t <= i; t++)
+                    for (int u = 0; u <= j; u++)
+                        for (int v = 0; v <= k; v++)
+                        {
+                            int tuv = tuv_poss(t, u, v); // TODO: do this more effectively by looping over (t, u, v)-triplets directly
+                            ecoeffs_c(mu, tuv) = ecoeffs_x(i, t) * ecoeffs_y(j, u) *
+                                                 ecoeffs_z(k, v);
+                        }
+            }
+
+            double d = sh_data.coeffs[pos + i];
+            int pos = offset_ecoeffs + i * n_ecoeffs;
+            for (int mu = 0; mu < dim_sph; mu++)
+                for (int mu_ = 0; mu_ < dim_cart; mu++)
+                    for (int tuv = 0; tuv < dim_tuv; tuv++)
+                    {
+                        double ecoeff = d * ecoeffs_c(mu_, tuv) * sph_trafo(mu, mu_);
+
+                        int idx = pos + mu * dim_tuv + tuv;
+                        ecoeffs_out[idx] += ecoeff;
+                    }
+        }
+    }
+}
+
+void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out,
+                              vector<double> &ecoeffs_tsp_out)
+{
+    lible::vec2d ecoeffs_x(l + 1, l + 1, 0);
+    lible::vec2d ecoeffs_y(l + 1, l + 1, 0);
+    lible::vec2d ecoeffs_z(l + 1, l + 1, 0);
+
+    arma::dmat sph_trafo = returnSphericalTrafo(l);
+
+    const auto &cart_exps = cartExps(l);
+
+    int dim_cart = dimCartesians(l);
+    int dim_sph = dimSphericals(l);
+    int dim_tuv = dimHermiteGaussians(l);
+
+    int n_ecoeffs = dim_sph * dim_tuv;
+
+    vec3i tuv_poss = returnHermiteGaussianPositions(l);
+
+    for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
+    {
+        int dim = sh_data.cdepths[ishell];
+        int pos = sh_data.coffsets[ishell];
+
+        int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
+
+        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);        
+        for (int i = 0; i < dim; i++)
+        {
+            double a = sh_data.exps[pos + i];            
+            calcECoeffs(a, l, ecoeffs_x, ecoeffs_y, ecoeffs_z);
+            
+            for (size_t mu = 0; mu < cart_exps.size(); mu++)
+            {
+                auto [i, j, k] = cart_exps[mu];
+                for (int t = 0; t <= i; t++)
+                    for (int u = 0; u <= j; u++)
+                        for (int v = 0; v <= k; v++)
+                        {
+                            int tuv = tuv_poss(t, u, v); // TODO: do this more effectively by looping over (t, u, v)-triplets directly
+                            ecoeffs_c(mu, tuv) = ecoeffs_x(i, t) * ecoeffs_y(j, u) *
+                                                 ecoeffs_z(k, v);
+                        }
+            }
+
+            double d = sh_data.coeffs[pos + i];
+            int pos = offset_ecoeffs + i * n_ecoeffs;
+            for (int mu = 0; mu < dim_sph; mu++)
+                for (int mu_ = 0; mu_ < dim_cart; mu++)
+                    for (int tuv = 0; tuv < dim_tuv; tuv++)
+                    {
+                        double ecoeff = d * ecoeffs_c(mu_, tuv) * sph_trafo(mu, mu_);
+
+                        int idx = pos + mu * dim_tuv + tuv;
+                        ecoeffs_out[idx] += ecoeff;
+
+                        int idx_tsp = pos + tuv * dim_sph + mu;
+                        ecoeffs_tsp_out[idx_tsp] += ecoeff;
+                    }
+        }
+    }
+}
+
 void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &sp_data,
-                              vector<double> &ecoeffs_out, vector<double> &ecoeffs_tsp_out)
+                              vector<double> &ecoeffs_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -221,8 +377,8 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
     arma::dmat sph_trafo_a = returnSphericalTrafo(la);
     arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
 
-    const auto &cart_exps_a = cart_exps[la];
-    const auto &cart_exps_b = cart_exps[lb];
+    const auto &cart_exps_a = cartExps(la);
+    const auto &cart_exps_b = cartExps(lb);
 
     int dim_a_cart = dimCartesians(la);
     int dim_b_cart = dimCartesians(lb);
@@ -234,8 +390,7 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
     int dim_tuv = dimHermiteGaussians(lab);
     int n_ecoeffs = dim_ab * dim_tuv;
 
-    vec3i tuv_poss = returnTUVPoss(lab);
-    vector<IdxsTUV> idxs_tuv = returnIdxsTUV(lab);
+    vec3i tuv_poss = returnHermiteGaussianPositions(lab);
 
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
@@ -270,8 +425,12 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
                 coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
 
                 ecoeffs_ppair_cc.set(0);
-                for (const auto [i, j, k, mu] : cart_exps_a)
-                    for (const auto [i_, j_, k_, nu] : cart_exps_b)
+                for (size_t mu = 0; mu < cart_exps_a.size(); mu++)
+                {
+                    auto [i, j, k] = cart_exps_a[mu];
+                    for (size_t nu = 0; nu < cart_exps_b.size(); nu++)
+                    {
+                        auto [i_, j_, k_] = cart_exps_b[nu];
                         for (int t = 0; t <= i + i_; t++)
                             for (int u = 0; u <= j + j_; u++)
                                 for (int v = 0; v <= k + k_; v++)
@@ -280,6 +439,109 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
                                     ecoeffs_ppair_cc(mu, nu, tuv) =
                                         Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
                                 }
+                    }
+                }
+
+                ecoeffs_ppair_sc.set(0);
+                for (int mu = 0; mu < dim_a_sph; mu++)
+                    for (int mu_ = 0; mu_ < dim_a_cart; mu_++)
+                        for (int nu = 0; nu < dim_b_cart; nu++)
+                            for (int tuv = 0; tuv < dim_tuv; tuv++)
+                                ecoeffs_ppair_sc(mu, nu, tuv) +=
+                                    ecoeffs_ppair_cc(mu_, nu, tuv) * sph_trafo_a(mu, mu_);
+
+                double da = sp_data.coeffs[pos_a + ia];
+                double db = sp_data.coeffs[pos_b + ib];
+                int pos = offset_ecoeffs + iab * n_ecoeffs;
+                for (int mu = 0, munu = 0; mu < dim_a_sph; mu++)
+                    for (int nu = 0; nu < dim_b_sph; nu++, munu++)
+                        for (int nu_ = 0; nu_ < dim_b_cart; nu_++)
+                            for (int tuv = 0; tuv < dim_tuv; tuv++)
+                            {
+                                double ecoeff = da * db * ecoeffs_ppair_sc(mu, nu_, tuv) *
+                                                sph_trafo_b(nu, nu_);
+
+                                int idx = pos + munu * dim_tuv + tuv;
+                                ecoeffs_out[idx] += ecoeff;
+                            }
+            }
+    }
+}
+
+void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &sp_data,
+                              vector<double> &ecoeffs_out, vector<double> &ecoeffs_tsp_out)
+{
+    lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
+
+    arma::dmat sph_trafo_a = returnSphericalTrafo(la);
+    arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
+
+    const auto &cart_exps_a = cartExps(la);
+    const auto &cart_exps_b = cartExps(lb);
+
+    int dim_a_cart = dimCartesians(la);
+    int dim_b_cart = dimCartesians(lb);
+    int dim_a_sph = dimSphericals(la);
+    int dim_b_sph = dimSphericals(lb);
+    int dim_ab = dim_a_sph * dim_b_sph;
+
+    int lab = la + lb;
+    int dim_tuv = dimHermiteGaussians(lab);
+    int n_ecoeffs = dim_ab * dim_tuv;
+
+    vec3i tuv_poss = returnHermiteGaussianPositions(lab);
+
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        int dim_a = sp_data.cdepths[2 * ipair + 0];
+        int dim_b = sp_data.cdepths[2 * ipair + 1];
+        int pos_a = sp_data.coffsets[2 * ipair + 0];
+        int pos_b = sp_data.coffsets[2 * ipair + 1];
+
+        array<double, 3> xyz_a{sp_data.coords[6 * ipair + 0],
+                               sp_data.coords[6 * ipair + 1],
+                               sp_data.coords[6 * ipair + 2]};
+
+        array<double, 3> xyz_b{sp_data.coords[6 * ipair + 3],
+                               sp_data.coords[6 * ipair + 4],
+                               sp_data.coords[6 * ipair + 5]};
+
+        int offset_ecoeffs = sp_data.offsets_ecoeffs[ipair];
+
+        vec3d ecoeffs_ppair_cc(dim_a_cart, dim_b_cart, dim_tuv, 0);
+        vec3d ecoeffs_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+        for (int ia = 0, iab = 0; ia < dim_a; ia++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
+            {
+                double a = sp_data.exps[pos_a + ia];
+                double b = sp_data.exps[pos_b + ib];
+                double mu = a * b / (a + b);
+
+                std::array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
+                                          std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
+
+                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+
+                ecoeffs_ppair_cc.set(0);
+                for (size_t mu = 0; mu < cart_exps_a.size(); mu++)
+                {
+                    auto [i, j, k] = cart_exps_a[mu];
+                    for (size_t nu = 0; nu < cart_exps_b.size(); nu++)
+                    {
+                        auto [i_, j_, k_] = cart_exps_b[nu];
+                        for (int t = 0; t <= i + i_; t++)
+                            for (int u = 0; u <= j + j_; u++)
+                                for (int v = 0; v <= k + k_; v++)
+                                {
+                                    int tuv = tuv_poss(t, u, v);
+                                    ecoeffs_ppair_cc(mu, nu, tuv) =
+                                        Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
+                                }
+                    }
+                }
 
                 ecoeffs_ppair_sc.set(0);
                 for (int mu = 0; mu < dim_a_sph; mu++)
