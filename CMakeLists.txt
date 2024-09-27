@@ -19,14 +19,14 @@ endif()
 
 # Modules
 option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" OFF)
-option(LIBLE_BUILD_DOCS "Enables building sphinx-documentation" OFF)
+option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" ON)
 option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" OFF)
 option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
 option(LIBLE_BUILD_GPUINTS  "Build and install the GPU molecular integrals module" OFF)
 
 ### Options
-option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" ON)
+option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -134,7 +134,12 @@ target_compile_definitions(lible PRIVATE AUX_BASIS_DIR="${src_dir}/src/lible/int
 #add_subdirectory("${src_dir}/extern")
 #add_subdirectory("${src_dir}/src")
 
-### installation
+### Documentation
+if(lible_is_top_level AND LIBLE_BUILD_DOCS)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/docs")
+endif()
+
+### Installation
 if(lible_is_top_level)
 
 	# TODO: put in a file and include for better organization?

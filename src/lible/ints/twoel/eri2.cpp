@@ -110,7 +110,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
         vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
-        calcECoeffsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
+        // calcECoeffsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
 
         ecoeffs[l] = std::move(ecoeffs_l);
         ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
@@ -134,46 +134,46 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
             int lab = la + lb;
             BoysF boys_f(lab);
 
-            const vector<double> &ecoeffs_a = ecoeffs[la];
-            const vector<double> &ecoeffs_b_tsp = ecoeffs[lb];
+            // const vector<double> &ecoeffs_a = ecoeffs[la];
+            // const vector<double> &ecoeffs_b_tsp = ecoeffs[lb];
 
-            vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
-            vector<array<int, 3>> idxs_tuv_b = returnHermiteGaussianIdxs(lb);     
+            // vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
+            // vector<array<int, 3>> idxs_tuv_b = returnHermiteGaussianIdxs(lb);
 
-            vector<double> rints(dim_tuv_a * dim_tuv_b, 0);
-            vector<double> fnx(lab + 1, 0);
-            vec4d rints_tmp(lab + 1, 0);
+            // vector<double> rints(dim_tuv_a * dim_tuv_b, 0);
+            // vector<double> fnx(lab + 1, 0);
+            // vec4d rints_tmp(lab + 1, 0);
 
-            if (la == lb)
-            {
-                for (int ishell_a = 0; ishell_a < n_shells_a; ishell_a++)
-                    for (int ishell_b = 0; ishell_b <= ishell_a; ishell_b++)
-                    {
-                        vector<double> eri2_shells_sph(dim_sph_a * dim_sph_b, 0);
+            // if (la == lb)
+            // {
+            //     for (int ishell_a = 0; ishell_a < n_shells_a; ishell_a++)
+            //         for (int ishell_b = 0; ishell_b <= ishell_a; ishell_b++)
+            //         {
+            //             vector<double> eri2_shells_sph(dim_sph_a * dim_sph_b, 0);
 
-                        kernelERI2(ishell_a, ishell_b, la, lb, ecoeffs_a, ecoeffs_b_tsp,
-                                   idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
-                                   rints, rints_tmp, eri2_shells_sph);
+            //             kernelERI2(ishell_a, ishell_b, la, lb, ecoeffs_a, ecoeffs_b_tsp,
+            //                        idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
+            //                        rints, rints_tmp, eri2_shells_sph);
 
-                        transferIntegrals(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                          eri2_shells_sph, eri2);
-                    }
-            }
-            else
-            {
-                for (int ishell_a = 0; ishell_a < n_shells_a; ishell_a++)
-                    for (int ishell_b = 0; ishell_b < n_shells_b; ishell_b++)
-                    {
-                        vector<double> eri2_shells_sph(dim_sph_a * dim_sph_b, 0);
+            //             transferIntegrals(ishell_a, ishell_b, sh_data_a, sh_data_b,
+            //                               eri2_shells_sph, eri2);
+            //         }
+            // }
+            // else
+            // {
+            //     for (int ishell_a = 0; ishell_a < n_shells_a; ishell_a++)
+            //         for (int ishell_b = 0; ishell_b < n_shells_b; ishell_b++)
+            //         {
+            //             vector<double> eri2_shells_sph(dim_sph_a * dim_sph_b, 0);
 
-                        kernelERI2(ishell_a, ishell_b, la, lb, ecoeffs_a, ecoeffs_b_tsp,
-                                   idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
-                                   rints, rints_tmp, eri2_shells_sph);
+            //             kernelERI2(ishell_a, ishell_b, la, lb, ecoeffs_a, ecoeffs_b_tsp,
+            //                        idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
+            //                        rints, rints_tmp, eri2_shells_sph);
 
-                        transferIntegrals(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                          eri2_shells_sph, eri2);
-                    }
-            }
+            //             transferIntegrals(ishell_a, ishell_b, sh_data_a, sh_data_b,
+            //                               eri2_shells_sph, eri2);
+            //         }
+            // }
         }
 
     auto end{std::chrono::steady_clock::now()};

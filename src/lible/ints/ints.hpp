@@ -17,7 +17,7 @@ namespace lible
     namespace ints
     {
         std::vector<double> eri2Diagonal(const Structure &structure);
-        
+
         /**
          *
          */
@@ -39,14 +39,14 @@ namespace lible
         vec2d dipoleMoment(const Structure &structure);
 
         /**
-         * 
+         *
          */
-        vec2d eri4Diagonal(const Structure &structure);
+        vec2d eri2(const Structure &structure);
 
         /**
          *
          */
-        vec2d eri2();
+        vec2d eri4Diagonal(const Structure &structure);
 
         /**
          *
@@ -75,7 +75,7 @@ namespace lible
 
         /** */
         typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
-        
+
         /**
          *
          */
@@ -86,7 +86,7 @@ namespace lible
          *
          */
         std::map<int, std::vector<shell_exps_coeffs_t>>
-        basisForAtomAux(const int atomic_nr, const std::string &aux_basis_set);        
+        basisForAtomAux(const int atomic_nr, const std::string &aux_basis_set);
 
         /**
          *

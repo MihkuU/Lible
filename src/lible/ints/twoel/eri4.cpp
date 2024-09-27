@@ -21,8 +21,8 @@ namespace lible::ints::two
 {
     void kernelERI4(const int lab, const int lcd, const int ipair_ab, const int ipair_cd,
                     const vector<double> &ecoeffs_ab, const vector<double> &ecoeffs_cd_tsp,
-                    const vector<array<int, 3>> &idxs_tuv_ab,
-                    const vector<array<int, 3>> &idxs_tuv_cd_tsp,
+                    const vector<array<int, 3>> &idxs_tuv_ab, 
+                    const vector<array<int, 3>> &idxs_tuv_cd,
                     const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
                     const BoysF &boys_f, vector<double> &eri4_shells_sph, vector<double> &rints,
                     vector<double> &fnx, vec4d &rints_tmp)
@@ -93,8 +93,8 @@ namespace lible::ints::two
                         boys_f.calcFnx(labcd, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                        calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab,
-                                  idxs_tuv_cd_tsp, rints_tmp, rints);
+                        calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,
+                                  rints_tmp, rints);
 
                         int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] +
                                              icd * dim_ecoeffs_cd;

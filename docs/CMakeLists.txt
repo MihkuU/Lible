@@ -10,12 +10,12 @@
 #]=]
 
 # The main header corresponding to the lible-ints module
-set(lible_ints_main_header "${PROJECT_SOURCE_DIR}/src/ints/lible/ints.hpp")
+set(lible_ints_main_header "${PROJECT_SOURCE_DIR}/src/lible/ints/ints.hpp")
 
 ### Handle the Doxygen part
 find_package(Doxygen REQUIRED)
 
-set(doxygen_input_dir ${PROJECT_SOURCE_DIR}/src/ints/lible/ints.hpp)
+set(doxygen_input_dir ${PROJECT_SOURCE_DIR}/src/lible/ints)
 set(doxygen_output_dir ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
 set(doxygen_index_file ${CMAKE_CURRENT_SOURCE_DIR}/html/index.html)
 set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
