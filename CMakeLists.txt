@@ -19,7 +19,7 @@ endif()
 
 # Modules
 option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" OFF)
-option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" ON)
+option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" OFF)
 option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)

@@ -3,6 +3,8 @@
 #include <lible/ints/spherical_trafo.hpp>
 #include <lible/ints/utils.hpp>
 
+#define _USE_MATH_DEFINES
+
 namespace LI = lible::ints;
 
 using std::array, std::vector;
@@ -45,9 +47,9 @@ vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
     arma::dmat sph_trafo2 = sph_trafo1.t();
     arma::dmat ints_sph = sph_trafo1 * ints_contracted * sph_trafo2;
 
-    vector<double> normalization(dim_sph);
+    vector<double> norms(dim_sph);
     for (int i = 0; i < dim_sph; i++)
-        normalization[i] = 1.0 / std::sqrt(ints_sph(i, i));
+        norms[i] = 1.0 / std::sqrt(ints_sph(i, i));
 
-    return normalization;
+    return norms;
 }

@@ -16,6 +16,18 @@ namespace lible
 {
     namespace ints
     {
+        /**
+         * Just a test.
+         */
+        struct Tseburek
+        {
+            /** Test variable. */
+            int var;
+        };
+        
+        /**
+         * 
+         */
         std::vector<double> eri2Diagonal(const Structure &structure);
 
         /**

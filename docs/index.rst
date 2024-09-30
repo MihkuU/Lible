@@ -42,7 +42,7 @@ not enough here. Thus, the overall documentation is split into three parts:
    :maxdepth: 2
    :caption: User guide
 
-   molecular_integrals
+   ints 
 
 .. toctree::
    :hidden:
@@ -50,8 +50,3 @@ not enough here. Thus, the overall documentation is split into three parts:
    :caption: Programming interface
 
    utilities
-..
-   Docs
-   ====
-   .. doxygenstruct:: lible::ints::test
-   :members:
