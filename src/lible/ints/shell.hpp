@@ -17,13 +17,13 @@ namespace lible
 	namespace ints
 	{
 		/**		 
-		 * Data structure for representing a shell of atomic orbitals. Groups together various
+		 * Structure for representing a shell of atomic orbitals. Groups together various
 		 * data that defines a shell: angular momentum, contraction coefficients, contraction
 		 * exponents etc. 		
 		 */
 		struct Shell
 		{
-			/** The main constructor. */
+			/** The constructor. */
 			Shell(const int l, const int z, const size_t dim_cart, const size_t dim_sph,
 				  const size_t pos, const size_t pos_cart, const std::array<double, 3> &xyz_coords,
 				  const std::vector<double> &coeffs, const std::vector<double> &coeffs_raw,

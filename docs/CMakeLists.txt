@@ -11,7 +11,9 @@
 #]=]
 
 set(lible_header_dir "${PROJECT_SOURCE_DIR}/src/lible/ints")
-set(lible_ints_headers "${lible_header_dir}/ints.hpp" "${lible_header_dir}/shell.hpp")
+set(lible_ints_headers "${lible_header_dir}/ints.hpp" 
+					   "${lible_header_dir}/shell.hpp"
+					   "${lible_header_dir}/shell_pair_data.hpp")
 
 ### The Doxygen part
 find_package(Doxygen REQUIRED)

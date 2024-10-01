@@ -10,3 +10,9 @@ A whole bunch of shit, bullshit and horseshit.
 
 .. doxygenstruct:: lible::ints::Shell
    :members:
+
+.. doxygenstruct:: lible::ints::ShellData
+   :members:
+
+.. doxygenstruct:: lible::ints::ShellPairData
+   :members:
