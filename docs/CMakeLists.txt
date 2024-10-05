@@ -13,7 +13,8 @@
 set(lible_header_dir "${PROJECT_SOURCE_DIR}/src/lible/ints")
 set(lible_ints_headers "${lible_header_dir}/ints.hpp" 
 					   "${lible_header_dir}/shell.hpp"
-					   "${lible_header_dir}/shell_pair_data.hpp")
+					   "${lible_header_dir}/shell_pair_data.hpp"
+					   "${lible_header_dir}/structure.hpp")
 
 ### The Doxygen part
 find_package(Doxygen REQUIRED)
@@ -28,7 +29,6 @@ configure_file(${doxyfile_in} ${doxyfile_out} @ONLY)
 
 file(MAKE_DIRECTORY ${doxygen_output_dir})
 add_custom_command(OUTPUT ${doxygen_index_file}
-#	DEPENDS               ${lible_ints_main_header}
 	DEPENDS               ${lible_ints_headers}
 	COMMAND               ${DOXYGEN_EXECUTABLE} ${doxyfile_out}
 	MAIN_DEPENDENCY       ${doxyfile_out} ${doxyfile_in}
@@ -59,7 +59,12 @@ add_custom_command(OUTPUT ${sphinx_index_file}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	DEPENDS
 		${CMAKE_CURRENT_SOURCE_DIR}/index.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/integrals.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/ints/conventions.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/ints/ints.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/ints/shell.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/ints/spdata.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/ints/structure.rst
 		${doxygen_index_file}
 	MAIN_DEPENDENCY   ${sphinx_source}/conf.py
 	COMMENT           "Generating documentation with Sphinx")

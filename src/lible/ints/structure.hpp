@@ -9,31 +9,49 @@ namespace lible
 {
     namespace ints
     {
-        /** */
+        /** \defgroup structure */
+
         typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
 
-        /** */
+        /**
+         * \ingroup structure
+         * Typedef for bundling shell Gaussian exponents and contraction coefficients for each
+         * angular momentum per atom.
+         */
         typedef std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>> basis_atoms_t;
 
         /**
-         * Struct for representing the atomic structure. Note that the access is public for
-         * several data members. What is meant to be used 'internally' is declared private.
+         * \struct Structure structure.hpp <lible/ints/structure.hpp>
+         * \ingroup structure
          *
-         * TODO: in the future, different atoms must have the capability to have different basis.
+         * Structure for representing the atomic structure. The main data carrier for calculating
+         * the integrals. Note that to use the RI approximation, the Structure object has to be
+         * initialized by providing an auxiliary basis set name. By default, RI is disabled.
          */
         struct Structure
         {
+            /** Constructur for initializing a structure object. */
+            Structure();
+
+            /** Constructor for initializing a Structure object. */
             Structure(const std::string &basis_set, const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
+            /** Constructor for initializing a Structure object. RI approximation is disabled. */
             Structure(const std::string &basis_set, const std::vector<std::string> &elements,
                       const std::vector<double> &coords_angstrom);
 
-            Structure(const std::string &basis_set, const std::string &aux_basis_set,
+            /**
+             * Constructor for initializing a Structure object with enabling the RI approximation.
+             */
+            Structure(const std::string &basis_set, const std::string &basis_set_aux,
                       const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
-            Structure(const std::string &basis_set, const std::string &aux_basis_set,
+            /**
+             * Constructor for initializing a Structure object with enabling the RI approximation.
+             */
+            Structure(const std::string &basis_set, const std::string &basis_set_aux,
                       const std::vector<std::string> &elements,
                       const std::vector<double> &coords_angstrom);
 
@@ -66,23 +84,64 @@ namespace lible
             std::map<int, std::vector<Shell>> getShellsAux() const;
 
         private:
-            bool use_ri = false;
-            int max_l;            
-            int max_l_aux;
-            size_t dim_ao;
-            size_t dim_ao_aux;
-            size_t dim_ao_cart;
-            size_t dim_ao_cart_aux;
-            size_t n_atoms;
-            std::string aux_basis_set;
+            /** Flag for using the RI-approximation. */
+            bool use_ri{false};
+
+            /** */
+            bool prescreen_built{false};
+
+            /** */
+            bool prescreen_built_ri{false};
+
+            /** Highest angular momentum among the shells of atomic orbitals. */
+            int max_l{};
+
+            /** Highest angular momentum among the shells of auxiliary atomic orbitals. */
+            int max_l_aux{};
+
+            /** Number of atomic orbitals. */
+            size_t dim_ao{};
+
+            /** Number of auxiliary atomic orbitals. */
+            size_t dim_ao_aux{};
+
+            /** Number of atomic orbitals in Cartesian Gaussian basis. */
+            size_t dim_ao_cart{};
+
+            /** Number of auxiliary atomic orbitals in Cartesian Gaussian basis. */
+            size_t dim_ao_cart_aux{};
+
+            /** Number of atoms in the structure. */
+            size_t n_atoms{};
+
+            /** Name of the main basis set. */
             std::string basis_set;
+
+            /** Name of the auxiliary basis set. */
+            std::string basis_set_aux;            
+
+            /** Rolled out coordinates of atoms.*/
             std::vector<double> coords;
+
+            /** Atomic numbers. */
             std::vector<int> atomic_nrs;
+
+            /** Coordinates of the atoms. */
             std::vector<std::array<double, 3>> coords_xyz;
+
+            /** Symbols of the atoms. */
             std::vector<std::string> elements;
+
+            /** Shells corresponding to the main basis set for each atomic number. */
             std::map<int, std::vector<Shell>> shells;
+
+            /** Shells corresponding to the auxiliary basis set for each atomic number. */
             std::map<int, std::vector<Shell>> shells_aux;
 
+            /**
+             * Constructs the shells for the given basis. Used for both the main and auxiliary
+             * basis.
+             */
             void constructShells(const basis_atoms_t &basis_atoms, int &max_l, size_t &dim_ao,
                                  size_t &dim_ao_cart, std::map<int, std::vector<Shell>> &shells);
         };

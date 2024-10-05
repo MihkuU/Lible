@@ -18,11 +18,15 @@ LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
 
     int dim_sph = dimSphericals(l);
     int dim_herm_gauss = dimHermiteGaussians(l);
-    int n_sph_ecoeffs = dim_sph * dim_herm_gauss;        
+    int n_sph_ecoeffs = dim_sph * dim_herm_gauss;
+
+    int n_coords = 3 * n_shells;
+    int n_norms = dim_sph * n_shells;
 
     vector<double> coeffs(n_primitives);
+    vector<double> coords(n_coords);
     vector<double> exps(n_primitives);
-    vector<double> norms(n_shells * dim_sph);
+    vector<double> norms(n_norms);
 
     vector<int> cdepths(n_shells);
     vector<int> coffsets(n_shells);
@@ -36,20 +40,25 @@ LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
     {
         const auto &shell = shells[ishell];
 
+        coords[3 * ishell + 0] = shell.xyz_coords[0];
+        coords[3 * ishell + 1] = shell.xyz_coords[1];
+        coords[3 * ishell + 2] = shell.xyz_coords[2];
+
         int cdepth = shell.coeffs.size();
 
-        coffsets[ishell] += pos_coeffs;
-
+        coffsets[ishell] = pos_coeffs;
         for (int i = 0; i < cdepth; i++)
         {
             coeffs[pos_coeffs] = shell.coeffs[i];
-            exps[pos_coeffs]= shell.exps[i];
+            exps[pos_coeffs] = shell.exps[i];
             pos_coeffs++;
         }
-        
+
         cdepths[ishell] = cdepth;
 
-        offsets_ecoeffs[ishell] += pos_ecoeffs;
+        offsets_sph[ishell] = shell.pos;
+
+        offsets_ecoeffs[ishell] = pos_ecoeffs;
         pos_ecoeffs += cdepth * n_sph_ecoeffs;
 
         offsets_norms[ishell] = pos_norms;
@@ -60,7 +69,7 @@ LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
         }
     }
 
-    ShellData sh_data(l, n_shells, n_primitives, coeffs, exps, norms, cdepths, coffsets,
+    ShellData sh_data(l, n_shells, n_primitives, coeffs, coords, exps, norms, cdepths, coffsets,
                       offsets_ecoeffs, offsets_norms, offsets_sph);
 
     return sh_data;
@@ -108,18 +117,18 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
 
     int n_prim_pairs{0};
 
-    std::vector<double> coeffs(n_coeffs);
-    std::vector<double> coords(n_coords);
-    std::vector<double> exps(n_coeffs);
-    std::vector<double> norms(n_norms);
+    vector<double> coeffs(n_coeffs);
+    vector<double> coords(n_coords);
+    vector<double> exps(n_coeffs);
+    vector<double> norms(n_norms);
 
-    std::vector<int> cdepths(2 * n_pairs);
-    std::vector<int> coffsets(2 * n_pairs);
+    vector<int> cdepths(2 * n_pairs);
+    vector<int> coffsets(2 * n_pairs);
 
-    std::vector<int> offsets_cart(2 * n_pairs);
-    std::vector<int> offsets_ecoeffs(n_pairs);
-    std::vector<int> offsets_norms(2 * n_pairs);
-    std::vector<int> offsets_sph(2 * n_pairs);
+    vector<int> offsets_cart(2 * n_pairs);
+    vector<int> offsets_ecoeffs(n_pairs);
+    vector<int> offsets_norms(2 * n_pairs);
+    vector<int> offsets_sph(2 * n_pairs);
 
     int pos_coords{0}, pos_coeffs{0}, pos_norms{0}, pos_ecoeffs{0};
     for (int ipair = 0; ipair < n_pairs; ipair++)

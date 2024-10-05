@@ -19,6 +19,10 @@ namespace LI = lible::ints;
 
 using std::array, std::string, std::vector;
 
+LI::Structure::Structure()
+{
+}
+
 LI::Structure::Structure(const string &basis_set, const vector<int> &atomic_nrs,
                          const vector<double> &coords_angstrom)
     : basis_set(basis_set), coords(coords_angstrom), atomic_nrs(atomic_nrs)
@@ -75,30 +79,30 @@ LI::Structure::Structure(const string &basis_set, const vector<string> &elements
     constructShells(basis_atoms, max_l, dim_ao, dim_ao_cart, shells);
 }
 
-LI::Structure::Structure(const string &basis_set, const string &aux_basis_set,
+LI::Structure::Structure(const string &basis_set, const string &basis_set_aux,
                          const vector<int> &atomic_nrs,
                          const vector<double> &coords_angstrom)
     : Structure(basis_set, atomic_nrs, coords_angstrom)
 {
-    this->aux_basis_set = aux_basis_set;
+    this->basis_set_aux = basis_set_aux;
     use_ri = true;
 
     std::set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
-    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, aux_basis_set);
+    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, basis_set_aux);
     
     constructShells(basis_atoms_aux, max_l_aux, dim_ao_aux, dim_ao_cart_aux, shells_aux);
 }
 
-LI::Structure::Structure(const string &basis_set, const string &aux_basis_set,
+LI::Structure::Structure(const string &basis_set, const string &basis_set_aux,
                          const vector<string> &elements,
                          const vector<double> &coords_angstrom)
     : Structure(basis_set, elements, coords_angstrom)                         
 {        
-    this->aux_basis_set = aux_basis_set;
+    this->basis_set_aux = basis_set_aux;
     use_ri = true;
 
     std::set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
-    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, aux_basis_set);
+    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, basis_set_aux);
     
     constructShells(basis_atoms_aux, max_l_aux, dim_ao_aux, dim_ao_cart_aux, shells_aux);
 }

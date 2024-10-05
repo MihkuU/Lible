@@ -90,7 +90,7 @@ namespace lible::ints::two
                         arma::vec::fixed<3> xyz_pq = xyz_p - xyz_q;
 
                         double x = alpha * arma::dot(xyz_pq, xyz_pq);
-                        boys_f.calcFnx(labcd, x, fnx);
+                        boys_f.calcFnx(labcd, x, fnx);                    
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
                         calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,

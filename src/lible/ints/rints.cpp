@@ -4,7 +4,7 @@ namespace LI = lible::ints;
 
 using std::array, std::vector;
 
-void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::fixed<3> &xyz_pq,
+void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::fixed<3> &xyz_ab,
                    const vector<double> &fnx, vec4d &rints_tmp, vec3d &rints_out)
 {
     rints_tmp.set(0);
@@ -31,7 +31,7 @@ void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::
                 {
                     if (t > 0)
                     {
-                        rints_tmp(n, t, u, v) = xyz_pq(0) * rints_tmp(n + 1, t - 1, u, v);
+                        rints_tmp(n, t, u, v) = xyz_ab(0) * rints_tmp(n + 1, t - 1, u, v);
                         if (t > 1)
                             rints_tmp(n, t, u, v) += (t - 1) * rints_tmp(n + 1, t - 2, u, v);
                     }
@@ -39,13 +39,13 @@ void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::
                     {
                         if (u > 0)
                         {
-                            rints_tmp(n, t, u, v) = xyz_pq(1) * rints_tmp(n + 1, t, u - 1, v);
+                            rints_tmp(n, t, u, v) = xyz_ab(1) * rints_tmp(n + 1, t, u - 1, v);
                             if (u > 1)
                                 rints_tmp(n, t, u, v) += (u - 1) * rints_tmp(n + 1, t, u - 2, v);
                         }
                         else if (v > 0)
                         {
-                            rints_tmp(n, t, u, v) = xyz_pq(2) * rints_tmp(n + 1, t, u, v - 1);
+                            rints_tmp(n, t, u, v) = xyz_ab(2) * rints_tmp(n + 1, t, u, v - 1);
                             if (v > 1)
                                 rints_tmp(n, t, u, v) += (v - 1) * rints_tmp(n + 1, t, u, v - 2);
                         }
@@ -125,7 +125,6 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
             auto [t, u, v] = tuv_idxs_a[i];
 
             rints_out[i * dim_tuv_b + j] = sign * fac * rints_tmp(0, t + t_, u + u_, v + v_);
-            // rints_out[i * dim_tuv_b + j] = 1.0;
         }
     }
 }
@@ -194,7 +193,6 @@ void LI::calcRIntsDiagonal(const int l, const double fac, const double p,
             auto [t, u, v] = tuv_idxs[i];
 
             rints_out[i * dim_tuv + j] = sign * fac * rints_tmp(0, t + t_, u + u_, v + v_);
-            // rints_out[i * dim_tuv + j] = 1.0; // TMP
         }
     }
 }

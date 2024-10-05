@@ -15,8 +15,13 @@ namespace lible
 	 *
 	 */
 	namespace ints
-	{
+	{		
+		/** \defgroup shell */		 
+
 		/**		 
+		 * \struct Shell shell.hpp <lible/ints/shell.hpp>
+		 * \ingroup shell		 
+		 * 
 		 * Structure for representing a shell of atomic orbitals. Groups together various
 		 * data that defines a shell: angular momentum, contraction coefficients, contraction
 		 * exponents etc. 		
@@ -52,7 +57,7 @@ namespace lible
 			/** Starting position in the list of atomic orbitals in Cartesian basis. */
 			const size_t pos_cart;
 
-			/** Coordinates of the atom corresponding to the shell. */ // TODO: specify in angstrom
+			/** Coordinates of the atom corresponding to the shell. */
 			const std::array<double, 3> xyz_coords;
 
 			/** Contraction coefficients with primitive norms multiplied into. */
@@ -68,10 +73,12 @@ namespace lible
 			const std::vector<double> norms;
 		};
 
-		/**
-		 * Calculates the norms of the shell atomic orbitals in spherical basis.
+		/** 
+		 * \ingroup shell
+		 * 
+		 * Calculates the norms of the shell atomic orbitals in spherical basis. 
 		 */
 		std::vector<double> calcShellNorms(const int l, const std::vector<double> &coeffs,
-										   const std::vector<double> &exps);
+										   const std::vector<double> &exps);										   
 	}
 }

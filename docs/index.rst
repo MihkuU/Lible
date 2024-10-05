@@ -39,10 +39,10 @@ not enough here. Thus, the overall documentation is split into three parts:
 
 .. toctree::
    :hidden:
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: User guide
 
-   ints 
+   integrals 
 
 .. toctree::
    :hidden:

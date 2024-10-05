@@ -733,7 +733,6 @@ void LI::transferIntegrals(const int ipair_ab, const ShellPairData &sp_data_ab,
             double norm_a = sp_data_ab.norms[pos_norm_a + mu];
             double norm_b = sp_data_ab.norms[pos_norm_b + nu];
 
-            // double normalized_int = eri4_shells_sph[munumunu] * norm_a * norm_b;
             double normalized_int = eri4_shells_sph[munumunu] * norm_a * norm_b * norm_a * norm_b;
 
             int a = pos_a + mu;
@@ -754,7 +753,7 @@ void LI::transferIntegrals(const int ishell_a, const int ishell_b,
     int pos_a = sh_data_a.offsets_sph[ishell_a];
     int pos_b = sh_data_b.offsets_sph[ishell_b];
     int pos_norm_a = sh_data_a.offsets_norms[ishell_a];
-    int pos_norm_b = sh_data_a.offsets_norms[ishell_b];
+    int pos_norm_b = sh_data_b.offsets_norms[ishell_b];
 
     for (int mu = 0; mu < dim_a; mu++)
         for (int nu = 0; nu < dim_b; nu++)
@@ -768,9 +767,12 @@ void LI::transferIntegrals(const int ishell_a, const int ishell_b,
 
             int a = pos_a + mu;
             int b = pos_b + nu;
+            
+            // eri2(a, b) = normalized_int;
+            // eri2(b, a) = normalized_int;
 
-            eri2(a, b) = normalized_int;
-            eri2(b, a) = normalized_int;
+            eri2(a, b) = norm_a * norm_b; // tmp
+            eri2(b, a) = norm_a * norm_b; // tmp
         }
 }
 

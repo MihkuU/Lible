@@ -352,9 +352,9 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
             double d = sh_data.coeffs[pos + i];
             int pos = offset_ecoeffs + i * n_ecoeffs;
             for (int mu = 0; mu < dim_sph; mu++)
-                for (int mu_ = 0; mu_ < dim_cart; mu++)
+                for (int mu_ = 0; mu_ < dim_cart; mu_++)
                     for (int tuv = 0; tuv < dim_tuv; tuv++)
-                    {
+                    {                        
                         double ecoeff = d * ecoeffs_c(mu_, tuv) * sph_trafo(mu, mu_);
 
                         int idx = pos + mu * dim_tuv + tuv;

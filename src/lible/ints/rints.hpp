@@ -15,7 +15,7 @@ namespace lible
          *
          */
         void calcRInts(const int la, const int lb, const double p,
-                       const arma::vec::fixed<3> &xyz_pq, const std::vector<double> &fnx,
+                       const arma::vec::fixed<3> &xyz_ab, const std::vector<double> &fnx,
                        vec4d &rints_tmp, vec3d &rints_out);
 
         /**
