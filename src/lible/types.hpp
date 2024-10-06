@@ -9,7 +9,6 @@
 
 namespace lible
 {
-    using vec1d = std::vector<double>;
     using vec2d = Vec2D<double>;
     using vec3d = Vec3D<double>;
     using vec4d = Vec4D<double>;

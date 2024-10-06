@@ -46,7 +46,7 @@ void LI::ecoeffsKernel(const double one_o_2a, const int l, vec2d &ecoeffs)
             ecoeffs(i, 0) = ecoeffs(i - 1, 1);
 
         for (int t = 1; t < i; t++)
-            if ((i + t) % 2 == 0)
+            if ((t + i) % 2 == 0)
                 ecoeffs(i, t) = one_o_2a * ecoeffs(i - 1, t - 1) +
                                 (t + 1) * ecoeffs(i - 1, t + 1);
 
@@ -307,6 +307,9 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
 void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out,
                               vector<double> &ecoeffs_tsp_out)
 {
+    std::fill(ecoeffs_out.begin(), ecoeffs_out.end(), 0);
+    std::fill(ecoeffs_tsp_out.begin(), ecoeffs_tsp_out.end(), 0);
+
     lible::vec2d ecoeffs_x(l + 1, l + 1, 0);
     lible::vec2d ecoeffs_y(l + 1, l + 1, 0);
     lible::vec2d ecoeffs_z(l + 1, l + 1, 0);
@@ -350,17 +353,17 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
             }
 
             double d = sh_data.coeffs[pos + i];
-            int pos = offset_ecoeffs + i * n_ecoeffs;
+            int pos_ecoeffs = offset_ecoeffs + i * n_ecoeffs;
             for (int mu = 0; mu < dim_sph; mu++)
                 for (int mu_ = 0; mu_ < dim_cart; mu_++)
                     for (int tuv = 0; tuv < dim_tuv; tuv++)
                     {                        
                         double ecoeff = d * ecoeffs_c(mu_, tuv) * sph_trafo(mu, mu_);
 
-                        int idx = pos + mu * dim_tuv + tuv;
+                        int idx = pos_ecoeffs + mu * dim_tuv + tuv;
                         ecoeffs_out[idx] += ecoeff;
 
-                        int idx_tsp = pos + tuv * dim_sph + mu;
+                        int idx_tsp = pos_ecoeffs + tuv * dim_sph + mu;
                         ecoeffs_tsp_out[idx_tsp] += ecoeff;
                     }
         }

@@ -72,7 +72,6 @@ namespace lible::ints::two
             for (int ib = 0; ib < dim_b; ib++)
             {
                 int pos_rints_x_ecoeffs = iab * dim_rints_x_ecoeffs;
-
                 for (int ic = 0, icd = 0; ic < dim_c; ic++)
                     for (int id = 0; id < dim_d; id++)
                     {

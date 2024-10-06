@@ -768,11 +768,8 @@ void LI::transferIntegrals(const int ishell_a, const int ishell_b,
             int a = pos_a + mu;
             int b = pos_b + nu;
             
-            // eri2(a, b) = normalized_int;
-            // eri2(b, a) = normalized_int;
-
-            eri2(a, b) = norm_a * norm_b; // tmp
-            eri2(b, a) = norm_a * norm_b; // tmp
+            eri2(a, b) = normalized_int;
+            eri2(b, a) = normalized_int;
         }
 }
 

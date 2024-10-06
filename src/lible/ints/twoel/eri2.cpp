@@ -50,9 +50,11 @@ namespace lible::ints::two
         int dim_ecoeffs_a = dim_sph_a * dim_tuv_a;
         int dim_ecoeffs_b = dim_sph_b * dim_tuv_b;
         int dim_rints_x_ecoeffs = dim_tuv_a * dim_sph_b;
-        vector<double> rints_x_ecoeffs(dim_a * dim_b * dim_rints_x_ecoeffs, 0);
+        vector<double> rints_x_ecoeffs(dim_a * dim_rints_x_ecoeffs, 0);
 
         for (int ia = 0; ia < dim_a; ia++)
+        {
+            int pos_rints_x_ecoeffs = ia * dim_rints_x_ecoeffs;
             for (int ib = 0; ib < dim_b; ib++)
             {
                 double a = sh_data_a.exps[pos_a + ia];
@@ -63,16 +65,16 @@ namespace lible::ints::two
                 boys_f.calcFnx(lab, x, fnx);
 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-                calcRInts(la, lb, alpha, fac, xyz_ab, fnx, idxs_tuv_a, idxs_tuv_b, rints_tmp,
+                calcRInts(la, lb, fac, alpha, xyz_ab, fnx, idxs_tuv_a, idxs_tuv_b, rints_tmp,
                           rints);
 
-                int pos_rints_x_ecoeffs = ia * dim_rints_x_ecoeffs;
                 int pos_ecoeffs_b = sh_data_b.offsets_ecoeffs[ishell_b] + ib * dim_ecoeffs_b;
 
                 cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_tuv_a, dim_sph_b,
                             dim_tuv_b, 1.0, &rints[0], dim_tuv_b, &ecoeffs_b_tsp[pos_ecoeffs_b],
                             dim_sph_b, 1.0, &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_b);
             }
+        }
 
         for (int ia = 0; ia < dim_a; ia++)
         {
@@ -115,6 +117,30 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
         ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
     }
 
+    printf("\n");
+    for (int la = 0; la <= structure.getMaxL(); la++)
+    {        
+        vector<Shell> shells = structure.getShellsL(la);
+        for (size_t ishell = 0; ishell < shells.size(); ishell++)
+        {
+            vector<double> norms = shells[ishell].norms;
+            for (size_t ia = 0; ia < norms.size(); ia++)
+                printf("la = %d, norm_a = %16.12lf\n", la, norms[ia]);
+        }
+    }
+
+    printf("\n");
+    for (int la = 0; la <= l_max_aux; la++)
+    {        
+        vector<Shell> shells = structure.getShellsLAux(la);
+        for (size_t ishell = 0; ishell < shells.size(); ishell++)
+        {
+            vector<double> norms = shells[ishell].norms;
+            for (size_t ia = 0; ia < norms.size(); ia++)
+                printf("la = %d, norm_a = %16.12lf\n", la, norms[ia]);
+        }
+    }
+
     size_t dim_ao_aux = structure.getDimAOAux();
     vec2d eri2(dim_ao_aux, dim_ao_aux, 0);
     for (int la = 0; la <= l_max_aux; la++)
@@ -134,7 +160,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
             BoysF boys_f(lab);
 
             const vector<double> &ecoeffs_a = ecoeffs[la];
-            const vector<double> &ecoeffs_b_tsp = ecoeffs[lb];
+            const vector<double> &ecoeffs_b_tsp = ecoeffs_tsp[lb];
 
             vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
             vector<array<int, 3>> idxs_tuv_b = returnHermiteGaussianIdxs(lb);
