@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 # Setting up some external libraries
 # List of libraries:
 #   - armadillo, https://arma.sourceforge.net/
-#   - ankerl, https://github.com/martinus/unordered_dense
 #   - fmt, https://github.com/fmtlib/fmt
 #   - mpl, https://github.com/rabauke/mpl
 
@@ -27,10 +26,6 @@ endif()
 # fmt
 target_compile_definitions(lible PRIVATE FMT_HEADER_ONLY)
 target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fmt/include)
-
-# ankerl-unordered dense
-find_package(unordered_dense CONFIG REQUIRED PATHS ${CMAKE_CURRENT_BINARY_DIR}/unordered_dense/build/lib/cmake/unordered_dense)
-target_link_libraries(lible PRIVATE unordered_dense::unordered_dense)
 
 # mpl
 if(LIBLE_USE_MPI)
