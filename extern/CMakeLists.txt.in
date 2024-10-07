@@ -49,18 +49,3 @@ if(@LIBLE_USE_MPI@)
 	    DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 	)
 endif()
-
-set(ankerl_dense_dir "@CMAKE_CURRENT_BINARY_DIR@/unordered_dense")
-ExternalProject_Add(ankerl_dense
-	URL						   "@CMAKE_CURRENT_SOURCE_DIR@/unordered_dense-main.zip"
-	SOURCE_DIR				   "${ankerl_dense_dir}"
-	CONFIGURE_COMMAND
-		${CMAKE_COMMAND} -S "${ankerl_dense_dir}" -B "${ankerl_dense_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${ankerl_dense_dir}/build
-	BUILD_COMMAND
-		${CMAKE_COMMAND} --build "${ankerl_dense_dir}/build"
-	INSTALL_COMMAND
-		${CMAKE_COMMAND} --install "${ankerl_dense_dir}/build"
-	TEST_COMMAND
-	BUILD_ALWAYS               OFF
-	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
-)

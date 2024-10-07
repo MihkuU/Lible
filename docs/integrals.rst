@@ -9,8 +9,9 @@ A whole bunch of shit, bullshit and horseshit.
    :hidden:
    :caption: Integrals
 
-   ints/conventions
+   ints/definitions
    ints/ints
    ints/shell
    ints/spdata
    ints/structure
+   ints/tutorials
