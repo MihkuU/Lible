@@ -67,7 +67,7 @@ namespace lible
          * \ingroup ints
          * Calculates the three-center ERIs, \f$(\mu\nu|P)\f$.
          */
-        vec3d eri3();
+        vec3d eri3(const Structure &structure);
 
         /**
          * \ingroup ints

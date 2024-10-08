@@ -69,11 +69,11 @@ namespace lible::ints::two
         vector<double> rints_x_ecoeffs(dim_a * dim_b * dim_rints_x_ecoeffs, 0);
 
         for (int ia = 0, iab = 0; ia < dim_a; ia++)
-            for (int ib = 0; ib < dim_b; ib++)
+            for (int ib = 0; ib < dim_b; ib++, iab++)
             {
                 int pos_rints_x_ecoeffs = iab * dim_rints_x_ecoeffs;
                 for (int ic = 0, icd = 0; ic < dim_c; ic++)
-                    for (int id = 0; id < dim_d; id++)
+                    for (int id = 0; id < dim_d; id++, icd++)
                     {
                         double a = sp_data_ab.exps[pos_a + ia];
                         double b = sp_data_ab.exps[pos_b + ib];
@@ -89,7 +89,7 @@ namespace lible::ints::two
                         arma::vec::fixed<3> xyz_pq = xyz_p - xyz_q;
 
                         double x = alpha * arma::dot(xyz_pq, xyz_pq);
-                        boys_f.calcFnx(labcd, x, fnx);                    
+                        boys_f.calcFnx(labcd, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
                         calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,
@@ -102,9 +102,7 @@ namespace lible::ints::two
                                     dim_sph_cd, dim_tuv_cd, 1.0, &rints[0], dim_tuv_cd,
                                     &ecoeffs_cd_tsp[pos_ecoeffs_cd], dim_sph_cd, 1.0,
                                     &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_cd);
-                        icd++;
                     }
-                iab++;
             }
 
         for (int ia = 0, iab = 0; ia < dim_a; ia++)

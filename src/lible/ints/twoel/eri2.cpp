@@ -91,7 +91,7 @@ namespace lible::ints::two
 
 lible::vec2d LIT::calcERI2(const Structure &structure)
 {
-    assert(structure.getUseRI());
+    assert(structure.getUseRI()); // TODO: use throw exception here instead
 
     palPrint(fmt::format("Lible::{:<40}", "SHARK ERI2..."));
 
@@ -115,30 +115,6 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
 
         ecoeffs[l] = std::move(ecoeffs_l);
         ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
-    }
-
-    printf("\n");
-    for (int la = 0; la <= structure.getMaxL(); la++)
-    {        
-        vector<Shell> shells = structure.getShellsL(la);
-        for (size_t ishell = 0; ishell < shells.size(); ishell++)
-        {
-            vector<double> norms = shells[ishell].norms;
-            for (size_t ia = 0; ia < norms.size(); ia++)
-                printf("la = %d, norm_a = %16.12lf\n", la, norms[ia]);
-        }
-    }
-
-    printf("\n");
-    for (int la = 0; la <= l_max_aux; la++)
-    {        
-        vector<Shell> shells = structure.getShellsLAux(la);
-        for (size_t ishell = 0; ishell < shells.size(); ishell++)
-        {
-            vector<double> norms = shells[ishell].norms;
-            for (size_t ia = 0; ia < norms.size(); ia++)
-                printf("la = %d, norm_a = %16.12lf\n", la, norms[ia]);
-        }
     }
 
     size_t dim_ao_aux = structure.getDimAOAux();
