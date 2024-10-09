@@ -13,6 +13,8 @@ namespace lible
     {
         namespace two
         {
+            std::vector<double> calcERI2Diagonal(const Structure &structure);
+
             vec2d calcERI2(const Structure &structure);
 
             vec2d calcERI4Diagonal(const Structure &structure);

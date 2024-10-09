@@ -693,6 +693,27 @@ vector<tuple<int, int, double>> LI::sphericalTrafo(const int l)
     return sph_trafo;
 }
 
+void LI::transferIntegrals(const int ishell, const ShellData &sh_data,
+                           const vector<double> &eri2_shells_sph,
+                           vector<double> &eri2_diagonal)
+{
+    int dim_a = dimSphericals(sh_data.l);
+    int pos_a = sh_data.offsets_sph[ishell];
+    int pos_norm_a = sh_data.offsets_norms[ishell];
+
+    for (int mu = 0; mu < dim_a; mu++)
+    {
+        int munu = mu * dim_a + mu;
+        
+        double norm_a = sh_data.norms[pos_norm_a];
+        double normalized_int = norm_a * norm_a * eri2_shells_sph[munu];
+
+        int a = pos_a + mu;
+
+        eri2_diagonal[a] = normalized_int;
+    }
+}
+
 void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
                            const arma::dmat &ints_sph, vec2d &ints)
 {

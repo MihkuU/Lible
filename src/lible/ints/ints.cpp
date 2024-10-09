@@ -11,6 +11,11 @@ namespace LI = lible::ints;
 namespace LIO = lible::ints::one;
 namespace LIT = lible::ints::two;
 
+std::vector<double> LI::eri2Diagonal(const Structure &structure)
+{
+    return LIT::calcERI2Diagonal(structure);
+}
+
 lible::vec2d LI::eri4Diagonal(const Structure &structure)
 {
     return LIT::calcERI4Diagonal(structure);

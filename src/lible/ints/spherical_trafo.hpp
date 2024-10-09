@@ -28,6 +28,15 @@ namespace lible
          */
         arma::dmat returnSphericalTrafo(const int l);
 
+        // TODO: rename the eri2_shells to eri2_shellbatch or something alike?
+
+        /**
+         *
+         */
+        void transferIntegrals(const int ishell, const ShellData &sh_data,
+                               const std::vector<double> &eri2_shells_sph,
+                               std::vector<double> &eri2_diagonal);
+
         /**
          *
          */
