@@ -178,8 +178,7 @@ namespace lible::ints::two
                         boys_f.calcFnx(labab, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                        calcRIntsDiagonal(lab, fac, alpha, xyz_pq, fnx, idxs_tuv, rints_tmp,
-                                          rints);
+                        calcRInts(lab, lab, fac, alpha, xyz_pq, fnx, idxs_tuv, idxs_tuv, rints_tmp, rints);
 
                         int pos_ecoeffs_cd = sp_data_ab.offsets_ecoeffs[ipair_ab] +
                                              icd * dim_ecoeffs_ab;
