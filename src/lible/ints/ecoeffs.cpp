@@ -93,8 +93,8 @@ void LI::ecoeffsPrimitivePair(const double a, const double b, const int la, cons
                            (a * xyz_a[1] + b * xyz_b[1]) / p,
                            (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-    array<double, 3> xyz_pa{xyz_p[0] - xyz_a[1], xyz_p[0] - xyz_a[1], xyz_p[2] - xyz_a[2]};
-    array<double, 3> xyz_pb{xyz_p[0] - xyz_b[1], xyz_p[0] - xyz_b[1], xyz_p[2] - xyz_b[2]};
+    array<double, 3> xyz_pa{xyz_p[0] - xyz_a[0], xyz_p[1] - xyz_a[1], xyz_p[2] - xyz_a[2]};
+    array<double, 3> xyz_pb{xyz_p[0] - xyz_b[0], xyz_p[1] - xyz_b[1], xyz_p[2] - xyz_b[2]};
 
     ecoeffsRecurrence2(a, b, xyz_pa[0], xyz_pb[0], one_o_2p, la, lb, ecoeffs_x);
     ecoeffsRecurrence2(a, b, xyz_pa[1], xyz_pb[1], one_o_2p, la, lb, ecoeffs_y);
