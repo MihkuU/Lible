@@ -1,5 +1,6 @@
 #pragma once
 
+#include <lible/log.hpp>
 #include <lible/types.hpp>
 #include <lible/utils.hpp>
 #include <lible/ints/shell_pair_data.hpp>
@@ -55,6 +56,8 @@ namespace lible
                 std::string msg = returnPreamble(opt);
                 palPrint(fmt::format("Lible::{:<40}", msg));
 
+                log::logger << fmt::format("Lible::{:<40}", msg);
+
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
 
@@ -77,6 +80,8 @@ namespace lible
                 auto end{std::chrono::steady_clock::now()};
                 std::chrono::duration<double> duration{end - start};
                 palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+                
+                log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
                 return ints;
             }

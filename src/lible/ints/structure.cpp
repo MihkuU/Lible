@@ -23,6 +23,8 @@ LI::Structure::Structure()
 {
 }
 
+// TODO: do error handling where atomic_nrs and coords_angstrom match
+
 LI::Structure::Structure(const string &basis_set, const vector<int> &atomic_nrs,
                          const vector<double> &coords_angstrom)
     : basis_set(basis_set), coords(coords_angstrom), atomic_nrs(atomic_nrs)

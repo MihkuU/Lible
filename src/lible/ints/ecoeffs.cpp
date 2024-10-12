@@ -9,36 +9,37 @@ namespace LI = lible::ints;
 
 using std::array, std::vector;
 
-void LI::coeffs(const double a, const double b, const double PA, const double PB,
-                const double one_o_2p, const int la, const int lb, vec3d &E)
+void LI::ecoeffsRecurrence2(const double a, const double b, const double PA, const double PB,
+                            const double one_o_2p, const int la, const int lb, vec3d &ecoeffs)
 {
     for (int i = 1; i <= la; i++)
     {
-        E(i, 0, 0) = PA * E(i - 1, 0, 0) + E(i - 1, 0, 1);
+        ecoeffs(i, 0, 0) = PA * ecoeffs(i - 1, 0, 0) + ecoeffs(i - 1, 0, 1);
 
         for (int t = 1; t < i; t++)
-            E(i, 0, t) = one_o_2p * E(i - 1, 0, t - 1) +
-                         PA * E(i - 1, 0, t) +
-                         (t + 1) * E(i - 1, 0, t + 1);
+            ecoeffs(i, 0, t) = one_o_2p * ecoeffs(i - 1, 0, t - 1) +
+                               PA * ecoeffs(i - 1, 0, t) +
+                               (t + 1) * ecoeffs(i - 1, 0, t + 1);
 
-        E(i, 0, i) = one_o_2p * E(i - 1, 0, i - 1) + PA * E(i - 1, 0, i);
+        ecoeffs(i, 0, i) = one_o_2p * ecoeffs(i - 1, 0, i - 1) + PA * ecoeffs(i - 1, 0, i);
     }
 
     for (int j = 1; j <= lb; j++)
         for (int i = 0; i <= la; i++)
         {
-            E(i, j, 0) = PB * E(i, j - 1, 0) + E(i, j - 1, 1);
+            ecoeffs(i, j, 0) = PB * ecoeffs(i, j - 1, 0) + ecoeffs(i, j - 1, 1);
 
             for (int t = 1; t < i + j; t++)
-                E(i, j, t) = one_o_2p * E(i, j - 1, t - 1) +
-                             PB * E(i, j - 1, t) +
-                             (t + 1) * E(i, j - 1, t + 1);
+                ecoeffs(i, j, t) = one_o_2p * ecoeffs(i, j - 1, t - 1) +
+                                   PB * ecoeffs(i, j - 1, t) +
+                                   (t + 1) * ecoeffs(i, j - 1, t + 1);
 
-            E(i, j, i + j) = one_o_2p * E(i, j - 1, i + j - 1) + PB * E(i, j - 1, i + j);
+            ecoeffs(i, j, i + j) = one_o_2p * ecoeffs(i, j - 1, i + j - 1) +
+                                   PB * ecoeffs(i, j - 1, i + j);
         }
 }
 
-void LI::ecoeffsKernel(const double one_o_2a, const int l, vec2d &ecoeffs)
+void LI::ecoeffsRecurrence1(const double one_o_2a, const int l, vec2d &ecoeffs)
 {
     for (int i = 1; i <= l; i++)
     {
@@ -54,35 +55,8 @@ void LI::ecoeffsKernel(const double one_o_2a, const int l, vec2d &ecoeffs)
     }
 }
 
-void LI::coeffs(const double a, const double b, const int la, const int lb,
-                const array<double, 3> &A, const array<double, 3> &B,
-                const array<double, 3> &Kab, vec3d &Ex, vec3d &Ey, vec3d &Ez)
-{
-    Ex.set(0);
-    Ey.set(0);
-    Ez.set(0);
-
-    Ex(0, 0, 0) = Kab[0];
-    Ey(0, 0, 0) = Kab[1];
-    Ez(0, 0, 0) = Kab[2];
-
-    double p = a + b;
-    double one_o_2p = 1.0 / (2 * p);
-
-    arma::vec::fixed<3> RA{A[0], A[1], A[2]};
-    arma::vec::fixed<3> RB{B[0], B[1], B[2]};
-
-    arma::vec::fixed<3> P = (a * RA + b * RB) / p;
-    arma::vec::fixed<3> PA = P - RA;
-    arma::vec::fixed<3> PB = P - RB;
-
-    coeffs(a, b, PA[0], PB[0], one_o_2p, la, lb, Ex);
-    coeffs(a, b, PA[1], PB[1], one_o_2p, la, lb, Ey);
-    coeffs(a, b, PA[2], PB[2], one_o_2p, la, lb, Ez);
-}
-
-void LI::calcECoeffs(const double a, const int l, vec2d &ecoeffs_x, vec2d &ecoeffs_y,
-                     vec2d &ecoeffs_z)
+void LI::ecoeffsPrimitive(const double a, const int l, vec2d &ecoeffs_x, vec2d &ecoeffs_y,
+                          vec2d &ecoeffs_z)
 {
     ecoeffs_x.set(0);
     ecoeffs_y.set(0);
@@ -94,27 +68,51 @@ void LI::calcECoeffs(const double a, const int l, vec2d &ecoeffs_x, vec2d &ecoef
 
     double one_o_2a = 1.0 / (2 * a);
 
-    ecoeffsKernel(one_o_2a, l, ecoeffs_x);
-    ecoeffsKernel(one_o_2a, l, ecoeffs_y);
-    ecoeffsKernel(one_o_2a, l, ecoeffs_z);
+    ecoeffsRecurrence1(one_o_2a, l, ecoeffs_x);
+    ecoeffsRecurrence1(one_o_2a, l, ecoeffs_y);
+    ecoeffsRecurrence1(one_o_2a, l, ecoeffs_z);
 }
 
-void LI::calcECoeffs(const int l, const vector<double> &exps,
-                     vector<arma::dmat> &ecoeffs_out)
+void LI::ecoeffsPrimitivePair(const double a, const double b, const int la, const int lb,
+                              const array<double, 3> &xyz_a, const array<double, 3> &xyz_b,
+                              const array<double, 3> &Kab, vec3d &ecoeffs_x, vec3d &ecoeffs_y,
+                              vec3d &ecoeffs_z)
 {
-    // Calculates Hermite expansion coefficients for a diagonal shell pair located on the same
-    // atom.
+    ecoeffs_x.set(0);
+    ecoeffs_y.set(0);
+    ecoeffs_z.set(0);
 
+    ecoeffs_x(0, 0, 0) = Kab[0];
+    ecoeffs_y(0, 0, 0) = Kab[1];
+    ecoeffs_z(0, 0, 0) = Kab[2];
+
+    double p = a + b;
+    double one_o_2p = 1.0 / (2 * p);
+
+    array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                           (a * xyz_a[1] + b * xyz_b[1]) / p,
+                           (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+    array<double, 3> xyz_pa{xyz_p[0] - xyz_a[1], xyz_p[0] - xyz_a[1], xyz_p[2] - xyz_a[2]};
+    array<double, 3> xyz_pb{xyz_p[0] - xyz_b[1], xyz_p[0] - xyz_b[1], xyz_p[2] - xyz_b[2]};
+
+    ecoeffsRecurrence2(a, b, xyz_pa[0], xyz_pb[0], one_o_2p, la, lb, ecoeffs_x);
+    ecoeffsRecurrence2(a, b, xyz_pa[1], xyz_pb[1], one_o_2p, la, lb, ecoeffs_y);
+    ecoeffsRecurrence2(a, b, xyz_pa[2], xyz_pb[2], one_o_2p, la, lb, ecoeffs_z);
+}
+
+void LI::ecoeffsShell(const int l, const vector<double> &exps, vector<arma::dmat> &ecoeffs_out)
+{
     int dim = dimCartesians(l);
     size_t k = exps.size();
 
     ecoeffs_out.resize(k * k, arma::zeros(dim, dim));
 
-    lible::vec3d Ex(l + 1, l + 1, 2 * l + 1, 0);
-    lible::vec3d Ey(l + 1, l + 1, 2 * l + 1, 0);
-    lible::vec3d Ez(l + 1, l + 1, 2 * l + 1, 0);
+    lible::vec3d ecoeffs_x(l + 1, l + 1, 2 * l + 1, 0);
+    lible::vec3d ecoeffs_y(l + 1, l + 1, 2 * l + 1, 0);
+    lible::vec3d ecoeffs_z(l + 1, l + 1, 2 * l + 1, 0);
 
-    array<double, 3> A{0, 0, 0}; // dummy center
+    array<double, 3> xyz_a{0, 0, 0}; // dummy center
 
     const auto &cart_exps_a = cart_exps[l];
 
@@ -126,16 +124,17 @@ void LI::calcECoeffs(const int l, const vector<double> &exps,
 
             std::array<double, 3> Kab{1, 1, 1};
 
-            coeffs(a, b, l, l, A, A, Kab, Ex, Ey, Ez);
+            ecoeffsPrimitivePair(a, b, l, l, xyz_a, xyz_a, Kab, ecoeffs_x, ecoeffs_y, ecoeffs_z);
 
             for (const auto [i, j, k, mu] : cart_exps_a)
                 for (const auto [i_, j_, k_, nu] : cart_exps_a)
-                    ecoeffs_out[iab](mu, nu) = Ex(i, i_, 0) * Ey(j, j_, 0) * Ez(k, k_, 0);
+                    ecoeffs_out[iab](mu, nu) = ecoeffs_x(i, i_, 0) * ecoeffs_y(j, j_, 0) *
+                                               ecoeffs_z(k, k_, 0);
         }
 }
 
-void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
-                     vector<vector<vec3d>> &ecoeffs_out)
+void LI::ecoeffsShellPairs3D(const int la, const int lb, const ShellPairData &sp_data,
+                             vector<vector<vec3d>> &ecoeffs_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -169,7 +168,7 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
                                           std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
                                           std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
 
-                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+                ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
 
                 for (int i = 0; i <= la; i++)
                     for (int j = 0; j <= lb; j++)
@@ -188,8 +187,8 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
     }
 }
 
-void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
-                     vector<vector<vec4d>> &ecoeffs_out)
+void LI::ecoeffsShellPairs4D(const int la, const int lb, const ShellPairData &sp_data,
+                             vector<vector<vec4d>> &ecoeffs_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -223,7 +222,7 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
                                           std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
                                           std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
 
-                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+                ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
 
                 for (int i = 0; i <= la; i++)
                     for (int j = 0; j <= lb; j++)
@@ -245,7 +244,7 @@ void LI::calcECoeffs(const int la, const int lb, const ShellPairData &sp_data,
     }
 }
 
-void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out)
+void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out)
 {
     lible::vec2d ecoeffs_x(l + 1, l + 1, 0);
     lible::vec2d ecoeffs_y(l + 1, l + 1, 0);
@@ -270,12 +269,12 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
 
         int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
 
-        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);        
+        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);
         for (int i = 0; i < dim; i++)
         {
-            double a = sh_data.exps[pos + i];            
-            calcECoeffs(a, l, ecoeffs_x, ecoeffs_y, ecoeffs_z);
-            
+            double a = sh_data.exps[pos + i];
+            ecoeffsPrimitive(a, l, ecoeffs_x, ecoeffs_y, ecoeffs_z);
+
             for (size_t mu = 0; mu < cart_exps.size(); mu++)
             {
                 auto [i, j, k] = cart_exps[mu];
@@ -304,8 +303,8 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
     }
 }
 
-void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out,
-                              vector<double> &ecoeffs_tsp_out)
+void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<double> &ecoeffs_out,
+                                vector<double> &ecoeffs_tsp_out)
 {
     std::fill(ecoeffs_out.begin(), ecoeffs_out.end(), 0);
     std::fill(ecoeffs_tsp_out.begin(), ecoeffs_tsp_out.end(), 0);
@@ -333,12 +332,12 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
 
         int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
 
-        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);        
+        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);
         for (int i = 0; i < dim; i++)
         {
-            double a = sh_data.exps[pos + i];            
-            calcECoeffs(a, l, ecoeffs_x, ecoeffs_y, ecoeffs_z);
-            
+            double a = sh_data.exps[pos + i];
+            ecoeffsPrimitive(a, l, ecoeffs_x, ecoeffs_y, ecoeffs_z);
+
             for (size_t mu = 0; mu < cart_exps.size(); mu++)
             {
                 auto [i, j, k] = cart_exps[mu];
@@ -357,7 +356,7 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
             for (int mu = 0; mu < dim_sph; mu++)
                 for (int mu_ = 0; mu_ < dim_cart; mu_++)
                     for (int tuv = 0; tuv < dim_tuv; tuv++)
-                    {                        
+                    {
                         double ecoeff = d * ecoeffs_c(mu_, tuv) * sph_trafo(mu, mu_);
 
                         int idx = pos_ecoeffs + mu * dim_tuv + tuv;
@@ -370,8 +369,8 @@ void LI::calcECoeffsSpherical(const int l, const ShellData &sh_data, vector<doub
     }
 }
 
-void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &sp_data,
-                              vector<double> &ecoeffs_out)
+void LI::ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp_data,
+                             vector<double> &ecoeffs_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -425,7 +424,7 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
                                           std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
                                           std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
 
-                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+                ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
 
                 ecoeffs_ppair_cc.set(0);
                 for (size_t mu = 0; mu < cart_exps_a.size(); mu++)
@@ -471,8 +470,8 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
     }
 }
 
-void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &sp_data,
-                              vector<double> &ecoeffs_out, vector<double> &ecoeffs_tsp_out)
+void LI::ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp_data,
+                             vector<double> &ecoeffs_out, vector<double> &ecoeffs_tsp_out)
 {
     lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
     lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
@@ -526,7 +525,7 @@ void LI::calcECoeffsSpherical(const int la, const int lb, const ShellPairData &s
                                           std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
                                           std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
 
-                coeffs(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
+                ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b, Kab, Ex, Ey, Ez);
 
                 ecoeffs_ppair_cc.set(0);
                 for (size_t mu = 0; mu < cart_exps_a.size(); mu++)

@@ -8,6 +8,7 @@
 
 namespace lible
 {
+    // TODO: replace the class with a namespace!
     class Brain
     {
     public:

@@ -17,7 +17,7 @@ void LIO::kernel<LIO::Option::kinetic_energy>(const int la, const int lb,
     // Formula taken from https://gqcg-res.github.io/knowdes/the-mcmurchie-davidson-integral-scheme.html.
 
     vector<vector<vec3d>> ecoeffs;
-    calcECoeffs(la, lb + 2, sp_data, ecoeffs);
+    ecoeffsShellPairs3D(la, lb + 2, sp_data, ecoeffs);
 
     int dim_a_cart = dimCartesians(sp_data.la);
     int dim_b_cart = dimCartesians(sp_data.lb);

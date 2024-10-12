@@ -21,7 +21,7 @@ namespace lible::ints::two
 {
     void kernelERI4(const int lab, const int lcd, const int ipair_ab, const int ipair_cd,
                     const vector<double> &ecoeffs_ab, const vector<double> &ecoeffs_cd_tsp,
-                    const vector<array<int, 3>> &idxs_tuv_ab, 
+                    const vector<array<int, 3>> &idxs_tuv_ab,
                     const vector<array<int, 3>> &idxs_tuv_cd,
                     const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
                     const BoysF &boys_f, vector<double> &eri4_shells_sph, vector<double> &rints,
@@ -38,21 +38,21 @@ namespace lible::ints::two
         int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
         int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
 
-        arma::vec::fixed<3> xyz_a{sp_data_ab.coords[6 * ipair_ab],
-                                  sp_data_ab.coords[6 * ipair_ab + 1],
-                                  sp_data_ab.coords[6 * ipair_ab + 2]};
+        array<double, 3> xyz_a{sp_data_ab.coords[6 * ipair_ab],
+                               sp_data_ab.coords[6 * ipair_ab + 1],
+                               sp_data_ab.coords[6 * ipair_ab + 2]};
 
-        arma::vec::fixed<3> xyz_b{sp_data_ab.coords[6 * ipair_ab + 3],
-                                  sp_data_ab.coords[6 * ipair_ab + 4],
-                                  sp_data_ab.coords[6 * ipair_ab + 5]};
+        array<double, 3> xyz_b{sp_data_ab.coords[6 * ipair_ab + 3],
+                               sp_data_ab.coords[6 * ipair_ab + 4],
+                               sp_data_ab.coords[6 * ipair_ab + 5]};
 
-        arma::vec::fixed<3> xyz_c{sp_data_cd.coords[6 * ipair_cd],
-                                  sp_data_cd.coords[6 * ipair_cd + 1],
-                                  sp_data_cd.coords[6 * ipair_cd + 2]};
+        array<double, 3> xyz_c{sp_data_cd.coords[6 * ipair_cd],
+                               sp_data_cd.coords[6 * ipair_cd + 1],
+                               sp_data_cd.coords[6 * ipair_cd + 2]};
 
-        arma::vec::fixed<3> xyz_d{sp_data_cd.coords[6 * ipair_cd + 3],
-                                  sp_data_cd.coords[6 * ipair_cd + 4],
-                                  sp_data_cd.coords[6 * ipair_cd + 5]};
+        array<double, 3> xyz_d{sp_data_cd.coords[6 * ipair_cd + 3],
+                               sp_data_cd.coords[6 * ipair_cd + 4],
+                               sp_data_cd.coords[6 * ipair_cd + 5]};
 
         int dim_a_sph = dimSphericals(sp_data_ab.la);
         int dim_b_sph = dimSphericals(sp_data_ab.lb);
@@ -84,11 +84,19 @@ namespace lible::ints::two
                         double q = c + d;
                         double alpha = p * q / (p + q);
 
-                        arma::vec::fixed<3> xyz_p = (a * xyz_a + b * xyz_b) / p;
-                        arma::vec::fixed<3> xyz_q = (c * xyz_c + d * xyz_d) / q;
-                        arma::vec::fixed<3> xyz_pq = xyz_p - xyz_q;
+                        array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                               (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                               (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-                        double x = alpha * arma::dot(xyz_pq, xyz_pq);
+                        array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
+                                               (c * xyz_c[1] + d * xyz_d[1]) / q,
+                                               (c * xyz_c[2] + d * xyz_d[2]) / q};
+
+                        array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0], xyz_p[1] - xyz_q[1],
+                                                xyz_p[2] - xyz_q[2]};
+
+                        double xx{xyz_pq[0]}, xy{xyz_pq[1]}, xz{xyz_pq[2]};
+                        double x = alpha * (xx * xx + xy * xy + xz * xz);
                         boys_f.calcFnx(labcd, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
@@ -119,7 +127,7 @@ namespace lible::ints::two
     }
 
     void kernelERI4Diagonal(const int lab, const int ipair_ab, const vector<double> &ecoeffs_ab,
-                            const vector<double> &ecoeffs_ab_tsp, 
+                            const vector<double> &ecoeffs_ab_tsp,
                             const vector<array<int, 3>> &idxs_tuv,
                             const BoysF &boys_f, const ShellPairData &sp_data_ab,
                             vec4d &rints_tmp, vector<double> &eri4_shells_sph, vector<double> &fnx,
@@ -136,13 +144,13 @@ namespace lible::ints::two
         int pos_c = pos_a;
         int pos_d = pos_b;
 
-        arma::vec::fixed<3> xyz_a{sp_data_ab.coords[6 * ipair_ab],
-                                  sp_data_ab.coords[6 * ipair_ab + 1],
-                                  sp_data_ab.coords[6 * ipair_ab + 2]};
+        array<double, 3> xyz_a{sp_data_ab.coords[6 * ipair_ab],
+                               sp_data_ab.coords[6 * ipair_ab + 1],
+                               sp_data_ab.coords[6 * ipair_ab + 2]};
 
-        arma::vec::fixed<3> xyz_b{sp_data_ab.coords[6 * ipair_ab + 3],
-                                  sp_data_ab.coords[6 * ipair_ab + 4],
-                                  sp_data_ab.coords[6 * ipair_ab + 5]};
+        array<double, 3> xyz_b{sp_data_ab.coords[6 * ipair_ab + 3],
+                               sp_data_ab.coords[6 * ipair_ab + 4],
+                               sp_data_ab.coords[6 * ipair_ab + 5]};
 
         int dim_a_sph = dimSphericals(sp_data_ab.la);
         int dim_b_sph = dimSphericals(sp_data_ab.lb);
@@ -169,12 +177,19 @@ namespace lible::ints::two
                         double p = a + b;
                         double q = c + d;
                         double alpha = p * q / (p + q);
+                        array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                               (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                               (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-                        arma::vec::fixed<3> xyz_p = (a * xyz_a + b * xyz_b) / p;
-                        arma::vec::fixed<3> xyz_q = (c * xyz_a + d * xyz_b) / q;
-                        arma::vec::fixed<3> xyz_pq = xyz_p - xyz_q;
+                        array<double, 3> xyz_q{(c * xyz_a[0] + d * xyz_b[0]) / q,
+                                               (c * xyz_a[1] + d * xyz_b[1]) / q,
+                                               (c * xyz_a[2] + d * xyz_b[2]) / q};
 
-                        double x = alpha * arma::dot(xyz_pq, xyz_pq);
+                        array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0], xyz_p[1] - xyz_q[1],
+                                                xyz_p[2] - xyz_q[2]};
+
+                        double xx{xyz_pq[0]}, xy{xyz_pq[1]}, xz{xyz_pq[2]};
+                        double x = alpha * (xx * xx + xy * xy + xz * xz);
                         boys_f.calcFnx(labab, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
@@ -204,7 +219,7 @@ namespace lible::ints::two
                             &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_ab, 1.0,
                             &eri4_shells_sph[0], dim_sph_ab);
             }
-    }    
+    }
 }
 
 lible::vec4d LIT::calcERI4(const Structure &structure)
@@ -237,7 +252,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
         vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
 
-        calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
 
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
         ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
@@ -264,7 +279,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
             int dim_ab_sph = dim_a_sph * dim_b_sph;
             int dim_cd_sph = dim_c_sph * dim_d_sph;
             int dim_tuv_ab = dimHermiteGaussians(lab);
-            int dim_tuv_cd = dimHermiteGaussians(lcd);            
+            int dim_tuv_cd = dimHermiteGaussians(lcd);
 
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_pairs_cd = sp_data_cd.n_pairs;
@@ -345,7 +360,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
         vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
 
-        calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
 
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
         ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
@@ -362,7 +377,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             auto [lc, ld] = l_pairs[lcld];
 
             int lab = la + lb;
-            int lcd = lc + ld;            
+            int lcd = lc + ld;
 
             int dim_a_sph = dimSphericals(la);
             int dim_b_sph = dimSphericals(lb);
@@ -372,7 +387,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             int dim_cd_sph = dim_c_sph * dim_d_sph;
 
             int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;            
+            int n_pairs_cd = sp_data_cd.n_pairs;
 
             int labcd = lab + lcd;
             BoysF boys_f(labcd);
@@ -432,7 +447,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 
     vector<pair<int, int>> l_pairs = returnLPairs(l_max);
 
-    vector<ShellPairData> sp_datas;    
+    vector<ShellPairData> sp_datas;
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
@@ -451,7 +466,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
         vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
-        calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
 
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
         ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);

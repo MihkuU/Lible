@@ -32,16 +32,19 @@ namespace lible::ints::two
         int pos_a = sh_data_a.coffsets[ishell_a];
         int pos_b = sh_data_b.coffsets[ishell_b];
 
-        arma::vec::fixed<3> xyz_a{sh_data_a.coords[3 * ishell_a],
-                                  sh_data_a.coords[3 * ishell_a + 1],
-                                  sh_data_a.coords[3 * ishell_a + 2]};
+        array<double, 3> xyz_a{sh_data_a.coords[3 * ishell_a],
+                               sh_data_a.coords[3 * ishell_a + 1],
+                               sh_data_a.coords[3 * ishell_a + 2]};
 
-        arma::vec::fixed<3> xyz_b{sh_data_b.coords[3 * ishell_b],
-                                  sh_data_b.coords[3 * ishell_b + 1],
-                                  sh_data_b.coords[3 * ishell_b + 2]};
+        array<double, 3> xyz_b{sh_data_b.coords[3 * ishell_b],
+                               sh_data_b.coords[3 * ishell_b + 1],
+                               sh_data_b.coords[3 * ishell_b + 2]};
 
-        arma::vec::fixed<3> xyz_ab = xyz_a - xyz_b;
-        double xyz_ab_dot = arma::dot(xyz_ab, xyz_ab);
+        array<double, 3> xyz_ab{xyz_a[0] - xyz_b[0], xyz_a[1] - xyz_b[1],
+                                xyz_a[2] - xyz_b[2]};
+
+        double xx{xyz_ab[0]}, xy{xyz_ab[1]}, xz{xyz_ab[2]};
+        double xyz_ab_dot = xx * xx + xy * xy + xz * xz;
 
         int dim_sph_a = dimSphericals(la);
         int dim_sph_b = dimSphericals(lb);
@@ -98,7 +101,7 @@ namespace lible::ints::two
         int dim_a = sh_data_a.cdepths[ishell];
         int pos_a = sh_data_a.coffsets[ishell];
 
-        arma::vec::fixed<3> xyz_aa{0, 0, 0};
+        array<double, 3> xyz_aa{0, 0, 0};
 
         int dim_sph_a = dimSphericals(la);
         int dim_tuv_a = dimHermiteGaussians(la);
@@ -165,7 +168,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
         vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
-        calcECoeffsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
+        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
 
         ecoeffs[l] = std::move(ecoeffs_l);
         ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
@@ -258,7 +261,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
         vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
-        calcECoeffsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
+        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
 
         ecoeffs[l] = std::move(ecoeffs_l);
         ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);

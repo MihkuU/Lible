@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <fstream>
 
 namespace lible
 {
@@ -9,31 +10,19 @@ namespace lible
 		class Logger
 		{
 		public:
-			static void writeToLog(const std::string &message);
 
-			static bool getWriteLog()
-			{
-				return write_log;
-			}
+			Logger();
 
-			static std::string getLogFName()
-			{
-				return log_fname;
-			}
+			~Logger();
 
-			static void setLogFName(const std::string &log_fname_in)
-			{
-				log_fname = log_fname_in;
-			}
-
-			static void setWriteLog(bool write_log_in)
-			{
-				write_log = write_log_in;
-			}
+			void operator<<(const std::string &message);
 
 		private:
-			static inline bool write_log = true;
-			static inline std::string log_fname = "lible.log";
+			std::string log_fname;
+
+			std::ofstream log_file;
 		};
+
+		inline Logger logger{};
 	}
 }

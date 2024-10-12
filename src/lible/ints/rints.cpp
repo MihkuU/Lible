@@ -4,7 +4,7 @@ namespace LI = lible::ints;
 
 using std::array, std::vector;
 
-void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::fixed<3> &xyz_ab,
+void LI::calcRInts(const int la, const int lb, const double p, const array<double, 3> &xyz_ab,
                    const vector<double> &fnx, vec4d &rints_tmp, vec3d &rints_out)
 {
     rints_tmp.set(0);
@@ -31,7 +31,7 @@ void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::
                 {
                     if (t > 0)
                     {
-                        rints_tmp(n, t, u, v) = xyz_ab(0) * rints_tmp(n + 1, t - 1, u, v);
+                        rints_tmp(n, t, u, v) = xyz_ab[0] * rints_tmp(n + 1, t - 1, u, v);
                         if (t > 1)
                             rints_tmp(n, t, u, v) += (t - 1) * rints_tmp(n + 1, t - 2, u, v);
                     }
@@ -39,13 +39,13 @@ void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::
                     {
                         if (u > 0)
                         {
-                            rints_tmp(n, t, u, v) = xyz_ab(1) * rints_tmp(n + 1, t, u - 1, v);
+                            rints_tmp(n, t, u, v) = xyz_ab[1] * rints_tmp(n + 1, t, u - 1, v);
                             if (u > 1)
                                 rints_tmp(n, t, u, v) += (u - 1) * rints_tmp(n + 1, t, u - 2, v);
                         }
                         else if (v > 0)
                         {
-                            rints_tmp(n, t, u, v) = xyz_ab(2) * rints_tmp(n + 1, t, u, v - 1);
+                            rints_tmp(n, t, u, v) = xyz_ab[2] * rints_tmp(n + 1, t, u, v - 1);
                             if (v > 1)
                                 rints_tmp(n, t, u, v) += (v - 1) * rints_tmp(n + 1, t, u, v - 2);
                         }
@@ -60,7 +60,7 @@ void LI::calcRInts(const int la, const int lb, const double p, const arma::vec::
 }
 
 void LI::calcRInts(const int la, const int lb, const double fac, const double p,
-                   const arma::vec::fixed<3> &xyz_pq, const vector<double> &fnx,
+                   const array<double, 3> &xyz_pq, const vector<double> &fnx,
                    const vector<array<int, 3>> &tuv_idxs_a,
                    const vector<array<int, 3>> &tuv_idxs_b,
                    vec4d &rints_tmp, vector<double> &rints_out)
@@ -89,7 +89,7 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
                 {
                     if (t > 0)
                     {
-                        rints_tmp(n, t, u, v) = xyz_pq(0) * rints_tmp(n + 1, t - 1, u, v);
+                        rints_tmp(n, t, u, v) = xyz_pq[0] * rints_tmp(n + 1, t - 1, u, v);
                         if (t > 1)
                             rints_tmp(n, t, u, v) += (t - 1) * rints_tmp(n + 1, t - 2, u, v);
                     }
@@ -97,13 +97,13 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
                     {
                         if (u > 0)
                         {
-                            rints_tmp(n, t, u, v) = xyz_pq(1) * rints_tmp(n + 1, t, u - 1, v);
+                            rints_tmp(n, t, u, v) = xyz_pq[1] * rints_tmp(n + 1, t, u - 1, v);
                             if (u > 1)
                                 rints_tmp(n, t, u, v) += (u - 1) * rints_tmp(n + 1, t, u - 2, v);
                         }
                         else if (v > 0)
                         {
-                            rints_tmp(n, t, u, v) = xyz_pq(2) * rints_tmp(n + 1, t, u, v - 1);
+                            rints_tmp(n, t, u, v) = xyz_pq[2] * rints_tmp(n + 1, t, u, v - 1);
                             if (v > 1)
                                 rints_tmp(n, t, u, v) += (v - 1) * rints_tmp(n + 1, t, u, v - 2);
                         }
@@ -128,43 +128,3 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
         }
     }
 }
-
-// template <int la, int lb>
-// constexpr array<LI::RData> LI::generateRRecurrenceTable()
-// {
-//     array<RData> rrecurrence_table;
-
-//     return rrecurrence_table;
-// }
-
-// template <int la, int lb, int dim>
-// std::array<LI::RData, dim> LI::generateRRecurrenceTable()
-// {
-// }
-
-// constexpr int LI::calcCartDimSum(const int l)
-// {
-//     return (l + 1) * (l + 2) * (l + 3) / 6;
-// }
-
-// constexpr int LI::calcCartDimSum(const int la, const int lb)
-// {
-//     int lab = la + lb;
-//     return (lab + 1) * (lab + 2) * (lab + 3) / 6;
-// }
-
-// constexpr int LI::calcIdx(const int i, const int j, const int k)
-// {
-//     int l = i + j + k;
-//     // int offset = calcRDim()
-//     int jk = j + k;
-//     return jk * (jk + 1) / 2 + k;
-// }
-
-// template <int la, int lb>
-// constexpr array<LI::RData, LI::calcCartDimSum(la, lb) + 1> LI::generateRRecurrenceTable()
-// {
-//     array<RData, calcCartDimSum(la, lb) + 1> r_recurrenc_table;
-
-//     return r_recurrenc_table;
-// }

@@ -35,17 +35,17 @@ namespace lible::ints::two
         int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
         int pos_c = sh_data_c.coffsets[ishell_c];
 
-        arma::vec::fixed<3> xyz_a{sp_data_ab.coords[6 * ipair_ab],
-                                  sp_data_ab.coords[6 * ipair_ab + 1],
-                                  sp_data_ab.coords[6 * ipair_ab + 2]};
+        array<double, 3> xyz_a{sp_data_ab.coords[6 * ipair_ab],
+                               sp_data_ab.coords[6 * ipair_ab + 1],
+                               sp_data_ab.coords[6 * ipair_ab + 2]};
 
-        arma::vec::fixed<3> xyz_b{sp_data_ab.coords[6 * ipair_ab + 3],
-                                  sp_data_ab.coords[6 * ipair_ab + 4],
-                                  sp_data_ab.coords[6 * ipair_ab + 5]};
+        array<double, 3> xyz_b{sp_data_ab.coords[6 * ipair_ab + 3],
+                               sp_data_ab.coords[6 * ipair_ab + 4],
+                               sp_data_ab.coords[6 * ipair_ab + 5]};
 
-        arma::vec::fixed<3> xyz_c{sh_data_c.coords[3 * ishell_c],
-                                  sh_data_c.coords[3 * ishell_c + 1],
-                                  sh_data_c.coords[3 * ishell_c + 2]};
+        array<double, 3> xyz_c{sh_data_c.coords[3 * ishell_c],
+                               sh_data_c.coords[3 * ishell_c + 1],
+                               sh_data_c.coords[3 * ishell_c + 2]};
 
         int dim_sph_a = dimSphericals(sp_data_ab.la);
         int dim_sph_b = dimSphericals(sp_data_ab.lb);
@@ -71,10 +71,15 @@ namespace lible::ints::two
                     double p = a + b;
                     double alpha = p * c / (p + c);
 
-                    arma::vec::fixed<3> xyz_p = (a * xyz_a + b * xyz_b) / p;
-                    arma::vec::fixed<3> xyz_pc = xyz_p - xyz_c;
+                    array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                           (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                           (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-                    double x = alpha * arma::dot(xyz_pc, xyz_pc);
+                    array<double, 3> xyz_pc{xyz_p[0] - xyz_c[0], xyz_p[1] - xyz_c[1],
+                                            xyz_p[2] - xyz_c[2]};
+
+                    double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
+                    double x = alpha * (xx * xx + xy * xy + xz * xz);
                     boys_f.calcFnx(labc, x, fnx);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
@@ -86,7 +91,7 @@ namespace lible::ints::two
                     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, dim_tuv_ab,
                                 dim_sph_c, dim_tuv_c, 1.0, &rints[0], dim_tuv_c,
                                 &ecoeffs_c[pos_ecoeffs_c], dim_tuv_c, 1.0,
-                                &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_c);                    
+                                &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_c);
                 }
             }
 
@@ -122,7 +127,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
     {
         auto [la, lb] = l_pairs[ipair];
         sp_datas.emplace_back(constructShellPairData(la, lb, structure));
-    }    
+    }
 
     vector<vector<double>> ecoeffs(l_pairs.size());
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
@@ -134,7 +139,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
                             sp_datas[ipair].n_prim_pairs;
 
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
-        calcECoeffsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair);        
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair);
 
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
     }
@@ -149,7 +154,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
         int n_ecoeffs = dimSphericals(l) * dimHermiteGaussians(l) * sh_datas[l].n_primitives;
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
-        calcECoeffsSpherical(l, sh_datas[l], ecoeffs_l);
+        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l);
 
         ecoeffs_aux[l] = std::move(ecoeffs_l);
     }

@@ -21,7 +21,7 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
     vector<double> fnx(lab + 1, 0);
 
     vector<vector<vec4d>> ecoeffs;
-    calcECoeffs(la, lb, sp_data, ecoeffs);
+    ecoeffsShellPairs4D(la, lb, sp_data, ecoeffs);
 
     BoysF boys_f(lab);
 
@@ -40,13 +40,13 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
     {
         ints_contracted.zeros();
 
-        arma::vec::fixed<3> xyz_a{sp_data.coords[6 * ipair + 0],
-                                  sp_data.coords[6 * ipair + 1],
-                                  sp_data.coords[6 * ipair + 2]};
+        array<double, 3> xyz_a{sp_data.coords[6 * ipair + 0],
+                               sp_data.coords[6 * ipair + 1],
+                               sp_data.coords[6 * ipair + 2]};
 
-        arma::vec::fixed<3> xyz_b{sp_data.coords[6 * ipair + 3],
-                                  sp_data.coords[6 * ipair + 4],
-                                  sp_data.coords[6 * ipair + 5]};
+        array<double, 3> xyz_b{sp_data.coords[6 * ipair + 3],
+                               sp_data.coords[6 * ipair + 4],
+                               sp_data.coords[6 * ipair + 5]};
 
         int dim_a = sp_data.cdepths[2 * ipair + 0];
         int dim_b = sp_data.cdepths[2 * ipair + 1];
@@ -61,7 +61,9 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
                 double b = sp_data.exps[pos_b + ib];
                 double p = a + b;
 
-                arma::vec::fixed<3> xyz_p = (a * xyz_a + b * xyz_b) / p;
+                array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                       (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                       (a * xyz_a[2] + b * xyz_b[2]) / p};
 
                 rints_sum.set(0);
                 for (int iatom = 0; iatom < sp_data.n_atoms; iatom++)
@@ -71,8 +73,11 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
                                               coords[3 * iatom + 1],
                                               coords[3 * iatom + 2]};
 
-                    arma::vec::fixed<3> xyz_pc = xyz_p - xyz_c;
-                    double xyz_pc_dot = arma::dot(xyz_pc, xyz_pc);
+                    array<double, 3> xyz_pc{xyz_p[0] - xyz_c[0], xyz_p[1] - xyz_c[1],
+                                            xyz_p[2] - xyz_c[2]};
+
+                    double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
+                    double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
                     double x = p * xyz_pc_dot;
 
                     boys_f.calcFnx(lab, x, fnx);
