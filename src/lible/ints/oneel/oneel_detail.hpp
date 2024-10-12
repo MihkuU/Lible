@@ -53,9 +53,7 @@ namespace lible
             {
                 auto start{std::chrono::steady_clock::now()};
 
-                std::string msg = returnPreamble(opt);
-                palPrint(fmt::format("Lible::{:<40}", msg));
-
+                std::string msg = returnPreamble(opt);            
                 log::logger << fmt::format("Lible::{:<40}", msg);
 
                 int l_max = structure.getMaxL();
@@ -78,8 +76,7 @@ namespace lible
                     }
 
                 auto end{std::chrono::steady_clock::now()};
-                std::chrono::duration<double> duration{end - start};
-                palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+                std::chrono::duration<double> duration{end - start};                
                 
                 log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
