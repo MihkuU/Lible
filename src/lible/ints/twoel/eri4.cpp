@@ -220,6 +220,84 @@ namespace lible::ints::two
                             &eri4_shells_sph[0], dim_sph_ab);
             }
     }
+
+    void kernelERI4_new(const int la, const int lb, const int lc, const int ld,
+                        const int cdepth_a, const int cdepth_b, const int cdepth_c, const int cdepth_d,
+                        const double *coords_a, const double *coords_b, const double *coords_c, const double *coords_d,
+                        const double *cexps_a, const double *cexps_b, const double *cexps_c, const double *cexps_d,
+                        const double *ecoeffs_ab, const double *ecoeffs_cd)
+    {
+        int lab = la + lb;
+        int lcd = lc + ld;
+        int labcd = lab + lcd;
+
+        int dim_a_sph = dimSphericals(la);
+        int dim_b_sph = dimSphericals(lb);
+        int dim_c_sph = dimSphericals(lc);
+        int dim_d_sph = dimSphericals(ld);
+        int dim_tuv_ab = dimHermiteGaussians(lab);
+        int dim_tuv_cd = dimHermiteGaussians(lcd);
+        int dim_sph_ab = dim_a_sph * dim_b_sph;
+        int dim_sph_cd = dim_c_sph * dim_d_sph;
+
+        int dim_ecoeffs_ab = dim_sph_ab * dim_tuv_ab;
+        int dim_ecoeffs_cd = dim_sph_cd * dim_tuv_cd;
+        int dim_rints_x_ecoeffs = dim_sph_cd * dim_tuv_ab;
+        vector<double> rints_x_ecoeffs(cdepth_a * cdepth_b * dim_rints_x_ecoeffs, 0);
+
+        vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
+        vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
+
+        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+            {
+                int pos_rints_x_ecoeffs = iab * dim_rints_x_ecoeffs;
+                for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
+                    for (int id = 0; id < cdepth_d; id++, icd++)
+                    {
+                        double a = cexps_a[ia];
+                        double b = cexps_b[ib];
+                        double c = cexps_c[ic];
+                        double d = cexps_d[id];
+
+                        double p = a + b;
+                        double q = c + d;
+                        double alpha = p * q / (p + q);
+
+                        array<double, 3> xyz_p{(a * coords_a[0] + b * coords_b[0]) / p,
+                                               (a * coords_a[1] + b * coords_b[1]) / p,
+                                               (a * coords_a[2] + b * coords_b[2]) / p};
+
+                        array<double, 3> xyz_q{(c * coords_c[0] + d * coords_d[0]) / q,
+                                               (c * coords_c[1] + d * coords_d[1]) / q,
+                                               (c * coords_c[2] + d * coords_d[2]) / q};
+
+                        array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0], xyz_p[1] - xyz_q[1],
+                                                xyz_p[2] - xyz_q[2]};
+
+                        double vx{xyz_pq[0]}, vy{xyz_pq[1]}, vz{xyz_pq[2]};
+                        double x = alpha * (vx * vx + vy * vy + vz * vz);
+                        // boys_f.calcFnx(labcd, x, fnx);
+
+                        double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
+                        // calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,
+                        //           rints_tmp, rints);
+
+                        // int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] +
+                        //                      icd * dim_ecoeffs_cd;
+
+                        // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_tuv_ab,
+                        //             dim_sph_cd, dim_tuv_cd, 1.0, &rints[0], dim_tuv_cd,
+                        //             &ecoeffs_cd_tsp[pos_ecoeffs_cd], dim_sph_cd, 1.0,
+                        //             &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_cd);
+                    }
+            }
+    }
+
+    template <int la, int lb, int lc, int ld>
+    void kernelERI4_new()
+    {
+    }
 }
 
 lible::vec4d LIT::calcERI4(const Structure &structure)
