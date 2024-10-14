@@ -227,6 +227,8 @@ namespace lible::ints::two
                         const double *cexps_a, const double *cexps_b, const double *cexps_c, const double *cexps_d,
                         const double *ecoeffs_ab, const double *ecoeffs_cd)
     {
+        // TODO get buffers for rints_0 and rints_n
+
         int lab = la + lb;
         int lcd = lc + ld;
         int labcd = lab + lcd;

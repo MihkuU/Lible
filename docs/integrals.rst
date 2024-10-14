@@ -3,7 +3,7 @@
 Integrals
 =========
 
-A whole bunch of shit, bullshit and horseshit.
+Todo...
 
 .. toctree::
    :hidden:
