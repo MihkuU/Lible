@@ -50,13 +50,11 @@ def configureDoxyfile(input_dir, output_dir):
 # Check if we're running on 'Read the Docs' servers
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
-# breathe_projects = {}
-#
-#"""
-#if read_the_docs_build:
-#	input_dir = '../src/ints/lible/ints.hpp'
-#	output_dir = 'build'
-#	configureDoxyfile(input_dir, output_dir)
-#	subprocess.call('doxygen', shell=True)
-#	breathe_projects['Lible'] = output_dir + '/xml'
-#"""
+breathe_projects = {}
+
+if read_the_docs_build:
+	input_dir = '../src/lible/ints/'
+	output_dir = 'build'
+	configureDoxyfile(input_dir, output_dir)
+	subprocess.call('doxygen', shell=True)
+	breathe_projects['Lible'] = output_dir + '/xml'
