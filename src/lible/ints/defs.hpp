@@ -14,6 +14,8 @@ namespace lible
 
         constexpr int _max_angular_momentum_ = 9;
 
+        constexpr int _eri_kernel_max_l_ = 24;
+
         const std::map<int, std::string> angmom_to_label{
             {0, "s"},
             {1, "p"},
