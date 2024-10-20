@@ -103,7 +103,7 @@ void LI::ecoeffsPrimitivePair(const double a, const double b, const int la, cons
 
 void LI::ecoeffsShell(const int l, const vector<double> &exps, vector<arma::dmat> &ecoeffs_out)
 {
-    int dim = dimCartesians(l);
+    int dim = numCartesians(l);
     size_t k = exps.size();
 
     ecoeffs_out.resize(k * k, arma::zeros(dim, dim));
@@ -254,9 +254,9 @@ void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<do
 
     const auto &cart_exps = cartExps(l);
 
-    int dim_cart = dimCartesians(l);
-    int dim_sph = dimSphericals(l);
-    int dim_tuv = dimHermiteGaussians(l);
+    int dim_cart = numCartesians(l);
+    int dim_sph = numSphericals(l);
+    int dim_tuv = numHermites(l);
 
     int n_ecoeffs = dim_sph * dim_tuv;
 
@@ -317,9 +317,9 @@ void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<do
 
     const auto &cart_exps = cartExps(l);
 
-    int dim_cart = dimCartesians(l);
-    int dim_sph = dimSphericals(l);
-    int dim_tuv = dimHermiteGaussians(l);
+    int dim_cart = numCartesians(l);
+    int dim_sph = numSphericals(l);
+    int dim_tuv = numHermites(l);
 
     int n_ecoeffs = dim_sph * dim_tuv;
 
@@ -382,14 +382,14 @@ void LI::ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp
     const auto &cart_exps_a = cartExps(la);
     const auto &cart_exps_b = cartExps(lb);
 
-    int dim_a_cart = dimCartesians(la);
-    int dim_b_cart = dimCartesians(lb);
-    int dim_a_sph = dimSphericals(la);
-    int dim_b_sph = dimSphericals(lb);
+    int dim_a_cart = numCartesians(la);
+    int dim_b_cart = numCartesians(lb);
+    int dim_a_sph = numSphericals(la);
+    int dim_b_sph = numSphericals(lb);
     int dim_ab = dim_a_sph * dim_b_sph;
 
     int lab = la + lb;
-    int dim_tuv = dimHermiteGaussians(lab);
+    int dim_tuv = numHermites(lab);
     int n_ecoeffs = dim_ab * dim_tuv;
 
     vec3i tuv_poss = returnHermiteGaussianPositions(lab);
@@ -483,14 +483,14 @@ void LI::ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp
     const auto &cart_exps_a = cartExps(la);
     const auto &cart_exps_b = cartExps(lb);
 
-    int dim_a_cart = dimCartesians(la);
-    int dim_b_cart = dimCartesians(lb);
-    int dim_a_sph = dimSphericals(la);
-    int dim_b_sph = dimSphericals(lb);
+    int dim_a_cart = numCartesians(la);
+    int dim_b_cart = numCartesians(lb);
+    int dim_a_sph = numSphericals(la);
+    int dim_b_sph = numSphericals(lb);
     int dim_ab = dim_a_sph * dim_b_sph;
 
     int lab = la + lb;
-    int dim_tuv = dimHermiteGaussians(lab);
+    int dim_tuv = numHermites(lab);
     int n_ecoeffs = dim_ab * dim_tuv;
 
     vec3i tuv_poss = returnHermiteGaussianPositions(lab);

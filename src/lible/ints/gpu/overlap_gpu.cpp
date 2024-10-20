@@ -811,8 +811,8 @@ lible::vec2d LIG::calculateS_L0(const Structure &structure)
 //         const auto &shell_pair_data = shell_pair_datas[ispd];
 //         int la = shell_pair_data.la;
 //         int lb = shell_pair_data.lb;
-//         int dim_cart_a = dimCartesians(la);
-//         int dim_cart_b = dimCartesians(lb);
+//         int dim_cart_a = numCartesians(la);
+//         int dim_cart_b = numCartesians(lb);
 //         int dim_cart_axb = dim_cart_a * dim_cart_b;
 //         int dim_ecoeffs_raw = (la + 1) * (lb + 1) * (la + lb + 1) * 3;
 

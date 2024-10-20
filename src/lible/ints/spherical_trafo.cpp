@@ -11,8 +11,8 @@ using std::tuple, std::vector;
 
 arma::dmat LI::returnSphericalTrafo(const int l)
 {
-    int dim_cart = dimCartesians(l);
-    int dim_sph = dimSphericals(l);
+    int dim_cart = numCartesians(l);
+    int dim_sph = numSphericals(l);
 
     arma::dmat trafo(dim_sph, dim_cart, arma::fill::zeros);
 
@@ -697,7 +697,7 @@ void LI::transferIntegrals(const int ishell, const ShellData &sh_data,
                            const vector<double> &eri2_shells_sph,
                            vector<double> &eri2_diagonal)
 {
-    int dim_a = dimSphericals(sh_data.l);
+    int dim_a = numSphericals(sh_data.l);
     int pos_a = sh_data.offsets_sph[ishell];
     int pos_norm_a = sh_data.offsets_norms[ishell];
 
@@ -737,8 +737,8 @@ void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
 void LI::transferIntegrals(const int ipair_ab, const ShellPairData &sp_data_ab,
                            const vector<double> &eri4_shells_sph, vec2d &eri4_diagonal)
 {
-    int dim_a = dimSphericals(sp_data_ab.la);
-    int dim_b = dimSphericals(sp_data_ab.lb);
+    int dim_a = numSphericals(sp_data_ab.la);
+    int dim_b = numSphericals(sp_data_ab.lb);
     int dim_ab = dim_a * dim_b;
     
     int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
@@ -768,8 +768,8 @@ void LI::transferIntegrals(const int ishell_a, const int ishell_b,
                            const ShellData &sh_data_a, const ShellData &sh_data_b,
                            const vector<double> &eri2_shells_sph, vec2d &eri2)
 {
-    int dim_a = dimSphericals(sh_data_a.l);
-    int dim_b = dimSphericals(sh_data_b.l);
+    int dim_a = numSphericals(sh_data_a.l);
+    int dim_b = numSphericals(sh_data_b.l);
 
     int pos_a = sh_data_a.offsets_sph[ishell_a];
     int pos_b = sh_data_b.offsets_sph[ishell_b];
@@ -798,9 +798,9 @@ void LI::transferIntegrals(const int ipair_ab, const int ishell_c,
                            const ShellData &sh_data_c, const ShellPairData &sp_data_ab,
                            const vector<double> &eri3_shells_sph, vec3d &eri3)
 {
-    int dim_a = dimSphericals(sp_data_ab.la);
-    int dim_b = dimSphericals(sp_data_ab.lb);
-    int dim_c = dimSphericals(sh_data_c.l);
+    int dim_a = numSphericals(sp_data_ab.la);
+    int dim_b = numSphericals(sp_data_ab.lb);
+    int dim_c = numSphericals(sh_data_c.l);
 
     int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
     int pos_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
@@ -836,10 +836,10 @@ void LI::transferIntegrals(const int ipair_ab, const int ipair_cd,
                            const ShellPairData &sp_data_cd,
                            const vector<double> &eri4_shells_sph, vec4d &eri4)
 {
-    int dim_a = dimSphericals(sp_data_ab.la);
-    int dim_b = dimSphericals(sp_data_ab.lb);
-    int dim_c = dimSphericals(sp_data_cd.la);
-    int dim_d = dimSphericals(sp_data_cd.lb);
+    int dim_a = numSphericals(sp_data_ab.la);
+    int dim_b = numSphericals(sp_data_ab.lb);
+    int dim_c = numSphericals(sp_data_cd.la);
+    int dim_d = numSphericals(sp_data_cd.lb);
 
     int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
     int pos_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];

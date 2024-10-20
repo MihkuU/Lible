@@ -47,12 +47,12 @@ namespace lible::ints::two
                                sh_data_c.coords[3 * ishell_c + 1],
                                sh_data_c.coords[3 * ishell_c + 2]};
 
-        int dim_sph_a = dimSphericals(sp_data_ab.la);
-        int dim_sph_b = dimSphericals(sp_data_ab.lb);
-        int dim_sph_c = dimSphericals(sh_data_c.l);
+        int dim_sph_a = numSphericals(sp_data_ab.la);
+        int dim_sph_b = numSphericals(sp_data_ab.lb);
+        int dim_sph_c = numSphericals(sh_data_c.l);
         int dim_sph_ab = dim_sph_a * dim_sph_b;
-        int dim_tuv_ab = dimHermiteGaussians(lab);
-        int dim_tuv_c = dimHermiteGaussians(lc);
+        int dim_tuv_ab = numHermites(lab);
+        int dim_tuv_c = numHermites(lc);
         int dim_ecoeffs_ab = dim_sph_ab * dim_tuv_ab;
         int dim_ecoeffs_c = dim_sph_c * dim_tuv_c;
         int dim_rints_x_ecoeffs = dim_tuv_ab * dim_sph_c;
@@ -135,7 +135,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
         auto [la, lb] = l_pairs[ipair];
 
         int lab = la + lb;
-        int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
                             sp_datas[ipair].n_prim_pairs;
 
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
@@ -151,7 +151,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
     vector<vector<double>> ecoeffs_aux(sh_datas.size());
     for (int l = 0; l <= l_max_aux; l++)
     {
-        int n_ecoeffs = dimSphericals(l) * dimHermiteGaussians(l) * sh_datas[l].n_primitives;
+        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
         ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l);
@@ -171,12 +171,12 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
             auto [la, lb] = l_pairs[lalb];
             int lab = la + lb;
 
-            int dim_a_sph = dimSphericals(la);
-            int dim_b_sph = dimSphericals(lb);
-            int dim_c_sph = dimSphericals(lc);
+            int dim_a_sph = numSphericals(la);
+            int dim_b_sph = numSphericals(lb);
+            int dim_c_sph = numSphericals(lc);
             int dim_ab_sph = dim_a_sph * dim_b_sph;
-            int dim_tuv_ab = dimHermiteGaussians(lab);
-            int dim_tuv_c = dimHermiteGaussians(lc);
+            int dim_tuv_ab = numHermites(lab);
+            int dim_tuv_c = numHermites(lc);
 
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_shells_c = sh_data_c.n_shells;

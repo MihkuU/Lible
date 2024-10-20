@@ -12,8 +12,8 @@ using std::array, std::vector;
 vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
                                   const vector<double> &exps)
 {
-    int dim_cart = dimCartesians(l);
-    int dim_sph = dimSphericals(l);
+    int dim_cart = numCartesians(l);
+    int dim_sph = numSphericals(l);
 
     vector<arma::dmat> h_coeffs;
     ecoeffsShell(l, exps, h_coeffs);

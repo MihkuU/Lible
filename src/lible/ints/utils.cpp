@@ -36,24 +36,9 @@ double LI::doubleFactorial(const int n)
     return double_factorial;
 }
 
-int LI::dimCartesians(const int l)
-{
-    return (l + 1) * (l + 2) / 2;
-}
-
-int LI::dimSphericals(const int l)
-{
-    return 2 * l + 1;
-}
-
-int LI::dimHermiteGaussians(const int l)
-{
-    return (l + 1) * (l + 2) * (l + 3) / 6;
-}
-
 std::vector<std::array<int, 3>> LI::cartExps(const int l)
 {
-    std::size_t dim_cart = dimCartesians(l);
+    std::size_t dim_cart = numCartesians(l);
 
     std::vector<std::array<int, 3>> cartesian_exps(dim_cart);
     for (int x = l, pos = 0; x >= 0; x--)

@@ -25,11 +25,32 @@ namespace lible
 
             vec4d calcERI4(const Structure &structure);
 
-            void calcERI4Benchmark(const Structure &structure);
-            
-            using eri4_kernel_t = std::function<void(void)>;
+            vec4d calcERI4New(const Structure &structure);
 
-            eri4_kernel_t deployERI4Kernel(const int lab, const int lcd);            
+            void calcERI4Benchmark(const Structure &structure);
+
+            using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                     const int cdepth_c, const int cdepth_d,
+                                                     const double *exps_a, const double *exps_b,
+                                                     const double *exps_c, const double *exps_d,
+                                                     const double *coords_a, const double *coords_b,
+                                                     const double *coords_c, const double *coords_d,
+                                                     const double *ecoeffs_ab,
+                                                     const double *ecoeffs_cd_tsp,
+                                                     double *eri4_batch)>;
+
+            template <int la, int lb, int lc, int ld>
+            void eri4Kernel(const int cdepth_a, const int cdepth_b,
+                            const int cdepth_c, const int cdepth_d,
+                            const double *exps_a, const double *exps_b,
+                            const double *exps_c, const double *exps_d,
+                            const double *coords_a, const double *coords_b,
+                            const double *coords_c, const double *coords_d,
+                            const double *ecoeffs_ab,
+                            const double *ecoeffs_cd_tsp,
+                            double *eri4_batch);
+
+            kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
         }
     }
 }

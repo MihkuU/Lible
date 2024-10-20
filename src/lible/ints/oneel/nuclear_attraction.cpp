@@ -25,8 +25,8 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
 
     BoysF boys_f(lab);
 
-    int dim_a_cart = dimCartesians(sp_data.la);
-    int dim_b_cart = dimCartesians(sp_data.lb);
+    int dim_a_cart = numCartesians(sp_data.la);
+    int dim_b_cart = numCartesians(sp_data.lb);
 
     auto cart_exps_a = cart_exps[la];
     auto cart_exps_b = cart_exps[lb];

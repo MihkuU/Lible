@@ -46,10 +46,10 @@ namespace lible::ints::two
         double xx{xyz_ab[0]}, xy{xyz_ab[1]}, xz{xyz_ab[2]};
         double xyz_ab_dot = xx * xx + xy * xy + xz * xz;
 
-        int dim_sph_a = dimSphericals(la);
-        int dim_sph_b = dimSphericals(lb);
-        int dim_tuv_a = dimHermiteGaussians(la);
-        int dim_tuv_b = dimHermiteGaussians(lb);
+        int dim_sph_a = numSphericals(la);
+        int dim_sph_b = numSphericals(lb);
+        int dim_tuv_a = numHermites(la);
+        int dim_tuv_b = numHermites(lb);
         int dim_ecoeffs_a = dim_sph_a * dim_tuv_a;
         int dim_ecoeffs_b = dim_sph_b * dim_tuv_b;
         int dim_rints_x_ecoeffs = dim_tuv_a * dim_sph_b;
@@ -103,8 +103,8 @@ namespace lible::ints::two
 
         array<double, 3> xyz_aa{0, 0, 0};
 
-        int dim_sph_a = dimSphericals(la);
-        int dim_tuv_a = dimHermiteGaussians(la);
+        int dim_sph_a = numSphericals(la);
+        int dim_tuv_a = numHermites(la);
         int dim_ecoeffs_a = dim_sph_a * dim_tuv_a;
         int dim_rints_x_ecoeffs = dim_tuv_a * dim_sph_a;
         vector<double> rints_x_ecoeffs(dim_a * dim_rints_x_ecoeffs, 0);
@@ -164,7 +164,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
     vector<vector<double>> ecoeffs_tsp(sh_datas.size());
     for (int l = 0; l <= l_max_aux; l++)
     {
-        int n_ecoeffs = dimSphericals(l) * dimHermiteGaussians(l) * sh_datas[l].n_primitives;
+        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
         vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
@@ -184,10 +184,10 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
 
             int n_shells_a = sh_data_a.n_shells;
             int n_shells_b = sh_data_b.n_shells;
-            int dim_sph_a = dimSphericals(la);
-            int dim_sph_b = dimSphericals(lb);
-            int dim_tuv_a = dimHermiteGaussians(la);
-            int dim_tuv_b = dimHermiteGaussians(lb);
+            int dim_sph_a = numSphericals(la);
+            int dim_sph_b = numSphericals(lb);
+            int dim_tuv_a = numHermites(la);
+            int dim_tuv_b = numHermites(lb);
 
             int lab = la + lb;
             BoysF boys_f(lab);
@@ -257,7 +257,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
     vector<vector<double>> ecoeffs_tsp(sh_datas.size());
     for (int l = 0; l <= l_max_aux; l++)
     {
-        int n_ecoeffs = dimSphericals(l) * dimHermiteGaussians(l) * sh_datas[l].n_primitives;
+        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
 
         vector<double> ecoeffs_l(n_ecoeffs, 0);
         vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
@@ -275,8 +275,8 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
 
         int n_shells_a = sh_data_a.n_shells;
 
-        int dim_sph_a = dimSphericals(la);
-        int dim_tuv_a = dimHermiteGaussians(la);
+        int dim_sph_a = numSphericals(la);
+        int dim_tuv_a = numHermites(la);
 
         int laa = la + la;
         BoysF boys_f(laa);

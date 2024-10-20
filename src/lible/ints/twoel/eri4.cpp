@@ -54,12 +54,12 @@ namespace lible::ints::two
                                sp_data_cd.coords[6 * ipair_cd + 4],
                                sp_data_cd.coords[6 * ipair_cd + 5]};
 
-        int dim_a_sph = dimSphericals(sp_data_ab.la);
-        int dim_b_sph = dimSphericals(sp_data_ab.lb);
-        int dim_c_sph = dimSphericals(sp_data_cd.la);
-        int dim_d_sph = dimSphericals(sp_data_cd.lb);
-        int dim_tuv_ab = dimHermiteGaussians(lab);
-        int dim_tuv_cd = dimHermiteGaussians(lcd);
+        int dim_a_sph = numSphericals(sp_data_ab.la);
+        int dim_b_sph = numSphericals(sp_data_ab.lb);
+        int dim_c_sph = numSphericals(sp_data_cd.la);
+        int dim_d_sph = numSphericals(sp_data_cd.lb);
+        int dim_tuv_ab = numHermites(lab);
+        int dim_tuv_cd = numHermites(lcd);
         int dim_sph_ab = dim_a_sph * dim_b_sph;
         int dim_sph_cd = dim_c_sph * dim_d_sph;
 
@@ -152,9 +152,9 @@ namespace lible::ints::two
                                sp_data_ab.coords[6 * ipair_ab + 4],
                                sp_data_ab.coords[6 * ipair_ab + 5]};
 
-        int dim_a_sph = dimSphericals(sp_data_ab.la);
-        int dim_b_sph = dimSphericals(sp_data_ab.lb);
-        int dim_tuv_ab = dimHermiteGaussians(lab);
+        int dim_a_sph = numSphericals(sp_data_ab.la);
+        int dim_b_sph = numSphericals(sp_data_ab.lb);
+        int dim_tuv_ab = numHermites(lab);
         int dim_sph_ab = dim_a_sph * dim_b_sph;
 
         int dim_ecoeffs_ab = dim_sph_ab * dim_tuv_ab;
@@ -233,12 +233,12 @@ namespace lible::ints::two
         int lcd = lc + ld;
         int labcd = lab + lcd;
 
-        int dim_a_sph = dimSphericals(la);
-        int dim_b_sph = dimSphericals(lb);
-        int dim_c_sph = dimSphericals(lc);
-        int dim_d_sph = dimSphericals(ld);
-        int dim_tuv_ab = dimHermiteGaussians(lab);
-        int dim_tuv_cd = dimHermiteGaussians(lcd);
+        int dim_a_sph = numSphericals(la);
+        int dim_b_sph = numSphericals(lb);
+        int dim_c_sph = numSphericals(lc);
+        int dim_d_sph = numSphericals(ld);
+        int dim_tuv_ab = numHermites(lab);
+        int dim_tuv_cd = numHermites(lcd);
         int dim_sph_ab = dim_a_sph * dim_b_sph;
         int dim_sph_cd = dim_c_sph * dim_d_sph;
 
@@ -326,7 +326,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
         auto [la, lb] = l_pairs[ipair];
 
         int lab = la + lb;
-        int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
                             sp_datas[ipair].n_prim_pairs;
 
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
@@ -352,14 +352,14 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
             int lab = la + lb;
             int lcd = lc + ld;
 
-            int dim_a_sph = dimSphericals(la);
-            int dim_b_sph = dimSphericals(lb);
-            int dim_c_sph = dimSphericals(lc);
-            int dim_d_sph = dimSphericals(ld);
+            int dim_a_sph = numSphericals(la);
+            int dim_b_sph = numSphericals(lb);
+            int dim_c_sph = numSphericals(lc);
+            int dim_d_sph = numSphericals(ld);
             int dim_ab_sph = dim_a_sph * dim_b_sph;
             int dim_cd_sph = dim_c_sph * dim_d_sph;
-            int dim_tuv_ab = dimHermiteGaussians(lab);
-            int dim_tuv_cd = dimHermiteGaussians(lcd);
+            int dim_tuv_ab = numHermites(lab);
+            int dim_tuv_cd = numHermites(lcd);
 
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_pairs_cd = sp_data_cd.n_pairs;
@@ -410,6 +410,118 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
     return eri4;
 }
 
+lible::vec4d LIT::calcERI4New(const Structure &structure)
+{
+    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4 new..."));
+
+    auto start{std::chrono::steady_clock::now()};
+
+    int l_max = structure.getMaxL();
+    vector<pair<int, int>> l_pairs = returnLPairs(l_max);
+
+    vector<ShellPairData> sp_datas;
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
+    }
+
+    vector<vector<double>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+
+        int lab = la + lb;
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
+                            sp_datas[ipair].n_prim_pairs;
+
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
+
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
+
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+    }
+
+    size_t dim_ao = structure.getDimAO();
+    vec4d eri4(dim_ao, 0);
+    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+        for (int lcld = 0; lcld <= lalb; lcld++)
+        {
+            auto [la, lb] = l_pairs[lalb];
+            auto [lc, ld] = l_pairs[lcld];
+
+            int n_sph_a = numSphericals(la);
+            int n_sph_b = numSphericals(lb);
+            int n_sph_c = numSphericals(lc);
+            int n_sph_d = numSphericals(ld);
+            int n_sph_ab = n_sph_a * n_sph_b;
+            int n_sph_cd = n_sph_c * n_sph_d;
+
+            const ShellPairData &sp_data_ab = sp_datas[lalb];
+            const ShellPairData &sp_data_cd = sp_datas[lcld];
+
+            int n_pairs_ab = sp_data_ab.n_pairs;
+            int n_pairs_cd = sp_data_cd.n_pairs;
+
+            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+
+            kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+
+            vector<double> eri4_batch(n_sph_ab * n_sph_cd);
+            if (lalb == lcld)
+                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+                    for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
+                    {
+                        // TODO: Write a kernel wrapper
+                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
+                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
+                                    sp_data_cd.cdepths[2 * ipair_cd],
+                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
+                                    &sp_data_ab.exps[2 * ipair_ab],
+                                    &sp_data_ab.exps[2 * ipair_ab + 1],
+                                    &sp_data_cd.exps[2 * ipair_cd],
+                                    &sp_data_cd.exps[2 * ipair_cd + 1],
+                                    &sp_data_ab.coords[6 * ipair_ab],
+                                    &sp_data_ab.coords[6 * ipair_ab + 3],
+                                    &sp_data_cd.coords[6 * ipair_cd],
+                                    &sp_data_cd.coords[6 * ipair_cd + 3],
+                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
+                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
+                                    &eri4_batch[0]);
+                    }
+            else
+                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+                    for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
+                    {
+                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
+                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
+                                    sp_data_cd.cdepths[2 * ipair_cd],
+                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
+                                    &sp_data_ab.exps[2 * ipair_ab],
+                                    &sp_data_ab.exps[2 * ipair_ab + 1],
+                                    &sp_data_cd.exps[2 * ipair_cd],
+                                    &sp_data_cd.exps[2 * ipair_cd + 1],
+                                    &sp_data_ab.coords[6 * ipair_ab],
+                                    &sp_data_ab.coords[6 * ipair_ab + 3],
+                                    &sp_data_cd.coords[6 * ipair_cd],
+                                    &sp_data_cd.coords[6 * ipair_cd + 3],
+                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
+                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
+                                    &eri4_batch[0]);
+                    }
+        }
+
+    auto end{std::chrono::steady_clock::now()};
+    std::chrono::duration<double> duration{end - start};
+    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+
+    return eri4;    
+}
+
 void LIT::calcERI4Benchmark(const Structure &structure)
 {
     palPrint(fmt::format("Lible::{:<40}\n", "ERI4 (Shark flat) benchmark..."));
@@ -434,7 +546,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
         auto [la, lb] = l_pairs[ipair];
 
         int lab = la + lb;
-        int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
                             sp_datas[ipair].n_prim_pairs;
 
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
@@ -459,10 +571,10 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             int lab = la + lb;
             int lcd = lc + ld;
 
-            int dim_a_sph = dimSphericals(la);
-            int dim_b_sph = dimSphericals(lb);
-            int dim_c_sph = dimSphericals(lc);
-            int dim_d_sph = dimSphericals(ld);
+            int dim_a_sph = numSphericals(la);
+            int dim_b_sph = numSphericals(lb);
+            int dim_c_sph = numSphericals(lc);
+            int dim_d_sph = numSphericals(ld);
             int dim_ab_sph = dim_a_sph * dim_b_sph;
             int dim_cd_sph = dim_c_sph * dim_d_sph;
 
@@ -541,7 +653,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
         auto [la, lb] = l_pairs[ipair];
 
         int lab = la + lb;
-        int n_ecoeffs_sph = dimSphericals(la) * dimSphericals(lb) * dimHermiteGaussians(lab) *
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
                             sp_datas[ipair].n_prim_pairs;
 
         vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
@@ -562,10 +674,10 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 
         int lab = la + lb;
 
-        int dim_a_sph = dimSphericals(la);
-        int dim_b_sph = dimSphericals(lb);
+        int dim_a_sph = numSphericals(la);
+        int dim_b_sph = numSphericals(lb);
         int dim_ab_sph = dim_a_sph * dim_b_sph;
-        int dim_tuv_ab = dimHermiteGaussians(lab);
+        int dim_tuv_ab = numHermites(lab);
 
         int n_pairs_ab = sp_data_ab.n_pairs;
 

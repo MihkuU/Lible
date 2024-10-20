@@ -56,6 +56,11 @@ void LI::eri4Benchmark(const Structure &structure)
     LIT::calcERI4Benchmark(structure);
 }
 
+lible::vec4d LI::eri4New(const Structure &structure)
+{
+    return LIT::calcERI4New(structure);
+}
+
 #ifdef _LIBLE_USE_HIP_
 namespace LIG = lible::ints::gpu;
 

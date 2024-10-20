@@ -16,8 +16,8 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
     vector<vector<vec3d>> ecoeffs;
     ecoeffsShellPairs3D(la, lb, sp_data, ecoeffs);
 
-    int dim_a_cart = dimCartesians(sp_data.la);
-    int dim_b_cart = dimCartesians(sp_data.lb);
+    int dim_a_cart = numCartesians(sp_data.la);
+    int dim_b_cart = numCartesians(sp_data.lb);
 
     auto cart_exps_a = cart_exps[la];
     auto cart_exps_b = cart_exps[lb];

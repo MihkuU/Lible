@@ -198,8 +198,8 @@ void LI::Structure::constructShells(const basis_atoms_t &basis_atoms, int &max_l
 
             assert((max_angmom <= _max_angular_momentum_));
 
-            size_t dim_cart = dimCartesians(angmom);
-            size_t dim_sphe = dimSphericals(angmom);
+            size_t dim_cart = numCartesians(angmom);
+            size_t dim_sphe = numSphericals(angmom);
 
             for (const auto &[exps, coeffs_raw] : shell_exps_coeffs)
             {

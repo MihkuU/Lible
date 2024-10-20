@@ -16,8 +16,8 @@ LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
     for (int ishell = 0; ishell < n_shells; ishell++)
         n_primitives += shells[ishell].coeffs.size();
 
-    int dim_sph = dimSphericals(l);
-    int dim_herm_gauss = dimHermiteGaussians(l);
+    int dim_sph = numSphericals(l);
+    int dim_herm_gauss = numHermites(l);
     int n_sph_ecoeffs = dim_sph * dim_herm_gauss;
 
     int n_coords = 3 * n_shells;
@@ -99,9 +99,9 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
             for (int jshell = 0; jshell < n_shells_b; jshell++, idx++)
                 shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
 
-    int dim_sph_a = dimSphericals(la);
-    int dim_sph_b = dimSphericals(lb);
-    int dim_herm_gauss = dimHermiteGaussians(la + lb);
+    int dim_sph_a = numSphericals(la);
+    int dim_sph_b = numSphericals(lb);
+    int dim_herm_gauss = numHermites(la + lb);
     int n_sph_ecoeffs = dim_sph_a * dim_sph_b * dim_herm_gauss;
 
     int n_coords = 6 * n_pairs;

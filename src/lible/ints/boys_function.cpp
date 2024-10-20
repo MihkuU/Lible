@@ -1,7 +1,5 @@
 #include <lible/ints/boys_function.hpp>
 
-#include <cmath>
-
 namespace LI = lible::ints;
 
 using std::vector;

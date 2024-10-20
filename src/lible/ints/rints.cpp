@@ -111,7 +111,7 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
                 }
     }
 
-    int dim_tuv_b = dimHermiteGaussians(lb);
+    int dim_tuv_b = numHermites(lb);
     for (size_t j = 0; j < tuv_idxs_b.size(); j++)
     {
         auto [t_, u_, v_] = tuv_idxs_b[j];

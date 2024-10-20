@@ -75,6 +75,9 @@ namespace lible
          */
         vec4d eri4(const Structure &structure);
 
+        /** */
+        vec4d eri4New(const Structure &structure);
+
         /**
          * \ingroup ints
          * Runs a benchmark of calculating the four-center ERIs for all shell quartets, 
