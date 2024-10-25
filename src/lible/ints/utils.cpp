@@ -67,10 +67,13 @@ std::vector<std::pair<int, int>> LI::returnLPairs(const int l_max)
 lible::vec3i LI::returnHermiteGaussianPositions(const int l)
 {
     vec3i tuv_poss(l + 1, l + 1, l + 1, -1);
-    for (int t = 0, tuv = 0; t <= l; t++)
-        for (int u = 0; u <= l - t; u++)
-            for (int v = 0; v <= l - t - u; v++, tuv++)
+    for (int n = 0, tuv = 0; n <= l; n++)
+        for (int t = n; t >= 0; t--)
+            for (int u = n - t; u >= 0; u--, tuv++)
+            {
+                int v = n - t - u;
                 tuv_poss(t, u, v) = tuv;
+            }
 
     return tuv_poss;
 }
@@ -78,10 +81,13 @@ lible::vec3i LI::returnHermiteGaussianPositions(const int l)
 vector<array<int, 3>> LI::returnHermiteGaussianIdxs(const int l)
 {
     vector<array<int, 3>> idxs_tuv((l + 1) * (l + 2) * (l + 3) / 6);
-    for (int t = 0, tuv = 0; t <= l; t++)
-        for (int u = 0; u <= l - t; u++)
-            for (int v = 0; v <= l - t - u; v++, tuv++)
-                idxs_tuv[tuv] = {t, u, v};
+    for (int n = 0, tuv = 0; n <= l; n++)
+        for (int t = n; t >= 0; t--)
+            for (int u = n - t; u >= 0; u--, tuv++)
+            {
+                int v = n - t - u;
+                idxs_tuv[tuv] = {t, u, v};                
+            }
 
     return idxs_tuv;
 }

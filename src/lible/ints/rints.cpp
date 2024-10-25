@@ -59,7 +59,7 @@ void LI::calcRInts(const int la, const int lb, const double p, const array<doubl
                 rints_out(t, u, v) = rints_tmp(0, t, u, v);
 }
 
-void LI::calcRInts(const int la, const int lb, const double fac, const double p,
+void LI::calcRInts(const int la, const int lb, const double fac, const double alpha,
                    const array<double, 3> &xyz_pq, const vector<double> &fnx,
                    const vector<array<int, 3>> &tuv_idxs_a,
                    const vector<array<int, 3>> &tuv_idxs_b,
@@ -71,7 +71,7 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
     rints_tmp(0, 0, 0, 0) = fnx[0];
 
     int lab = la + lb;
-    double x = -2 * p;
+    double x = -2 * alpha;
     double y = x;
     for (int n = 1; n <= lab; n++)
     {
@@ -110,6 +110,8 @@ void LI::calcRInts(const int la, const int lb, const double fac, const double p,
                     }
                 }
     }
+
+    // rints_tmp.set(0.25); // tmp
 
     int dim_tuv_b = numHermites(lb);
     for (size_t j = 0; j < tuv_idxs_b.size(); j++)

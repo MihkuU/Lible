@@ -175,8 +175,7 @@ namespace lible::ints::two
                         double d = sp_data_ab.exps[pos_d + id];
 
                         double p = a + b;
-                        double q = c + d;
-                        double alpha = p * q / (p + q);
+                        double q = c + d;                        
                         array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
                                                (a * xyz_a[1] + b * xyz_b[1]) / p,
                                                (a * xyz_a[2] + b * xyz_b[2]) / p};
@@ -188,6 +187,7 @@ namespace lible::ints::two
                         array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0], xyz_p[1] - xyz_q[1],
                                                 xyz_p[2] - xyz_q[2]};
 
+                        double alpha = p * q / (p + q);
                         double xx{xyz_pq[0]}, xy{xyz_pq[1]}, xz{xyz_pq[2]};
                         double x = alpha * (xx * xx + xy * xy + xz * xz);
                         boys_f.calcFnx(labab, x, fnx);
@@ -219,86 +219,6 @@ namespace lible::ints::two
                             &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_ab, 1.0,
                             &eri4_shells_sph[0], dim_sph_ab);
             }
-    }
-
-    void kernelERI4_new(const int la, const int lb, const int lc, const int ld,
-                        const int cdepth_a, const int cdepth_b, const int cdepth_c, const int cdepth_d,
-                        const double *coords_a, const double *coords_b, const double *coords_c, const double *coords_d,
-                        const double *cexps_a, const double *cexps_b, const double *cexps_c, const double *cexps_d,
-                        const double *ecoeffs_ab, const double *ecoeffs_cd)
-    {
-        // TODO get buffers for rints_0 and rints_n
-
-        int lab = la + lb;
-        int lcd = lc + ld;
-        int labcd = lab + lcd;
-
-        int dim_a_sph = numSphericals(la);
-        int dim_b_sph = numSphericals(lb);
-        int dim_c_sph = numSphericals(lc);
-        int dim_d_sph = numSphericals(ld);
-        int dim_tuv_ab = numHermites(lab);
-        int dim_tuv_cd = numHermites(lcd);
-        int dim_sph_ab = dim_a_sph * dim_b_sph;
-        int dim_sph_cd = dim_c_sph * dim_d_sph;
-
-        int dim_ecoeffs_ab = dim_sph_ab * dim_tuv_ab;
-        int dim_ecoeffs_cd = dim_sph_cd * dim_tuv_cd;
-        int dim_rints_x_ecoeffs = dim_sph_cd * dim_tuv_ab;
-        vector<double> rints_x_ecoeffs(cdepth_a * cdepth_b * dim_rints_x_ecoeffs, 0);
-
-        vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
-        vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
-
-        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
-            for (int ib = 0; ib < cdepth_b; ib++, iab++)
-            {
-                int pos_rints_x_ecoeffs = iab * dim_rints_x_ecoeffs;
-                for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
-                    for (int id = 0; id < cdepth_d; id++, icd++)
-                    {
-                        double a = cexps_a[ia];
-                        double b = cexps_b[ib];
-                        double c = cexps_c[ic];
-                        double d = cexps_d[id];
-
-                        double p = a + b;
-                        double q = c + d;
-                        double alpha = p * q / (p + q);
-
-                        array<double, 3> xyz_p{(a * coords_a[0] + b * coords_b[0]) / p,
-                                               (a * coords_a[1] + b * coords_b[1]) / p,
-                                               (a * coords_a[2] + b * coords_b[2]) / p};
-
-                        array<double, 3> xyz_q{(c * coords_c[0] + d * coords_d[0]) / q,
-                                               (c * coords_c[1] + d * coords_d[1]) / q,
-                                               (c * coords_c[2] + d * coords_d[2]) / q};
-
-                        array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0], xyz_p[1] - xyz_q[1],
-                                                xyz_p[2] - xyz_q[2]};
-
-                        double vx{xyz_pq[0]}, vy{xyz_pq[1]}, vz{xyz_pq[2]};
-                        double x = alpha * (vx * vx + vy * vy + vz * vz);
-                        // boys_f.calcFnx(labcd, x, fnx);
-
-                        double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                        // calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,
-                        //           rints_tmp, rints);
-
-                        // int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] +
-                        //                      icd * dim_ecoeffs_cd;
-
-                        // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_tuv_ab,
-                        //             dim_sph_cd, dim_tuv_cd, 1.0, &rints[0], dim_tuv_cd,
-                        //             &ecoeffs_cd_tsp[pos_ecoeffs_cd], dim_sph_cd, 1.0,
-                        //             &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_cd);
-                    }
-            }
-    }
-
-    template <int la, int lb, int lc, int ld>
-    void kernelERI4_new()
-    {
     }
 }
 
@@ -476,15 +396,18 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                 for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
                     {
-                        // TODO: Write a kernel wrapper
+                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
+                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
+                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
+                        // TODO: Write a kernel wrapper?
                         kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
                                     sp_data_ab.cdepths[2 * ipair_ab + 1],
                                     sp_data_cd.cdepths[2 * ipair_cd],
                                     sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                    &sp_data_ab.exps[2 * ipair_ab],
-                                    &sp_data_ab.exps[2 * ipair_ab + 1],
-                                    &sp_data_cd.exps[2 * ipair_cd],
-                                    &sp_data_cd.exps[2 * ipair_cd + 1],
+                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
+                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
                                     &sp_data_ab.coords[6 * ipair_ab],
                                     &sp_data_ab.coords[6 * ipair_ab + 3],
                                     &sp_data_cd.coords[6 * ipair_cd],
@@ -492,19 +415,25 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                                     &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
                                     &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
                                     &eri4_batch[0]);
+
+                        transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                          eri4_batch, eri4);
                     }
             else
                 for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
                     {
+                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
+                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
+                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
                         kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
                                     sp_data_ab.cdepths[2 * ipair_ab + 1],
                                     sp_data_cd.cdepths[2 * ipair_cd],
                                     sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                    &sp_data_ab.exps[2 * ipair_ab],
-                                    &sp_data_ab.exps[2 * ipair_ab + 1],
-                                    &sp_data_cd.exps[2 * ipair_cd],
-                                    &sp_data_cd.exps[2 * ipair_cd + 1],
+                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
+                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
                                     &sp_data_ab.coords[6 * ipair_ab],
                                     &sp_data_ab.coords[6 * ipair_ab + 3],
                                     &sp_data_cd.coords[6 * ipair_cd],
@@ -512,6 +441,9 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                                     &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
                                     &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
                                     &eri4_batch[0]);
+
+                        transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                          eri4_batch, eri4);
                     }
         }
 

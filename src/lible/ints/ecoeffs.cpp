@@ -324,6 +324,7 @@ void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<do
     int n_ecoeffs = dim_sph * dim_tuv;
 
     vec3i tuv_poss = returnHermiteGaussianPositions(l);
+    vector<array<int, 3>> tuv_idxs = returnHermiteGaussianIdxs(l);
 
     for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
     {
@@ -344,8 +345,8 @@ void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<do
                 for (int t = 0; t <= i; t++)
                     for (int u = 0; u <= j; u++)
                         for (int v = 0; v <= k; v++)
-                        {
-                            int tuv = tuv_poss(t, u, v); // TODO: do this more effectively by looping over (t, u, v)-triplets directly
+                        {                            
+                            int tuv = tuv_poss(t, u, v);
                             ecoeffs_c(mu, tuv) = ecoeffs_x(i, t) * ecoeffs_y(j, u) *
                                                  ecoeffs_z(k, v);
                         }

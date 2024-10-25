@@ -45,6 +45,8 @@ void LIT::eri4Kernel(const int cdepth_a, const int cdepth_b,
     constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
     constexpr int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
 
+    std::fill(eri4_batch, eri4_batch + n_sph_ab * n_sph_cd, 0);
+
     std::array<double, labcd + 1> fnx;
     BoysF2<labcd> boys_f;
 
@@ -86,7 +88,7 @@ void LIT::eri4Kernel(const int cdepth_a, const int cdepth_b,
                     boys_f.calcFnx(x, &fnx[0]);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                    calcRInts<lab, lcd>(fac, &fnx[0], p, &xyz_pq[0], &rints[0]);
+                    calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
                     int pos_ecoeffs_cd = icd * n_ecoeffs_cd;
 
@@ -233,8 +235,7 @@ namespace lible::ints::two
         eri4Kernel<4, 4, 4, 1>,
         eri4Kernel<4, 4, 4, 2>,
         eri4Kernel<4, 4, 4, 3>,
-        eri4Kernel<4, 4, 4, 4>
-    };
+        eri4Kernel<4, 4, 4, 4>};
 }
 
 kernel_eri4_t LIT::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
