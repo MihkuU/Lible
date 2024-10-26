@@ -1,4 +1,5 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
+#include <lible/log.hpp>
 #include <lible/utils.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
@@ -175,7 +176,7 @@ namespace lible::ints::two
                         double d = sp_data_ab.exps[pos_d + id];
 
                         double p = a + b;
-                        double q = c + d;                        
+                        double q = c + d;
                         array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
                                                (a * xyz_a[1] + b * xyz_b[1]) / p,
                                                (a * xyz_a[2] + b * xyz_b[2]) / p};
@@ -224,8 +225,7 @@ namespace lible::ints::two
 
 lible::vec4d LIT::calcERI4(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4 flat..."));
-
+    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI4 flat...");
     auto start{std::chrono::steady_clock::now()};
 
     int l_max = structure.getMaxL();
@@ -306,8 +306,8 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
                                    idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
                                    eri4_shells_sph, rints, fnx, rints_tmp);
 
-                        transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                          eri4_shells_sph, eri4);
+                        transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                         eri4_shells_sph, eri4);
                     }
             else
                 for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
@@ -318,22 +318,21 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
                                    idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
                                    eri4_shells_sph, rints, fnx, rints_tmp);
 
-                        transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                          eri4_shells_sph, eri4);
+                        transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                         eri4_shells_sph, eri4);
                     }
         }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri4;
 }
 
 lible::vec4d LIT::calcERI4New(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4 new..."));
-
+    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI4 new...");
     auto start{std::chrono::steady_clock::now()};
 
     int l_max = structure.getMaxL();
@@ -416,8 +415,8 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                                     &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
                                     &eri4_batch[0]);
 
-                        transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                          eri4_batch, eri4);
+                        transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                         eri4_batch, eri4);
                     }
             else
                 for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
@@ -442,16 +441,16 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                                     &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
                                     &eri4_batch[0]);
 
-                        transferIntegrals(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                          eri4_batch, eri4);
+                        transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                         eri4_batch, eri4);
                     }
         }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
-    return eri4;    
+    return eri4;
 }
 
 void LIT::calcERI4Benchmark(const Structure &structure)
@@ -538,6 +537,8 @@ void LIT::calcERI4Benchmark(const Structure &structure)
                         kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
                                    idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
                                    eri4_shells_sph, rints, fnx, rints_tmp);
+
+                        n_shells_abcd++;
                     }
             else
                 for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
@@ -547,6 +548,136 @@ void LIT::calcERI4Benchmark(const Structure &structure)
                         kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
                                    idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
                                    eri4_shells_sph, rints, fnx, rints_tmp);
+
+                        n_shells_abcd++;
+                    }
+
+            auto end{std::chrono::steady_clock::now()};
+            std::chrono::duration<double> duration{end - start};
+
+            palPrint(fmt::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
+                                 n_shells_abcd, duration.count()));
+        }
+
+    auto end{std::chrono::steady_clock::now()};
+    std::chrono::duration<double> duration{end - start};
+    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+}
+
+void LIT::calcERI4BenchmarkNew(const Structure &structure)
+{
+    palPrint(fmt::format("Lible::{:<40}\n", "ERI4 (Shark flat new) benchmark..."));
+
+    auto start{std::chrono::steady_clock::now()};
+
+    int l_max = structure.getMaxL();
+
+    vector<pair<int, int>> l_pairs = returnLPairs(l_max);
+
+    vector<ShellPairData> sp_datas;
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
+    }
+
+    vector<vector<double>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+
+        int lab = la + lb;
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
+                            sp_datas[ipair].n_prim_pairs;
+
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
+
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
+
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+    }
+
+    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+        for (int lcld = 0; lcld <= lalb; lcld++)
+        {
+            auto start{std::chrono::steady_clock::now()};
+
+            auto [la, lb] = l_pairs[lalb];
+            auto [lc, ld] = l_pairs[lcld];
+
+            int n_sph_a = numSphericals(la);
+            int n_sph_b = numSphericals(lb);
+            int n_sph_c = numSphericals(lc);
+            int n_sph_d = numSphericals(ld);
+            int n_sph_ab = n_sph_a * n_sph_b;
+            int n_sph_cd = n_sph_c * n_sph_d;
+
+            const ShellPairData &sp_data_ab = sp_datas[lalb];
+            const ShellPairData &sp_data_cd = sp_datas[lcld];
+
+            int n_pairs_ab = sp_data_ab.n_pairs;
+            int n_pairs_cd = sp_data_cd.n_pairs;
+
+            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+
+            kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+
+            size_t n_shells_abcd = 0;
+            vector<double> eri4_batch(n_sph_ab * n_sph_cd);
+            if (lalb == lcld)
+                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+                    for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
+                    {
+                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
+                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
+                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
+                        // TODO: Write a kernel wrapper?
+                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
+                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
+                                    sp_data_cd.cdepths[2 * ipair_cd],
+                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
+                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
+                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
+                                    &sp_data_ab.coords[6 * ipair_ab],
+                                    &sp_data_ab.coords[6 * ipair_ab + 3],
+                                    &sp_data_cd.coords[6 * ipair_cd],
+                                    &sp_data_cd.coords[6 * ipair_cd + 3],
+                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
+                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
+                                    &eri4_batch[0]);
+
+                        n_shells_abcd++;
+                    }
+            else
+                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+                    for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
+                    {
+                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
+                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
+                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
+                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
+                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
+                                    sp_data_cd.cdepths[2 * ipair_cd],
+                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
+                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
+                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
+                                    &sp_data_ab.coords[6 * ipair_ab],
+                                    &sp_data_ab.coords[6 * ipair_ab + 3],
+                                    &sp_data_cd.coords[6 * ipair_cd],
+                                    &sp_data_cd.coords[6 * ipair_cd + 3],
+                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
+                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
+                                    &eri4_batch[0]);
+
+                        n_shells_abcd++;
                     }
 
             auto end{std::chrono::steady_clock::now()};
@@ -563,8 +694,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
 lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI4-diagonal..."));
-
+    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI4-diagonal...");
     auto start{std::chrono::steady_clock::now()};
 
     int l_max = structure.getMaxL();
@@ -631,13 +761,13 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
             kernelERI4Diagonal(lab, ipair_ab, ecoeffs_ab, ecoeffs_tsp_ab, idxs_tuv_ab, boys_f,
                                sp_data_ab, rints_tmp, eri4_shells_sph, fnx, rints);
 
-            transferIntegrals(ipair_ab, sp_data_ab, eri4_shells_sph, eri4_diagonal);
+            transferIntsERI4Diag(ipair_ab, sp_data_ab, eri4_shells_sph, eri4_diagonal);
         }
     }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri4_diagonal;
 }

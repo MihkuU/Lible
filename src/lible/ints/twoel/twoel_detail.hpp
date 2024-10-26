@@ -29,6 +29,8 @@ namespace lible
 
             void calcERI4Benchmark(const Structure &structure);
 
+            void calcERI4BenchmarkNew(const Structure &structure);
+
             using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
                                                      const int cdepth_c, const int cdepth_d,
                                                      const double *exps_a, const double *exps_b,

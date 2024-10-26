@@ -6,8 +6,9 @@ namespace LI = lible::ints;
 using std::pair, std::vector;
 
 LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
-{
-    assert(structure.getUseRI());
+{    
+    if (!structure.getUseRI)
+        throw std::runtime_error("RI approximation is not enabled!");
 
     const auto &shells = structure.getShellsLAux(l);
     int n_shells = shells.size();

@@ -110,6 +110,6 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
 
         ints_sph = sph_trafo_bra * ints_contracted * sph_trafo_ket;
 
-        transferIntegrals(ipair, sp_data, ints_sph, ints_out);
+        transferInts1El(ipair, sp_data, ints_sph, ints_out);
     }
 }

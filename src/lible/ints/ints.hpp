@@ -85,6 +85,9 @@ namespace lible
          */
         void eri4Benchmark(const Structure &structure);
 
+        /** */
+        void eri4BenchmarkNew(const Structure &structure);
+
         /**
          * \ingroup ints
          * Returns the names of all available basis sets.

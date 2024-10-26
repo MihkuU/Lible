@@ -1,5 +1,5 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
-#include <lible/utils.hpp>
+#include <lible/log.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
@@ -111,10 +111,10 @@ namespace lible::ints::two
 
 lible::vec3d LIT::calcERI3(const Structure &structure)
 {
-    assert(structure.getUseRI()); // TODO: use throw exception here instead
+    if (!structure.getUseRI())
+        throw std::runtime_error("RI approximation is not enabled!");
 
-    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI3..."));
-
+    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI3...");
     auto start{std::chrono::steady_clock::now()};
 
     int l_max = structure.getMaxL();
@@ -203,14 +203,14 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
                                idxs_tuv_c, sp_data_ab, sh_data_c, boys_f, eri3_shells_sph, rints,
                                fnx, rints_tmp);
 
-                    transferIntegrals(ipair_ab, ishell_c, sh_data_c, sp_data_ab, eri3_shells_sph,
-                                      eri3);
+                    transferIntsERI3(ipair_ab, ishell_c, sh_data_c, sp_data_ab, eri3_shells_sph,
+                                     eri3);
                 }
         }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri3;
 }

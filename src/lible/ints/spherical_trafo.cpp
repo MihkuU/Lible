@@ -693,29 +693,8 @@ vector<tuple<int, int, double>> LI::sphericalTrafo(const int l)
     return sph_trafo;
 }
 
-void LI::transferIntegrals(const int ishell, const ShellData &sh_data,
-                           const vector<double> &eri2_shells_sph,
-                           vector<double> &eri2_diagonal)
-{
-    int dim_a = numSphericals(sh_data.l);
-    int pos_a = sh_data.offsets_sph[ishell];
-    int pos_norm_a = sh_data.offsets_norms[ishell];
-
-    for (int mu = 0; mu < dim_a; mu++)
-    {
-        int munu = mu * dim_a + mu;
-        
-        double norm_a = sh_data.norms[pos_norm_a];
-        double normalized_int = norm_a * norm_a * eri2_shells_sph[munu];
-
-        int a = pos_a + mu;
-
-        eri2_diagonal[a] = normalized_int;
-    }
-}
-
-void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
-                           const arma::dmat &ints_sph, vec2d &ints)
+void LI::transferInts1El(const int ipair, const ShellPairData &sp_data,
+                         const arma::dmat &ints_sph, vec2d &ints)
 {
     int pos_a = sp_data.offsets_sph[2 * ipair];
     int pos_b = sp_data.offsets_sph[2 * ipair + 1];
@@ -734,13 +713,34 @@ void LI::transferIntegrals(const int ipair, const ShellPairData &sp_data,
         }
 }
 
-void LI::transferIntegrals(const int ipair_ab, const ShellPairData &sp_data_ab,
-                           const vector<double> &eri4_shells_sph, vec2d &eri4_diagonal)
+void LI::transferIntsERI2Diag(const int ishell, const ShellData &sh_data,
+                              const vector<double> &eri2_shells_sph,
+                              vector<double> &eri2_diagonal)
+{
+    int dim_a = numSphericals(sh_data.l);
+    int pos_a = sh_data.offsets_sph[ishell];
+    int pos_norm_a = sh_data.offsets_norms[ishell];
+
+    for (int mu = 0; mu < dim_a; mu++)
+    {
+        int munu = mu * dim_a + mu;
+
+        double norm_a = sh_data.norms[pos_norm_a];
+        double normalized_int = norm_a * norm_a * eri2_shells_sph[munu];
+
+        int a = pos_a + mu;
+
+        eri2_diagonal[a] = normalized_int;
+    }
+}
+
+void LI::transferIntsERI4Diag(const int ipair_ab, const ShellPairData &sp_data_ab,
+                              const vector<double> &eri4_shells_sph, vec2d &eri4_diagonal)
 {
     int dim_a = numSphericals(sp_data_ab.la);
     int dim_b = numSphericals(sp_data_ab.lb);
     int dim_ab = dim_a * dim_b;
-    
+
     int pos_a = sp_data_ab.offsets_sph[2 * ipair_ab];
     int pos_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
     int pos_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
@@ -761,12 +761,12 @@ void LI::transferIntegrals(const int ipair_ab, const ShellPairData &sp_data_ab,
 
             eri4_diagonal(a, b) = normalized_int;
             eri4_diagonal(b, a) = normalized_int;
-        }        
+        }
 }
 
-void LI::transferIntegrals(const int ishell_a, const int ishell_b,
-                           const ShellData &sh_data_a, const ShellData &sh_data_b,
-                           const vector<double> &eri2_shells_sph, vec2d &eri2)
+void LI::transferIntsERI2(const int ishell_a, const int ishell_b,
+                          const ShellData &sh_data_a, const ShellData &sh_data_b,
+                          const vector<double> &eri2_shells_sph, vec2d &eri2)
 {
     int dim_a = numSphericals(sh_data_a.l);
     int dim_b = numSphericals(sh_data_b.l);
@@ -788,13 +788,13 @@ void LI::transferIntegrals(const int ishell_a, const int ishell_b,
 
             int a = pos_a + mu;
             int b = pos_b + nu;
-            
+
             eri2(a, b) = normalized_int;
             eri2(b, a) = normalized_int;
         }
 }
 
-void LI::transferIntegrals(const int ipair_ab, const int ishell_c,
+void LI::transferIntsERI3(const int ipair_ab, const int ishell_c,
                            const ShellData &sh_data_c, const ShellPairData &sp_data_ab,
                            const vector<double> &eri3_shells_sph, vec3d &eri3)
 {
@@ -831,10 +831,10 @@ void LI::transferIntegrals(const int ipair_ab, const int ishell_c,
             }
 }
 
-void LI::transferIntegrals(const int ipair_ab, const int ipair_cd,
-                           const ShellPairData &sp_data_ab,
-                           const ShellPairData &sp_data_cd,
-                           const vector<double> &eri4_shells_sph, vec4d &eri4)
+void LI::transferIntsERI4(const int ipair_ab, const int ipair_cd,
+                          const ShellPairData &sp_data_ab,
+                          const ShellPairData &sp_data_cd,
+                          const vector<double> &eri4_shells_sph, vec4d &eri4)
 {
     int dim_a = numSphericals(sp_data_ab.la);
     int dim_b = numSphericals(sp_data_ab.lb);

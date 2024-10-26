@@ -1,5 +1,5 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
-#include <lible/utils.hpp>
+#include <lible/log.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
@@ -148,9 +148,10 @@ namespace lible::ints::two
 
 lible::vec2d LIT::calcERI2(const Structure &structure)
 {
-    assert(structure.getUseRI()); // TODO: use throw exception here instead
+    if (!structure.getUseRI())
+        throw std::runtime_error("RI approximation is not enabled!");
 
-    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI2..."));
+    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI2...");
 
     auto start{std::chrono::steady_clock::now()};
 
@@ -213,8 +214,8 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
                                    idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
                                    rints, rints_tmp, eri2_shells_sph);
 
-                        transferIntegrals(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                          eri2_shells_sph, eri2);
+                        transferIntsERI2(ishell_a, ishell_b, sh_data_a, sh_data_b,
+                                         eri2_shells_sph, eri2);
                     }
             }
             else
@@ -228,23 +229,25 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
                                    idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
                                    rints, rints_tmp, eri2_shells_sph);
 
-                        transferIntegrals(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                          eri2_shells_sph, eri2);
+                        transferIntsERI2(ishell_a, ishell_b, sh_data_a, sh_data_b,
+                                         eri2_shells_sph, eri2);
                     }
             }
         }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri2;
 }
 
 vector<double> LIT::calcERI2Diagonal(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}", "SHARK ERI2-diagonal..."));
+    if (!structure.getUseRI())
+        throw std::runtime_error("RI approximation is not enabled!");
 
+    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI2-diagonal...");
     auto start{std::chrono::steady_clock::now()};
 
     int l_max_aux = structure.getMaxLAux();
@@ -297,13 +300,13 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
             kernelERI2Diagonal(ishell, la, ecoeffs_a, ecoeffs_a_tsp, idxs_tuv_a, boys_f, sh_data_a,
                                fnx, rints, rints_tmp, eri2_shells_sph);
 
-            transferIntegrals(ishell, sh_data_a, eri2_shells_sph, eri2_diagonal);
+            transferIntsERI2Diag(ishell, sh_data_a, eri2_shells_sph, eri2_diagonal);
         }
     }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format(" {:.2e} s\n", duration.count()));
+    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri2_diagonal;
 }
