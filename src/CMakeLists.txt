@@ -56,7 +56,8 @@ if(LIBLE_BUILD_INTS)
 		"${src_dir}/lible/ints/oneel/*.cpp"
 		"${src_dir}/lible/ints/oneel/*.hpp"
 		"${src_dir}/lible/ints/twoel/*.cpp"
-		"${src_dir}/lible/ints/twoel/*.hpp")
+		"${src_dir}/lible/ints/twoel/eri4_kernels/*.cpp"
+		"${src_dir}/lible/ints/twoel/*.cpp")
 
 	#set_source_files_properties(${ints_sources} PROPERTIES LANGUAGE ${GPU_RUNTIME})
 	target_sources(lible PRIVATE ${ints_sources})

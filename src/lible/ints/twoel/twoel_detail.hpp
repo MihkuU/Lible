@@ -7,8 +7,6 @@
 
 #include <functional>
 
-#include <armadillo>
-
 namespace lible
 {
     namespace ints
