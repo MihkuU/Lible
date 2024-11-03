@@ -66,6 +66,11 @@ lible::vec4d LI::eri4New(const Structure &structure)
     return LIT::calcERI4New(structure);
 }
 
+LI::kernel_eri4_t LI::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
+{
+    return LIT::deployERI4Kernel(la, lb, lc, ld);
+}
+
 #ifdef _LIBLE_USE_HIP_
 namespace LIG = lible::ints::gpu;
 

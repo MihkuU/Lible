@@ -47,8 +47,8 @@ namespace lible
         vec2d nuclearAttraction(const Structure &structure);
 
         /**
-         * \ingroup ints   
-         * Calculates the dipole moment integral matrices for the \f$x,y,z\f$-directions.     
+         * \ingroup ints
+         * Calculates the dipole moment integral matrices for the \f$x,y,z\f$-directions.
          */
         std::array<vec2d, 3> dipoleMoment(const Structure &structure);
 
@@ -81,7 +81,7 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Runs a benchmark of calculating the four-center ERIs for all shell quartets, 
+         * Runs a benchmark of calculating the four-center ERIs for all shell quartets,
          * \f$(l_a l_b|l_c l_d)\f$ with \f$l_a \geq l_b\f$ and \f$(l_a l_b) \geq (l_c l_d)\f$.
          */
         void eri4Benchmark(const Structure &structure);
@@ -103,7 +103,7 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Typedef for bundling Gaussian primitive exponents and contraction coefficients 
+         * Typedef for bundling Gaussian primitive exponents and contraction coefficients
          * of a shell.
          */
         typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
@@ -142,7 +142,7 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Returns the exponents of a Cartesian Gaussian \f$(x,y,z)\f$-directions for the given 
+         * Returns the exponents of a Cartesian Gaussian \f$(x,y,z)\f$-directions for the given
          * angular momentum.
          */
         std::vector<std::array<int, 3>> cartExps(const int l);
@@ -154,10 +154,10 @@ namespace lible
          */
         std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
 
-        /** 
+        /**
          * \ingroup ints
-         * 
-        */
+         * Type alias for the four-center repulsion integral kernel function.
+         */
         using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
                                                  const int cdepth_c, const int cdepth_d,
                                                  const double *exps_a, const double *exps_b,
@@ -168,9 +168,11 @@ namespace lible
                                                  const double *ecoeffs_cd_tsp,
                                                  double *eri4_batch)>;
 
-        /** \ingroup ints
-         * 
-        */
+        /**
+         * \ingroup ints
+         * Function for deploying a kernel function for calculating the four-center electron
+         * repulsion integrals.
+         */
         kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
 
 #ifdef _LIBLE_USE_HIP_
