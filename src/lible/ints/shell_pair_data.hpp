@@ -94,7 +94,7 @@ namespace lible
                   atomic_coords(atomic_coords), coeffs(coeffs), coords(coords), exps(exps),
                   norms(norms), atomic_nrs(atomic_nrs), cdepths(cdepths), coffsets(coffsets),
                   offsets_cart(offsets_cart), offsets_ecoeffs(offsets_ecoeffs),
-                  offsets_norms(offsets_norms), offsets_sph(offsets_sph)
+                  offsets_norms(offsets_norms), offsets_sph(offsets_sph)                  
             {
             }
 

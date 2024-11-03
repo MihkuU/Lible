@@ -831,10 +831,9 @@ void LI::transferIntsERI3(const int ipair_ab, const int ishell_c,
             }
 }
 
-void LI::transferIntsERI4(const int ipair_ab, const int ipair_cd,
-                          const ShellPairData &sp_data_ab,
-                          const ShellPairData &sp_data_cd,
-                          const vector<double> &eri4_shells_sph, vec4d &eri4)
+void LI::transferIntsERI4(const int ipair_ab, const int ipair_cd, const ShellPairData &sp_data_ab,
+                          const ShellPairData &sp_data_cd, const vector<double> &eri4_shells_sph, 
+                          vec4d &eri4)
 {
     int dim_a = numSphericals(sp_data_ab.la);
     int dim_b = numSphericals(sp_data_ab.lb);
