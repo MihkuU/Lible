@@ -91,10 +91,10 @@ namespace lible
 
                                 int pos_ecoeffs_cd = icd * n_ecoeffs_cd;
 
-                                // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab,
-                                //             n_sph_cd, n_hermite_cd, 1.0, &rints[0], n_hermite_cd,
-                                //             &ecoeffs_cd_tsp[pos_ecoeffs_cd], n_sph_cd, 1.0,
-                                //             &rints_x_ecoeffs[pos_rints_x_ecoeffs], n_sph_cd);
+                                cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab,
+                                            n_sph_cd, n_hermite_cd, 1.0, &rints[0], n_hermite_cd,
+                                            &ecoeffs_cd_tsp[pos_ecoeffs_cd], n_sph_cd, 1.0,
+                                            &rints_x_ecoeffs[pos_rints_x_ecoeffs], n_sph_cd);
                             }
                     }
 
@@ -104,10 +104,10 @@ namespace lible
                         int pos_rints_x_ecoeffs = iab * n_rints_x_ecoeffs;
                         int pos_ecoeffs_ab = iab * n_ecoeffs_ab;
 
-                        // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd,
-                        //             n_hermite_ab, 1.0, &ecoeffs_ab[pos_ecoeffs_ab], n_hermite_ab,
-                        //             &rints_x_ecoeffs[pos_rints_x_ecoeffs], n_sph_cd, 1.0,
-                        //             &eri4_batch[0], n_sph_cd);
+                        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd,
+                                    n_hermite_ab, 1.0, &ecoeffs_ab[pos_ecoeffs_ab], n_hermite_ab,
+                                    &rints_x_ecoeffs[pos_rints_x_ecoeffs], n_sph_cd, 1.0,
+                                    &eri4_batch[0], n_sph_cd);
                     }
             }
         }
