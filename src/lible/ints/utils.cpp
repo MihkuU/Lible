@@ -2,7 +2,7 @@
 
 namespace LI = lible::ints;
 
-using std::array, std::vector;
+using std::array, std::pair, std::vector;
 
 double LI::calcPurePrimitiveNorm(const int l, const double exp)
 {
@@ -36,11 +36,11 @@ double LI::doubleFactorial(const int n)
     return double_factorial;
 }
 
-std::vector<std::array<int, 3>> LI::cartExps(const int l)
+vector<array<int, 3>> LI::cartExps(const int l)
 {
-    std::size_t dim_cart = numCartesians(l);
+    size_t dim_cart = numCartesians(l);
 
-    std::vector<std::array<int, 3>> cartesian_exps(dim_cart);
+    vector<array<int, 3>> cartesian_exps(dim_cart);
     for (int x = l, pos = 0; x >= 0; x--)
         for (int y = l - x; y >= 0; y--)
         {
@@ -52,10 +52,10 @@ std::vector<std::array<int, 3>> LI::cartExps(const int l)
     return cartesian_exps;
 }
 
-std::vector<std::pair<int, int>> LI::returnLPairs(const int l_max)
+vector<pair<int, int>> LI::returnLPairs(const int l_max)
 {
     int n_pairs = (l_max + 1) * (l_max + 2) / 2;
-    std::vector<std::pair<int, int>> l_pairs(n_pairs);
+    vector<pair<int, int>> l_pairs(n_pairs);
 
     for (int la = 0, idx = 0; la <= l_max; la++)
         for (int lb = 0; lb <= la; lb++, idx++)

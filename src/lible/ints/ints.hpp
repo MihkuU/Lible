@@ -4,6 +4,7 @@
 #include <lible/ints/structure.hpp>
 
 #include <cassert>
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -148,10 +149,24 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Returns the Cartesial to spherical basis transformation, 
+         * Returns the Cartesial to spherical basis transformation,
          * \f$\{(\text{i_spherical}, \text{i_cartesian}, \text{val})\}\f$.
          */
         std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
+
+        /** */
+        using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                 const int cdepth_c, const int cdepth_d,
+                                                 const double *exps_a, const double *exps_b,
+                                                 const double *exps_c, const double *exps_d,
+                                                 const double *coords_a, const double *coords_b,
+                                                 const double *coords_c, const double *coords_d,
+                                                 const double *ecoeffs_ab,
+                                                 const double *ecoeffs_cd_tsp,
+                                                 double *eri4_batch)>;
+
+        /** */
+        kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu
