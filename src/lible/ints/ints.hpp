@@ -154,7 +154,10 @@ namespace lible
          */
         std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
 
-        /** */
+        /** 
+         * \ingroup ints
+         * 
+        */
         using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
                                                  const int cdepth_c, const int cdepth_d,
                                                  const double *exps_a, const double *exps_b,
@@ -165,7 +168,9 @@ namespace lible
                                                  const double *ecoeffs_cd_tsp,
                                                  double *eri4_batch)>;
 
-        /** */
+        /** \ingroup ints
+         * 
+        */
         kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
 
 #ifdef _LIBLE_USE_HIP_

@@ -400,7 +400,6 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                         int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
                         int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
 
-                        // TODO: Write a kernel wrapper?
                         kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
                                     sp_data_ab.cdepths[2 * ipair_ab + 1],
                                     sp_data_cd.cdepths[2 * ipair_cd],
