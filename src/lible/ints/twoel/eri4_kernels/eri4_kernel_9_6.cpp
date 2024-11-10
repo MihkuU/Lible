@@ -1,0 +1,162 @@
+#include <lible/ints/twoel/eri4_kernel.hpp>
+
+template void lible::ints::two::eri4Kernel<5, 4, 3, 3>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<5, 4, 4, 2>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<5, 4, 5, 1>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<5, 4, 6, 0>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<6, 3, 3, 3>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<6, 3, 4, 2>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<6, 3, 5, 1>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<6, 3, 6, 0>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<7, 2, 3, 3>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<7, 2, 4, 2>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<7, 2, 5, 1>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<7, 2, 6, 0>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<8, 1, 3, 3>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<8, 1, 4, 2>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<8, 1, 5, 1>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<8, 1, 6, 0>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<9, 0, 3, 3>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<9, 0, 4, 2>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<9, 0, 5, 1>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+
+template void lible::ints::two::eri4Kernel<9, 0, 6, 0>(const int, const int, const int, const int,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       const double*, const double*,
+                                                       double*);
+

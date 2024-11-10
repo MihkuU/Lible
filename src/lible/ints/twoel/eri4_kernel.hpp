@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lible/ints/boys_function.hpp>
-#include <lible/ints/rints_meta.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <array>
 #include <vector>
@@ -16,6 +16,11 @@ namespace lible
 {
     namespace ints
     {
+        //
+        template <int la, int lb>
+        void calcRInts(const double alpha, const double fac, const double *fnx,
+                       const double *xyz_ab, double *rints_out);
+
         namespace two
         {
             template <int la, int lb, int lc, int ld>

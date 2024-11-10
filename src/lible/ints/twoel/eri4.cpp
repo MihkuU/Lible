@@ -6,6 +6,8 @@
 #include <lible/ints/spherical_trafo.hpp>
 #include <lible/ints/utils.hpp>
 
+#include <map>
+
 #include <fmt/core.h>
 
 #ifdef _LIBLE_USE_MKL_
@@ -16,7 +18,7 @@
 
 namespace LIT = lible::ints::two;
 
-using std::array, std::pair, std::vector;
+using std::array, std::map, std::pair, std::vector;
 
 namespace lible::ints::two
 {
@@ -336,113 +338,98 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
     auto start{std::chrono::steady_clock::now()};
 
     int l_max = structure.getMaxL();
-    vector<pair<int, int>> l_pairs = returnLPairs(l_max);
+    map<int, vector<pair<int, int>>> l_pairs = returnLPairsMap(l_max);
 
-    vector<ShellPairData> sp_datas;
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-    {
-        auto [la, lb] = l_pairs[ipair];
-        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
-    }
+    map<pair<int, int>, ShellPairData> sp_datas;
+    for (auto &[lab, l_pairs] : l_pairs)
+        for (auto &[la, lb] : l_pairs)
+            sp_datas.emplace(std::make_pair(la, lb), constructShellPairData(la, lb, structure));
 
-    vector<vector<double>> ecoeffs(l_pairs.size());
-    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-    {
-        auto [la, lb] = l_pairs[ipair];
+    map<pair<int, int>, vector<double>> ecoeffs;
+    map<pair<int, int>, vector<double>> ecoeffs_tsp;
+    for (auto &[lab, l_pairs] : l_pairs)
+        for (auto &l_pair : l_pairs)
+        {
+            auto [la, lb] = l_pair;
+            int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
+                                sp_datas.at(l_pair).n_prim_pairs;
 
-        int lab = la + lb;
-        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
-                            sp_datas[ipair].n_prim_pairs;
+            vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+            vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
 
-        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
-        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
+            ecoeffsSPsSpherical(la, lb, sp_datas.at(l_pair), ecoeffs_ipair, ecoeffs_tsp_ipair);
 
-        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
-
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
-    }
+            ecoeffs[l_pair] = std::move(ecoeffs_ipair);
+            ecoeffs_tsp[l_pair] = std::move(ecoeffs_tsp_ipair);
+        }
 
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(dim_ao, 0);
-    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
-        for (int lcld = 0; lcld <= lalb; lcld++)
+    for (int lab = 0; lab <= 2 * l_max; lab++)
+        for (int lcd = 0; lcd <= lab; lcd++)
         {
-            auto [la, lb] = l_pairs[lalb];
-            auto [lc, ld] = l_pairs[lcld];
+            vector<pair<int, int>> l_pairs_ab = l_pairs.at(lab);
+            vector<pair<int, int>> l_pairs_cd = l_pairs.at(lcd);
+            for (size_t ipair_ab = 0; ipair_ab < l_pairs_ab.size(); ipair_ab++)
+            {
+                size_t bound_cd = (lab == lcd) ? ipair_ab + 1 : l_pairs_cd.size();
+                for (size_t ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                {
+                    pair<int, int> l_pair_ab = l_pairs_ab[ipair_ab];
+                    pair<int, int> l_pair_cd = l_pairs_cd[ipair_cd];
 
-            int n_sph_a = numSphericals(la);
-            int n_sph_b = numSphericals(lb);
-            int n_sph_c = numSphericals(lc);
-            int n_sph_d = numSphericals(ld);
-            int n_sph_ab = n_sph_a * n_sph_b;
-            int n_sph_cd = n_sph_c * n_sph_d;
+                    auto [la, lb] = l_pair_ab;
+                    auto [lc, ld] = l_pair_cd;
 
-            const ShellPairData &sp_data_ab = sp_datas[lalb];
-            const ShellPairData &sp_data_cd = sp_datas[lcld];
+                    int n_sph_a = numSphericals(la);
+                    int n_sph_b = numSphericals(lb);
+                    int n_sph_c = numSphericals(lc);
+                    int n_sph_d = numSphericals(ld);
+                    int n_sph_ab = n_sph_a * n_sph_b;
+                    int n_sph_cd = n_sph_c * n_sph_d;
 
-            int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;
+                    const ShellPairData &sp_data_ab = sp_datas.at(l_pair_ab);
+                    const ShellPairData &sp_data_cd = sp_datas.at(l_pair_cd);
 
-            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+                    int n_pairs_ab = sp_data_ab.n_pairs;
+                    int n_pairs_cd = sp_data_cd.n_pairs;
 
-            kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+                    const vector<double> &ecoeffs_ab = ecoeffs.at(l_pair_ab);
+                    const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp.at(l_pair_cd);
 
-            vector<double> eri4_batch(n_sph_ab * n_sph_cd);
-            if (lalb == lcld)
-                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-                    for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
+                    kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+
+                    vector<double> eri4_batch(n_sph_ab * n_sph_cd);
+                    for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     {
-                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
-                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
-                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
-                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+                        int bound_cd = (l_pair_ab == l_pair_cd) ? ipair_ab + 1 : n_pairs_cd;
+                        for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                        {
+                            int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
+                            int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+                            int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
+                            int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
 
-                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
-                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
-                                    sp_data_cd.cdepths[2 * ipair_cd],
-                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
-                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
-                                    &sp_data_ab.coords[6 * ipair_ab],
-                                    &sp_data_ab.coords[6 * ipair_ab + 3],
-                                    &sp_data_cd.coords[6 * ipair_cd],
-                                    &sp_data_cd.coords[6 * ipair_cd + 3],
-                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
-                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
-                                    &eri4_batch[0]);
+                            kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
+                                        sp_data_ab.cdepths[2 * ipair_ab + 1],
+                                        sp_data_cd.cdepths[2 * ipair_cd],
+                                        sp_data_cd.cdepths[2 * ipair_cd + 1],
+                                        &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
+                                        &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
+                                        &sp_data_ab.coords[6 * ipair_ab],
+                                        &sp_data_ab.coords[6 * ipair_ab + 3],
+                                        &sp_data_cd.coords[6 * ipair_cd],
+                                        &sp_data_cd.coords[6 * ipair_cd + 3],
+                                        &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
+                                        &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
+                                        &eri4_batch[0]);
 
-                        transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                         eri4_batch, eri4);
+                            transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                             eri4_batch, eri4);
+                        }
                     }
-            else
-                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-                    for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
-                    {
-                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
-                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
-                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
-                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
-
-                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
-                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
-                                    sp_data_cd.cdepths[2 * ipair_cd],
-                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
-                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
-                                    &sp_data_ab.coords[6 * ipair_ab],
-                                    &sp_data_ab.coords[6 * ipair_ab + 3],
-                                    &sp_data_cd.coords[6 * ipair_cd],
-                                    &sp_data_cd.coords[6 * ipair_cd + 3],
-                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
-                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
-                                    &eri4_batch[0]);
-
-                        transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                         eri4_batch, eri4);
-                    }
+                }
+            }
         }
 
     auto end{std::chrono::steady_clock::now()};
@@ -570,120 +557,104 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
     auto start{std::chrono::steady_clock::now()};
 
     int l_max = structure.getMaxL();
+    map<int, vector<pair<int, int>>> l_pairs = returnLPairsMap(l_max);
 
-    vector<pair<int, int>> l_pairs = returnLPairs(l_max);
+    map<pair<int, int>, ShellPairData> sp_datas;
+    for (auto &[lab, l_pairs] : l_pairs)
+        for (auto &[la, lb] : l_pairs)
+            sp_datas.emplace(std::make_pair(la, lb), constructShellPairData(la, lb, structure));
 
-    vector<ShellPairData> sp_datas;
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-    {
-        auto [la, lb] = l_pairs[ipair];
-        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
-    }
-
-    vector<vector<double>> ecoeffs(l_pairs.size());
-    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-    {
-        auto [la, lb] = l_pairs[ipair];
-
-        int lab = la + lb;
-        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
-                            sp_datas[ipair].n_prim_pairs;
-
-        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
-        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
-
-        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
-
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
-    }
-
-    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
-        for (int lcld = 0; lcld <= lalb; lcld++)
+    map<pair<int, int>, vector<double>> ecoeffs;
+    map<pair<int, int>, vector<double>> ecoeffs_tsp;
+    for (auto &[lab, l_pairs] : l_pairs)
+        for (auto &l_pair : l_pairs)
         {
-            auto start{std::chrono::steady_clock::now()};
+            auto [la, lb] = l_pair;
+            int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
+                                sp_datas.at(l_pair).n_prim_pairs;
 
-            auto [la, lb] = l_pairs[lalb];
-            auto [lc, ld] = l_pairs[lcld];
+            vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+            vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
 
-            int n_sph_a = numSphericals(la);
-            int n_sph_b = numSphericals(lb);
-            int n_sph_c = numSphericals(lc);
-            int n_sph_d = numSphericals(ld);
-            int n_sph_ab = n_sph_a * n_sph_b;
-            int n_sph_cd = n_sph_c * n_sph_d;
+            ecoeffsSPsSpherical(la, lb, sp_datas.at(l_pair), ecoeffs_ipair, ecoeffs_tsp_ipair);
 
-            const ShellPairData &sp_data_ab = sp_datas[lalb];
-            const ShellPairData &sp_data_cd = sp_datas[lcld];
+            ecoeffs[l_pair] = std::move(ecoeffs_ipair);
+            ecoeffs_tsp[l_pair] = std::move(ecoeffs_tsp_ipair);
+        }
 
-            int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;
+    for (int lab = 0; lab <= 2 * l_max; lab++)
+        for (int lcd = 0; lcd <= lab; lcd++)
+        {
+            vector<pair<int, int>> l_pairs_ab = l_pairs.at(lab);
+            vector<pair<int, int>> l_pairs_cd = l_pairs.at(lcd);
+            for (size_t ipair_ab = 0; ipair_ab < l_pairs_ab.size(); ipair_ab++)
+            {
+                size_t bound_cd = (lab == lcd) ? ipair_ab + 1 : l_pairs_cd.size();
+                for (size_t ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                {
+                    auto start{std::chrono::steady_clock::now()};
 
-            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+                    pair<int, int> l_pair_ab = l_pairs_ab[ipair_ab];
+                    pair<int, int> l_pair_cd = l_pairs_cd[ipair_cd];
 
-            kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+                    auto [la, lb] = l_pair_ab;
+                    auto [lc, ld] = l_pair_cd;                    
 
-            size_t n_shells_abcd = 0;
-            vector<double> eri4_batch(n_sph_ab * n_sph_cd);
-            if (lalb == lcld)
-                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-                    for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
+                    int n_sph_a = numSphericals(la);
+                    int n_sph_b = numSphericals(lb);
+                    int n_sph_c = numSphericals(lc);
+                    int n_sph_d = numSphericals(ld);
+                    int n_sph_ab = n_sph_a * n_sph_b;
+                    int n_sph_cd = n_sph_c * n_sph_d;
+
+                    const ShellPairData &sp_data_ab = sp_datas.at(l_pair_ab);
+                    const ShellPairData &sp_data_cd = sp_datas.at(l_pair_cd);
+
+                    int n_pairs_ab = sp_data_ab.n_pairs;
+                    int n_pairs_cd = sp_data_cd.n_pairs;
+
+                    const vector<double> &ecoeffs_ab = ecoeffs.at(l_pair_ab);
+                    const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp.at(l_pair_cd);
+
+                    kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+
+                    size_t n_shells_abcd = 0;
+                    vector<double> eri4_batch(n_sph_ab * n_sph_cd);
+                    for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
                     {
-                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
-                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
-                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
-                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+                        int bound_cd = (l_pair_ab == l_pair_cd) ? ipair_ab + 1 : n_pairs_cd;
+                        for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                        {
+                            int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
+                            int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+                            int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
+                            int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
 
-                        // TODO: Write a kernel wrapper?
-                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
-                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
-                                    sp_data_cd.cdepths[2 * ipair_cd],
-                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
-                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
-                                    &sp_data_ab.coords[6 * ipair_ab],
-                                    &sp_data_ab.coords[6 * ipair_ab + 3],
-                                    &sp_data_cd.coords[6 * ipair_cd],
-                                    &sp_data_cd.coords[6 * ipair_cd + 3],
-                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
-                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
-                                    &eri4_batch[0]);
+                            kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
+                                        sp_data_ab.cdepths[2 * ipair_ab + 1],
+                                        sp_data_cd.cdepths[2 * ipair_cd],
+                                        sp_data_cd.cdepths[2 * ipair_cd + 1],
+                                        &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
+                                        &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
+                                        &sp_data_ab.coords[6 * ipair_ab],
+                                        &sp_data_ab.coords[6 * ipair_ab + 3],
+                                        &sp_data_cd.coords[6 * ipair_cd],
+                                        &sp_data_cd.coords[6 * ipair_cd + 3],
+                                        &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
+                                        &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
+                                        &eri4_batch[0]);
 
-                        n_shells_abcd++;
-                    }
-            else
-                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-                    for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
-                    {
-                        int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
-                        int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
-                        int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
-                        int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
-
-                        kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
-                                    sp_data_ab.cdepths[2 * ipair_ab + 1],
-                                    sp_data_cd.cdepths[2 * ipair_cd],
-                                    sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                    &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
-                                    &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
-                                    &sp_data_ab.coords[6 * ipair_ab],
-                                    &sp_data_ab.coords[6 * ipair_ab + 3],
-                                    &sp_data_cd.coords[6 * ipair_cd],
-                                    &sp_data_cd.coords[6 * ipair_cd + 3],
-                                    &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
-                                    &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
-                                    &eri4_batch[0]);
-
-                        n_shells_abcd++;
+                            n_shells_abcd++;
+                        }
                     }
 
-            auto end{std::chrono::steady_clock::now()};
-            std::chrono::duration<double> duration{end - start};
+                    auto end{std::chrono::steady_clock::now()};
+                    std::chrono::duration<double> duration{end - start};
 
-            palPrint(fmt::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
-                                 n_shells_abcd, duration.count()));
+                    palPrint(fmt::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
+                                         n_shells_abcd, duration.count()));
+                }
+            }
         }
 
     auto end{std::chrono::steady_clock::now()};

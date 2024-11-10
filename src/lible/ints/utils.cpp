@@ -2,7 +2,7 @@
 
 namespace LI = lible::ints;
 
-using std::array, std::pair, std::vector;
+using std::array, std::map, std::pair, std::vector;
 
 double LI::calcPurePrimitiveNorm(const int l, const double exp)
 {
@@ -62,6 +62,25 @@ vector<pair<int, int>> LI::returnLPairs(const int l_max)
             l_pairs[idx] = std::make_pair(la, lb);
 
     return l_pairs;
+}
+
+map<int, vector<pair<int, int>>> LI::returnLPairsMap(const int l_max)
+{
+    int l_max_pair = 2 * l_max;
+
+    map<int, vector<pair<int, int>>> l_pairs_map;
+    for (int lab = 0; lab <= l_max_pair; lab++)
+    {
+        vector<pair<int, int>> lpairs;
+        for (int la = 0; la <= l_max; la++)
+            for (int lb = 0; lb <= la; lb++)
+                if (la + lb == lab)
+                    lpairs.push_back(std::make_pair(la, lb));
+
+        l_pairs_map[lab] = lpairs;
+    }
+
+    return l_pairs_map;
 }
 
 lible::vec3i LI::returnHermiteGaussianPositions(const int l)

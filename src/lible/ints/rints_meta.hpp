@@ -5,8 +5,6 @@
 
 #include <lible/ints/utils.hpp>
 
-// TODO: This header file might be temporary!
-
 namespace lible
 {
     namespace ints

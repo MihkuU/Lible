@@ -3,6 +3,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <map>
 #include <stdexcept>
 #include <vector>
 
@@ -34,7 +35,7 @@ namespace lible
             return (l + 1) * (l + 2) * (l + 3) / 6;
         }        
 
-        /** Calculaces the index of a Cartesian Gaussian with given Cartesian exponents i, j, k.*/
+        /** Calculaces the index of a Cartesian Gaussian with given Cartesian exponents i, j, k. */
         constexpr int indexCart(const int i, const int j, const int k)
         {
             int jk = j + k;
@@ -78,6 +79,9 @@ namespace lible
          * Returns a list of angular momentum pairs {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
          */
         std::vector<std::pair<int, int>> returnLPairs(const int l_max);
+
+        /** */
+        std::map<int, std::vector<std::pair<int, int>>> returnLPairsMap(const int l_max);
 
         /**
          *
