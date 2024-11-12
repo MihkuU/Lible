@@ -18,79 +18,6 @@ using std::array, std::vector;
 
 namespace lible::ints::two
 {
-    void kernelERI2(const int ishell_a, const int ishell_b, const int la, const int lb,
-                    const vector<double> &ecoeffs_a, const vector<double> &ecoeffs_b_tsp,
-                    const vector<array<int, 3>> &idxs_tuv_a,
-                    const vector<array<int, 3>> &idxs_tuv_b,
-                    const BoysF &boys_f, const ShellData &sh_data_a, const ShellData &sh_data_b,
-                    vector<double> &fnx, vector<double> &rints, vec4d &rints_tmp,
-                    vector<double> &eri2_shells_sph)
-    {
-        int lab = la + lb;
-        int dim_a = sh_data_a.cdepths[ishell_a];
-        int dim_b = sh_data_b.cdepths[ishell_b];
-        int pos_a = sh_data_a.coffsets[ishell_a];
-        int pos_b = sh_data_b.coffsets[ishell_b];
-
-        array<double, 3> xyz_a{sh_data_a.coords[3 * ishell_a],
-                               sh_data_a.coords[3 * ishell_a + 1],
-                               sh_data_a.coords[3 * ishell_a + 2]};
-
-        array<double, 3> xyz_b{sh_data_b.coords[3 * ishell_b],
-                               sh_data_b.coords[3 * ishell_b + 1],
-                               sh_data_b.coords[3 * ishell_b + 2]};
-
-        array<double, 3> xyz_ab{xyz_a[0] - xyz_b[0], xyz_a[1] - xyz_b[1],
-                                xyz_a[2] - xyz_b[2]};
-
-        double xx{xyz_ab[0]}, xy{xyz_ab[1]}, xz{xyz_ab[2]};
-        double xyz_ab_dot = xx * xx + xy * xy + xz * xz;
-
-        int dim_sph_a = numSphericals(la);
-        int dim_sph_b = numSphericals(lb);
-        int dim_tuv_a = numHermites(la);
-        int dim_tuv_b = numHermites(lb);
-        int dim_ecoeffs_a = dim_sph_a * dim_tuv_a;
-        int dim_ecoeffs_b = dim_sph_b * dim_tuv_b;
-        int dim_rints_x_ecoeffs = dim_tuv_a * dim_sph_b;
-        vector<double> rints_x_ecoeffs(dim_a * dim_rints_x_ecoeffs, 0);
-
-        for (int ia = 0; ia < dim_a; ia++)
-        {
-            int pos_rints_x_ecoeffs = ia * dim_rints_x_ecoeffs;
-            for (int ib = 0; ib < dim_b; ib++)
-            {
-                double a = sh_data_a.exps[pos_a + ia];
-                double b = sh_data_b.exps[pos_b + ib];
-
-                double alpha = a * b / (a + b);
-                double x = alpha * xyz_ab_dot;
-                boys_f.calcFnx(lab, x, fnx);
-
-                double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-                calcRInts(la, lb, fac, alpha, xyz_ab, fnx, idxs_tuv_a, idxs_tuv_b, rints_tmp,
-                          rints);
-
-                int pos_ecoeffs_b = sh_data_b.offsets_ecoeffs[ishell_b] + ib * dim_ecoeffs_b;
-
-                cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_tuv_a, dim_sph_b,
-                            dim_tuv_b, 1.0, &rints[0], dim_tuv_b, &ecoeffs_b_tsp[pos_ecoeffs_b],
-                            dim_sph_b, 1.0, &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_b);
-            }
-        }
-
-        for (int ia = 0; ia < dim_a; ia++)
-        {
-            int pos_rints_x_ecoeffs = ia * dim_rints_x_ecoeffs;
-            int pos_ecoeffs_a = sh_data_a.offsets_ecoeffs[ishell_a] + ia * dim_ecoeffs_a;
-
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, dim_sph_a, dim_sph_b,
-                        dim_tuv_a, 1.0, &ecoeffs_a[pos_ecoeffs_a], dim_tuv_a,
-                        &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_b, 1.0, &eri2_shells_sph[0],
-                        dim_sph_b);
-        }
-    }
-
     void kernelERI2Diagonal(const int ishell, const int la, const vector<double> &ecoeffs_a,
                             const vector<double> &ecoeffs_a_tsp,
                             const vector<array<int, 3>> &idxs_tuv_a, const BoysF &boys_f,
@@ -183,55 +110,33 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
             const auto &sh_data_a = sh_datas[la];
             const auto &sh_data_b = sh_datas[lb];
 
-            int n_shells_a = sh_data_a.n_shells;
-            int n_shells_b = sh_data_b.n_shells;
-            int dim_sph_a = numSphericals(la);
-            int dim_sph_b = numSphericals(lb);
-            int dim_tuv_a = numHermites(la);
-            int dim_tuv_b = numHermites(lb);
-
-            int lab = la + lb;
-            BoysF boys_f(lab);
+            int n_sph_a = numSphericals(la);
+            int n_sph_b = numSphericals(lb);
 
             const vector<double> &ecoeffs_a = ecoeffs[la];
             const vector<double> &ecoeffs_b_tsp = ecoeffs_tsp[lb];
 
-            vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
-            vector<array<int, 3>> idxs_tuv_b = returnHermiteGaussianIdxs(lb);
+            kernel_eri2_t kernel_eri2 = deployERI2Kernel(la, lb);
 
-            vector<double> rints(dim_tuv_a * dim_tuv_b, 0);
-            vector<double> fnx(lab + 1, 0);
-            vec4d rints_tmp(lab + 1, 0);
-
-            if (la == lb)
+            vector<double> eri2_batch(n_sph_a * n_sph_b, 0);
+            for (int ishell_a = 0; ishell_a < sh_data_a.n_shells; ishell_a++)
             {
-                for (int ishell_a = 0; ishell_a < n_shells_a; ishell_a++)
-                    for (int ishell_b = 0; ishell_b <= ishell_a; ishell_b++)
-                    {
-                        vector<double> eri2_shells_sph(dim_sph_a * dim_sph_b, 0);
+                int bound_b = (la == lb) ? ishell_a + 1 : sh_data_b.n_shells;
+                for (int ishell_b = 0; ishell_b < bound_b; ishell_b++)
+                {
+                    int pos_a = sh_data_a.coffsets[ishell_a];
+                    int pos_b = sh_data_b.coffsets[ishell_b];
 
-                        kernelERI2(ishell_a, ishell_b, la, lb, ecoeffs_a, ecoeffs_b_tsp,
-                                   idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
-                                   rints, rints_tmp, eri2_shells_sph);
+                    kernel_eri2(sh_data_a.cdepths[ishell_a], sh_data_b.cdepths[ishell_b],
+                                &sh_data_a.exps[pos_a], &sh_data_b.exps[pos_b],
+                                &sh_data_a.coords[3 * ishell_a], &sh_data_b.coords[3 * ishell_b],
+                                &ecoeffs_a[sh_data_a.offsets_ecoeffs[ishell_a]],
+                                &ecoeffs_b_tsp[sh_data_b.offsets_ecoeffs[ishell_b]],
+                                &eri2_batch[0]);
 
-                        transferIntsERI2(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                         eri2_shells_sph, eri2);
-                    }
-            }
-            else
-            {
-                for (int ishell_a = 0; ishell_a < n_shells_a; ishell_a++)
-                    for (int ishell_b = 0; ishell_b < n_shells_b; ishell_b++)
-                    {
-                        vector<double> eri2_shells_sph(dim_sph_a * dim_sph_b, 0);
-
-                        kernelERI2(ishell_a, ishell_b, la, lb, ecoeffs_a, ecoeffs_b_tsp,
-                                   idxs_tuv_a, idxs_tuv_b, boys_f, sh_data_a, sh_data_b, fnx,
-                                   rints, rints_tmp, eri2_shells_sph);
-
-                        transferIntsERI2(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                         eri2_shells_sph, eri2);
-                    }
+                    transferIntsERI2(ishell_a, ishell_b, sh_data_a, sh_data_b,
+                                     eri2_batch, eri2);
+                }
             }
         }
 

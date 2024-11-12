@@ -156,7 +156,7 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Type alias for the four-center repulsion integral kernel function.
+         * Type alias for the four-center two-electron repulsion integral kernel function.
          */
         using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
                                                  const int cdepth_c, const int cdepth_d,
@@ -170,10 +170,46 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Function for deploying a kernel function for calculating the four-center electron
+         * Type alias for the three-center two-electron repulsion integral kernel function.
+         */
+        using kernel_eri3_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                 const int cdepth_c, const double *exps_a,
+                                                 const double *exps_b, const double *exps_c,
+                                                 const double *coords_a, const double *coords_b,
+                                                 const double *coords_c, const double *ecoeffs_ab,
+                                                 const double *ecoeffs_c, double *eri3_batch)>;
+
+        /**
+         * \ingroup ints
+         * Type alias for the two-center two-electron repulsion integral kernel function.
+         */
+        using kernel_eri2_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                 const double *exps_a, const double *exps_b,
+                                                 const double *coords_a, const double *coords_b,
+                                                 const double *ecoeffs_a,
+                                                 const double *ecoeffs_b_tsp,
+                                                 double *eri2_batch)>;
+
+        /**
+         * \ingroup ints
+         * Function for deploying a kernel function for calculating the four-center two-electron
          * repulsion integrals.
          */
         kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
+
+        /**
+         * \ingroup ints
+         * Function for deploying a kernel function for calculating the three-center two-electron
+         * repulsion integrals.
+         */
+        kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int ld);
+
+        /**          
+         * \ingroup ints
+         * Function for deploying a kernel function for calculating the two-center two-electron
+         * repulsion integrals.
+         */
+        kernel_eri2_t deployERI3Kernel(const int la, const int lb);
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

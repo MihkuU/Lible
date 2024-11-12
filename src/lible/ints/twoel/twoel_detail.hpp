@@ -29,15 +29,20 @@ namespace lible
 
             void calcERI4BenchmarkNew(const Structure &structure);
 
-            using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
-                                                     const int cdepth_c, const int cdepth_d,
-                                                     const double *exps_a, const double *exps_b,
-                                                     const double *exps_c, const double *exps_d,
-                                                     const double *coords_a, const double *coords_b,
-                                                     const double *coords_c, const double *coords_d,
-                                                     const double *ecoeffs_ab,
-                                                     const double *ecoeffs_cd_tsp,
-                                                     double *eri4_batch)>;
+            template <int la, int lb>
+            void eri2Kernel(const int cdepth_a, const int cdepth_b,
+                            const double *exps_a, const double *exps_b,
+                            const double *coords_a, const double *coords_b,
+                            const double *ecoeffs_a, const double *ecoeffs_b_tsp,
+                            double *eri2_batch);
+
+            template <int la, int lb, int lc>
+            void eri3Kernel(const int cdepth_a, const int cdepth_b,
+                            const int cdepth_c, const double *exps_a,
+                            const double *exps_b, const double *exps_c,
+                            const double *coords_a, const double *coords_b,
+                            const double *coords_c, const double *ecoeffs_ab,
+                            const double *ecoeffs_c, double *eri3_batch);
 
             template <int la, int lb, int lc, int ld>
             void eri4Kernel(const int cdepth_a, const int cdepth_b,
@@ -49,6 +54,34 @@ namespace lible
                             const double *ecoeffs_ab,
                             const double *ecoeffs_cd_tsp,
                             double *eri4_batch);
+
+            using kernel_eri2_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                     const double *exps_a, const double *exps_b,
+                                                     const double *coords_a, const double *coords_b,
+                                                     const double *ecoeffs_a,
+                                                     const double *ecoeffs_b_tsp,
+                                                     double *eri2_batch)>;
+
+            using kernel_eri3_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                     const int cdepth_c, const double *exps_a,
+                                                     const double *exps_b, const double *exps_c,
+                                                     const double *coords_a, const double *coords_b,
+                                                     const double *coords_c, const double *ecoeffs_ab,
+                                                     const double *ecoeffs_c, double *eri3_batch)>;
+
+            using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
+                                                     const int cdepth_c, const int cdepth_d,
+                                                     const double *exps_a, const double *exps_b,
+                                                     const double *exps_c, const double *exps_d,
+                                                     const double *coords_a, const double *coords_b,
+                                                     const double *coords_c, const double *coords_d,
+                                                     const double *ecoeffs_ab,
+                                                     const double *ecoeffs_cd_tsp,
+                                                     double *eri4_batch)>;
+
+            kernel_eri2_t deployERI2Kernel(const int la, const int lb);
+
+            kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int lc);
 
             kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
         }

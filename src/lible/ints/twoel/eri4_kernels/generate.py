@@ -12,10 +12,11 @@ def writeKernelInstantiate(lbra, lket):
 			if lc + ld == lket:
 				lcld_list.append((lc, ld))
 
-	with open('eri4_kernel_{}_{}.cpp'.format(lbra, lket), 'w') as file:
+	with open('eri_kernels_{}_{}.cpp'.format(lbra, lket), 'w') as file:
 		file_str = ''
-		file_str += '#include <lible/ints/twoel/eri4_kernel.hpp>\n\n'
+		file_str += '#include <lible/ints/twoel/eri_kernels.hpp>\n\n'
 
+		# Write ERI4 kernels
 		for la, lb in lalb_list:
 			for lc, ld in lcld_list:
 				file_str += 'template void lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int, const int, const int, const int,\n'.format(la, lb, lc, ld)
@@ -25,6 +26,20 @@ def writeKernelInstantiate(lbra, lket):
 				file_str += '                                                       const double*, const double*,\n'
 				file_str += '                                                       const double*, const double*,\n'
 				file_str += '                                                       double*);\n\n'
+		
+		# Write ERI3 kernels
+		for la, lb in lalb_list:
+			file_str += 'template void lible::ints::two::eri3Kernel<{}, {}, {}>(const int, const int, const int,\n'.format(la, lb, lket)
+			file_str += '                                                    const double*, const double*, const double*,\n'
+			file_str += '                                                    const double*, const double*, const double*,\n'
+			file_str += '                                                    const double*, const double*, double*);\n\n'
+
+		# Write ERI2 kernels
+		file_str += 'template void lible::ints::two::eri2Kernel<{}, {}>(const int, const int,\n'.format(lbra, lket)
+		file_str += '                                                 const double*, const double*,\n'
+		file_str += '                                                 const double*, const double*,\n'
+		file_str += '                                                 const double*, const double*,\n'
+		file_str += '                                                 double*);\n\n'
 
 		file.write(file_str)
 
