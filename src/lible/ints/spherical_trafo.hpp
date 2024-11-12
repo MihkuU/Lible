@@ -55,14 +55,14 @@ namespace lible
          */
         void transferIntsERI2(const int ishell_a, const int ishell_b,
                               const ShellData &sh_data_a, const ShellData &sh_data_b,
-                              const std::vector<double> &eri2_shells_sph, vec2d &eri2);
+                              const std::vector<double> &eri2_batch, vec2d &eri2);
 
         /**
          *
          */
         void transferIntsERI3(const int ipair_ab, const int ishell_c,
                               const ShellData &sh_data_c, const ShellPairData &sp_data_ab,
-                              const std::vector<double> &eri3_shells_sph, vec3d &eri3);
+                              const std::vector<double> &eri4_batch, vec3d &eri3);
 
         /**
          *
@@ -70,6 +70,6 @@ namespace lible
         void transferIntsERI4(const int ipair_ab, const int ipair_cd,
                               const ShellPairData &sp_data_ab,
                               const ShellPairData &sp_data_cd,
-                              const std::vector<double> &eri4_shells_sph, vec4d &eri4);
+                              const std::vector<double> &eri4_batch, vec4d &eri4);
     }
 }

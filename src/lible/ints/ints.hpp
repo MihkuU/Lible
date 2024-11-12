@@ -209,7 +209,7 @@ namespace lible
          * Function for deploying a kernel function for calculating the two-center two-electron
          * repulsion integrals.
          */
-        kernel_eri2_t deployERI3Kernel(const int la, const int lb);
+        kernel_eri2_t deployERI2Kernel(const int la, const int lb);
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

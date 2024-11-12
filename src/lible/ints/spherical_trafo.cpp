@@ -766,7 +766,7 @@ void LI::transferIntsERI4Diag(const int ipair_ab, const ShellPairData &sp_data_a
 
 void LI::transferIntsERI2(const int ishell_a, const int ishell_b,
                           const ShellData &sh_data_a, const ShellData &sh_data_b,
-                          const vector<double> &eri2_shells_sph, vec2d &eri2)
+                          const vector<double> &eri2_batch, vec2d &eri2)
 {
     int dim_a = numSphericals(sh_data_a.l);
     int dim_b = numSphericals(sh_data_b.l);
@@ -784,7 +784,7 @@ void LI::transferIntsERI2(const int ishell_a, const int ishell_b,
             double norm_a = sh_data_a.norms[pos_norm_a + mu];
             double norm_b = sh_data_b.norms[pos_norm_b + nu];
 
-            double normalized_int = norm_a * norm_b * eri2_shells_sph[munu];
+            double normalized_int = norm_a * norm_b * eri2_batch[munu];
 
             int a = pos_a + mu;
             int b = pos_b + nu;
