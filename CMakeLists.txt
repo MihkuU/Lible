@@ -82,6 +82,7 @@ if(LIBLE_USE_MPI)
 	find_package(MPI REQUIRED)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_MPI_)
 	target_link_libraries(lible PRIVATE MPI::MPI_CXX)
+endif()
 
 if(LIBLE_BUILD_GPUINTS)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
