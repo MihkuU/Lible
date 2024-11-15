@@ -12,16 +12,6 @@ target_include_directories(lible PUBLIC
 	$<BUILD_INTERFACE:${src_dir}/>
 	$<INSTALL_INTERFACE:include>)
 
-#[=[
-if(LIBLE_BUILD_DAVIDSON)
-	file(GLOB davidson_sources "davidson/*.cpp")
-	target_sources(lible PRIVATE ${davidson_sources})
-	target_include_directories(lible PUBLIC 
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/davidson>
-		$<INSTALL_INTERFACE:include>)
-endif()
-#]=]
-
 if(LIBLE_BUILD_GEOMOPT)
 	file(GLOB geomopt_sources CONFIGURE_DEPENDS
 		"geomopt/*.cpp"
@@ -64,14 +54,9 @@ if(LIBLE_BUILD_INTS)
 	target_sources(lible PRIVATE ${ints_sources})
 	
 	if(LIBLE_BUILD_GPUINTS)
-   		#target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_) # Does it work here???
-
-		set(CMAKE_CXX_STANDARD 17)
+		set(CMAKE_CXX_STANDARD 20)
 		set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-		#file(GLOB ints_sources_gpu CONFIGURE_DEPENDS
-		#	"${src_dir}/lible/ints/gpu/*.cpp"
-		#	"${src_dir}/lible/ints/gpu/*.hpp")
 		file(GLOB ints_sources_gpu CONFIGURE_DEPENDS
 			"${src_dir}/lible/ints/gpu/*.cpp")
 

@@ -32,15 +32,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(LIBLE_BUILD_GPUINTS)
-	### TODO!!!!! 
-	###	There is some serious cluster fuck with how the GPU-ints are currently handled. This mess is also
-	### in the src/CMakeLists.txt file. Figure out eventually how to organize this. Right now this just
-	### seems to work on my laptop with an nvidia GPU.
-
-    #target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
-    #target_link_libraries(lible PRIVATE lible_gpuints)
-	#add_compile_options(-fPIC)
-
     # Based on the boilerplate that I found from AMDs HIP course
     if(NOT CMAKE_GPU_RUNTIME)
         set(GPU_RUNTIME "ROCM" CACHE STRING "Switches between ROCM and CUDA")
@@ -89,16 +80,11 @@ add_subdirectory("${src_dir}/src")
 
 if(LIBLE_USE_MPI)
 	find_package(MPI REQUIRED)
-	#set(CMAKE_CXX_COMPILER mpic++)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_MPI_)
 	target_link_libraries(lible PRIVATE MPI::MPI_CXX)
-else()
-	#set(CMAKE_CXX_COMPILER g++)
-endif()
 
 if(LIBLE_BUILD_GPUINTS)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
-	#target_compile_options(lible PRIVATE -fPIC -fgpu-rdc --hip-link) # TODO: give optional compiler-flags
 	target_link_libraries(lible PRIVATE lible_gpuints)
 endif()
 
@@ -119,21 +105,11 @@ else()
 	set(BLA_VENDOR OpenBLAS)
 	find_package(BLAS REQUIRED)
 	target_link_libraries(lible PRIVATE BLAS::BLAS)
-	#message("OpenBLAS_INCLUDE_DIRS: ${BLAS_INCLUDE_DIRS}\n")
-	#message("OpenBLAS_LIBRARIES: ${BLAS_LIBRARIES}\n")
-	#target_include_directories(lible PRIVATE ${OpenBLAS_INCLUDE_DIRS})
-	#target_link_libraries(lible PRIVATE ${OpenBLAS_LIBRARIES})
-	
 endif()
 
 # miscellaneous # TODO: manage this
 target_compile_definitions(lible PRIVATE BASIS_DIR="${src_dir}/src/lible/ints/basis")
 target_compile_definitions(lible PRIVATE AUX_BASIS_DIR="${src_dir}/src/lible/ints/aux_basis")
-
-### Dependencies/Sources 
-#set(src_dir ${CMAKE_CURRENT_SOURCE_DIR})
-#add_subdirectory("${src_dir}/extern")
-#add_subdirectory("${src_dir}/src")
 
 ### Documentation
 if(lible_is_top_level AND LIBLE_BUILD_DOCS)
@@ -143,7 +119,6 @@ endif()
 ### Installation
 if(lible_is_top_level)
 
-	# TODO: put in a file and include for better organization?
 	set(lible_basic_headers "${src_dir}/src/lible/utils.hpp")
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/types.hpp")
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vec2d.hpp") 
@@ -160,9 +135,9 @@ if(lible_is_top_level)
 	endif()
 
 	if(LIBLE_BUILD_INTS)
-		list(APPEND lible_ints_headers "${src_dir}/src/lible/ints/ints.hpp")
-		list(APPEND lible_ints_headers "${src_dir}/src/lible/ints/shell.hpp")
-		list(APPEND lible_ints_headers "${src_dir}/src/lible/ints/structure.hpp")
+		file(GLOB lible_ints_headers1 "${src_dir}/src/lible/ints/*.hpp")
+		file(GLOB lible_ints_headers2 "${src_dir}/src/lible/ints/oneel/*.hpp")
+		file(GLOB lible_ints_headers3 "${src_dir}/src/lible/ints/twoel/*.hpp")
 	endif()
 
 	include(GNUInstallDirs)
@@ -174,8 +149,9 @@ if(lible_is_top_level)
 			DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible)	
 
 	if(LIBLE_BUILD_INTS)
-		install(FILES ${lible_ints_headers}
-				DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints)
+		install(FILES ${lible_ints_headers1} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints)
+		install(FILES ${lible_ints_headers2} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/oneel)
+		install(FILES ${lible_ints_headers3} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/twoel)
 	endif()
 
 	if(LIBLE_BUILD_GCI)
