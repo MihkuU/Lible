@@ -5,18 +5,41 @@
 
 #include <vector>
 
-#include <armadillo> // TODO: remove?
-
 namespace lible
 {
     namespace ints
     {
         /**
+         * Calculates the Hermite expansion coefficients for the given l-pairs and shell-pair
+         * datas. The function assumes the given shell-pair datas correspond to the l-pairs.
+         * The E-coefficients in the ket are transposed.
+         */
+        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
+                           const std::vector<ShellPairData> &sp_datas);
+
+        /**
+         * Calculates the Hermite expansion coefficients for the given l-value. It is assumed
+         * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
+         * for the auxiliary basis set.
+         */
+        std::vector<std::vector<double>>
+        ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+
+        /**
+         * Calculates the Hermite expansion coefficients for the given l value. It is assumed 
+         * that the shell datas are ordered as 0,...,l_max_aux. The function assume shell data
+         * for the auxiliary basis set. The E-coefficients in the ket are transposed.
+         */
+        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+
+        /**
          * Calculates Hermite expansion coefficients for a diagonal shell pair located on the same
-         * atom. TODO: change the arma type
+         * atom.
          */
         void ecoeffsShell(const int l, const std::vector<double> &exps,
-                          std::vector<arma::dmat> &ecoeffs_out);
+                          std::vector<std::vector<double>> &ecoeffs_out);
 
         /**
          * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
@@ -37,7 +60,7 @@ namespace lible
          * given shells.
          */
         void ecoeffsShellsSpherical(const int l, const ShellData &sh_data,
-                                  std::vector<double> &ecoeffs_out);
+                                    std::vector<double> &ecoeffs_out);
 
         /**
          * Calculates the Cartesian-to-spherical-transformed Hermite expansion coefficients for
@@ -54,7 +77,7 @@ namespace lible
         void ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp_data,
                                  std::vector<double> &ecoeffs_out);
         /**
-         * Calculates the Cartesian-to-spherical-transformed Hermite expansion coefficients for 
+         * Calculates the Cartesian-to-spherical-transformed Hermite expansion coefficients for
          * given shell pairs. Calculates also the transposed coefficients.
          */
         void ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp_data,

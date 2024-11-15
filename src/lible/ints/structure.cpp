@@ -1,7 +1,6 @@
 #include <lible/ints/structure.hpp>
 #include <lible/ints/basis_sets.hpp>
 #include <lible/ints/defs.hpp>
-#include <lible/ints/ints.hpp>
 #include <lible/ints/utils.hpp>
 
 #include <algorithm>

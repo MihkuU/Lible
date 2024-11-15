@@ -83,24 +83,9 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
     auto start{std::chrono::steady_clock::now()};
 
     int l_max_aux = structure.getMaxLAux();
+    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
 
-    vector<ShellData> sh_datas;
-    for (int l = 0; l <= l_max_aux; l++)
-        sh_datas.emplace_back(constructShellDataAux(l, structure));
-
-    vector<vector<double>> ecoeffs(sh_datas.size());
-    vector<vector<double>> ecoeffs_tsp(sh_datas.size());
-    for (int l = 0; l <= l_max_aux; l++)
-    {
-        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
-
-        vector<double> ecoeffs_l(n_ecoeffs, 0);
-        vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
-        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
-
-        ecoeffs[l] = std::move(ecoeffs_l);
-        ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
-    }
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromShellDatasAuxPairs(l_max_aux, sh_datas);
 
     size_t dim_ao_aux = structure.getDimAOAux();
     vec2d eri2(dim_ao_aux, dim_ao_aux, 0);
@@ -156,24 +141,9 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
     auto start{std::chrono::steady_clock::now()};
 
     int l_max_aux = structure.getMaxLAux();
+    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
 
-    vector<ShellData> sh_datas;
-    for (int l = 0; l <= l_max_aux; l++)
-        sh_datas.emplace_back(constructShellDataAux(l, structure));
-
-    vector<vector<double>> ecoeffs(sh_datas.size());
-    vector<vector<double>> ecoeffs_tsp(sh_datas.size());
-    for (int l = 0; l <= l_max_aux; l++)
-    {
-        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
-
-        vector<double> ecoeffs_l(n_ecoeffs, 0);
-        vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
-        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
-
-        ecoeffs[l] = std::move(ecoeffs_l);
-        ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
-    }
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromShellDatasAuxPairs(l_max_aux, sh_datas);    
 
     size_t dim_ao_aux = structure.getDimAOAux();
     vector<double> eri2_diagonal(dim_ao_aux, 0);

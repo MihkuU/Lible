@@ -204,12 +204,95 @@ namespace lible
          */
         kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int ld);
 
-        /**          
+        /**
          * \ingroup ints
          * Function for deploying a kernel function for calculating the two-center two-electron
          * repulsion integrals.
          */
         kernel_eri2_t deployERI2Kernel(const int la, const int lb);
+
+        class ShellData;     // Forward declaration for the ShellData class.
+        class ShellPairData; // Forward-declaration for the ShellPairData class.
+
+        /**
+         * \ingroup ints         
+         * Constructs the shell data corresponding to the auxilary basis set.
+         */
+        ShellData constructShellDataAux(const int l, const Structure &structure);
+
+        /**
+         * \ingroup ints         
+         *  Constructs the shell pair data corresponding to the main basis set.
+         */
+        ShellPairData constructShellPairData(const int la, const int lb,
+                                             const Structure &structure);
+
+        /**
+         * \ingroup ints         
+         * Constructs the shell datas for the auxiliary basis set, up to l_max.
+         */
+        std::vector<ShellData>
+        constructShellDatasAux(const int l_max, const Structure &structure);
+
+        /**
+         * \ingroup ints         
+         * Constructs the shell pair datas for the given l-pairs.
+         */
+        std::vector<ShellPairData>
+        constructShellPairDatas(const std::vector<std::pair<int, int>> &l_pairs,
+                                const Structure &structure);
+
+        /**
+         * \ingroup ints         
+         * Calculates the Hermite expansion coefficients for the given l-pairs and shell-pair
+         * datas. The function assumes the given shell-pair datas correspond to the l-pairs.
+         * The E-coefficients in the ket are transposed.
+         */
+        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
+                           const std::vector<ShellPairData> &sp_datas);
+
+        /**
+         * \ingroup ints         
+         * Calculates the Hermite expansion coefficients for the given l-value. It is assumed
+         * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
+         * for the auxiliary basis set.
+         */
+        std::vector<std::vector<double>>
+        ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+
+        /**
+         * \ingroup ints         
+         * Calculates the Hermite expansion coefficients for the given l value. It is assumed
+         * that the shell datas are ordered as 0,...,l_max_aux. The function assume shell data
+         * for the auxiliary basis set. The E-coefficients in the ket are transposed.
+         */
+        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+
+        /** Returns the number of Cartesian Gaussians. */
+        constexpr int numCartesians(const int l)
+        {
+            return (l + 1) * (l + 2) / 2;
+        }
+
+        /** 
+         * \ingroup ints 
+         * Returns the number of spherical Gaussians. 
+         */
+        constexpr int numSphericals(const int l)
+        {
+            return 2 * l + 1;
+        }
+
+        /** 
+         * \ingroup ints 
+         * Returns the number of Hermite Gaussians. 
+         */
+        constexpr int numHermites(const int l)
+        {
+            return (l + 1) * (l + 2) * (l + 3) / 6;
+        }
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

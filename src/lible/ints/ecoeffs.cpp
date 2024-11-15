@@ -4,10 +4,83 @@
 #include <lible/ints/utils.hpp>
 
 #include <array>
+#include <stdexcept>
 
 namespace LI = lible::ints;
 
-using std::array, std::vector;
+using std::array, std::pair, std::vector;
+
+std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+LI::ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
+                       const std::vector<ShellPairData> &sp_datas)
+{
+    if (l_pairs.size() != sp_datas.size())
+        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
+
+    vector<vector<double>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+
+        int lab = la + lb;
+        int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
+                            sp_datas[ipair].n_prim_pairs;
+
+        vector<double> ecoeffs_ipair(n_ecoeffs_sph, 0);
+        vector<double> ecoeffs_tsp_ipair(n_ecoeffs_sph, 0);
+
+        ecoeffsSPsSpherical(la, lb, sp_datas[ipair], ecoeffs_ipair, ecoeffs_tsp_ipair);
+
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+    }
+
+    return {ecoeffs, ecoeffs_tsp};
+}
+
+vector<vector<double>>
+LI::ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas)
+{
+    if ((l_max_aux + 1) != sh_datas.size())
+        throw std::runtime_error("The size of sh_datas doesn't match (l_max_aux + 1)\n");
+
+    vector<vector<double>> ecoeffs_aux(sh_datas.size());
+    for (int l = 0; l <= l_max_aux; l++)
+    {
+        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
+
+        vector<double> ecoeffs_l(n_ecoeffs, 0);
+        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l);
+
+        ecoeffs_aux[l] = std::move(ecoeffs_l);
+    }
+
+    return ecoeffs_aux;
+}
+
+pair<vector<vector<double>>, vector<vector<double>>>
+LI::ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const vector<ShellData> &sh_datas)
+{
+    if ((l_max_aux + 1) != sh_datas.size())
+        throw std::runtime_error("The size of sh_datas doesn't match (l_max_aux + 1)\n");
+
+    vector<vector<double>> ecoeffs(sh_datas.size());
+    vector<vector<double>> ecoeffs_tsp(sh_datas.size());
+    for (int l = 0; l <= l_max_aux; l++)
+    {
+        int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_datas[l].n_primitives;
+
+        vector<double> ecoeffs_l(n_ecoeffs, 0);
+        vector<double> ecoeffs_tsp_l(n_ecoeffs, 0);
+        ecoeffsShellsSpherical(l, sh_datas[l], ecoeffs_l, ecoeffs_tsp_l);
+
+        ecoeffs[l] = std::move(ecoeffs_l);
+        ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
+    }
+
+    return {ecoeffs, ecoeffs_tsp};
+}
 
 void LI::ecoeffsRecurrence2(const double a, const double b, const double PA, const double PB,
                             const double one_o_2p, const int la, const int lb, vec3d &ecoeffs)
@@ -101,12 +174,12 @@ void LI::ecoeffsPrimitivePair(const double a, const double b, const int la, cons
     ecoeffsRecurrence2(a, b, xyz_pa[2], xyz_pb[2], one_o_2p, la, lb, ecoeffs_z);
 }
 
-void LI::ecoeffsShell(const int l, const vector<double> &exps, vector<arma::dmat> &ecoeffs_out)
+void LI::ecoeffsShell(const int l, const vector<double> &exps, vector<vector<double>> &ecoeffs_out)
 {
     int dim = numCartesians(l);
     size_t k = exps.size();
 
-    ecoeffs_out.resize(k * k, arma::zeros(dim, dim));
+    ecoeffs_out.resize(k * k, vector<double>(dim * dim, 0));
 
     lible::vec3d ecoeffs_x(l + 1, l + 1, 2 * l + 1, 0);
     lible::vec3d ecoeffs_y(l + 1, l + 1, 2 * l + 1, 0);
@@ -128,8 +201,11 @@ void LI::ecoeffsShell(const int l, const vector<double> &exps, vector<arma::dmat
 
             for (const auto [i, j, k, mu] : cart_exps_a)
                 for (const auto [i_, j_, k_, nu] : cart_exps_a)
-                    ecoeffs_out[iab](mu, nu) = ecoeffs_x(i, i_, 0) * ecoeffs_y(j, j_, 0) *
-                                               ecoeffs_z(k, k_, 0);
+                {
+                    int munu = mu * dim + nu;
+                    ecoeffs_out[iab][munu] = ecoeffs_x(i, i_, 0) * ecoeffs_y(j, j_, 0) *
+                                             ecoeffs_z(k, k_, 0);
+                }
         }
 }
 
@@ -345,7 +421,7 @@ void LI::ecoeffsShellsSpherical(const int l, const ShellData &sh_data, vector<do
                 for (int t = 0; t <= i; t++)
                     for (int u = 0; u <= j; u++)
                         for (int v = 0; v <= k; v++)
-                        {                            
+                        {
                             int tuv = tuv_poss(t, u, v);
                             ecoeffs_c(mu, tuv) = ecoeffs_x(i, t) * ecoeffs_y(j, u) *
                                                  ecoeffs_z(k, v);

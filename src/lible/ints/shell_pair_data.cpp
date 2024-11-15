@@ -6,7 +6,7 @@ namespace LI = lible::ints;
 using std::pair, std::vector;
 
 LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
-{    
+{
     if (!structure.getUseRI())
         throw std::runtime_error("RI approximation is not enabled!");
 
@@ -217,4 +217,26 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
                           offsets_ecoeffs, offsets_norms, offsets_sph);
 
     return sp_data;
+}
+
+vector<LI::ShellData> LI::constructShellDatasAux(const int l_max, const Structure &structure)
+{
+    vector<ShellData> sh_datas;
+    for (int l = 0; l <= l_max; l++)
+        sh_datas.emplace_back(constructShellDataAux(l, structure));
+
+    return sh_datas;
+}
+
+vector<LI::ShellPairData> LI::constructShellPairDatas(const vector<pair<int, int>> &l_pairs,
+                                                      const Structure &structure)
+{
+    vector<ShellPairData> sp_datas;
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
+    }
+
+    return sp_datas;
 }

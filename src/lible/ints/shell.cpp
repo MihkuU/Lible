@@ -15,8 +15,8 @@ vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
     int dim_cart = numCartesians(l);
     int dim_sph = numSphericals(l);
 
-    vector<arma::dmat> h_coeffs;
-    ecoeffsShell(l, exps, h_coeffs);
+    vector<vector<double>> e_coeffs;
+    ecoeffsShell(l, exps, e_coeffs);
 
     arma::dmat ints_contracted(dim_cart, dim_cart, arma::fill::zeros);
 
@@ -36,9 +36,9 @@ vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
 
             double fac = da_x_db * std::pow(M_PI / p, 1.5);
 
-            for (int mu = 0; mu < dim_cart; mu++)
-                for (int nu = 0; nu < dim_cart; nu++)
-                    ints_contracted(mu, nu) += fac * h_coeffs[iab](mu, nu);
+            for (int mu = 0, munu = 0; mu < dim_cart; mu++)
+                for (int nu = 0; nu < dim_cart; nu++, munu++)
+                    ints_contracted(mu, nu) += fac * e_coeffs[iab][munu];
 
             iab++;
         }

@@ -1,8 +1,8 @@
 #include <lible/ints/gpu/gpuints.hpp>
+#include <lible/util.hpp>
 #include <lible/ints/gpu/dev_ecoeffs.hpp>
 #include <lible/ints/gpu/utils.hpp>
 #include <lible/ints/shell_pair_data.hpp>
-#include <lible/util.hpp>
 
 #include <hip/hip_runtime.h>
 #include <fmt/core.h>

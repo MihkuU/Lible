@@ -61,7 +61,7 @@ namespace lible
 
             /** Offsets of the spherical Hermite expansion coefficients. */
             const std::vector<int> offsets_ecoeffs;
-            
+
             /** Offsets of the shell atomic orbital norms. */
             const std::vector<int> offsets_norms;
 
@@ -69,14 +69,14 @@ namespace lible
             const std::vector<int> offsets_sph;
         };
 
-        /**        
+        /**
          * \ingroup spdata
-         * 
+         *
          * Structure for representing contiguously rolled out data of shell pairs. The data of
          * each shell in a pair is placed side-by-side to each other in a corresponding vector.
-         * If \f$l_a \neq l_b\f$, all of the shells are taken. When \f$l_a = l_b\f$, we enforce 
-         * \f$i \geq j\f$ where \f$i, j\f$ refer to the shell indices. Contains a few additional 
-         * gadgets that might be useful.                 
+         * If \f$l_a \neq l_b\f$, all of the shells are taken. When \f$l_a = l_b\f$, we enforce
+         * \f$i \geq j\f$ where \f$i, j\f$ refer to the shell indices. Contains a few additional
+         * gadgets that might be useful.
          */
         struct ShellPairData
         {
@@ -94,7 +94,7 @@ namespace lible
                   atomic_coords(atomic_coords), coeffs(coeffs), coords(coords), exps(exps),
                   norms(norms), atomic_nrs(atomic_nrs), cdepths(cdepths), coffsets(coffsets),
                   offsets_cart(offsets_cart), offsets_ecoeffs(offsets_ecoeffs),
-                  offsets_norms(offsets_norms), offsets_sph(offsets_sph)                  
+                  offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
             }
 
@@ -134,17 +134,34 @@ namespace lible
 
         /**
          * \ingroup spdata
-         * 
+         *
          * Constructs the shell data corresponding to the auxilary basis set.
          */
         ShellData constructShellDataAux(const int l, const Structure &structure);
 
         /**
-         * \ingroup spdata     
-         *    
+         * \ingroup spdata
+         *
          *  Constructs the shell pair data corresponding to the main basis set.
          */
         ShellPairData constructShellPairData(const int la, const int lb,
                                              const Structure &structure);
+
+        /**
+         * \ingroup spdata
+         *
+         * Constructs the shell datas for the auxiliary basis set, up to l_max.
+         */
+        std::vector<ShellData>
+        constructShellDatasAux(const int l_max, const Structure &structure);
+
+        /**
+         * \ingroup spdata
+         *
+         * Constructs the shell pair datas for the given l-pairs.
+         */
+        std::vector<ShellPairData>
+        constructShellPairDatas(const std::vector<std::pair<int, int>> &l_pairs,
+                                const Structure &structure);
     }
 }
