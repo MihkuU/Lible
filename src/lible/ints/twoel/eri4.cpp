@@ -345,7 +345,6 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
 
             kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
 
-            size_t n_shells_abcd = 0;
             vector<double> eri4_batch(n_sph_ab * n_sph_cd);
             for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
             {

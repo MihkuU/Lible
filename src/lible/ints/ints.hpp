@@ -1,7 +1,9 @@
 #pragma once
 
 #include <lible/types.hpp>
+#include <lible/ints/shell_pair_data.hpp>
 #include <lible/ints/structure.hpp>
+#include <lible/ints/utils.hpp>
 
 #include <cassert>
 #include <functional>
@@ -211,9 +213,6 @@ namespace lible
          */
         kernel_eri2_t deployERI2Kernel(const int la, const int lb);
 
-        class ShellData;     // Forward declaration for the ShellData class.
-        class ShellPairData; // Forward-declaration for the ShellPairData class.
-
         /**
          * \ingroup ints         
          * Constructs the shell data corresponding to the auxilary basis set.
@@ -243,7 +242,7 @@ namespace lible
                                 const Structure &structure);
 
         /**
-         * \ingroup ints         
+         * \ingroup ints
          * Calculates the Hermite expansion coefficients for the given l-pairs and shell-pair
          * datas. The function assumes the given shell-pair datas correspond to the l-pairs.
          * The E-coefficients in the ket are transposed.
@@ -253,7 +252,7 @@ namespace lible
                            const std::vector<ShellPairData> &sp_datas);
 
         /**
-         * \ingroup ints         
+         * \ingroup ints
          * Calculates the Hermite expansion coefficients for the given l-value. It is assumed
          * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
          * for the auxiliary basis set.
@@ -262,7 +261,7 @@ namespace lible
         ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas);
 
         /**
-         * \ingroup ints         
+         * \ingroup ints
          * Calculates the Hermite expansion coefficients for the given l value. It is assumed
          * that the shell datas are ordered as 0,...,l_max_aux. The function assume shell data
          * for the auxiliary basis set. The E-coefficients in the ket are transposed.
@@ -270,29 +269,29 @@ namespace lible
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
         ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const std::vector<ShellData> &sh_datas);
 
-        /** Returns the number of Cartesian Gaussians. */
-        constexpr int numCartesians(const int l)
-        {
-            return (l + 1) * (l + 2) / 2;
-        }
-
-        /** 
-         * \ingroup ints 
-         * Returns the number of spherical Gaussians. 
+        /**
+         * \ingroup ints
+         * Returns the number of Cartesian Gaussians.
          */
-        constexpr int numSphericals(const int l)
-        {
-            return 2 * l + 1;
-        }
+        constexpr int numCartesians(const int l);
 
-        /** 
-         * \ingroup ints 
-         * Returns the number of Hermite Gaussians. 
+        /**
+         * \ingroup ints
+         * Returns the number of spherical Gaussians.
          */
-        constexpr int numHermites(const int l)
-        {
-            return (l + 1) * (l + 2) * (l + 3) / 6;
-        }
+        constexpr int numSphericals(const int l);
+
+        /**
+         * \ingroup ints
+         * Returns the number of Hermite Gaussians.
+         */
+        constexpr int numHermites(const int l);
+
+        /**
+         * \ingroup ints
+         * Returns a list of angular momentum pairs {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
+         */
+        std::vector<std::pair<int, int>> returnLPairs(const int l_max);        
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu
