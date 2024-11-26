@@ -27,13 +27,11 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
     int l_max_aux = structure.getMaxLAux();
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
-    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);    
-
+    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
     vector<vector<double>> ecoeffs_aux = ecoeffsFromShellDatasAux(l_max_aux, sh_datas);
-    
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);        
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
 
     size_t dim_ao = structure.getDimAO();
     size_t dim_ao_aux = structure.getDimAOAux();
@@ -67,7 +65,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
                     kernel_eri3(sp_data_ab.cdepths[2 * ipair_ab],
                                 sp_data_ab.cdepths[2 * ipair_ab + 1],
                                 sh_data_c.cdepths[ishell_c],
-                                &sp_data_ab.exps[pos_a], 
+                                &sp_data_ab.exps[pos_a],
                                 &sp_data_ab.exps[pos_b],
                                 &sh_data_c.exps[pos_c],
                                 &sp_data_ab.coords[6 * ipair_ab],
