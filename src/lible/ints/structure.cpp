@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cctype>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -194,8 +195,13 @@ void LI::Structure::constructShells(const basis_atoms_t &basis_atoms, int &max_l
         {
             if (angmom > max_angmom)
                 max_angmom = angmom;
-
-            assert((max_angmom <= _max_angular_momentum_));
+            
+            if (max_angmom > _max_angular_momentum_)
+            {
+                std::string msg = std::format("Maximum angular momentum {} is larger than allowed {}!",
+                                              max_angmom, _max_angular_momentum_);
+                throw std::runtime_error(msg);
+            }
 
             size_t dim_cart = numCartesians(angmom);
             size_t dim_sphe = numSphericals(angmom);

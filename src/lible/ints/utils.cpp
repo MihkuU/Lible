@@ -6,19 +6,14 @@ using std::array, std::map, std::pair, std::vector;
 
 double LI::calcPurePrimitiveNorm(const int l, const double exp)
 {
-    double partial_norm = std::sqrt(std::pow(2 * exp / M_PI, 1.5) *
-                                    std::pow(4 * exp, l) /
+    double norm = std::sqrt(std::pow(2 * exp / M_PI, 1.5) * std::pow(4 * exp, l) /
                                     doubleFactorial(2 * l - 1));
 
-    return partial_norm;
+    return norm;
 }
 
 double LI::doubleFactorial(const int n)
-{
-    /*
-     * Definition from DOI:10.1002/9781119019572 in eq. (6.5.10) without the odd negative values.
-     */
-
+{    
     double double_factorial = 1;
     if (n == 0)
         return double_factorial;

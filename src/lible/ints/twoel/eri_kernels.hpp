@@ -58,7 +58,7 @@ namespace lible
                 std::array<double, n_hermites_abcd> rints;
 
                 constexpr int n_rints_x_ecoeffs = n_sph_cd * n_hermite_ab;
-                std::vector<double> rints_x_ecoeffs(cdepth_a * cdepth_b * n_rints_x_ecoeffs);
+                std::vector<double> rints_x_ecoeffs(cdepth_a * cdepth_b * n_rints_x_ecoeffs, 0);
 
                 for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
                     for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -143,7 +143,7 @@ namespace lible
                 std::array<double, n_hermites_abc> rints;
 
                 constexpr int n_rints_x_ecoeffs = n_sph_c * n_hermite_ab;
-                std::vector<double> rints_x_ecoeffs(cdepth_a * cdepth_b * n_rints_x_ecoeffs);
+                std::vector<double> rints_x_ecoeffs(cdepth_a * cdepth_b * n_rints_x_ecoeffs, 0);
 
                 for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
                     for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -219,7 +219,7 @@ namespace lible
                 std::array<double, n_hermites_ab> rints;
 
                 constexpr int n_rints_x_ecoeffs = n_hermite_a * n_sph_b;
-                std::vector<double> rints_x_ecoeffs(cdepth_a * n_rints_x_ecoeffs);
+                std::vector<double> rints_x_ecoeffs(cdepth_a * n_rints_x_ecoeffs, 0);
 
                 std::array<double, 3> xyz_ab{coords_a[0] - coords_b[0],
                                              coords_a[1] - coords_b[1],

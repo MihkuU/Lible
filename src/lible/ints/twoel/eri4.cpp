@@ -325,7 +325,7 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
         for (int lcld = 0; lcld <= lalb; lcld++)
         {
             auto [la, lb] = l_pairs[lalb];
-            auto [lc, ld] = l_pairs[lcld];
+            auto [lc, ld] = l_pairs[lcld];    
 
             int n_sph_a = numSphericals(la);
             int n_sph_b = numSphericals(lb);

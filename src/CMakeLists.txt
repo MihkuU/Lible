@@ -46,7 +46,7 @@ if(LIBLE_BUILD_INTS)
 		"${src_dir}/lible/ints/oneel/*.cpp"
 		"${src_dir}/lible/ints/oneel/*.hpp"
 		"${src_dir}/lible/ints/twoel/*.cpp"
-		"${src_dir}/lible/ints/twoel/eri4_kernels/*.cpp"
+		"${src_dir}/lible/ints/twoel/eri_kernels/*.cpp"
 		"${src_dir}/lible/ints/twoel/rints_kernels/*.cpp"
 		"${src_dir}/lible/ints/twoel/*.cpp")
 
