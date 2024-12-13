@@ -229,6 +229,12 @@ string LI::returnBasisFamilyString(const string &basis_set)
         {
         case BasisFamily::ahlrichs:
             return "ahlrichs";
+        case BasisFamily::ano:
+            return "ano";
+        case BasisFamily::dunning:
+            return "dunning";
+        case BasisFamily::pople:
+            return "pople";
         case BasisFamily::sto:
             return "sto";
         default:
