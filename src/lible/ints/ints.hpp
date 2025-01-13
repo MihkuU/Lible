@@ -93,13 +93,13 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Returns the names of all available basis sets.
+         * Returns the names of all available basis sets in lower case.
          */
         std::set<std::string> availableBasisSets();
 
         /**
          * \ingroup ints
-         * Returns the names of all available auxiliary basis sets.
+         * Returns the names of all available auxiliary basis sets in lower case.
          */
         std::set<std::string> availableBasisSetsAux();
 
