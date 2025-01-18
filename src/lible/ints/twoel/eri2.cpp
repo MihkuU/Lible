@@ -1,5 +1,4 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
-#include <lible/log.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
@@ -78,10 +77,6 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
     if (!structure.getUseRI())
         throw std::runtime_error("RI approximation is not enabled!");
 
-    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI2...");
-
-    auto start{std::chrono::steady_clock::now()};
-
     int l_max_aux = structure.getMaxLAux();
     vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
 
@@ -125,10 +120,6 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
             }
         }
 
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    log::logger << fmt::format(" {:.2e} s\n", duration.count());
-
     return eri2;
 }
 
@@ -136,9 +127,6 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
 {
     if (!structure.getUseRI())
         throw std::runtime_error("RI approximation is not enabled!");
-
-    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI2-diagonal...");
-    auto start{std::chrono::steady_clock::now()};
 
     int l_max_aux = structure.getMaxLAux();
     vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
@@ -178,10 +166,6 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
             transferIntsERI2Diag(ishell, sh_data_a, eri2_shells_sph, eri2_diagonal);
         }
     }
-
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri2_diagonal;
 }

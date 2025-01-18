@@ -1,5 +1,4 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
-#include <lible/log.hpp>
 #include <lible/utils.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
@@ -227,9 +226,6 @@ namespace lible::ints::two
 
 lible::vec4d LIT::calcERI4(const Structure &structure)
 {
-    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI4 flat...");
-    auto start{std::chrono::steady_clock::now()};
-
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
@@ -301,18 +297,11 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
                     }
         }
 
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    log::logger << fmt::format(" {:.2e} s\n", duration.count());
-
     return eri4;
 }
 
 lible::vec4d LIT::calcERI4New(const Structure &structure)
 {
-    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI4 new...");
-    auto start{std::chrono::steady_clock::now()};
-
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
@@ -375,10 +364,6 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
                 }
             }
         }
-
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri4;
 }
@@ -552,9 +537,6 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
 
 lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 {
-    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI4-diagonal...");
-    auto start{std::chrono::steady_clock::now()};
-
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
@@ -599,10 +581,6 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
             transferIntsERI4Diag(ipair_ab, sp_data_ab, eri4_shells_sph, eri4_diagonal);
         }
     }
-
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    log::logger << fmt::format(" {:.2e} s\n", duration.count());
 
     return eri4_diagonal;
 }

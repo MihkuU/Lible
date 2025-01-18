@@ -1,5 +1,4 @@
 #include <lible/ints/twoel/twoel_detail.hpp>
-#include <lible/log.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
@@ -20,9 +19,6 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
 {
     if (!structure.getUseRI())
         throw std::runtime_error("RI approximation is not enabled!");
-
-    log::logger << fmt::format("Lible::{:<40}", "SHARK ERI3...");
-    auto start{std::chrono::steady_clock::now()};
 
     int l_max_aux = structure.getMaxLAux();
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
@@ -77,11 +73,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
 
                     transferIntsERI3(ipair_ab, ishell_c, sh_data_c, sp_data_ab, eri3_batch, eri3);
                 }
-        }
-
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    log::logger << fmt::format(" {:.2e} s\n", duration.count());
+        }    
 
     return eri3;
 }

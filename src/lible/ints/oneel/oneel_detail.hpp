@@ -1,6 +1,5 @@
 #pragma once
 
-#include <lible/log.hpp>
 #include <lible/types.hpp>
 #include <lible/utils.hpp>
 #include <lible/ints/shell_pair_data.hpp>
@@ -50,12 +49,7 @@ namespace lible
 
             template <Option opt>
             vec2d calculate(const Structure &structure)
-            {
-                auto start{std::chrono::steady_clock::now()};
-
-                std::string msg = returnPreamble(opt);            
-                log::logger << fmt::format("Lible::{:<40}", msg);
-
+            {                
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
 
@@ -74,12 +68,7 @@ namespace lible
 
                         kernel<opt>(la, lb, sp_data, ints);
                     }
-
-                auto end{std::chrono::steady_clock::now()};
-                std::chrono::duration<double> duration{end - start};                
                 
-                log::logger << fmt::format(" {:.2e} s\n", duration.count());
-
                 return ints;
             }
         }
