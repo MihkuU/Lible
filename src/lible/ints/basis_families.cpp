@@ -32,6 +32,7 @@ const static std::unordered_map<string, LI::BasisFamily>
                    {"ahlrichs-pvdz", LI::BasisFamily::ahlrichs},
                    {"ahlrichs-tzv", LI::BasisFamily::ahlrichs},
                    {"ahlrichs-vdz", LI::BasisFamily::ahlrichs},
+                   {"ahlrichs-vtz", LI::BasisFamily::ahlrichs},                   
                    {"def2-qzvpd", LI::BasisFamily::ahlrichs},
                    {"def2-qzvppd", LI::BasisFamily::ahlrichs},
                    {"def2-qzvpp", LI::BasisFamily::ahlrichs},
