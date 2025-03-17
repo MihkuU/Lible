@@ -99,14 +99,46 @@ LI::Structure::Structure(const string &basis_set, const string &basis_set_aux,
                          const vector<string> &elements,
                          const vector<double> &coords_angstrom)
     : Structure(basis_set, elements, coords_angstrom)                         
-{        
+{
     this->basis_set_aux = basis_set_aux;
     use_ri = true;
 
     std::set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
     basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, basis_set_aux);
-    
+
     constructShells(basis_atoms_aux, max_l_aux, dim_ao_aux, dim_ao_cart_aux, shells_aux);
+}
+
+LI::Structure::Structure(const basis_atoms_t &basis_set_custom, const vector<int> &atomic_nrs,
+                         const vector<double> &coords_angstrom)
+    : basis_set("custom"), coords(coords_angstrom), atomic_nrs(atomic_nrs)
+{
+    n_atoms = atomic_nrs.size();
+
+    elements.resize(n_atoms);
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
+        elements[iatom] = atomic_symbols.at(atomic_nrs[iatom]);
+
+    for (size_t i = 0; i < coords.size(); i++)
+        coords[i] *= _ang_to_bohr_;
+
+    coords_xyz.resize(n_atoms);
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
+        coords_xyz[iatom] = {coords[3 * iatom], coords[3 * iatom + 1], coords[3 * iatom + 2]};
+
+    constructShells(basis_set_custom, max_l, dim_ao, dim_ao_cart, shells);
+}
+
+LI::Structure::Structure(const basis_atoms_t &basis_set_custom,
+                         const basis_atoms_t &basis_set_custom_aux,
+                         const vector<int> &atomic_nrs,
+                         const vector<double> &coords_angstrom)
+    : Structure(basis_set_custom, atomic_nrs, coords_angstrom)
+{
+    this->basis_set_aux = "custom";
+    use_ri = true;
+
+    constructShells(basis_set_custom_aux, max_l, dim_ao, dim_ao_cart, shells);
 }
 
 bool LI::Structure::getUseRI() const 

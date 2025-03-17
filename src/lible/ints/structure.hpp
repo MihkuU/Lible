@@ -41,18 +41,26 @@ namespace lible
             Structure(const std::string &basis_set, const std::vector<std::string> &elements,
                       const std::vector<double> &coords_angstrom);
 
-            /**
-             * Constructor for initializing a Structure object with enabling the RI approximation.
-             */
+            /** Constructor for initializing a Structure object with enabling the RI approximation. */
             Structure(const std::string &basis_set, const std::string &basis_set_aux,
                       const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
-            /**
-             * Constructor for initializing a Structure object with enabling the RI approximation.
-             */
+            /** Constructor for initializing a Structure object with enabling the RI approximation. */
             Structure(const std::string &basis_set, const std::string &basis_set_aux,
                       const std::vector<std::string> &elements,
+                      const std::vector<double> &coords_angstrom);
+
+            /** Constructor for initializing a structure object with a given custom basis sets. */
+            Structure(const basis_atoms_t& basis_set_custom, const std::vector<int> &atomic_nrs,
+                      const std::vector<double> &coords_angstrom);
+
+            /**
+             * Constructor for initializing a structure object with a given custom main basis sets
+             * and auxiliary.
+             */
+            Structure(const basis_atoms_t& basis_set_custom, const basis_atoms_t& basis_set_custom_aux,
+                      const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
             bool getUseRI() const;
