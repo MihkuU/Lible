@@ -54,7 +54,7 @@ const static std::unordered_map<string, LI::BasisFamily>
                    {"ano-r1", LI::BasisFamily::ano},
                    {"ano-r2", LI::BasisFamily::ano},
                    {"ano-r3", LI::BasisFamily::ano},
-                   {"no-rcc-mb", LI::BasisFamily::ano},
+                   {"ano-rcc-mb", LI::BasisFamily::ano},
                    {"ano-rcc-vdz", LI::BasisFamily::ano},
                    {"ano-rcc-vdzp", LI::BasisFamily::ano},
                    {"ano-rcc-vqzp", LI::BasisFamily::ano},
