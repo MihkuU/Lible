@@ -51,17 +51,33 @@ namespace lible
                       const std::vector<std::string> &elements,
                       const std::vector<double> &coords_angstrom);
 
-            /** Constructor for initializing a structure object with a given custom basis sets. */
+            /** Constructor for initializing a structure object with a given custom basis set. */
             Structure(const basis_atoms_t& basis_set_custom, const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
             /**
-             * Constructor for initializing a structure object with a given custom main basis sets
-             * and auxiliary.
+             * Constructor for initializing a structure object with a given main basis set
+             * and custom auxiliary basis set.
+             */
+            Structure(const std::string &basis_set, const basis_atoms_t& basis_set_custom_aux,
+                      const std::vector<int> &atomic_nrs,
+                      const std::vector<double> &coords_angstrom);
+
+            /**
+             * Constructor for initializing a structure object with a custom main basis set
+             * and a given auxiliary basis set.
+             */
+            Structure(const basis_atoms_t& basis_set_custom, const std::string &basis_set_aux,
+                      const std::vector<int> &atomic_nrs,
+                      const std::vector<double> &coords_angstrom);                      
+
+            /**
+             * Constructor for initializing a structure object with custom main and auxiliary 
+             * basis sets.
              */
             Structure(const basis_atoms_t& basis_set_custom, const basis_atoms_t& basis_set_custom_aux,
                       const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
+                      const std::vector<double> &coords_angstrom);                      
 
             bool getUseRI() const;
 

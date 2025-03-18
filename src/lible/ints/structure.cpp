@@ -129,6 +129,31 @@ LI::Structure::Structure(const basis_atoms_t &basis_set_custom, const vector<int
     constructShells(basis_set_custom, max_l, dim_ao, dim_ao_cart, shells);
 }
 
+LI::Structure::Structure(const string &basis_set, const basis_atoms_t &basis_set_custom_aux,
+                         const vector<int> &atomic_nrs,
+                         const vector<double> &coords_angstrom)
+    : Structure(basis_set, atomic_nrs, coords_angstrom)
+{
+    this->basis_set_aux = "custom";
+    use_ri = true;
+
+    constructShells(basis_set_custom_aux, max_l_aux, dim_ao_aux, dim_ao_cart_aux, shells_aux);
+}
+
+LI::Structure::Structure(const basis_atoms_t &basis_set_custom, const string &basis_set_aux,
+                         const vector<int> &atomic_nrs,
+                         const vector<double> &coords_angstrom)
+    : Structure(basis_set_custom, atomic_nrs, coords_angstrom)
+{
+    this->basis_set_aux = basis_set_aux;
+    use_ri = true;
+
+    std::set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
+    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, basis_set_aux);
+
+    constructShells(basis_atoms_aux, max_l_aux, dim_ao_aux, dim_ao_cart_aux, shells_aux);    
+}
+
 LI::Structure::Structure(const basis_atoms_t &basis_set_custom,
                          const basis_atoms_t &basis_set_custom_aux,
                          const vector<int> &atomic_nrs,
@@ -138,7 +163,7 @@ LI::Structure::Structure(const basis_atoms_t &basis_set_custom,
     this->basis_set_aux = "custom";
     use_ri = true;
 
-    constructShells(basis_set_custom_aux, max_l, dim_ao, dim_ao_cart, shells);
+    constructShells(basis_set_custom_aux, max_l_aux, dim_ao_aux, dim_ao_cart_aux, shells_aux);
 }
 
 bool LI::Structure::getUseRI() const 
