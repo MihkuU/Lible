@@ -16,37 +16,12 @@ using std::vector;
 
 #ifdef _LIBLE_USE_MPI_
 
-/*
- * Some code adopted from https://rabauke.github.io/mpl/html/examples/stl_container.html.
- * Later put them in some utils file?
- */
-
-// send an STL container
-// template <typename T>
-// void LB::isend(const int &rank, const mpl::communicator &comm, const T &x)
-// {
-//     mpl::irequest r{comm.isend(x, rank)};
-//     r.wait();
-// }
-
-// // receive an STL container
-// template <typename T>
-// T LB::irecv(const int &rank, const mpl::communicator &comm)
-// {
-//     using value_type = mpl::detail::remove_const_from_members_t<typename T::value_type>;
-//     T x;
-//     mpl::irequest r{comm.irecv(x, 0)};
-//     mpl::status_t s{r.wait()};
-//     return x;
-// }
-
-/*
- *
- */
+// Some code adopted from https://rabauke.github.io/mpl/html/examples/stl_container.html.
+// Later put them in some utils file?
 
 static pair<string, string> splitStrByLast(const string &str, const char &delimiter)
 {
-    size_t pos_last;
+    size_t pos_last{};
     for (size_t i = 0; i < str.size(); i++)
         if (str[i] == delimiter)
             pos_last = i;
@@ -109,10 +84,6 @@ mpl::communicator LB::returnNodesComm()
     int rank = comm_world.rank();
 
     vector<int> node_ranks = returnNodeRanks();
-
-    bool is_node_rank = (std::find(node_ranks.begin(), node_ranks.end(), rank) != node_ranks.end())
-                            ? true
-                            : false;
 
     mpl::ranks node_ranks_mpl(node_ranks.size());
     for (size_t i = 0; i < node_ranks.size(); i++)

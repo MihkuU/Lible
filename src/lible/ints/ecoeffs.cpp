@@ -42,7 +42,7 @@ LI::ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
 vector<vector<double>>
 LI::ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas)
 {
-    if ((l_max_aux + 1) != sh_datas.size())
+    if (size_t(l_max_aux + 1) != sh_datas.size())
         throw std::runtime_error("The size of sh_datas doesn't match (l_max_aux + 1)\n");
 
     vector<vector<double>> ecoeffs_aux(sh_datas.size());
@@ -62,7 +62,7 @@ LI::ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &
 pair<vector<vector<double>>, vector<vector<double>>>
 LI::ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const vector<ShellData> &sh_datas)
 {
-    if ((l_max_aux + 1) != sh_datas.size())
+    if (size_t(l_max_aux + 1) != (size_t)sh_datas.size())
         throw std::runtime_error("The size of sh_datas doesn't match (l_max_aux + 1)\n");
 
     vector<vector<double>> ecoeffs(sh_datas.size());

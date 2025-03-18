@@ -45,8 +45,7 @@ namespace lible
         template <typename T>
         static T irecv(const int &rank, const mpl::communicator &comm)
         {
-            using value_type = mpl::detail::remove_const_from_members_t<typename T::value_type>;
-            T x;
+=            T x;
             mpl::irequest r{comm.irecv(x, 0)};
             mpl::status_t s{r.wait()};
             return x;

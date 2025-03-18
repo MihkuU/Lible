@@ -26,23 +26,6 @@ namespace lible
                 overlap
             };
 
-            static std::string returnPreamble(const Option &opt)
-            {
-                switch (opt)
-                {
-                case Option::dipole_moment:
-                    return "Dipole moment integrals...";
-                case Option::kinetic_energy:
-                    return "Kinetic energy integrals...";
-                case Option::nuclear_attraction:
-                    return "Nuclear attraction integrals...";
-                case Option::overlap:
-                    return "Overlap integrals...";
-                default:
-                    throw std::runtime_error("Inappropriate one-electron integral option.\n");
-                }
-            }
-
             template <Option opt>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
                         vec2d &ints_out);
