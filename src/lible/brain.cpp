@@ -81,8 +81,6 @@ vector<int> LB::returnNodeRanks()
 
 mpl::communicator LB::returnNodesComm()
 {
-    int rank = comm_world.rank();
-
     vector<int> node_ranks = returnNodeRanks();
 
     mpl::ranks node_ranks_mpl(node_ranks.size());

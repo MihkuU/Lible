@@ -45,7 +45,7 @@ namespace lible
         template <typename T>
         static T irecv(const int &rank, const mpl::communicator &comm)
         {
-=            T x;
+            T x;
             mpl::irequest r{comm.irecv(x, 0)};
             mpl::status_t s{r.wait()};
             return x;
