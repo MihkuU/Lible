@@ -7,8 +7,6 @@
 
 #include <map>
 
-#include <fmt/core.h>
-
 #ifdef _LIBLE_USE_MKL_
 #include <mkl_cblas.h>
 #else
@@ -370,7 +368,7 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
 
 void LIT::calcERI4Benchmark(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}\n", "ERI4 (Shark flat) benchmark..."));
+    palPrint(std::format("Lible::{:<40}\n", "ERI4 (Shark flat) benchmark..."));
 
     auto start{std::chrono::steady_clock::now()};
 
@@ -446,18 +444,18 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             auto end{std::chrono::steady_clock::now()};
             std::chrono::duration<double> duration{end - start};
 
-            palPrint(fmt::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
+            palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
                                  n_shells_abcd, duration.count()));
         }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    palPrint(std::format("done {:.2e} s\n", duration.count()));
 }
 
 void LIT::calcERI4BenchmarkNew(const Structure &structure)
 {
-    palPrint(fmt::format("Lible::{:<40}\n", "ERI4 (Shark flat new) benchmark..."));
+    palPrint(std::format("Lible::{:<40}\n", "ERI4 (Shark flat new) benchmark..."));
 
     auto start{std::chrono::steady_clock::now()};
 
@@ -526,13 +524,13 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
             auto end{std::chrono::steady_clock::now()};
             std::chrono::duration<double> duration{end - start};
 
-            palPrint(fmt::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
+            palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
                                  n_shells_abcd, duration.count()));
         }
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
-    palPrint(fmt::format("done {:.2e} s\n", duration.count()));
+    palPrint(std::format("done {:.2e} s\n", duration.count()));
 }
 
 lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)

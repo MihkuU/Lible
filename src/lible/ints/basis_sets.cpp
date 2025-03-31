@@ -2,13 +2,13 @@
 #include <lible/ints/defs.hpp>
 #include <lible/ints/utils.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-
-#include <fmt/core.h>
 
 namespace FS = std::filesystem;
 namespace LI = lible::ints;
@@ -33,13 +33,13 @@ namespace lible::ints
         vector<string> lines;
         while (std::getline(basis_file, line))
         {
-            if (line == fmt::format("end={}", atomic_nr))
+            if (line == std::format("end={}", atomic_nr))
                 break;
 
             if (read_lines)
                 lines.push_back(line);
 
-            if (line == fmt::format("element={}", atomic_nr))
+            if (line == std::format("element={}", atomic_nr))
             {
                 read_lines = true;
                 basis_found = true;
@@ -48,7 +48,7 @@ namespace lible::ints
 
         if (!basis_found)
         {
-            string msg = fmt::format("Basis set {} not found for element {}!",
+            string msg = std::format("Basis set {} not found for element {}!",
                                      basis_set, atomic_symbols.at(atomic_nr));
             throw std::runtime_error(msg);
         }
@@ -146,7 +146,7 @@ string LI::returnAuxBasisPath(const string &aux_basis_set)
             return basis_path;
     }
 
-    string message = fmt::format("The requested basis set {} could not be found!", aux_basis_set);
+    string message = std::format("The requested basis set {} could not be found!", aux_basis_set);
     throw std::runtime_error(message);
 }
 
@@ -169,6 +169,6 @@ string LI::returnBasisPath(const string &basis_set)
             return basis_path;
     }
 
-    string message = fmt::format("The requested basis set {} could not be found!", basis_set);
+    string message = std::format("The requested basis set {} could not be found!", basis_set);
     throw std::runtime_error(message);
 }

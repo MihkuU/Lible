@@ -3,8 +3,6 @@
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
 
-#include <fmt/core.h>
-
 #ifdef _LIBLE_USE_MKL_
 #include <mkl_cblas.h>
 #else

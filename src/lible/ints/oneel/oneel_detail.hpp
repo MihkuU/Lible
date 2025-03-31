@@ -9,7 +9,6 @@
 #include <string>
 
 #include <armadillo>
-#include <fmt/core.h>
 
 namespace lible
 {

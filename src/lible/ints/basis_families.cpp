@@ -1,11 +1,10 @@
 #include <lible/ints/basis_sets.hpp>
 
 #include <algorithm>
+#include <format>
 #include <set>
 #include <stdexcept>
 #include <unordered_map>
-
-#include <fmt/core.h>
 
 namespace LI = lible::ints;
 
@@ -200,7 +199,7 @@ string LI::returnAuxBasisFamilyString(const string &aux_basis_set)
                    { return std::tolower(c); });
 
     if (aux_basis_families.find(basis_set_lc) == aux_basis_families.end())
-        throw std::runtime_error(fmt::format("The requested auxiliary basis set {} could not be found!",
+        throw std::runtime_error(std::format("The requested auxiliary basis set {} could not be found!",
                                              aux_basis_set));
     else
     {
@@ -222,7 +221,7 @@ string LI::returnBasisFamilyString(const string &basis_set)
                    { return std::tolower(c); });
 
     if (basis_families.find(basis_set_lc) == basis_families.end())
-        throw std::runtime_error(fmt::format("The requested basis set {} could not be found!",
+        throw std::runtime_error(std::format("The requested basis set {} could not be found!",
                                              basis_set));
     else
     {

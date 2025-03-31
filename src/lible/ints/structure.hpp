@@ -79,6 +79,8 @@ namespace lible
                       const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);                      
 
+            // Some getters
+            
             bool getUseRI() const;
 
             int getMaxL() const;
@@ -108,59 +110,29 @@ namespace lible
             std::map<int, std::vector<Shell>> getShellsAux() const;
 
         private:
-            /** Flag for using the RI-approximation. */
-            bool use_ri{false};
+            bool use_ri{false};                    /** Flag for using the RI-approximation. */
+            bool prescreen_built{false};           // TODO: remove
+            bool prescreen_built_ri{false}; /** */ // TODO: remove
 
-            /** */
-            bool prescreen_built{false};
+            int max_l{};     /** Highest angular momentum among the shells of atomic orbitals. */
+            int max_l_aux{}; /** Highest angular momentum among the shells of auxiliary atomic orbitals. */
 
-            /** */
-            bool prescreen_built_ri{false};
+            size_t dim_ao{};          /** Number of atomic orbitals. */
+            size_t dim_ao_aux{};      /** Number of auxiliary atomic orbitals. */
+            size_t dim_ao_cart{};     /** Number of atomic orbitals in Cartesian Gaussian basis. */
+            size_t dim_ao_cart_aux{}; /** Number of auxiliary atomic orbitals in Cartesian Gaussian basis. */
+            size_t n_atoms{};         /** Number of atoms in the structure. */
 
-            /** Highest angular momentum among the shells of atomic orbitals. */
-            int max_l{};
+            std::string basis_set;     /** Name of the main basis set. */
+            std::string basis_set_aux; /** Name of the auxiliary basis set. */
 
-            /** Highest angular momentum among the shells of auxiliary atomic orbitals. */
-            int max_l_aux{};
+            std::vector<double> coords;                    /** Rolled out coordinates of atoms.*/
+            std::vector<int> atomic_nrs;                   /** Atomic numbers. */
+            std::vector<std::array<double, 3>> coords_xyz; /** Coordinates of the atoms. */
+            std::vector<std::string> elements;             /** Symbols of the atoms. */
 
-            /** Number of atomic orbitals. */
-            size_t dim_ao{};
-
-            /** Number of auxiliary atomic orbitals. */
-            size_t dim_ao_aux{};
-
-            /** Number of atomic orbitals in Cartesian Gaussian basis. */
-            size_t dim_ao_cart{};
-
-            /** Number of auxiliary atomic orbitals in Cartesian Gaussian basis. */
-            size_t dim_ao_cart_aux{};
-
-            /** Number of atoms in the structure. */
-            size_t n_atoms{};
-
-            /** Name of the main basis set. */
-            std::string basis_set;
-
-            /** Name of the auxiliary basis set. */
-            std::string basis_set_aux;            
-
-            /** Rolled out coordinates of atoms.*/
-            std::vector<double> coords;
-
-            /** Atomic numbers. */
-            std::vector<int> atomic_nrs;
-
-            /** Coordinates of the atoms. */
-            std::vector<std::array<double, 3>> coords_xyz;
-
-            /** Symbols of the atoms. */
-            std::vector<std::string> elements;
-
-            /** Shells corresponding to the main basis set for each atomic number. */
-            std::map<int, std::vector<Shell>> shells;
-
-            /** Shells corresponding to the auxiliary basis set for each atomic number. */
-            std::map<int, std::vector<Shell>> shells_aux;
+            std::map<int, std::vector<Shell>> shells;     /** Shells corresponding to the main basis set for each atomic number. */
+            std::map<int, std::vector<Shell>> shells_aux; /** Shells corresponding to the auxiliary basis set for each atomic number. */
 
             /**
              * Constructs the shells for the given basis. Used for both the main and auxiliary

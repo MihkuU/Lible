@@ -13,8 +13,6 @@
 #include <map>
 #include <set>
 
-#include <fmt/core.h>
-
 namespace LI = lible::ints;
 
 using std::array, std::string, std::vector;

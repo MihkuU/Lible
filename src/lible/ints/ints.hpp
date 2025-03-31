@@ -30,7 +30,7 @@ namespace lible
          */
         std::vector<double> eri2Diagonal(const Structure &structure);
 
-        /**
+        /**<
          * \ingroup ints
          * Calculates the overlap integral matrix.
          */
@@ -214,27 +214,27 @@ namespace lible
         kernel_eri2_t deployERI2Kernel(const int la, const int lb);
 
         /**
-         * \ingroup ints         
+         * \ingroup ints
          * Constructs the shell data corresponding to the auxilary basis set.
          */
         ShellData constructShellDataAux(const int l, const Structure &structure);
 
         /**
-         * \ingroup ints         
-         *  Constructs the shell pair data corresponding to the main basis set.
+         * \ingroup ints
+         * Constructs the shell pair data corresponding to the main basis set.
          */
         ShellPairData constructShellPairData(const int la, const int lb,
                                              const Structure &structure);
 
         /**
-         * \ingroup ints         
+         * \ingroup ints
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
          */
         std::vector<ShellData>
         constructShellDatasAux(const int l_max, const Structure &structure);
 
         /**
-         * \ingroup ints         
+         * \ingroup ints
          * Constructs the shell pair datas for the given l-pairs.
          */
         std::vector<ShellPairData>
@@ -291,7 +291,7 @@ namespace lible
          * \ingroup ints
          * Returns a list of angular momentum pairs {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
          */
-        std::vector<std::pair<int, int>> returnLPairs(const int l_max);        
+        std::vector<std::pair<int, int>> returnLPairs(const int l_max);
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

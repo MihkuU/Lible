@@ -76,6 +76,7 @@ namespace lible
          */
         void ecoeffsSPsSpherical(const int la, const int lb, const ShellPairData &sp_data,
                                  std::vector<double> &ecoeffs_out);
+                                 
         /**
          * Calculates the Cartesian-to-spherical-transformed Hermite expansion coefficients for
          * given shell pairs. Calculates also the transposed coefficients.

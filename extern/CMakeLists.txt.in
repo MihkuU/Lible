@@ -13,23 +13,11 @@ ExternalProject_Add(arma
 	SOURCE_DIR 		           "${arma_dir}"
     CONFIGURE_COMMAND 
 		${CMAKE_COMMAND} -E env "${arma_dir}/configure" "${arma_dir}/"
+		-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	BUILD_COMMAND     
 		${CMAKE_COMMAND} ${arma_dir} . -DCMAKE_INSTALL_PREFIX:PATH=${arma_dir}/build -DBUILD_SHARED_LIBS=OFF
     TEST_COMMAND      ""
 	BUILD_ALWAYS	  		   OFF
-	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
-)
-
-# fmt library
-set(fmt_dir "@CMAKE_CURRENT_BINARY_DIR@/fmt")
-ExternalProject_Add(fmt
-	URL 			           "@CMAKE_CURRENT_SOURCE_DIR@/fmt-master.zip"
-	SOURCE_DIR                 "${fmt_dir}"
-	CONFIGURE_COMMAND          ""
-	BUILD_COMMAND 	           ""
-	INSTALL_COMMAND            ""
-	TEST_COMMAND               ""
-    BUILD_ALWAYS               OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 )
 
@@ -41,6 +29,7 @@ if(@LIBLE_USE_MPI@)
     	SOURCE_DIR                 "${mpl_dir}"
 	    CONFIGURE_COMMAND          
 			${CMAKE_COMMAND} -S "${mpl_dir}" -B "${mpl_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${mpl_dir}/build
+			-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	    BUILD_COMMAND              "" 
 	    INSTALL_COMMAND            
 			${CMAKE_COMMAND} --install "${mpl_dir}/build"

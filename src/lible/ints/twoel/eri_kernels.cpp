@@ -6,8 +6,6 @@
 #include <map>
 #include <tuple>
 
-#include <fmt/core.h>
-
 #ifdef _LIBLE_USE_MKL_
 #include <mkl_cblas.h>
 #else
