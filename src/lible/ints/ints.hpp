@@ -5,6 +5,7 @@
 #include <lible/ints/structure.hpp>
 #include <lible/ints/utils.hpp>
 
+#include <array>
 #include <cassert>
 #include <functional>
 #include <map>

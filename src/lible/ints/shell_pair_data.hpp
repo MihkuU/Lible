@@ -108,7 +108,11 @@ namespace lible
         /**
          * \ingroup spdata
          *
-         *  Constructs the shell pair data corresponding to the main basis set.
+         * Constructs the shell pair data corresponding to the main basis set. It is assumed 
+         * that the integrals involving shells A and B are symmetric w.r.t. interchanging A and B. 
+         * If la != lb, shell pair data is created for pairs (ishellA, ishellB) and not 
+         * (ishellB, ishellA). When la == lb, the data is create for (ishellA, ishellA') pairs 
+         * such that ishellA >= ishellA'.
          */
         ShellPairData constructShellPairData(const int la, const int lb,
                                              const Structure &structure);

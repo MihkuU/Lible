@@ -25,10 +25,17 @@ namespace lible
                 overlap
             };
 
+            /** */
             template <Option opt>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
                         vec2d &ints_out);
 
+            /** */
+            template <Option opt>
+            void kernel(const int la, const int lb, const ShellPairData &sp_data,
+                        std::array<vec2d, 3> &ints_out);                        
+
+            /** For various one-electron integrals. */
             template <Option opt>
             vec2d calculate(const Structure &structure)
             {                
@@ -51,6 +58,34 @@ namespace lible
                         kernel<opt>(la, lb, sp_data, ints);
                     }
                 
+                return ints;
+            }
+
+            /** For dipole mom, linear mom and angmom. */
+            template <Option opt>
+            std::array<vec2d, 3> calculate3D(const Structure &structure)
+            {
+                int l_max = structure.getMaxL();
+                size_t dim_ao = structure.getDimAO();
+
+                std::array<vec2d, 3> ints{vec2d(dim_ao, dim_ao, 0),
+                                          vec2d(dim_ao, dim_ao, 0),
+                                          vec2d(dim_ao, dim_ao, 0)};
+                for (int la = l_max; la >= 0; la--)
+                {
+                    ShellPairData sp_data = constructShellPairData(la, la, structure);
+
+                    kernel<opt>(la, la, sp_data, ints);
+                }
+
+                for (int la = l_max; la >= 0; la--)
+                    for (int lb = la - 1; lb >= 0; lb--)
+                    {
+                        ShellPairData sp_data = constructShellPairData(la, lb, structure);
+
+                        kernel<opt>(la, lb, sp_data, ints);
+                    }
+
                 return ints;
             }
         }
