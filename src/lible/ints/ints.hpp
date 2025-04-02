@@ -53,7 +53,8 @@ namespace lible
          * \ingroup ints
          * Calculates the dipole moment integral matrices for the \f$x,y,z\f$-directions.
          */
-        std::array<vec2d, 3> dipoleMoment(const Structure &structure);
+        std::array<vec2d, 3> dipoleMoment(const std::array<double, 3> &origin,
+                                          const Structure &structure);
 
         /**
          * \ingroup ints
@@ -264,7 +265,7 @@ namespace lible
         /**
          * \ingroup ints
          * Calculates the Hermite expansion coefficients for the given l value. It is assumed
-         * that the shell datas are ordered as 0,...,l_max_aux. The function assume shell data
+         * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
          * for the auxiliary basis set. The E-coefficients in the ket are transposed.
          */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>

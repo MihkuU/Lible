@@ -77,25 +77,25 @@ namespace lible
             {
             }
 
-            int la; /** Angular momentum of the left shell. */
-            int lb; /** Angular momentum of the right shell. */
-            int n_atoms;
-            int n_pairs; /** Total number of atoms in the system. */
-            int n_prim_pairs;
+            int la;           /** Angular momentum of the left shell. */
+            int lb;           /** Angular momentum of the right shell. */
+            int n_atoms;      /** Total numer of atoms in the system. */
+            int n_pairs;      /** Total number of shell pairs. */
+            int n_prim_pairs; /** Total number of Gaussian primitive pairs. */
 
             std::vector<double> atomic_coords; /** Coordinates of each atom in the structure. */
-            std::vector<double> coeffs;
-            std::vector<double> coords; /** Coordinates of shells in the shell pairs. */
-            std::vector<double> exps;
-            std::vector<double> norms;
+            std::vector<double> coeffs;        /** Contraction coefficients including the primitive norms. */
+            std::vector<double> coords;        /** Coordinates of shells in the shell pairs. */
+            std::vector<double> exps;          /** Exponents of the Gaussian primitives. */
+            std::vector<double> norms;         /** Normalization consts of the atomic orbitals in spherical basis. */
 
-            std::vector<int> atomic_nrs; /** Atomic numbers of all the atoms in the system. */
-            std::vector<int> cdepths;
-            std::vector<int> coffsets;
-            std::vector<int> offsets_cart;
-            std::vector<int> offsets_ecoeffs;
-            std::vector<int> offsets_norms;
-            std::vector<int> offsets_sph;
+            std::vector<int> atomic_nrs;      /** Atomic numbers of all the atoms in the system. */
+            std::vector<int> cdepths;         /** Contraction depths corresponding to each shell in a shell pair. */
+            std::vector<int> coffsets;        /** Offsets of the contraction data (coeffs and exps) for each shell in a shell pair.*/
+            std::vector<int> offsets_cart;    /** Offsets of the atomic orbital (cartesian) positions in the list of all atomic orbitals. */
+            std::vector<int> offsets_ecoeffs; /** Offsets of the spherical Hermite expansion coefficients. */
+            std::vector<int> offsets_norms;   /** Offsets of the shell atomic orbital norms. */
+            std::vector<int> offsets_sph;     /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */
         };
 
         /**

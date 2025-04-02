@@ -31,14 +31,14 @@ namespace lible
                         vec2d &ints_out);
 
             /** */
-            template <Option opt>
+            template <Option opt, typename... Args>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
-                        std::array<vec2d, 3> &ints_out);                        
+                        std::array<vec2d, 3> &ints_out, Args... args);
 
             /** For various one-electron integrals. */
             template <Option opt>
             vec2d calculate(const Structure &structure)
-            {                
+            {
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
 
@@ -57,13 +57,13 @@ namespace lible
 
                         kernel<opt>(la, lb, sp_data, ints);
                     }
-                
+
                 return ints;
             }
 
             /** For dipole mom, linear mom and angmom. */
-            template <Option opt>
-            std::array<vec2d, 3> calculate3D(const Structure &structure)
+            template <Option opt, typename... Args>
+            std::array<vec2d, 3> calculate3D(const Structure &structure, Args... args)
             {
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
@@ -75,7 +75,7 @@ namespace lible
                 {
                     ShellPairData sp_data = constructShellPairData(la, la, structure);
 
-                    kernel<opt>(la, la, sp_data, ints);
+                    kernel<opt, Args...>(la, la, sp_data, ints, args...);
                 }
 
                 for (int la = l_max; la >= 0; la--)
@@ -83,7 +83,7 @@ namespace lible
                     {
                         ShellPairData sp_data = constructShellPairData(la, lb, structure);
 
-                        kernel<opt>(la, lb, sp_data, ints);
+                        kernel<opt, Args...>(la, lb, sp_data, ints, args...);
                     }
 
                 return ints;

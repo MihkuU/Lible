@@ -23,8 +23,8 @@ void LIO::kernel<LIO::Option::kinetic_energy>(const int la, const int lb,
     int dim_a_cart = numCartesians(sp_data.la);
     int dim_b_cart = numCartesians(sp_data.lb);
 
-    auto cart_exps_a = cart_exps[la];
-    auto cart_exps_b = cart_exps[lb];
+    vector<CartExps> cart_exps_a = cart_exps[la];
+    vector<CartExps> cart_exps_b = cart_exps[lb];
 
     arma::dmat sph_trafo_bra = returnSphericalTrafo(sp_data.la);
     arma::dmat sph_trafo_ket = returnSphericalTrafo(sp_data.lb).t();

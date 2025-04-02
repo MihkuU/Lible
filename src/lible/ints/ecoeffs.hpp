@@ -56,6 +56,14 @@ namespace lible
                                  std::vector<std::vector<vec4d>> &ecoeffs_out);
 
         /**
+         * Calculates the Hermite expanesion coefficients { E(r, i, j, t) | r = x,y,z && t <= t_max}
+         * for each pair of Gaussian primitives for each shell pair.
+         */
+        void ecoeffsShellPairs4D(const int la, const int lb, const int t_max,
+                                 const ShellPairData &sp_data,
+                                 std::vector<std::vector<vec4d>> &ecoeffs_out);
+
+        /**
          * Calculates the Cartesian-to-spherical-transformed Hermite expansion coefficients for
          * given shells.
          */
