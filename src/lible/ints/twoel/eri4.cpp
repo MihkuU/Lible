@@ -232,8 +232,8 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(dim_ao, 0);
-    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
-        for (int lcld = 0; lcld <= lalb; lcld++)
+    for (size_t lalb = 0; lalb < l_pairs.size(); lalb++)
+        for (size_t lcld = 0; lcld <= lalb; lcld++)
         {
             const auto &sp_data_ab = sp_datas[lalb];
             const auto &sp_data_cd = sp_datas[lcld];

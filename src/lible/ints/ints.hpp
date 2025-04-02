@@ -291,7 +291,7 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Returns a list of angular momentum pairs {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
+         * Returns a list of angular momentum pairs such that la >= lb: {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
          */
         std::vector<std::pair<int, int>> returnLPairs(const int l_max);
 

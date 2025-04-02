@@ -30,7 +30,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
     size_t dim_ao = structure.getDimAO();
     size_t dim_ao_aux = structure.getDimAOAux();
     vec3d eri3(dim_ao, dim_ao, dim_ao_aux, 0);
-    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+    for (size_t lalb = 0; lalb < l_pairs.size(); lalb++)
         for (int lc = 0; lc <= l_max_aux; lc++)
         {
             const auto &sp_data_ab = sp_datas[lalb];
