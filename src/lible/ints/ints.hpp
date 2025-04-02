@@ -31,7 +31,7 @@ namespace lible
          */
         std::vector<double> eri2Diagonal(const Structure &structure);
 
-        /**<
+        /**
          * \ingroup ints
          * Calculates the overlap integral matrix.
          */
