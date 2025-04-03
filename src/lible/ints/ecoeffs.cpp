@@ -324,9 +324,9 @@ void LI::ecoeffsShellPairs4D(const int la, const int lb, const int t_max,
                              const ShellPairData &sp_data,
                              vector<vector<vec4d>> &ecoeffs_out)
 {
-    lible::vec3d Ex(la + 1, lb + 1, t_max + 1, 0);
-    lible::vec3d Ey(la + 1, lb + 1, t_max + 1, 0);
-    lible::vec3d Ez(la + 1, lb + 1, t_max + 1, 0);
+    lible::vec3d Ex(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ey(la + 1, lb + 1, la + lb + 1, 0);
+    lible::vec3d Ez(la + 1, lb + 1, la + lb + 1, 0);
 
     ecoeffs_out.resize(sp_data.n_pairs);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)

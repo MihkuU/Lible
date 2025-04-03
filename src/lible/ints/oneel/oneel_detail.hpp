@@ -71,6 +71,7 @@ namespace lible
                 std::array<vec2d, 3> ints{vec2d(dim_ao, dim_ao, 0),
                                           vec2d(dim_ao, dim_ao, 0),
                                           vec2d(dim_ao, dim_ao, 0)};
+
                 for (int la = l_max; la >= 0; la--)
                 {
                     ShellPairData sp_data = constructShellPairData(la, la, structure);
@@ -83,7 +84,7 @@ namespace lible
                     {
                         ShellPairData sp_data = constructShellPairData(la, lb, structure);
 
-                        kernel<opt, T>(la, la, sp_data, ints, arg);
+                        kernel<opt, T>(la, lb, sp_data, ints, arg);
                     }
 
                 return ints;

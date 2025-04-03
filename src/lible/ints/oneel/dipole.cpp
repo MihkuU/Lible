@@ -85,7 +85,7 @@ void LIO::kernel<LIO::Option::dipole_moment, array<double, 3>>(const int la, con
                                       Exyz[iab](2, k, k_, 0);
 
                         double valz = fac *
-                                      (Exyz[iab](0, i, i_, 0)) * Exyz[iab](1, j, j_, 1) *
+                                      (Exyz[iab](0, i, i_, 0)) * Exyz[iab](1, j, j_, 0) *
                                       (Exyz[iab](2, k, k_, 1) + xyz_po[2] * Exyz[iab](2, k, k_, 0));
 
                         ints_contracted[0](mu, nu) += valx;
