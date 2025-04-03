@@ -9,10 +9,10 @@ namespace LIO = lible::ints::one;
 using std::array, std::vector;
 
 template <>
-void LIO::kernel<LIO::Option::dipole_moment>(const int la, const int lb,
-                                             const ShellPairData &sp_data,
-                                             array<lible::vec2d, 3> &ints_out,
-                                             const array<double, 3> &origin)
+void LIO::kernel<LIO::Option::dipole_moment, array<double, 3>>(const int la, const int lb,
+                                                               const ShellPairData &sp_data,
+                                                               array<lible::vec2d, 3> &ints_out,
+                                                               const array<double, 3> &origin)
 {
     vector<vector<vec4d>> ecoeffs;
     ecoeffsShellPairs4D(la, lb, 1, sp_data, ecoeffs);
