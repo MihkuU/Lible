@@ -28,7 +28,7 @@ namespace lible
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
-                                                     const double *xyz_b, const double *Kab,
+                                                     const double *xyz_b, 
                                                      const std::array<lible::vec3d, 3> &ecoeffs);
 
         /** */
