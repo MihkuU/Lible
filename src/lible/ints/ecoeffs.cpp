@@ -133,6 +133,18 @@ array<lible::vec3d, 3> LI::ecoeffsPrimitivePair(const double a, const double b, 
     return {ecoeffs_x, ecoeffs_y, ecoeffs_z};
 }
 
+array<lible::vec3d, 3> LI::ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
+                                                   const int lb, const double *xyz_a,
+                                                   const double *xyz_b, const double *Kab,
+                                                   const array<lible::vec3d, 3> &ecoeffs)
+{
+    vec3d ecoeffs1_x = ecoeffsRecurrence2_n1(a, b, la, lb, xyz_a[0], xyz_b[0], ecoeffs[0]);
+    vec3d ecoeffs1_y = ecoeffsRecurrence2_n1(a, b, la, lb, xyz_a[1], xyz_b[1], ecoeffs[1]);
+    vec3d ecoeffs1_z = ecoeffsRecurrence2_n1(a, b, la, lb, xyz_a[2], xyz_b[2], ecoeffs[2]);
+
+    return {ecoeffs1_x, ecoeffs1_y, ecoeffs1_z};
+}
+
 array<lible::vec2d, 3> LI::ecoeffsPrimitive(const double a, const int l)
 {
     double one_o_2a = 1.0 / (2 * a);
