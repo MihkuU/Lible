@@ -14,8 +14,7 @@ template <>
 void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
                                        const ShellPairData &sp_data, vec2d &ints_out)
 {
-    vector<vector<vec3d>> ecoeffs;
-    ecoeffsShellPairs3D(la, lb, sp_data, ecoeffs);
+    vector<vector<vec3d>> ecoeffs = ecoeffsSPData_Eij0(la, lb, sp_data);
 
     int dim_a_cart = numCartesians(sp_data.la);
     int dim_b_cart = numCartesians(sp_data.lb);
@@ -37,7 +36,7 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
         int pos_a = sp_data.coffsets[2 * ipair + 0];
         int pos_b = sp_data.coffsets[2 * ipair + 1];
 
-        const vector<vec3d> &Exyz = ecoeffs[ipair];
+        const vector<vec3d> &ecoeffs_ipair = ecoeffs[ipair];
 
         for (int ia = 0, iab = 0; ia < dim_a; ia++)
             for (int ib = 0; ib < dim_b; ib++, iab++)
@@ -54,9 +53,9 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb,
                 for (const auto &[i, j, k, mu] : cart_exps_a)
                     for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                         ints_contracted(mu, nu) += fac *
-                                                   Exyz[iab](0, i, i_) *
-                                                   Exyz[iab](1, j, j_) *
-                                                   Exyz[iab](2, k, k_);
+                                                   ecoeffs_ipair[iab](0, i, i_) *
+                                                   ecoeffs_ipair[iab](1, j, j_) *
+                                                   ecoeffs_ipair[iab](2, k, k_);
             }
 
         ints_sph = sph_trafo_bra * ints_contracted * sph_trafo_ket;

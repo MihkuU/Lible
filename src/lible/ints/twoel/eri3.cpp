@@ -24,8 +24,8 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
     vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
-    vector<vector<double>> ecoeffs_aux = ecoeffsFromShellDatasAux(l_max_aux, sh_datas);
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
+    vector<vector<double>> ecoeffs_aux = ecoeffsSphericalShellDatas_Bra(l_max_aux, sh_datas);
+    vector<vector<double>> ecoeffs = ecoeffsSphericalSPDatas_Bra(l_pairs, sp_datas);
 
     size_t dim_ao = structure.getDimAO();
     size_t dim_ao_aux = structure.getDimAOAux();

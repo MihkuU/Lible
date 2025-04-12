@@ -20,8 +20,7 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
     vec4d rints_tmp(lab + 1, 0);
     vector<double> fnx(lab + 1, 0);
 
-    vector<vector<vec4d>> ecoeffs;
-    ecoeffsShellPairs4D(la, lb, sp_data, ecoeffs);
+    vector<vector<vec4d>> ecoeffs = ecoeffsSPData_Eijt(la, lb, sp_data);
 
     BoysF boys_f(lab);
 

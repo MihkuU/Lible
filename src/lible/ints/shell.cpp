@@ -15,8 +15,7 @@ vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
     int dim_cart = numCartesians(l);
     int dim_sph = numSphericals(l);
 
-    vector<vector<double>> e_coeffs;
-    ecoeffsShell(l, exps, e_coeffs);
+    vector<vector<double>> e_coeffs = ecoeffsShell(l, exps);
 
     arma::dmat ints_contracted(dim_cart, dim_cart, arma::fill::zeros);
 

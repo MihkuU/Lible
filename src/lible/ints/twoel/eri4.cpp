@@ -228,7 +228,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(dim_ao, 0);
@@ -304,7 +304,7 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(dim_ao, 0);
@@ -376,7 +376,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
         for (int lcld = 0; lcld <= lalb; lcld++)
@@ -463,7 +463,7 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
         for (int lcld = 0; lcld <= lalb; lcld++)
@@ -539,7 +539,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 
     vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromSPDatas(l_pairs, sp_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
     size_t dim_ao = structure.getDimAO();
     vec2d eri4_diagonal(dim_ao, dim_ao, 0);

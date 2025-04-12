@@ -78,7 +78,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
     int l_max_aux = structure.getMaxLAux();
     vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromShellDatasAuxPairs(l_max_aux, sh_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(l_max_aux, sh_datas);
 
     size_t dim_ao_aux = structure.getDimAOAux();
     vec2d eri2(dim_ao_aux, dim_ao_aux, 0);
@@ -129,7 +129,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
     int l_max_aux = structure.getMaxLAux();
     vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsFromShellDatasAuxPairs(l_max_aux, sh_datas);    
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(l_max_aux, sh_datas);
 
     size_t dim_ao_aux = structure.getDimAOAux();
     vector<double> eri2_diagonal(dim_ao_aux, 0);

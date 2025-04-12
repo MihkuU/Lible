@@ -33,7 +33,7 @@ namespace lible
             /** */
             template <Option opt, typename T>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
-                        std::array<vec2d, 3> &ints_out, const T& arg);
+                        const T& arg, std::array<vec2d, 3> &ints_out);
 
             /** For various one-electron integrals. */
             template <Option opt>
@@ -76,7 +76,7 @@ namespace lible
                 {
                     ShellPairData sp_data = constructShellPairData(la, la, structure);
 
-                    kernel<opt, T>(la, la, sp_data, ints, arg);
+                    kernel<opt, T>(la, la, sp_data, arg, ints);
                 }
 
                 for (int la = l_max; la >= 0; la--)
@@ -84,7 +84,7 @@ namespace lible
                     {
                         ShellPairData sp_data = constructShellPairData(la, lb, structure);
 
-                        kernel<opt, T>(la, lb, sp_data, ints, arg);
+                        kernel<opt, T>(la, lb, sp_data, arg, ints);
                     }
 
                 return ints;
