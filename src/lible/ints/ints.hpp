@@ -243,33 +243,114 @@ namespace lible
         constructShellPairDatas(const std::vector<std::pair<int, int>> &l_pairs,
                                 const Structure &structure);
 
-        /**
-         * \ingroup ints
-         * Calculates the Hermite expansion coefficients for the given l-pairs and shell-pair
-         * datas. The function assumes the given shell-pair datas correspond to the l-pairs.
-         * The E-coefficients in the ket are transposed.
-         */
-        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
-                           const std::vector<ShellPairData> &sp_datas);
+        /** */
+        vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
+                                 const double PA, const double PB, const double Kab);
+
+        /** */
+        vec3d ecoeffsRecurrence2_n1(const double a, const double b, const int la, const int lb,
+                                    const double A, const double B, const vec3d &ecoeffs);
+
+        /** */
+        vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
+
+        /** */
+        std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
+                                                  const int lb, const double *xyz_a,
+                                                  const double *xyz_b, const double *Kab);
+
+        /** */
+        std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
+
+        /** */
+        std::vector<lible::vec3d>
+        ecoeffsShellPair_Eij0(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                              const double *exps_a, const double *exps_b, const double *xyz_a,
+                              const double *xyz_b);
+
+        /** */
+        std::vector<lible::vec4d>
+        ecoeffsShellPair_Eijt(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                              const double *exps_a, const double *exps_b, const double *xyz_a,
+                              const double *xyz_b);
+
+        /** */
+        std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);
 
         /**
-         * \ingroup ints
-         * Calculates the Hermite expansion coefficients for the given l-value. It is assumed
-         * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
-         * for the auxiliary basis set.
+         * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
+         * pair of Gaussian primitives in each shell pair.
          */
+        std::vector<std::vector<vec3d>>
+        ecoeffsSPData_Eij0(const int la, const int lb, const ShellPairData &sp_data);
+
+        /**
+         * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
+         * pair of Gaussian primitives in each shell pair.
+         */
+        std::vector<std::vector<vec4d>>
+        ecoeffsSPData_Eijt(const int la, const int lb, const ShellPairData &sp_data);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
+        std::vector<double>
+        ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &sp_data);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
+        std::pair<std::vector<double>, std::vector<double>>
+        ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairData &sp_data);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
+        std::vector<double>
+        ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
+        std::pair<std::vector<double>, std::vector<double>>
+        ecoeffsSphericalShellData_BraKet(const int l, const ShellData &sh_data);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<std::vector<double>>
-        ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        ecoeffsSphericalSPDatas_Bra(const std::vector<std::pair<int, int>> &l_pairs,
+                                    const std::vector<ShellPairData> &sp_datas);
 
-        /**
-         * \ingroup ints
-         * Calculates the Hermite expansion coefficients for the given l value. It is assumed
-         * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
-         * for the auxiliary basis set. The E-coefficients in the ket are transposed.
-         */
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        ecoeffsSphericalSPDatas_BraKet(const std::vector<std::pair<int, int>> &l_pairs,
+                                       const std::vector<ShellPairData> &sp_datas);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
+        std::vector<std::vector<double>>
+        ecoeffsSphericalShellDatas_Bra(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
+        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        ecoeffsSphericalShellDatas_BraKet(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        // /**
+        //  * \ingroup ints
+        //  * Calculates the Hermite expansion coefficients for the given l-pairs and shell-pair
+        //  * datas. The function assumes the given shell-pair datas correspond to the l-pairs.
+        //  * The E-coefficients in the ket are transposed.
+        //  */
+        // std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        // ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
+        //                    const std::vector<ShellPairData> &sp_datas);
+
+        // /**
+        //  * \ingroup ints
+        //  * Calculates the Hermite expansion coefficients for the given l-value. It is assumed
+        //  * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
+        //  * for the auxiliary basis set.
+        //  */
+        // std::vector<std::vector<double>>
+        // ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+
+        // /**
+        //  * \ingroup ints
+        //  * Calculates the Hermite expansion coefficients for the given l value. It is assumed
+        //  * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
+        //  * for the auxiliary basis set. The E-coefficients in the ket are transposed.
+        //  */
+        // std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
+        // ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const std::vector<ShellData> &sh_datas);
 
         /**
          * \ingroup ints
