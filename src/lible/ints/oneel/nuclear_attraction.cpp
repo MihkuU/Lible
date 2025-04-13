@@ -15,14 +15,14 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
                                                   vec2d &ints_out)
 {
     int lab = la + lb;
-    vec3d rints(lab + 1, 0);
-    vec3d rints_sum(lab + 1, 0);
-    vec4d rints_tmp(lab + 1, 0);
-    vector<double> fnx(lab + 1, 0);
+    // vec3d rints(lab + 1, 0);
+    // vec3d rints_sum(lab + 1, 0);
+    // vec4d rints_tmp(lab + 1, 0);
+    // vector<double> fnx(lab + 1, 0);
 
     vector<vector<vec4d>> ecoeffs = ecoeffsSPData_Eijt(la, lb, sp_data);
 
-    BoysF boys_f(lab);
+    BoysGrid boys_grid(lab);
 
     int dim_a_cart = numCartesians(sp_data.la);
     int dim_b_cart = numCartesians(sp_data.lb);
@@ -64,7 +64,8 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
                                        (a * xyz_a[1] + b * xyz_b[1]) / p,
                                        (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-                rints_sum.set(0);
+                // rints_sum.set(0);
+                vec3d rints_sum(lab + 1, 0);
                 for (int iatom = 0; iatom < sp_data.n_atoms; iatom++)
                 {
                     const auto &coords = sp_data.atomic_coords;
@@ -79,9 +80,11 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
                     double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
                     double x = p * xyz_pc_dot;
 
-                    boys_f.calcFnx(lab, x, fnx);
+                    vector<double> fnx = calcBoysF(lab, x, boys_grid);
 
-                    calcRInts(la, lb, p, xyz_pc, fnx, rints_tmp, rints);
+                    vec3d rints = calcRInts(lab, p, &xyz_pc[0], &fnx[0]);
+
+                    // calcRInts_(la, lb, p, xyz_pc, fnx, rints_tmp, rints);
 
                     int Z = sp_data.atomic_nrs[iatom];
                     for (int t = 0; t <= lab; t++)

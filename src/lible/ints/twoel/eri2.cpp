@@ -46,8 +46,8 @@ namespace lible::ints::two
                 boys_f.calcFnx(laa, x, fnx);
 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-                calcRInts(la, la, fac, alpha, xyz_aa, fnx, idxs_tuv_a, idxs_tuv_a, rints_tmp,
-                          rints);
+                calcRInts_(la, la, fac, alpha, xyz_aa, fnx, idxs_tuv_a, idxs_tuv_a, rints_tmp,
+                           rints);
 
                 int pos_ecoeffs_b = sh_data_a.offsets_ecoeffs[ishell] + ib * dim_ecoeffs_a;
 

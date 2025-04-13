@@ -4,8 +4,6 @@
 #include <cmath>
 #include <vector>
 
-#include <stdio.h> // tmp
-
 namespace lible
 {
     namespace ints
@@ -19,13 +17,13 @@ namespace lible
             BoysF(const int max_n) : max_n(max_n + 6)
             {
                 n_intervals = large_x / interval_size + 1;
-                preEvaluate(fnx_grid);
+                fnx_grid = preEvaluate();
             }
 
             /**
              *
              */
-            void calcFnx(const int max_n, const double x, std::vector<double> &fnx) const;
+            void calcFnx(const int max_n, const double x, std::vector<double> &fnx) const; // TODO: make return
 
         private:
             int max_n;
@@ -37,8 +35,42 @@ namespace lible
 
             std::vector<double> fnx_grid;
 
-            void preEvaluate(std::vector<double> &fnx_grid);
+            std::vector<double> preEvaluate() const;
         };
+
+        /** */
+        class BoysGrid
+        {
+        public:
+            BoysGrid(const int max_n);
+
+            /** */
+            double getLargeX() const;
+
+            /** */
+            double getIntervalSize() const;
+
+            /** */
+            int getMaxN() const;
+
+            /** */
+            std::vector<double> getFnxGrid() const;
+
+        private:
+            double boys_f_threshold = 1e-16; /** */
+            double interval_size = 0.01;     /** */
+            double large_x = 30;             /** */
+
+            int max_n;       /** */
+            int n_intervals; /** */
+
+            std::vector<double> fnx_grid; /** */
+
+            /** */
+            std::vector<double> preEvaluate() const;
+        };
+
+        std::vector<double> calcBoysF(const int max_n, const double x, const BoysGrid &boys_grid);
 
         /**                  
          * The Boys function is represented as a 2D grid (matrix) that is rolled out as a vector. 
@@ -46,7 +78,8 @@ namespace lible
          * The rows correspond to different angular momentum plus the number of terms in the 
          * Taylor series (eq. (9.8.12) from HJO).        
          *          
-         * TODO: Figure out a better name.
+         * TODO: Figure out a better name. 
+         * TODO: Move this version of the function to a separate file.
          */
         template <const int l>
         class BoysF2

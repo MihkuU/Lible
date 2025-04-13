@@ -4,8 +4,63 @@ namespace LI = lible::ints;
 
 using std::array, std::vector;
 
-void LI::calcRInts(const int la, const int lb, const double p, const array<double, 3> &xyz_ab,
-                   const vector<double> &fnx, vec4d &rints_tmp, vec3d &rints_out)
+lible::vec3d LI::calcRInts(const int l, const double p, const double *xyz_ab, const double *fnx)
+{
+    vec4d rints_buff(l + 1, 0);
+
+    rints_buff(0, 0, 0, 0) = fnx[0];
+    
+    double x = -2 * p;
+    double y = x;
+    for (int n = 1; n <= l; n++)
+    {
+        rints_buff(n, 0, 0, 0) = fnx[n] * y;
+        y *= x;
+    }
+
+    // This clever loop is taken from HUMMR:
+    for (int n = l - 1; n >= 0; n--)
+    {
+        int n_ = l - n;
+        for (int t = 0; t <= n_; t++)
+            for (int u = 0; u <= n_ - t; u++)
+                for (int v = 0; v <= n_ - t - u; v++)
+                {
+                    if (t > 0)
+                    {
+                        rints_buff(n, t, u, v) = xyz_ab[0] * rints_buff(n + 1, t - 1, u, v);
+                        if (t > 1)
+                            rints_buff(n, t, u, v) += (t - 1) * rints_buff(n + 1, t - 2, u, v);
+                    }
+                    else
+                    {
+                        if (u > 0)
+                        {
+                            rints_buff(n, t, u, v) = xyz_ab[1] * rints_buff(n + 1, t, u - 1, v);
+                            if (u > 1)
+                                rints_buff(n, t, u, v) += (u - 1) * rints_buff(n + 1, t, u - 2, v);
+                        }
+                        else if (v > 0)
+                        {
+                            rints_buff(n, t, u, v) = xyz_ab[2] * rints_buff(n + 1, t, u, v - 1);
+                            if (v > 1)
+                                rints_buff(n, t, u, v) += (v - 1) * rints_buff(n + 1, t, u, v - 2);
+                        }
+                    }
+                }
+    }
+
+    vec3d rints(l + 1, 0);
+    for (int t = 0; t <= l; t++)
+        for (int u = 0; u <= l - t; u++)
+            for (int v = 0; v <= l - t - u; v++)
+                rints(t, u, v) = rints_buff(0, t, u, v);
+
+    return rints;
+}
+
+void LI::calcRInts_(const int la, const int lb, const double p, const array<double, 3> &xyz_ab,
+                    const vector<double> &fnx, vec4d &rints_tmp, vec3d &rints_out)
 {
     rints_tmp.set(0);
     rints_out.set(0);
@@ -59,11 +114,11 @@ void LI::calcRInts(const int la, const int lb, const double p, const array<doubl
                 rints_out(t, u, v) = rints_tmp(0, t, u, v);
 }
 
-void LI::calcRInts(const int la, const int lb, const double fac, const double alpha,
-                   const array<double, 3> &xyz_pq, const vector<double> &fnx,
-                   const vector<array<int, 3>> &tuv_idxs_a,
-                   const vector<array<int, 3>> &tuv_idxs_b,
-                   vec4d &rints_tmp, vector<double> &rints_out)
+void LI::calcRInts_(const int la, const int lb, const double fac, const double alpha,
+                    const array<double, 3> &xyz_pq, const vector<double> &fnx,
+                    const vector<array<int, 3>> &tuv_idxs_a,
+                    const vector<array<int, 3>> &tuv_idxs_b,
+                    vec4d &rints_tmp, vector<double> &rints_out)
 {
     rints_tmp.set(0);
     std::fill(rints_out.begin(), rints_out.end(), 0);

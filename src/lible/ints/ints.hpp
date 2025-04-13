@@ -330,33 +330,15 @@ namespace lible
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
         ecoeffsSphericalShellDatas_BraKet(const int l_max_aux, const std::vector<ShellData> &sh_datas);
-        // /**
-        //  * \ingroup ints
-        //  * Calculates the Hermite expansion coefficients for the given l-pairs and shell-pair
-        //  * datas. The function assumes the given shell-pair datas correspond to the l-pairs.
-        //  * The E-coefficients in the ket are transposed.
-        //  */
-        // std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        // ecoeffsFromSPDatas(const std::vector<std::pair<int, int>> &l_pairs,
-        //                    const std::vector<ShellPairData> &sp_datas);
 
-        // /**
-        //  * \ingroup ints
-        //  * Calculates the Hermite expansion coefficients for the given l-value. It is assumed
-        //  * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
-        //  * for the auxiliary basis set.
-        //  */
-        // std::vector<std::vector<double>>
-        // ecoeffsFromShellDatasAux(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        /** TODO: */
+        class BoysGrid;
 
-        // /**
-        //  * \ingroup ints
-        //  * Calculates the Hermite expansion coefficients for the given l value. It is assumed
-        //  * that the shell datas are ordered as 0,...,l_max_aux. The function assumes shell data
-        //  * for the auxiliary basis set. The E-coefficients in the ket are transposed.
-        //  */
-        // std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        // ecoeffsFromShellDatasAuxPairs(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        /** TODO: */
+        std::vector<double> calcBoysF(const int max_n, const double x, const BoysGrid &boys_grid);
+
+        /** TODO: */
+        vec3d calcRInts(const int l, const double p, const double *xyz_ab, const double *fnx);
 
         /**
          * \ingroup ints

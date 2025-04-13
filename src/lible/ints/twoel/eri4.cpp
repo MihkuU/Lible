@@ -100,8 +100,8 @@ namespace lible::ints::two
                         boys_f.calcFnx(labcd, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                        calcRInts(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,
-                                  rints_tmp, rints);
+                        calcRInts_(lab, lcd, fac, alpha, xyz_pq, fnx, idxs_tuv_ab, idxs_tuv_cd,
+                                   rints_tmp, rints);
 
                         int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] +
                                              icd * dim_ecoeffs_cd;
@@ -193,7 +193,7 @@ namespace lible::ints::two
                         boys_f.calcFnx(labab, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                        calcRInts(lab, lab, fac, alpha, xyz_pq, fnx, idxs_tuv, idxs_tuv, rints_tmp, rints);
+                        calcRInts_(lab, lab, fac, alpha, xyz_pq, fnx, idxs_tuv, idxs_tuv, rints_tmp, rints);
 
                         int pos_ecoeffs_cd = sp_data_ab.offsets_ecoeffs[ipair_ab] +
                                              icd * dim_ecoeffs_ab;
@@ -312,7 +312,7 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
         for (int lcld = 0; lcld <= lalb; lcld++)
         {
             auto [la, lb] = l_pairs[lalb];
-            auto [lc, ld] = l_pairs[lcld];    
+            auto [lc, ld] = l_pairs[lcld];
 
             int n_sph_a = numSphericals(la);
             int n_sph_b = numSphericals(lb);
