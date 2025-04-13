@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lible/types.hpp>
+#include <lible/ints/boys_function.hpp>
 #include <lible/ints/shell_pair_data.hpp>
 #include <lible/ints/structure.hpp>
 #include <lible/ints/utils.hpp>
