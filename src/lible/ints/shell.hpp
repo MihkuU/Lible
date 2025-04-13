@@ -26,23 +26,25 @@ namespace lible
         struct Shell
         {
             /** The constructor. */
-            Shell(const int l, const int z, const size_t dim_cart, const size_t dim_sph,
-                  const size_t pos, const size_t pos_cart, const std::array<double, 3> &xyz_coords,
-                  const std::vector<double> &coeffs, const std::vector<double> &coeffs_raw,
-                  const std::vector<double> &exps, const std::vector<double> &norms)
-                : l(l), z(z), dim_cart(dim_cart), dim_sph(dim_sph), pos(pos), pos_cart(pos_cart),
-                  xyz_coords(xyz_coords), coeffs(coeffs), coeffs_raw(coeffs_raw), exps(exps),
-                  norms(norms)
+            Shell(const int l, const int z, const int atom_idx, const int dim_cart,
+                  const int dim_sph, const int pos, const int pos_cart,
+                  const std::array<double, 3> &xyz_coords, const std::vector<double> &coeffs,
+                  const std::vector<double> &coeffs_raw, const std::vector<double> &exps,
+                  const std::vector<double> &norms)
+                : l(l), z(z), atom_idx(atom_idx), dim_cart(dim_cart), dim_sph(dim_sph), pos(pos),
+                  pos_cart(pos_cart), xyz_coords(xyz_coords), coeffs(coeffs), 
+                  coeffs_raw(coeffs_raw), exps(exps), norms(norms)
             {
             }
 
             int l; /** Angular momentum. */
             int z; /** Atomic number. */
 
-            size_t dim_cart; /** Number of atomic orbitals in Cartesian basis. */
-            size_t dim_sph;  /** Number of atomic orbitals in spherical basis. */
-            size_t pos;      /** Starting position in the list of atomic orbitals. */
-            size_t pos_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */
+            int atom_idx; /** Index of the shell atom in the list of all atoms. */
+            int dim_cart; /** Number of atomic orbitals in Cartesian basis. */
+            int dim_sph;  /** Number of atomic orbitals in spherical basis. */
+            int pos;      /** Starting position in the list of atomic orbitals. */
+            int pos_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */            
 
             std::array<double, 3> xyz_coords; /** Coordinates of the atom corresponding to the shell. */
 

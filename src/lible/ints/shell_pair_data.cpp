@@ -123,6 +123,7 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
     vector<double> exps(n_coeffs);
     vector<double> norms(n_norms);
 
+    vector<int> atomic_idxs(2 * n_pairs);
     vector<int> cdepths(2 * n_pairs);
     vector<int> coffsets(2 * n_pairs);
 
@@ -198,11 +199,14 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
             norms[pos_norms] = norms_b[mu];
             pos_norms++;
         }
+
+        atomic_idxs[2 * ipair + 0] = shell_a.atom_idx;
+        atomic_idxs[2 * ipair + 1] = shell_b.atom_idx;
     }
 
     int n_atoms = structure.getNAtoms();
     vector<double> atomic_coords(3 * n_atoms);
-    vector<int> atomic_nrs(n_atoms);
+    vector<int> atomic_nrs(n_atoms);    
     for (int iatom = 0; iatom < n_atoms; iatom++)
     {
         auto [x, y, z] = structure.getCoordsAtom(iatom);
@@ -213,7 +217,7 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
     }
 
     ShellPairData sp_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords, coeffs, coords,
-                          exps, norms, atomic_nrs, cdepths, coffsets, offsets_cart,
+                          exps, norms, atomic_idxs, atomic_nrs, cdepths, coffsets, offsets_cart,
                           offsets_ecoeffs, offsets_norms, offsets_sph);
 
     return sp_data;

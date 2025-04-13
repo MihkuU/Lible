@@ -25,8 +25,8 @@ namespace lible
                       const std::vector<int> &cdepths, const std::vector<int> &coffsets,
                       const std::vector<int> &offsets_ecoeffs, const std::vector<int> &offsets_norms,
                       const std::vector<int> &offsets_sph)
-                : l(l), n_shells(n_shells), n_primitives(n_primitives),
-                  coeffs(coeffs), coords(coords), exps(exps), norms(norms), cdepths(cdepths),
+                : l(l), n_shells(n_shells), n_primitives(n_primitives), coeffs(coeffs), 
+                  coords(coords), exps(exps), norms(norms), cdepths(cdepths),
                   coffsets(coffsets), offsets_ecoeffs(offsets_ecoeffs),
                   offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
@@ -64,15 +64,15 @@ namespace lible
                           const int n_prim_pairs, const std::vector<double> &atomic_coords,
                           const std::vector<double> &coeffs, const std::vector<double> &coords,
                           const std::vector<double> &exps, const std::vector<double> &norms,
-                          const std::vector<int> &atomic_nrs, const std::vector<int> &cdepths,
-                          const std::vector<int> &coffsets, const std::vector<int> &offsets_cart,
-                          const std::vector<int> &offsets_ecoeffs,
+                          const std::vector<int> &atomic_idxs, const std::vector<int> &atomic_nrs, 
+                          const std::vector<int> &cdepths, const std::vector<int> &coffsets, 
+                          const std::vector<int> &offsets_cart, const std::vector<int> &offsets_ecoeffs,
                           const std::vector<int> &offsets_norms,
                           const std::vector<int> &offsets_sph)
                 : la(la), lb(lb), n_atoms(n_atoms), n_pairs(n_pairs), n_prim_pairs(n_prim_pairs),
                   atomic_coords(atomic_coords), coeffs(coeffs), coords(coords), exps(exps),
-                  norms(norms), atomic_nrs(atomic_nrs), cdepths(cdepths), coffsets(coffsets),
-                  offsets_cart(offsets_cart), offsets_ecoeffs(offsets_ecoeffs),
+                  norms(norms), atomic_idxs(atomic_idxs), atomic_nrs(atomic_nrs), cdepths(cdepths),
+                  coffsets(coffsets), offsets_cart(offsets_cart), offsets_ecoeffs(offsets_ecoeffs),
                   offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
             }
@@ -89,7 +89,8 @@ namespace lible
             std::vector<double> exps;          /** Exponents of the Gaussian primitives. */
             std::vector<double> norms;         /** Normalization consts of the atomic orbitals in spherical basis. */
 
-            std::vector<int> atomic_nrs;      /** Atomic numbers of all the atoms in the system. */
+            std::vector<int> atomic_idxs;     /** Indices of atoms involved in the shell pairs. */
+            std::vector<int> atomic_nrs;      /** Atomic numbers of all the atoms in the system. */            
             std::vector<int> cdepths;         /** Contraction depths corresponding to each shell in a shell pair. */
             std::vector<int> coffsets;        /** Offsets of the contraction data (coeffs and exps) for each shell in a shell pair.*/
             std::vector<int> offsets_cart;    /** Offsets of the atomic orbital (cartesian) positions in the list of all atomic orbitals. */

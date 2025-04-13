@@ -52,14 +52,14 @@ namespace lible
                       const std::vector<double> &coords_angstrom);
 
             /** Constructor for initializing a structure object with a given custom basis set. */
-            Structure(const basis_atoms_t& basis_set_custom, const std::vector<int> &atomic_nrs,
+            Structure(const basis_atoms_t &basis_set_custom, const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
             /**
              * Constructor for initializing a structure object with a given main basis set
              * and custom auxiliary basis set.
              */
-            Structure(const std::string &basis_set, const basis_atoms_t& basis_set_custom_aux,
+            Structure(const std::string &basis_set, const basis_atoms_t &basis_set_custom_aux,
                       const std::vector<int> &atomic_nrs,
                       const std::vector<double> &coords_angstrom);
 
@@ -67,39 +67,39 @@ namespace lible
              * Constructor for initializing a structure object with a custom main basis set
              * and a given auxiliary basis set.
              */
-            Structure(const basis_atoms_t& basis_set_custom, const std::string &basis_set_aux,
+            Structure(const basis_atoms_t &basis_set_custom, const std::string &basis_set_aux,
                       const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);                      
+                      const std::vector<double> &coords_angstrom);
 
             /**
-             * Constructor for initializing a structure object with custom main and auxiliary 
+             * Constructor for initializing a structure object with custom main and auxiliary
              * basis sets.
              */
-            Structure(const basis_atoms_t& basis_set_custom, const basis_atoms_t& basis_set_custom_aux,
+            Structure(const basis_atoms_t &basis_set_custom, const basis_atoms_t &basis_set_custom_aux,
                       const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);                      
+                      const std::vector<double> &coords_angstrom);
 
             // Some getters
-            
+
             bool getUseRI() const;
 
             int getMaxL() const;
 
             int getMaxLAux() const;
 
-            int getZ(const size_t iatom) const;
+            int getZ(const int iatom) const;
 
-            size_t getDimAO() const;
+            int getDimAO() const;
 
-            size_t getDimAOAux() const;
+            int getDimAOAux() const;
 
-            size_t getDimAOCart() const;
+            int getDimAOCart() const;
 
-            size_t getDimAOCartAux() const;
+            int getDimAOCartAux() const;
 
-            size_t getNAtoms() const;
+            int getNAtoms() const;
 
-            std::array<double, 3> getCoordsAtom(const size_t iatom) const;
+            std::array<double, 3> getCoordsAtom(const int iatom) const;
 
             std::vector<Shell> getShellsL(const int l) const;
 
@@ -117,11 +117,11 @@ namespace lible
             int max_l{};     /** Highest angular momentum among the shells of atomic orbitals. */
             int max_l_aux{}; /** Highest angular momentum among the shells of auxiliary atomic orbitals. */
 
-            size_t dim_ao{};          /** Number of atomic orbitals. */
-            size_t dim_ao_aux{};      /** Number of auxiliary atomic orbitals. */
-            size_t dim_ao_cart{};     /** Number of atomic orbitals in Cartesian Gaussian basis. */
-            size_t dim_ao_cart_aux{}; /** Number of auxiliary atomic orbitals in Cartesian Gaussian basis. */
-            size_t n_atoms{};         /** Number of atoms in the structure. */
+            int dim_ao{};          /** Number of atomic orbitals. */
+            int dim_ao_aux{};      /** Number of auxiliary atomic orbitals. */
+            int dim_ao_cart{};     /** Number of atomic orbitals in Cartesian Gaussian basis. */
+            int dim_ao_cart_aux{}; /** Number of auxiliary atomic orbitals in Cartesian Gaussian basis. */
+            int n_atoms{};         /** Number of atoms in the structure. */
 
             std::string basis_set;     /** Name of the main basis set. */
             std::string basis_set_aux; /** Name of the auxiliary basis set. */
@@ -136,10 +136,10 @@ namespace lible
 
             /**
              * Constructs the shells for the given basis. Used for both the main and auxiliary
-             * basis.
+             * basis.int
              */
-            void constructShells(const basis_atoms_t &basis_atoms, int &max_l, size_t &dim_ao,
-                                 size_t &dim_ao_cart, std::map<int, std::vector<Shell>> &shells);
+            void constructShells(const basis_atoms_t &basis_atoms, int &max_l, int &dim_ao,
+                                 int &dim_ao_cart, std::map<int, std::vector<Shell>> &shells);
         };
     }
 }
