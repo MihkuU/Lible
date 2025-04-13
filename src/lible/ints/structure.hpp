@@ -136,7 +136,7 @@ namespace lible
 
             /**
              * Constructs the shells for the given basis. Used for both the main and auxiliary
-             * basis.int
+             * basis.
              */
             void constructShells(const basis_atoms_t &basis_atoms, int &max_l, int &dim_ao,
                                  int &dim_ao_cart, std::map<int, std::vector<Shell>> &shells);

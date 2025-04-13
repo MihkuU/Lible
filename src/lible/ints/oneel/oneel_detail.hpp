@@ -45,7 +45,7 @@ namespace lible
                 vec2d ints(dim_ao, dim_ao, 0);
                 for (int la = l_max; la >= 0; la--)
                 {
-                    ShellPairData sp_data = constructShellPairData(la, la, structure);
+                    ShellPairData sp_data = constructShellPairDataSymm(la, la, structure);
 
                     kernel<opt>(la, la, sp_data, ints);
                 }
@@ -53,7 +53,7 @@ namespace lible
                 for (int la = l_max; la >= 0; la--)
                     for (int lb = la - 1; lb >= 0; lb--)
                     {
-                        ShellPairData sp_data = constructShellPairData(la, lb, structure);
+                        ShellPairData sp_data = constructShellPairDataSymm(la, lb, structure);
 
                         kernel<opt>(la, lb, sp_data, ints);
                     }
@@ -74,7 +74,7 @@ namespace lible
 
                 for (int la = l_max; la >= 0; la--)
                 {
-                    ShellPairData sp_data = constructShellPairData(la, la, structure);
+                    ShellPairData sp_data = constructShellPairDataSymm(la, la, structure);
 
                     kernel<opt, T>(la, la, sp_data, arg, ints);
                 }
@@ -82,7 +82,7 @@ namespace lible
                 for (int la = l_max; la >= 0; la--)
                     for (int lb = la - 1; lb >= 0; lb--)
                     {
-                        ShellPairData sp_data = constructShellPairData(la, lb, structure);
+                        ShellPairData sp_data = constructShellPairDataSymm(la, lb, structure);
 
                         kernel<opt, T>(la, lb, sp_data, arg, ints);
                     }

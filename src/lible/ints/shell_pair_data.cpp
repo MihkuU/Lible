@@ -76,7 +76,19 @@ LI::ShellData LI::constructShellDataAux(const int l, const Structure &structure)
     return sh_data;
 }
 
-LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
+LI::ShellPairData LI::constructShellPairDataSymm(const int la, const int lb,
+                                                 const Structure &structure)
+{
+    return constructShellPairData(true, la, lb, structure);
+}
+
+LI::ShellPairData LI::constructShellPairDataNoSymm(const int la, const int lb,
+                                                   const Structure &structure)
+{
+    return constructShellPairData(false, la, lb, structure);
+}
+
+LI::ShellPairData LI::constructShellPairData(const bool use_symm, const int la, const int lb,
                                              const Structure &structure)
 {
     const auto &shells_a = structure.getShellsL(la);
@@ -85,20 +97,38 @@ LI::ShellPairData LI::constructShellPairData(const int la, const int lb,
     int n_shells_b = shells_b.size();
 
     int n_pairs;
-    if (la == lb)
-        n_pairs = n_shells_a * (n_shells_a + 1) / 2;
+    if (use_symm)
+    {
+        if (la == lb)
+            n_pairs = n_shells_a * (n_shells_a + 1) / 2;
+        else
+            n_pairs = n_shells_a * n_shells_b;
+    }
     else
         n_pairs = n_shells_a * n_shells_b;
 
     vector<pair<int, int>> shell_pair_idxs(n_pairs);
-    if (la == lb)
-        for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
-            for (int jshell = 0; jshell <= ishell; jshell++, idx++)
-                shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
+    if (use_symm)
+    {
+        if (la == lb)
+        {
+            for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
+                for (int jshell = 0; jshell <= ishell; jshell++, idx++)
+                    shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
+        }
+        else
+        {
+            for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
+                for (int jshell = 0; jshell < n_shells_b; jshell++, idx++)
+                    shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
+        }
+    }
     else
+    {
         for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
             for (int jshell = 0; jshell < n_shells_b; jshell++, idx++)
                 shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
+    }
 
     int dim_sph_a = numSphericals(la);
     int dim_sph_b = numSphericals(lb);
@@ -239,7 +269,7 @@ vector<LI::ShellPairData> LI::constructShellPairDatas(const vector<pair<int, int
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
-        sp_datas.emplace_back(constructShellPairData(la, lb, structure));
+        sp_datas.emplace_back(constructShellPairDataSymm(la, lb, structure));
     }
 
     return sp_datas;

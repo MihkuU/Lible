@@ -225,7 +225,7 @@ namespace lible
          * \ingroup ints
          * Constructs the shell pair data corresponding to the main basis set.
          */
-        ShellPairData constructShellPairData(const int la, const int lb,
+        ShellPairData constructShellPairDataSymm(const int la, const int lb,
                                              const Structure &structure);
 
         /**
