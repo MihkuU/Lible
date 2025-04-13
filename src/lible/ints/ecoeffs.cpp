@@ -77,16 +77,16 @@ lible::vec3d LI::ecoeffsRecurrence2_n1(const double a, const double b, const int
     for (int j = 1; j <= lb; j++)
         for (int i = 0; i <= la; i++)
         {
-            ecoeffs1(i, j, 0) = -(b / p) * (R * ecoeffs1(i, j - 1, 0) + ecoeffs(i, j - 1, 0)) +
+            ecoeffs1(i, j, 0) = -(a / p) * (R * ecoeffs1(i, j - 1, 0) + ecoeffs(i, j - 1, 0)) +
                                 ecoeffs1(i, j - 1, 1);
 
             for (int t = 1; t < i + j; t++)
                 ecoeffs1(i, j, t) = one_o_2p * ecoeffs1(i, j - 1, t - 1) +
-                                    (b / p) * R * (ecoeffs1(i, j - 1, t) + ecoeffs(i, j - 1, t)) +
+                                    (a / p) * R * (ecoeffs1(i, j - 1, t) + ecoeffs(i, j - 1, t)) +
                                     (t + 1) * ecoeffs1(i, j - 1, t + 1);
 
             ecoeffs1(i, j, i + j) = one_o_2p * ecoeffs1(i, j - 1, i + j - 1) +
-                                    (b / p) * R * (ecoeffs1(i, j - 1, i + j) + ecoeffs(i, j - 1, i + j));
+                                    (a / p) * R * (ecoeffs1(i, j - 1, i + j) + ecoeffs(i, j - 1, i + j));
         }
 
     return ecoeffs1;
