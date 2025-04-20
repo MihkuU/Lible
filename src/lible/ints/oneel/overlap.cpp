@@ -48,7 +48,6 @@ void LI::overlapKernel(const int la, const int lb, const int cdepth_a, const int
             double db = ccoeffs_b[ib];
 
             double p = a + b;
-            double mu = a * b / p;
             double dadb = da * db;
             double fac = dadb * std::pow(M_PI / p, 1.5);
 
@@ -86,13 +85,12 @@ void LI::overlapDeriv1Kernel(const int la, const int lb, const int cdepth_a, con
             double db = ccoeffs_b[ib];
 
             double p = a + b;
-            double mu = a * b / p;
             double dadb = da * db;
             double fac = dadb * std::pow(M_PI / p, 1.5);
 
-            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 2, xyz_a, xyz_b);
+            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
 
-            auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb + 2, xyz_a, xyz_b, {Ex, Ey, Ez});
+            auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b, {Ex, Ey, Ez});
 
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
@@ -105,9 +103,9 @@ void LI::overlapDeriv1Kernel(const int la, const int lb, const int cdepth_a, con
                     intderivs_contracted[2 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
 
                     // d/dB
-                    intderivs_contracted[3 * n_ab_cart + munu] -= fac * E1x(i, i_, 0) * Ey(j, j_, 0) * Ez(k, k_, 0);
-                    intderivs_contracted[4 * n_ab_cart + munu] -= fac * Ex(i, i_, 0) * E1y(j, j_, 0) * Ez(k, k_, 0);
-                    intderivs_contracted[5 * n_ab_cart + munu] -= fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
+                    intderivs_contracted[3 * n_ab_cart + munu] += fac * E1x(i, i_, 0) * Ey(j, j_, 0) * Ez(k, k_, 0);
+                    intderivs_contracted[4 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * E1y(j, j_, 0) * Ez(k, k_, 0);
+                    intderivs_contracted[5 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
                 }
         }
 }

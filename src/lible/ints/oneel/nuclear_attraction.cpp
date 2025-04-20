@@ -45,7 +45,6 @@ void LI::externalChargesKernel(const int la, const int lb, const int cdepth_a, c
             double db = ccoeffs_b[ib];
 
             double p = a + b;
-            double mu = a * b / p;
             double dadb = da * db;
             double fac = 2 * (M_PI / p) * dadb;            
 

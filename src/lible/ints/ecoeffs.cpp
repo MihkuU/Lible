@@ -173,7 +173,6 @@ LI::ecoeffsShellPair_Eij0(const int la, const int lb, const int cdepth_a, const 
         {
             double a = exps_a[ia];
             double b = exps_b[ib];
-            double mu = a * b / (a + b);
 
             auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] = ecoeffsPrimitivePair(a, b, la, lb,
                                                                           xyz_a, xyz_b);
@@ -400,7 +399,6 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
             {
                 double a = sp_data.exps[pos_a + ia];
                 double b = sp_data.exps[pos_b + ib];
-                double mu = a * b / (a + b);
 
                 auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] =
                     ecoeffsPrimitivePair(a, b, la, lb, &xyz_a[0], &xyz_b[0]);
