@@ -23,7 +23,7 @@ namespace lible
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
                                                   const int lb, const double *xyz_a,
-                                                  const double *xyz_b, const double *Kab);
+                                                  const double *xyz_b);
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
@@ -45,6 +45,12 @@ namespace lible
         ecoeffsShellPair_Eijt(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                               const double *exps_a, const double *exps_b, const double *xyz_a,
                               const double *xyz_b);
+
+        /** TODO: remove */
+        std::vector<lible::vec4d>
+        ecoeffsShellPair_Eijt_Debug(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                    const double *exps_a, const double *exps_b, const double *xyz_a,
+                                    const double *xyz_b);
 
         /** */
         std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);

@@ -6,21 +6,195 @@
 
 #include <math.h>
 
+namespace LI = lible::ints;
 namespace LIO = lible::ints::one;
 
-using std::vector;
+using std::array, std::vector;
+
+namespace lible::ints
+{
+    // Forward declaration
+    void kineticEnergyKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                             const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                             const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                             double *ints_contracted);
+
+    // Forward declaration
+    void kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                   const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                   const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                   double *intderivs_contracted);
+
+    // A helper function for 'kineticEnergyDeriv1Kernel'.
+    auto kinEDeriv1Helper = [](const double b, const double b2, const double fac,
+                               const vec3d &ecoeffs_x, const vec3d &ecoeffs_y,
+                               const vec3d &ecoeffs_z, const array<int, 3> &ijk,
+                               const array<int, 3> &i_j_k_)
+    {
+        auto [i, j, k] = ijk;
+        auto [i_, j_, k_] = i_j_k_;
+
+        double Tx, Ty, Tz;
+        if (i_ < 2)
+            Tx = -2 * b2 * ecoeffs_x(i, i_ + 2, 0) +
+                 b * (2 * i_ + 1) * ecoeffs_x(i, i_, 0);
+        else
+            Tx = -2 * b2 * ecoeffs_x(i, i_ + 2, 0) +
+                 b * (2 * i_ + 1) * ecoeffs_x(i, i_, 0) -
+                 0.5 * i_ * (i_ - 1) * ecoeffs_x(i, i_ - 2, 0);
+
+        if (j_ < 2)
+            Ty = -2 * b2 * ecoeffs_y(j, j_ + 2, 0) +
+                 b * (2 * j_ + 1) * ecoeffs_y(j, j_, 0);
+        else
+            Ty = -2 * b2 * ecoeffs_y(j, j_ + 2, 0) +
+                 b * (2 * j_ + 1) * ecoeffs_y(j, j_, 0) -
+                 0.5 * j_ * (j_ - 1) * ecoeffs_y(j, j_ - 2, 0);
+
+        if (k_ < 2)
+            Tz = -2 * b2 * ecoeffs_z(k, k_ + 2, 0) +
+                 b * (2 * k_ + 1) * ecoeffs_z(k, k_, 0);
+        else
+            Tz = -2 * b2 * ecoeffs_z(k, k_ + 2, 0) +
+                 b * (2 * k_ + 1) * ecoeffs_z(k, k_, 0) -
+                 0.5 * k_ * (k_ - 1) * ecoeffs_z(k, k_ - 2, 0);
+
+        double integral = 0;
+        integral += fac * Tx * ecoeffs_y(j, j_, 0) * ecoeffs_z(k, k_, 0);
+        integral += fac * ecoeffs_x(i, i_, 0) * Ty * ecoeffs_z(k, k_, 0);
+        integral += fac * ecoeffs_x(i, i_, 0) * ecoeffs_y(j, j_, 0) * Tz;
+
+        return integral;
+    };
+}
+
+void LI::kineticEnergyKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                             const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                             const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                             double *ints_contracted)
+{
+    // Formula taken from https://gqcg-res.github.io/knowdes/the-mcmurchie-davidson-integral-scheme.html.
+
+    int n_a_cart = numCartesians(la);
+    int n_b_cart = numCartesians(lb);
+    int n_ab_cart = n_a_cart * n_b_cart;
+
+    std::fill(ints_contracted, ints_contracted + n_ab_cart, 0);
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            double a = cexps_a[ia];
+            double b = cexps_b[ib];
+            double b2 = std::pow(b, 2);
+            double da = ccoeffs_a[ia];
+            double db = ccoeffs_b[ib];
+
+            double p = a + b;
+            double dadb = da * db;
+            double fac = dadb * std::pow(M_PI / p, 1.5);
+
+            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 2, xyz_a, xyz_b);
+
+            for (const auto &[i, j, k, mu] : cart_exps_a)
+                for (const auto &[i_, j_, k_, nu] : cart_exps_b)
+                {
+                    double Tx, Ty, Tz;
+                    if (i_ < 2)
+                        Tx = -2 * b2 * Ex(i, i_ + 2, 0) +
+                             b * (2 * i_ + 1) * Ex(i, i_, 0);
+                    else
+                        Tx = -2 * b2 * Ex(i, i_ + 2, 0) +
+                             b * (2 * i_ + 1) * Ex(i, i_, 0) -
+                             0.5 * i_ * (i_ - 1) * Ex(i, i_ - 2, 0);
+
+                    if (j_ < 2)
+                        Ty = -2 * b2 * Ey(j, j_ + 2, 0) +
+                             b * (2 * j_ + 1) * Ey(j, j_, 0);
+                    else
+                        Ty = -2 * b2 * Ey(j, j_ + 2, 0) +
+                             b * (2 * j_ + 1) * Ey(j, j_, 0) -
+                             0.5 * j_ * (j_ - 1) * Ey(j, j_ - 2, 0);
+
+                    if (k_ < 2)
+                        Tz = -2 * b2 * Ez(k, k_ + 2, 0) +
+                             b * (2 * k_ + 1) * Ez(k, k_, 0);
+                    else
+                        Tz = -2 * b2 * Ez(k, k_ + 2, 0) +
+                             b * (2 * k_ + 1) * Ez(k, k_, 0) -
+                             0.5 * k_ * (k_ - 1) * Ez(k, k_ - 2, 0);
+
+                    ints_contracted[mu * n_b_cart + nu] += fac * Tx * Ey(j, j_, 0) * Ez(k, k_, 0);
+                    ints_contracted[mu * n_b_cart + nu] += fac * Ex(i, i_, 0) * Ty * Ez(k, k_, 0);
+                    ints_contracted[mu * n_b_cart + nu] += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * Tz;
+                }
+        }
+}
+
+void LI::kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                   const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                   const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                   double *intderivs_contracted)
+{
+    int n_a_cart = numCartesians(la);
+    int n_b_cart = numCartesians(lb);
+    int n_ab_cart = n_a_cart * n_b_cart;
+
+    std::fill(intderivs_contracted, intderivs_contracted + 6 * n_ab_cart, 0);
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            double a = cexps_a[ia];
+            double b = cexps_b[ib];
+            double b2 = std::pow(b, 2);
+            double da = ccoeffs_a[ia];
+            double db = ccoeffs_b[ib];
+
+            double p = a + b;
+            double dadb = da * db;
+            double fac = dadb * std::pow(M_PI / p, 1.5);
+
+            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 2, xyz_a, xyz_b);
+
+            auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb + 2, xyz_a, xyz_b,
+                                                           {Ex, Ey, Ez});
+
+            for (const auto &[i, j, k, mu] : cart_exps_a)
+                for (const auto &[i_, j_, k_, nu] : cart_exps_b)
+                {
+                    int munu = mu * n_ab_cart + nu;
+
+                    double kin_x = kinEDeriv1Helper(b, b2, fac, E1x, Ey, Ez, {i, j, k}, {i_, j_, k_});
+                    double kin_y = kinEDeriv1Helper(b, b2, fac, Ex, E1y, Ez, {i, j, k}, {i_, j_, k_});
+                    double kin_z = kinEDeriv1Helper(b, b2, fac, Ex, Ey, E1z, {i, j, k}, {i_, j_, k_});
+
+                    // d/dA
+                    intderivs_contracted[0 * n_ab_cart + munu] += kin_x;
+                    intderivs_contracted[1 * n_ab_cart + munu] += kin_y;
+                    intderivs_contracted[2 * n_ab_cart + munu] += kin_z;
+
+                    // d/dB
+                    intderivs_contracted[3 * n_ab_cart + munu] -= kin_x;
+                    intderivs_contracted[4 * n_ab_cart + munu] -= kin_y;
+                    intderivs_contracted[5 * n_ab_cart + munu] -= kin_z;
+                }
+        }
+}
 
 template <>
 void LIO::kernel<LIO::Option::kinetic_energy>(const int la, const int lb,
                                               const ShellPairData &sp_data,
                                               vec2d &ints_out)
 {
-    // Formula taken from https://gqcg-res.github.io/knowdes/the-mcmurchie-davidson-integral-scheme.html.
-
-    vector<vector<vec3d>> ecoeffs = ecoeffsSPData_Eij0(la, lb + 2, sp_data);
-
-    int dim_a_cart = numCartesians(sp_data.la);
-    int dim_b_cart = numCartesians(sp_data.lb);
+    int n_a_cart = numCartesians(sp_data.la);
+    int n_b_cart = numCartesians(sp_data.lb);
 
     vector<CartExps> cart_exps_a = cart_exps[la];
     vector<CartExps> cart_exps_b = cart_exps[lb];
@@ -28,68 +202,24 @@ void LIO::kernel<LIO::Option::kinetic_energy>(const int la, const int lb,
     arma::dmat sph_trafo_bra = returnSphericalTrafo(sp_data.la);
     arma::dmat sph_trafo_ket = returnSphericalTrafo(sp_data.lb).t();
 
-    arma::dmat ints_contracted(dim_a_cart, dim_b_cart);
+    arma::dmat ints_contracted(n_b_cart, n_a_cart);
     arma::dmat ints_sph;
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
         ints_contracted.zeros();
 
-        int dim_a = sp_data.cdepths[2 * ipair + 0];
-        int dim_b = sp_data.cdepths[2 * ipair + 1];
-        int pos_a = sp_data.coffsets[2 * ipair + 0];
-        int pos_b = sp_data.coffsets[2 * ipair + 1];
+        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+        int cofs_a = sp_data.coffsets[2 * ipair + 0];
+        int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
-        const vector<vec3d> &Exyz = ecoeffs[ipair];
+        kineticEnergyKernel(la, lb, cdepth_a, cdepth_b, &sp_data.exps[cofs_a], &sp_data.exps[cofs_b],
+                            &sp_data.coeffs[cofs_a], &sp_data.coeffs[cofs_b],
+                            &sp_data.coords[6 * ipair + 0], &sp_data.coords[6 * ipair + 3],
+                            ints_contracted.memptr());
 
-        for (int ia = 0, iab = 0; ia < dim_a; ia++)
-            for (int ib = 0; ib < dim_b; ib++, iab++)
-            {
-                double a = sp_data.exps[pos_a + ia];
-                double b = sp_data.exps[pos_b + ib];
-                double da = sp_data.coeffs[pos_a + ia];
-                double db = sp_data.coeffs[pos_b + ib];
-                double b2 = std::pow(b, 2);
-
-                double p = a + b;
-                double dadb = da * db;
-                double fac = dadb * std::pow(M_PI / p, 1.5);
-
-                for (const auto [i, j, k, mu] : cart_exps_a)
-                    for (const auto [i_, j_, k_, nu] : cart_exps_b)
-                    {
-                        double Tx, Ty, Tz;
-                        if (i_ < 2)
-                            Tx = -2 * b2 * Exyz[iab](0, i, i_ + 2) +
-                                 b * (2 * i_ + 1) * Exyz[iab](0, i, i_);
-                        else
-                            Tx = -2 * b2 * Exyz[iab](0, i, i_ + 2) +
-                                 b * (2 * i_ + 1) * Exyz[iab](0, i, i_) -
-                                 0.5 * i_ * (i_ - 1) * Exyz[iab](0, i, i_ - 2);
-
-                        if (j_ < 2)
-                            Ty = -2 * b2 * Exyz[iab](1, j, j_ + 2) +
-                                 b * (2 * j_ + 1) * Exyz[iab](1, j, j_);
-                        else
-                            Ty = -2 * b2 * Exyz[iab](1, j, j_ + 2) +
-                                 b * (2 * j_ + 1) * Exyz[iab](1, j, j_) -
-                                 0.5 * j_ * (j_ - 1) * Exyz[iab](1, j, j_ - 2);
-
-                        if (k_ < 2)
-                            Tz = -2 * b2 * Exyz[iab](2, k, k_ + 2) +
-                                 b * (2 * k_ + 1) * Exyz[iab](2, k, k_);
-                        else
-                            Tz = -2 * b2 * Exyz[iab](2, k, k_ + 2) +
-                                 b * (2 * k_ + 1) * Exyz[iab](2, k, k_) -
-                                 0.5 * k_ * (k_ - 1) * Exyz[iab](2, k, k_ - 2);
-
-                        ints_contracted(mu, nu) += fac * Tx * Exyz[iab](1, j, j_) * Exyz[iab](2, k, k_);
-                        ints_contracted(mu, nu) += fac * Exyz[iab](0, i, i_) * Ty * Exyz[iab](2, k, k_);
-                        ints_contracted(mu, nu) += fac * Exyz[iab](0, i, i_) * Exyz[iab](1, j, j_) * Tz;
-                    }
-            }
-
-        ints_sph = sph_trafo_bra * ints_contracted * sph_trafo_ket;
+        ints_sph = sph_trafo_bra * ints_contracted.t() * sph_trafo_ket;
 
         transferInts1El(ipair, sp_data, ints_sph, ints_out);
-    } 
+    }
 }

@@ -115,13 +115,19 @@ lible::vec2d LI::ecoeffsRecurrence1(const double one_o_2a, const int l)
 }
 
 array<lible::vec3d, 3> LI::ecoeffsPrimitivePair(const double a, const double b, const int la,
-                                                const int lb, const double *xyz_a,
-                                                const double *xyz_b, const double *Kab)
+                                                const int lb, const double *xyz_a, 
+                                                const double *xyz_b)
 {
     double p = a + b;
-    array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
-                           (a * xyz_a[1] + b * xyz_b[1]) / p,
-                           (a * xyz_a[2] + b * xyz_b[2]) / p};
+    double mu = a * b / p;
+
+    array<double, 3> xyz_p;
+    array<double, 3> Kab;
+    for (int i = 0; i < 3; i++)
+    {
+        xyz_p[i] = (a * xyz_a[i] + b * xyz_b[i]) / p;
+        Kab[i] = std::exp(-mu * std::pow(xyz_a[i] - xyz_b[i], 2));
+    }
 
     array<double, 3> xyz_pa{xyz_p[0] - xyz_a[0], xyz_p[1] - xyz_a[1], xyz_p[2] - xyz_a[2]};
     array<double, 3> xyz_pb{xyz_p[0] - xyz_b[0], xyz_p[1] - xyz_b[1], xyz_p[2] - xyz_b[2]};
@@ -169,12 +175,8 @@ LI::ecoeffsShellPair_Eij0(const int la, const int lb, const int cdepth_a, const 
             double b = exps_b[ib];
             double mu = a * b / (a + b);
 
-            array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
-                                 std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
-                                 std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
-
             auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] = ecoeffsPrimitivePair(a, b, la, lb,
-                                                                          xyz_a, xyz_b, &Kab[0]);
+                                                                          xyz_a, xyz_b);
 
             for (int i = 0; i <= la; i++)
                 for (int j = 0; j <= lb; j++)
@@ -197,39 +199,75 @@ LI::ecoeffsShellPair_Eijt(const int la, const int lb, const int cdepth_a, const 
                           const double *exps_a, const double *exps_b, const double *xyz_a,
                           const double *xyz_b)
 {
-    vector<vec4d> ecoeffs(cdepth_a * cdepth_b, vec4d(3, la + 1, lb + 1, la + lb + 1, 0));
+    vector<vec4d> ecoeffs(cdepth_a * cdepth_b);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
             double a = exps_a[ia];
             double b = exps_b[ib];
-            double mu = a * b / (a + b);
-
-            array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
-                                 std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
-                                 std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
 
             auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] = ecoeffsPrimitivePair(a, b, la, lb,
-                                                                          xyz_a, xyz_b, &Kab[0]);
+                                                                          xyz_a, xyz_b);
+
+            vec4d ecoeffs_xyz(3, la + 1, lb + 1, la + lb + 1);
+            for (int i = 0; i <= la; i++)
+                for (int j = 0; j <= lb; j++)
+                    for (int t = 0; t <= i + j; t++)
+                        ecoeffs_xyz(0, i, j, t) = ecoeffs_x(i, j, t);
 
             for (int i = 0; i <= la; i++)
                 for (int j = 0; j <= lb; j++)
                     for (int t = 0; t <= i + j; t++)
-                        ecoeffs[iab](0, i, j, t) = ecoeffs_x(i, j, t);
+                        ecoeffs_xyz(1, i, j, t) = ecoeffs_y(i, j, t);
 
             for (int i = 0; i <= la; i++)
                 for (int j = 0; j <= lb; j++)
                     for (int t = 0; t <= i + j; t++)
-                        ecoeffs[iab](1, i, j, t) = ecoeffs_y(i, j, t);
+                        ecoeffs_xyz(2, i, j, t) = ecoeffs_z(i, j, t);
 
-            for (int i = 0; i <= la; i++)
-                for (int j = 0; j <= lb; j++)
-                    for (int t = 0; t <= i + j; t++)
-                        ecoeffs[iab](2, i, j, t) = ecoeffs_z(i, j, t);
+            ecoeffs[iab] = ecoeffs_xyz;
         }
 
     return ecoeffs;
 }
+
+vector<lible::vec4d>
+LI::ecoeffsShellPair_Eijt_Debug(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                const double *exps_a, const double *exps_b, const double *xyz_a,
+                                const double *xyz_b)
+{
+    vector<vec4d> ecoeffs(cdepth_a * cdepth_b);
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            double a = exps_a[ia];
+            double b = exps_b[ib];
+
+            auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] = ecoeffsPrimitivePair(a, b, la, lb,
+                                                                          xyz_a, xyz_b);
+
+            vec4d ecoeffs_xyz(3, la + 1, lb + 1, la + lb + 1);
+            for (int i = 0; i <= la; i++)
+                for (int j = 0; j <= lb; j++)
+                    for (int t = 0; t <= i + j; t++)
+                        ecoeffs_xyz(0, i, j, t) = ecoeffs_x(i, j, t);
+
+            for (int i = 0; i <= la; i++)
+                for (int j = 0; j <= lb; j++)
+                    for (int t = 0; t <= i + j; t++)
+                        ecoeffs_xyz(1, i, j, t) = ecoeffs_y(i, j, t);
+
+            for (int i = 0; i <= la; i++)
+                for (int j = 0; j <= lb; j++)
+                    for (int t = 0; t <= i + j; t++)
+                        ecoeffs_xyz(2, i, j, t) = ecoeffs_z(i, j, t);
+
+            ecoeffs[iab] = ecoeffs_xyz;
+        }
+
+    return ecoeffs;
+}
+
 
 vector<vector<lible::vec3d>>
 LI::ecoeffsSPData_Eij0(const int la, const int lb, const ShellPairData &sp_data)
@@ -298,10 +336,8 @@ vector<vector<double>> LI::ecoeffsShell(const int l, const vector<double> &exps)
             double a = exps[ia];
             double b = exps[ib];
 
-            std::array<double, 3> Kab{1, 1, 1};            
-
             auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] = ecoeffsPrimitivePair(a, b, l, l, &xyz_a[0],
-                                                                          &xyz_a[0], &Kab[0]);
+                                                                          &xyz_a[0]);
 
             for (const auto [i, j, k, mu] : cart_exps_a)
                 for (const auto [i_, j_, k_, nu] : cart_exps_a)
@@ -366,12 +402,8 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
                 double b = sp_data.exps[pos_b + ib];
                 double mu = a * b / (a + b);
 
-                std::array<double, 3> Kab{std::exp(-mu * std::pow(xyz_a[0] - xyz_b[0], 2)),
-                                          std::exp(-mu * std::pow(xyz_a[1] - xyz_b[1], 2)),
-                                          std::exp(-mu * std::pow(xyz_a[2] - xyz_b[2], 2))};
-
                 auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] =
-                    ecoeffsPrimitivePair(a, b, la, lb, &xyz_a[0], &xyz_b[0], &Kab[0]);
+                    ecoeffsPrimitivePair(a, b, la, lb, &xyz_a[0], &xyz_b[0]);
 
                 ecoeffs_ppair_cc.set(0);
                 for (size_t mu = 0; mu < cart_exps_a.size(); mu++)

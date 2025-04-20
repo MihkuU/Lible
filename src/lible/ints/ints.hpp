@@ -38,11 +38,34 @@ namespace lible
          */
         vec2d overlap(const Structure &structure);
 
+        /** */
+        void overlapKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                           const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                           const double *ccoeffs_b, double *ints_contracted);
+
+        /** */
+        void overlapDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                 const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                 const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                 double *intderivs_contracted);
+
         /**
          * \ingroup ints
          * Calculates the kinetic energy integral matrix.
          */
         vec2d kineticEnergy(const Structure &structure);
+
+        /** */
+        void kineticEnergyKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                 const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                 const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                 double *ints_contracted);
+
+        /** */
+        void kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                       const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                       const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                       double *intderivs_contracted);
 
         /**
          * \ingroup ints
@@ -50,12 +73,28 @@ namespace lible
          */
         vec2d nuclearAttraction(const Structure &structure);
 
+        /** */
+        void externalChargesKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                   const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                   const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                   const std::vector<std::array<double, 4>> charges,
+                                   double *ints_contracted);
+
+        /** */
+        void externalChargesDerivKernel();
+
         /**
          * \ingroup ints
          * Calculates the dipole moment integral matrices for the \f$x,y,z\f$-directions.
          */
         std::array<vec2d, 3> dipoleMoment(const std::array<double, 3> &origin,
                                           const Structure &structure);
+
+        /** */
+        void dipoleMomentKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                const double *origin, double *ints_contracted);
 
         /**
          * \ingroup ints
@@ -227,7 +266,7 @@ namespace lible
          * Constructs the shell pair data corresponding to the main basis set.
          */
         ShellPairData constructShellPairDataSymm(const int la, const int lb,
-                                             const Structure &structure);
+                                                 const Structure &structure);
 
         /**
          * \ingroup ints
@@ -257,13 +296,13 @@ namespace lible
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
-                                                  const int lb, const double *xyz_a,
-                                                  const double *xyz_b, const double *Kab);
+                                                  const int lb, const double *xyz_a, 
+                                                  const double *xyz_b);
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
-                                                     const double *xyz_b, 
+                                                     const double *xyz_b,
                                                      const std::array<lible::vec3d, 3> &ecoeffs);
 
         /** */
