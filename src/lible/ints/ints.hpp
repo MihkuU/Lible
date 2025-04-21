@@ -87,6 +87,16 @@ namespace lible
                                         const std::vector<std::array<double, 4>> charges,
                                         const BoysGrid &boys_grid, double *intderivs_contracted);
 
+        /** */
+        void externalChargesOperatorDerivKernel(const int la, const int lb, const int cdepth_a, 
+                                                const int cdepth_b, const double *cexps_a, 
+                                                const double *cexps_b, const double *ccoeffs_a,
+                                                const double *ccoeffs_b, const double *xyz_a, 
+                                                const double *xyz_b, 
+                                                const std::vector<std::array<double, 4>> charges,
+                                                const BoysGrid &boys_grid, 
+                                                double *intderivs_contracted);
+
         /**
          * \ingroup ints
          * Calculates the dipole moment integral matrices for the \f$x,y,z\f$-directions.
