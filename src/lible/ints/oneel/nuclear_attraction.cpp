@@ -132,7 +132,7 @@ void LI::externalChargesDerivKernel(const int la, const int lb, const int cdepth
                                    (a * xyz_a[1] + b * xyz_b[1]) / p,
                                    (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-            vec3d rints_sum(lab + 1, 0);
+            vec3d rints_sum(lab + 2, 0);
             for (size_t icharge = 0; icharge < charges.size(); icharge++)
             {
                 auto [xc, yc, zc, charge] = charges[icharge];
@@ -143,13 +143,13 @@ void LI::externalChargesDerivKernel(const int la, const int lb, const int cdepth
                 double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
                 double x = p * xyz_pc_dot;
 
-                vector<double> fnx = calcBoysF(lab, x, boys_grid);
+                vector<double> fnx = calcBoysF(lab + 1, x, boys_grid);
 
-                vec3d rints = calcRInts(lab, p, &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts(lab + 1, p, &xyz_pc[0], &fnx[0]);
 
-                for (int t = 0; t <= lab; t++)
-                    for (int u = 0; u <= lab; u++)
-                        for (int v = 0; v <= lab; v++)
+                for (int t = 0; t <= lab + 1; t++)
+                    for (int u = 0; u <= lab + 1; u++)
+                        for (int v = 0; v <= lab + 1; v++)
                             rints_sum(t, u, v) += charge * rints(t, u, v);
             }
 
