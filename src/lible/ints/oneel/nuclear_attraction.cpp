@@ -116,7 +116,6 @@ void LI::externalChargesDerivKernel(const int la, const int lb, const int cdepth
         {
             double a = cexps_a[ia];
             double b = cexps_b[ib];
-            double b2 = std::pow(b, 2);
             double da = ccoeffs_a[ia];
             double db = ccoeffs_b[ib];
 
@@ -171,14 +170,14 @@ void LI::externalChargesDerivKernel(const int la, const int lb, const int cdepth
                                 int munu = mu * n_b_cart + nu;
 
                                 // d/dA
-                                intderivs_contracted[0 * n_ab_cart + munu] += (-1) * (a / p) * dpx + drx; // -1 = charge of electron
-                                intderivs_contracted[1 * n_ab_cart + munu] += (-1) * (a / p) * dpy + dry;
-                                intderivs_contracted[2 * n_ab_cart + munu] += (-1) * (a / p) * dpz + drz;
+                                intderivs_contracted[0 * n_ab_cart + munu] += -1 * ((a / p) * dpx + drx); // -1 = charge of electron
+                                intderivs_contracted[1 * n_ab_cart + munu] += -1 * ((a / p) * dpy + dry);
+                                intderivs_contracted[2 * n_ab_cart + munu] += -1 * ((a / p) * dpz + drz);
 
                                 // d/dB
-                                intderivs_contracted[3 * n_ab_cart + munu] += (-1) * (b / p) * dpx - drx;
-                                intderivs_contracted[4 * n_ab_cart + munu] += (-1) * (b / p) * dpy - dry;
-                                intderivs_contracted[5 * n_ab_cart + munu] += (-1) * (b / p) * dpz - drz;
+                                intderivs_contracted[3 * n_ab_cart + munu] += -1 * ((b / p) * dpx - drx);
+                                intderivs_contracted[4 * n_ab_cart + munu] += -1 * ((b / p) * dpy - dry);
+                                intderivs_contracted[5 * n_ab_cart + munu] += -1 * ((b / p) * dpz - drz);
                             }
         }
 }
