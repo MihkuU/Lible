@@ -99,13 +99,13 @@ void LI::overlapDeriv1Kernel(const int la, const int lb, const int cdepth_a, con
 
                     // d/dA
                     intderivs_contracted[0 * n_ab_cart + munu] += fac * E1x(i, i_, 0) * Ey(j, j_, 0) * Ez(k, k_, 0);
-                    // intderivs_contracted[1 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * E1y(j, j_, 0) * Ez(k, k_, 0);
-                    // intderivs_contracted[2 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
+                    intderivs_contracted[1 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * E1y(j, j_, 0) * Ez(k, k_, 0);
+                    intderivs_contracted[2 * n_ab_cart + munu] += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
 
-                    // // d/dB
-                    // intderivs_contracted[3 * n_ab_cart + munu] -= fac * E1x(i, i_, 0) * Ey(j, j_, 0) * Ez(k, k_, 0);
-                    // intderivs_contracted[4 * n_ab_cart + munu] -= fac * Ex(i, i_, 0) * E1y(j, j_, 0) * Ez(k, k_, 0);
-                    // intderivs_contracted[5 * n_ab_cart + munu] -= fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
+                    // d/dB
+                    intderivs_contracted[3 * n_ab_cart + munu] -= fac * E1x(i, i_, 0) * Ey(j, j_, 0) * Ez(k, k_, 0);
+                    intderivs_contracted[4 * n_ab_cart + munu] -= fac * Ex(i, i_, 0) * E1y(j, j_, 0) * Ez(k, k_, 0);
+                    intderivs_contracted[5 * n_ab_cart + munu] -= fac * Ex(i, i_, 0) * Ey(j, j_, 0) * E1z(k, k_, 0);
                 }
         }
 }
