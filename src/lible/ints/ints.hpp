@@ -77,11 +77,15 @@ namespace lible
         void externalChargesKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                                    const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
                                    const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                   const std::vector<std::array<double, 4>> charges,
+                                   const std::vector<std::array<double, 4>> charges, const BoysGrid &boys_grid,
                                    double *ints_contracted);
 
         /** */
-        void externalChargesDerivKernel();
+        void externalChargesDerivKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                        const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                        const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                        const std::vector<std::array<double, 4>> charges,
+                                        const BoysGrid &boys_grid, double *intderivs_contracted);
 
         /**
          * \ingroup ints

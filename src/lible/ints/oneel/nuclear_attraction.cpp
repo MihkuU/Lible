@@ -18,6 +18,12 @@ namespace lible::ints
                                const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
                                const vector<array<double, 4>> &charges, const BoysGrid &boys_grid,
                                double *ints_contracted);
+
+    void externalChargesDerivKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                    const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
+                                    const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
+                                    const vector<array<double, 4>> charges, const BoysGrid &boys_grid,
+                                    double *ints_contracted);
 }
 
 void LI::externalChargesKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
@@ -46,7 +52,7 @@ void LI::externalChargesKernel(const int la, const int lb, const int cdepth_a, c
 
             double p = a + b;
             double dadb = da * db;
-            double fac = 2 * (M_PI / p) * dadb;            
+            double fac = 2 * (M_PI / p) * dadb;
 
             auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
 
@@ -85,6 +91,95 @@ void LI::externalChargesKernel(const int la, const int lb, const int cdepth_a, c
                                                                        Ey(j, j_, u) *
                                                                        Ez(k, k_, v) * 
                                                                        rints_sum(t, u, v);
+        }
+}
+
+void LI::externalChargesDerivKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                    const double *cexps_a, const double *cexps_b,
+                                    const double *ccoeffs_a, const double *ccoeffs_b,
+                                    const double *xyz_a, const double *xyz_b,
+                                    const vector<array<double, 4>> charges, const BoysGrid &boys_grid,
+                                    double *intderivs_contracted)
+{
+    int lab = la + lb;
+    int n_a_cart = numCartesians(la);
+    int n_b_cart = numCartesians(lb);
+    int n_ab_cart = n_a_cart * n_b_cart;
+
+    std::fill(intderivs_contracted, intderivs_contracted + 6 * n_ab_cart, 0);
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            double a = cexps_a[ia];
+            double b = cexps_b[ib];
+            double b2 = std::pow(b, 2);
+            double da = ccoeffs_a[ia];
+            double db = ccoeffs_b[ib];
+
+            double p = a + b;
+            double dadb = da * db;
+            double fac = 2 * (M_PI / p) * dadb;
+
+            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
+
+            auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b,
+                                                           {Ex, Ey, Ez});
+
+            array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                   (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                   (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+            vec3d rints_sum(lab + 1, 0);
+            for (size_t icharge = 0; icharge < charges.size(); icharge++)
+            {
+                auto [xc, yc, zc, charge] = charges[icharge];
+
+                array<double, 3> xyz_pc{xyz_p[0] - xc, xyz_p[1] - yc, xyz_p[2] - zc};
+
+                double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
+                double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
+                double x = p * xyz_pc_dot;
+
+                vector<double> fnx = calcBoysF(lab, x, boys_grid);
+
+                vec3d rints = calcRInts(lab, p, &xyz_pc[0], &fnx[0]);
+
+                for (int t = 0; t <= lab; t++)
+                    for (int u = 0; u <= lab; u++)
+                        for (int v = 0; v <= lab; v++)
+                            rints_sum(t, u, v) += charge * rints(t, u, v);
+            }
+
+            for (const auto &[i, j, k, mu] : cart_exps_a)
+                for (const auto &[i_, j_, k_, nu] : cart_exps_b)
+                    for (int t = 0; t <= i + i_; t++)
+                        for (int u = 0; u <= j + j_; u++)
+                            for (int v = 0; v <= k + k_; v++)
+                            {
+                                double dpx = fac * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t + 1, u, v);
+                                double dpy = fac * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u + 1, v);
+                                double dpz = fac * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u, v + 1);
+
+                                double drx = fac * E1x(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u, v);
+                                double dry = fac * Ex(i, i_, t) * E1y(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u, v);
+                                double drz = fac * Ex(i, i_, t) * Ey(j, j_, u) * E1z(k, k_, v) * rints_sum(t, u, v);
+
+                                int munu = mu * n_b_cart + nu;
+
+                                // d/dA
+                                intderivs_contracted[0 * n_ab_cart + munu] += (-1) * (a / p) * dpx + drx; // -1 = charge of electron
+                                intderivs_contracted[1 * n_ab_cart + munu] += (-1) * (a / p) * dpy + dry;
+                                intderivs_contracted[2 * n_ab_cart + munu] += (-1) * (a / p) * dpz + drz;
+
+                                // d/dB
+                                intderivs_contracted[3 * n_ab_cart + munu] += (-1) * (b / p) * dpx - drx;
+                                intderivs_contracted[4 * n_ab_cart + munu] += (-1) * (b / p) * dpy - dry;
+                                intderivs_contracted[5 * n_ab_cart + munu] += (-1) * (b / p) * dpz - drz;
+                            }
         }
 }
 
