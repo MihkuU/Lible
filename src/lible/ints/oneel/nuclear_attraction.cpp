@@ -207,7 +207,7 @@ void LI::externalChargesOperatorDerivKernel(const int la, const int lb, const in
     int n_b_cart = numCartesians(lb);
     int n_ab_cart = n_a_cart * n_b_cart;
 
-    std::fill(intderivs_contracted, intderivs_contracted + 6 * n_ab_cart, 0);
+    std::fill(intderivs_contracted, intderivs_contracted + 3 * charges.size() n_ab_cart, 0);
 
     const auto &cart_exps_a = cart_exps[la];
     const auto &cart_exps_b = cart_exps[lb];
