@@ -256,9 +256,9 @@ void LI::externalChargesOperatorDerivKernel(const int la, const int lb, const in
                                     double Exyz = Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
 
                                     int munu = mu * n_b_cart + nu;
-                                    int idx1 = icharge * n_ab_cart + munu + 0;
-                                    int idx2 = icharge * n_ab_cart + munu + 1;
-                                    int idx3 = icharge * n_ab_cart + munu + 2;
+                                    int idx1 = (icharge + 0) * n_ab_cart + munu;
+                                    int idx2 = (icharge + 1) * n_ab_cart + munu;
+                                    int idx3 = (icharge + 2) * n_ab_cart + munu;
 
                                     intderivs_contracted[idx1] += charge * fac * Exyz * rints(t + 1, u, v);
                                     intderivs_contracted[idx2] += charge * fac * Exyz * rints(t, u + 1, v);
