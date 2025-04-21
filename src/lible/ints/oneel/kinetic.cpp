@@ -169,7 +169,7 @@ void LI::kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                 {
-                    int munu = mu * n_ab_cart + nu;
+                    int munu = mu * n_b_cart + nu;
 
                     double kin_x = kinEDeriv1Helper(b, b2, fac, E1x, Ey, Ez, {i, j, k}, {i_, j_, k_});
                     double kin_y = kinEDeriv1Helper(b, b2, fac, Ex, E1y, Ez, {i, j, k}, {i_, j_, k_});
