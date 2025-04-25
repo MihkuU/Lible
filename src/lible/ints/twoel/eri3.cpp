@@ -22,7 +22,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
     vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
-    vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
+    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
 
     vector<vector<double>> ecoeffs_aux = ecoeffsSphericalShellDatas_Bra(l_max_aux, sh_datas);
     vector<vector<double>> ecoeffs = ecoeffsSphericalSPDatas_Bra(l_pairs, sp_datas);

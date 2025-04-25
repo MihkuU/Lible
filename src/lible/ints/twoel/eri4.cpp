@@ -226,7 +226,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 {
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
+    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -302,7 +302,7 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
 {
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
+    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -374,7 +374,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
+    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -461,7 +461,7 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
 
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
+    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -537,7 +537,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 {
     vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatas(l_pairs, structure);
+    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 

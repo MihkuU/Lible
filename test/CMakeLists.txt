@@ -1,17 +1,10 @@
-cmake_minimum_required(VERSION 3.2)
+set(tests_dir ${CMAKE_CURRENT_SOURCE_DIR})
+target_sources(testlible PRIVATE 
+	${tests_dir}/main.cpp 
+	${tests_dir}/tests.cpp)
 
-project(LibleTest LANGUAGES CXX)
+target_include_directories(testlible PRIVATE ${tests_dir})
+target_include_directories(testlible PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_COMPILER "clang++")
-
-# set(CMAKE_CXX_FLAGS "-g")
-set(CMAKE_CXX_FLAGS "-O3")
-
-add_executable(testlible testlible.cpp)
-
-target_include_directories(testlible PUBLIC "/home/alastor/stuff/Lible/include")
-target_include_directories(testlible PUBLIC "/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/include")
-target_link_libraries(testlible PUBLIC "/home/alastor/stuff/Lible/build/dep/armadillo-12.4.1/build/lib/libarmadillo.so")
-target_link_libraries(testlible PUBLIC "/home/alastor/stuff/Lible/build/liblible.so")
+add_test(NAME "lible::ints::numCartesians()" COMMAND ${CMAKE_BINARY_DIR}/testlible "numCartesians")
+add_test(NAME "lible::ints::numSphericals()" COMMAND ${CMAKE_BINARY_DIR}/testlible "numSphericals")

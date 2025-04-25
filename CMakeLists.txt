@@ -169,3 +169,10 @@ if(lible_is_top_level)
 		DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lible)
 endif()
 
+### Testing
+include(CTest)
+enable_testing()
+add_executable(testlible)
+
+add_subdirectory("${src_dir}/test")
+

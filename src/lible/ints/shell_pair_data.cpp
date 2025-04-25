@@ -236,7 +236,7 @@ LI::ShellPairData LI::constructShellPairData(const bool use_symm, const int la, 
 
     int n_atoms = structure.getNAtoms();
     vector<double> atomic_coords(3 * n_atoms);
-    vector<int> atomic_nrs(n_atoms);    
+    vector<int> atomic_nrs(n_atoms);
     for (int iatom = 0; iatom < n_atoms; iatom++)
     {
         auto [x, y, z] = structure.getCoordsAtom(iatom);
@@ -262,14 +262,27 @@ vector<LI::ShellData> LI::constructShellDatasAux(const int l_max, const Structur
     return sh_datas;
 }
 
-vector<LI::ShellPairData> LI::constructShellPairDatas(const vector<pair<int, int>> &l_pairs,
-                                                      const Structure &structure)
+vector<LI::ShellPairData> LI::constructShellPairDatasSymm(const vector<pair<int, int>> &l_pairs,
+                                                          const Structure &structure)
 {
     vector<ShellPairData> sp_datas;
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
     {
         auto [la, lb] = l_pairs[ipair];
         sp_datas.emplace_back(constructShellPairDataSymm(la, lb, structure));
+    }
+
+    return sp_datas;
+}
+
+vector<LI::ShellPairData> LI::constructShellPairDatasNoSymm(const vector<pair<int, int>> &l_pairs,
+                                                            const Structure &structure)
+{
+    vector<ShellPairData> sp_datas;
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+        sp_datas.emplace_back(constructShellPairDataNoSymm(la, lb, structure));
     }
 
     return sp_datas;

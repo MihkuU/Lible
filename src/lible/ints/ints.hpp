@@ -200,13 +200,6 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Returns the exponents of a Cartesian Gaussian \f$(x,y,z)\f$-directions for the given
-         * angular momentum.
-         */
-        std::vector<std::array<int, 3>> cartExps(const int l);
-
-        /**
-         * \ingroup ints
          * Returns the Cartesial to spherical basis transformation,
          * \f$\{(\text{i_spherical}, \text{i_cartesian}, \text{val})\}\f$.
          */
@@ -282,6 +275,13 @@ namespace lible
         ShellPairData constructShellPairDataSymm(const int la, const int lb,
                                                  const Structure &structure);
 
+        /** 
+         * \ingroup ints
+         * 
+         */                                                 
+        ShellPairData constructShellPairDataNoSymm(const int la, const int lb,
+                                                   const Structure &structure);
+
         /**
          * \ingroup ints
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
@@ -294,8 +294,12 @@ namespace lible
          * Constructs the shell pair datas for the given l-pairs.
          */
         std::vector<ShellPairData>
-        constructShellPairDatas(const std::vector<std::pair<int, int>> &l_pairs,
-                                const Structure &structure);
+        constructShellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
+                                    const Structure &structure);
+
+        std::vector<ShellPairData>
+        constructShellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
+                                      const Structure &structure);
 
         /** */
         vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
@@ -412,6 +416,13 @@ namespace lible
          */
         constexpr int numHermites(const int l);
 
+        /**
+         * \ingroup ints
+         * Returns the exponents of a Cartesian Gaussian \f$(x,y,z)\f$-directions for the given
+         * angular momentum.
+         */
+        std::vector<std::array<int, 3>> cartExps(const int l);
+                
         /**
          * \ingroup ints
          * Returns a list of angular momentum pairs such that la >= lb: {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
