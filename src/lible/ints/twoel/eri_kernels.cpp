@@ -1353,14 +1353,14 @@ kernel_eri2_t LIT::deployERI2Kernel(const int la, const int lb)
     int l_max = _eri_kernel_max_l_;
     if (lab > _eri_kernel_max_l_)
     {
-        string msg = std::format("la + lb = {} is larger than the allowed max: {}!\n",
+        string msg = std::format("deployERI2Kernel(): la + lb = {} is larger than the allowed max: {}!\n",
                                  lab, l_max);
         throw std::runtime_error(msg);
     }
 
     if (eri2_kernels.find(std::make_tuple(la, lb)) == eri2_kernels.end())
     {
-        string msg = std::format("The combination ({}, {}) was not found!\n", la, lb);
+        string msg = std::format("deployERI2Kernel(): The combination ({}, {}) was not found!\n", la, lb);
         throw std::runtime_error(msg);
     }
 
@@ -1373,14 +1373,14 @@ kernel_eri3_t LIT::deployERI3Kernel(const int la, const int lb, const int lc)
     int l_max = _eri_kernel_max_l_;
     if (labc > _eri_kernel_max_l_)
     {
-        string msg = std::format("lab + lc = {} is larger than the allowed max: {}!\n",
+        string msg = std::format("deployERI3Kernel(): lab + lc = {} is larger than the allowed max: {}!\n",
                                  labc, l_max);
         throw std::runtime_error(msg);
     }
 
     if (eri3_kernels.find(std::make_tuple(la, lb, lc)) == eri3_kernels.end())
     {
-        string msg = std::format("The combination ({}, {}, {}) was not found!\n", la, lb, lc);
+        string msg = std::format("deployERI3Kernel(): The combination ({}, {}, {}) was not found!\n", la, lb, lc);
         throw std::runtime_error(msg);
     }
 
@@ -1393,14 +1393,14 @@ kernel_eri4_t LIT::deployERI4Kernel(const int la, const int lb, const int lc, co
     int l_max = _eri_kernel_max_l_;
     if (labcd > _eri_kernel_max_l_)
     {
-        string msg = std::format("lab + lcd = {} is larger than the allowed max: {}!\n",
+        string msg = std::format("deployERI4Kernel(): lab + lcd = {} is larger than the allowed max: {}!\n",
                                  labcd, l_max);
         throw std::runtime_error(msg);
     }
 
     if (eri4_kernels.find(std::make_tuple(la, lb, lc, ld)) == eri4_kernels.end())
     {
-        string msg = std::format("The combination ({}, {}, {}, {}) was not found!\n", la, lb, lc, ld);
+        string msg = std::format("deployERI4Kernel(): The combination ({}, {}, {}, {}) was not found!\n", la, lb, lc, ld);
         throw std::runtime_error(msg);
     }
 
