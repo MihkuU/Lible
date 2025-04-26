@@ -76,7 +76,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
         throw std::runtime_error("RI approximation is not enabled!");
 
     int l_max_aux = structure.getMaxLAux();
-    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
+    vector<ShellData> sh_datas = shellDatasAux(l_max_aux, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(l_max_aux, sh_datas);
 
@@ -127,7 +127,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
         throw std::runtime_error("RI approximation is not enabled!");
 
     int l_max_aux = structure.getMaxLAux();
-    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
+    vector<ShellData> sh_datas = shellDatasAux(l_max_aux, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(l_max_aux, sh_datas);
 

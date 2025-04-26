@@ -105,7 +105,7 @@ namespace lible
          *
          * Constructs the shell data corresponding to the auxilary basis set.
          */
-        ShellData constructShellDataAux(const int l, const Structure &structure);
+        ShellData shellDataAux(const int l, const Structure &structure);
 
         /**
          * \ingroup spdata
@@ -115,7 +115,7 @@ namespace lible
          * If la != lb, shell pair data is created for pairs (ishellA, ishellB). When la == lb,
          * the data is create for (ishellA, ishellA') pairs such that ishellA >= ishellA'.
          */
-        ShellPairData constructShellPairDataSymm(const int la, const int lb,
+        ShellPairData shellPairDataSymm(const int la, const int lb,
                                                  const Structure &structure);
 
         /**
@@ -124,7 +124,7 @@ namespace lible
          * Constructs the shell pair data corresponding to the main basis set. No symmetries are
          * being used in this version.
          */
-        ShellPairData constructShellPairDataNoSymm(const int la, const int lb,
+        ShellPairData shellPairDataNoSymm(const int la, const int lb,
                                                    const Structure &structure);
 
         /**
@@ -144,7 +144,7 @@ namespace lible
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
          */
         std::vector<ShellData>
-        constructShellDatasAux(const int l_max, const Structure &structure);
+        shellDatasAux(const int l_max, const Structure &structure);
 
         /**
          * \ingroup spdata
@@ -153,7 +153,7 @@ namespace lible
          * (la, lb)-pair assume symmetries.
          */
         std::vector<ShellPairData>
-        constructShellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
+        shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
                                     const Structure &structure);
 
         /**
@@ -163,7 +163,7 @@ namespace lible
          * (la, lb)-pair assume symmetries.
          */
         std::vector<ShellPairData>
-        constructShellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
+        shellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
                                       const Structure &structure);
     }
 }

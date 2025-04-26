@@ -266,40 +266,38 @@ namespace lible
          * \ingroup ints
          * Constructs the shell data corresponding to the auxilary basis set.
          */
-        ShellData constructShellDataAux(const int l, const Structure &structure);
+        ShellData shellDataAux(const int l, const Structure &structure);
 
         /**
          * \ingroup ints
          * Constructs the shell pair data corresponding to the main basis set.
          */
-        ShellPairData constructShellPairDataSymm(const int la, const int lb,
-                                                 const Structure &structure);
+        ShellPairData shellPairDataSymm(const int la, const int lb, const Structure &structure);
 
-        /** 
+        /**
          * \ingroup ints
-         * 
-         */                                                 
-        ShellPairData constructShellPairDataNoSymm(const int la, const int lb,
-                                                   const Structure &structure);
+         *
+         */
+        ShellPairData shellPairDataNoSymm(const int la, const int lb, const Structure &structure);
 
         /**
          * \ingroup ints
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
          */
-        std::vector<ShellData>
-        constructShellDatasAux(const int l_max, const Structure &structure);
+        std::vector<ShellData> shellDatasAux(const int l_max, const Structure &structure);
 
         /**
          * \ingroup ints
          * Constructs the shell pair datas for the given l-pairs.
          */
         std::vector<ShellPairData>
-        constructShellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                                    const Structure &structure);
+        shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
+                           const Structure &structure);
 
+        /** */
         std::vector<ShellPairData>
-        constructShellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                                      const Structure &structure);
+        shellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
+                             const Structure &structure);
 
         /** */
         vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
@@ -425,9 +423,16 @@ namespace lible
                 
         /**
          * \ingroup ints
-         * Returns a list of angular momentum pairs such that la >= lb: {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
+         * Returns a list of angular momentum pairs such that la >= lb: 
+         *   {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
          */
-        std::vector<std::pair<int, int>> returnLPairs(const int l_max);
+        std::vector<std::pair<int, int>> getLPairsSymm(const int l_max);
+
+        /**
+         * \ingroup ints
+         * Returns a list of angular momentum pairs: {(0, 0), (1, 0), (0, 1), ..., (l_max, l_max)}.
+         */
+        std::vector<std::pair<int, int>> getLPairsNoSymm(const int l_max);        
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

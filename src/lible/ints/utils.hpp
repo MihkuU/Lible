@@ -76,10 +76,15 @@ namespace lible
         /**
          * Returns a list of angular momentum pairs {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
          */
-        std::vector<std::pair<int, int>> returnLPairs(const int l_max);
+        std::vector<std::pair<int, int>> getLPairsSymm(const int l_max);
+
+        /**
+         * Returns a list of angular momentum pairs {(0, 0), (1, 0), (0, 1), ..., (l_max, l_max)}.
+         */        
+        std::vector<std::pair<int, int>> getLPairsNoSymm(const int l_max);
 
         /** */
-        std::map<int, std::vector<std::pair<int, int>>> returnLPairsMap(const int l_max);
+        std::map<int, std::vector<std::pair<int, int>>> getLPairsMap(const int l_max);
 
         /**
          *

@@ -19,10 +19,10 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
         throw std::runtime_error("RI approximation is not enabled!");
 
     int l_max_aux = structure.getMaxLAux();
-    vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellData> sh_datas = constructShellDatasAux(l_max_aux, structure);
-    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
+    vector<ShellData> sh_datas = shellDatasAux(l_max_aux, structure);
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
     vector<vector<double>> ecoeffs_aux = ecoeffsSphericalShellDatas_Bra(l_max_aux, sh_datas);
     vector<vector<double>> ecoeffs = ecoeffsSphericalSPDatas_Bra(l_pairs, sp_datas);

@@ -224,9 +224,9 @@ namespace lible::ints::two
 
 lible::vec4d LIT::calcERI4(const Structure &structure)
 {
-    vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -300,9 +300,9 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
 lible::vec4d LIT::calcERI4New(const Structure &structure)
 {
-    vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -372,9 +372,9 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
     auto start{std::chrono::steady_clock::now()};
 
-    vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -459,9 +459,9 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
 
     auto start{std::chrono::steady_clock::now()};
 
-    vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 
@@ -535,9 +535,9 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
 
 lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 {
-    vector<pair<int, int>> l_pairs = returnLPairs(structure.getMaxL());
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = constructShellPairDatasSymm(l_pairs, structure);
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(l_pairs, sp_datas);
 

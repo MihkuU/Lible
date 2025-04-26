@@ -47,7 +47,7 @@ vector<array<int, 3>> LI::cartExps(const int l)
     return cartesian_exps;
 }
 
-vector<pair<int, int>> LI::returnLPairs(const int l_max)
+vector<pair<int, int>> LI::getLPairsSymm(const int l_max)
 {
     int n_pairs = (l_max + 1) * (l_max + 2) / 2;
     vector<pair<int, int>> l_pairs(n_pairs);
@@ -59,7 +59,19 @@ vector<pair<int, int>> LI::returnLPairs(const int l_max)
     return l_pairs;
 }
 
-map<int, vector<pair<int, int>>> LI::returnLPairsMap(const int l_max)
+vector<pair<int, int>> LI::getLPairsNoSymm(const int l_max)
+{
+    int n_pairs = (l_max + 1) * (l_max + 1);
+    vector<pair<int, int>> l_pairs(n_pairs);
+
+    for (int la = 0, idx = 0; la <= l_max; la++)
+        for (int lb = 0; lb <= l_max; lb++, idx++)
+            l_pairs[idx] = {la, lb};
+
+    return l_pairs;
+}
+
+map<int, vector<pair<int, int>>> LI::getLPairsMap(const int l_max)
 {
     int l_max_pair = 2 * l_max;
 
