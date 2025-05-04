@@ -185,7 +185,7 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
     int n_hermite_b = numHermites(lb);
     int n_ecoeffs_b = n_sph_b * n_hermite_b;
 
-    std::fill(eri2_batch.begin(), eri2_batch.begin() + 6 * n_sph_ab, 0);
+    std::fill(eri2_batch, eri2_batch + 6 * n_sph_ab, 0);
 
     array<double, 3> xyz_ab{coords_a[0] - coords_b[0], coords_a[1] - coords_b[1],
                             coords_a[2] - coords_b[2]};
