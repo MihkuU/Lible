@@ -627,7 +627,6 @@ LI::ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data)
 
     const auto &cart_exps = cartExps(l);
 
-    int dim_cart = numCartesians(l);
     int dim_sph = numSphericals(l);
     int dim_tuv = numHermites(l);
 

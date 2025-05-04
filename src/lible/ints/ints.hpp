@@ -403,7 +403,7 @@ namespace lible
         std::vector<double> calcBoysF(const int max_n, const double x, const BoysGrid &boys_grid);
 
         /** TODO: */
-        vec3d calcRInts(const int l, const double p, const double *xyz_ab, const double *fnx);
+        vec3d calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx);
 
         /**
          * \ingroup ints
