@@ -211,15 +211,15 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
                         int idx4 = 4 * n_sph_abc + munuka;
                         int idx5 = 5 * n_sph_abc + munuka;
 
-                        // // A
-                        // eri3_batch[idx0] += (a / p) * eri3_batch_PR[idx0] + eri3_batch_PR[idx3];
-                        // eri3_batch[idx1] += (a / p) * eri3_batch_PR[idx1] + eri3_batch_PR[idx4];
-                        // eri3_batch[idx2] += (a / p) * eri3_batch_PR[idx2] + eri3_batch_PR[idx5];
+                        // A
+                        eri3_batch[idx0] += (a / p) * eri3_batch_PR[idx0] + eri3_batch_PR[idx3];
+                        eri3_batch[idx1] += (a / p) * eri3_batch_PR[idx1] + eri3_batch_PR[idx4];
+                        eri3_batch[idx2] += (a / p) * eri3_batch_PR[idx2] + eri3_batch_PR[idx5];
 
-                        // // B
-                        // eri3_batch[idx3] += (b / p) * eri3_batch_PR[idx0] - eri3_batch_PR[idx3];
-                        // eri3_batch[idx4] += (b / p) * eri3_batch_PR[idx1] - eri3_batch_PR[idx4];
-                        // eri3_batch[idx5] += (b / p) * eri3_batch_PR[idx2] - eri3_batch_PR[idx5];
+                        // B
+                        eri3_batch[idx3] += (b / p) * eri3_batch_PR[idx0] - eri3_batch_PR[idx3];
+                        eri3_batch[idx4] += (b / p) * eri3_batch_PR[idx1] - eri3_batch_PR[idx4];
+                        eri3_batch[idx5] += (b / p) * eri3_batch_PR[idx2] - eri3_batch_PR[idx5];
                     }
         }
 
