@@ -178,8 +178,20 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
                         n_sph_c, 1.0, &eri3_batch_PR[2 * n_sph_abc], n_sph_c);
 
             // R
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 3 * n_sph_ab, n_sph_c,
-                        n_hermite_ab, 1.0, &ecoeffs_deriv1_ab[ofs_ecoeffs_deriv1], n_hermite_ab,
+            // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 3 * n_sph_ab, n_sph_c,
+            //             n_hermite_ab, 1.0, &ecoeffs_deriv1_ab[ofs_ecoeffs_deriv1], n_hermite_ab,
+            //             &R_x_E[ofs3], n_sph_c, 1.0, &eri3_batch_PR[3 * n_sph_abc], n_sph_c);
+
+            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c,
+                        n_hermite_ab, 1.0, &ecoeffs_deriv1_ab[ofs_ecoeffs_deriv1 + 0 * n_ecoeffs_ab], n_hermite_ab,
+                        &R_x_E[ofs3], n_sph_c, 1.0, &eri3_batch_PR[3 * n_sph_abc], n_sph_c);
+
+            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c,
+                        n_hermite_ab, 1.0, &ecoeffs_deriv1_ab[ofs_ecoeffs_deriv1 + 1 * n_ecoeffs_ab], n_hermite_ab,
+                        &R_x_E[ofs3], n_sph_c, 1.0, &eri3_batch_PR[3 * n_sph_abc], n_sph_c);
+
+            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c,
+                        n_hermite_ab, 1.0, &ecoeffs_deriv1_ab[ofs_ecoeffs_deriv1 + 2 * n_ecoeffs_ab], n_hermite_ab,
                         &R_x_E[ofs3], n_sph_c, 1.0, &eri3_batch_PR[3 * n_sph_abc], n_sph_c);
 
             // C
@@ -210,6 +222,8 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
                         int idx3 = 3 * n_sph_abc + munuka;
                         int idx4 = 4 * n_sph_abc + munuka;
                         int idx5 = 5 * n_sph_abc + munuka;
+
+                        // TODO: try BLAS here?
 
                         // A
                         eri3_batch[idx0] += (a / p) * eri3_batch_PR[idx0] + eri3_batch_PR[idx3];
