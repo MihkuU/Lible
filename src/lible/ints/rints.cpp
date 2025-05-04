@@ -176,7 +176,7 @@ vector<double> LI::calcRInts_ERI2_deriv1(const int l, const double fac, const do
         if ((t_ + u_ + v_) % 2 != 0)
             sign = -1.0;
 
-        // double sign_ = sign * -1.0;
+        double sign_ = sign * -1.0;
 
         for (size_t i = 0; i < tuv_idxs_a.size(); i++)
         {
@@ -188,9 +188,9 @@ vector<double> LI::calcRInts_ERI2_deriv1(const int l, const double fac, const do
             rints_out[ofs2 + i * dim_tuv_b + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
 
             // d/dB
-            rints_out[ofs3 + i * dim_tuv_b + j] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
-            rints_out[ofs4 + i * dim_tuv_b + j] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
-            rints_out[ofs5 + i * dim_tuv_b + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+            rints_out[ofs3 + i * dim_tuv_b + j] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints_out[ofs4 + i * dim_tuv_b + j] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints_out[ofs5 + i * dim_tuv_b + j] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
         }
     }
 
