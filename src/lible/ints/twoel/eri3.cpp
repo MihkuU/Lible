@@ -71,7 +71,16 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
 
                     transferIntsERI3(ipair_ab, ishell_c, sh_data_c, sp_data_ab, eri3_batch, eri3);
                 }
-        }    
+        }
 
     return eri3;
+}
+
+void LIT::kernelERI3Deriv1(const int la, const int lb, const int ld,
+                           const int cdepth_a, const int cdepth_b, const int cdepth_c,
+                           const double *exps_a, const double *exps_b, const double *exps_c,
+                           const double *coords_a, const double *coords_b, const double *coords_d,
+                           const double *ecoeffs_ab, const double *ecoeffs_c,
+                           const BoysGrid &boys_grid, double *eri3_batch)
+{
 }

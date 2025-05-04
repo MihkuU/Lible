@@ -88,8 +88,16 @@ namespace lible
             void kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                                   const double *exps_a, const double *exps_b, const double *coords_a,
                                   const double *coords_b, const double *ecoeffs_a,
-                                  const double *ecoeffs_b_tsp, const BoysGrid &boys_grid,
+                                  const double *ecoeffs_b_tsp, const double *norms_a,
+                                  const double *norms_b, const BoysGrid &boys_grid,
                                   double *eri2_batch);
+
+            void kernelERI3Deriv1(const int la, const int lb, const int ld,
+                                  const int cdepth_a, const int cdepth_b, const int cdepth_c,
+                                  const double *exps_a, const double *exps_b, const double *exps_c,
+                                  const double *coords_a, const double *coords_b, const double *coords_d,
+                                  const double *ecoeffs_ab, const double *ecoeffs_c,
+                                  const BoysGrid &boys_grid, double *eri3_batch);
         }
     }
 }

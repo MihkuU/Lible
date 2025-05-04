@@ -89,11 +89,24 @@ LI::kernel_eri2_t LI::deployERI2Kernel(const int la, const int lb)
 void LI::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                           const double *exps_a, const double *exps_b, const double *coords_a,
                           const double *coords_b, const double *ecoeffs_a,
-                          const double *ecoeffs_b_tsp, const BoysGrid &boys_grid,
+                          const double *ecoeffs_b_tsp, const double *norms_a,
+                          const double *norms_b, const BoysGrid &boys_grid,
                           double *eri2_batch)
 {
-    LIT::kernelERI2Deriv1(la, lb, cdepth_a, cdepth_b, exps_a, exps_b, coords_a,
-                          coords_b, ecoeffs_a, ecoeffs_b_tsp, boys_grid, eri2_batch);
+    LIT::kernelERI2Deriv1(la, lb, cdepth_a, cdepth_b, exps_a, exps_b, coords_a, coords_b,
+                          ecoeffs_a, ecoeffs_b_tsp, norms_a, norms_b, boys_grid, eri2_batch);
+}
+
+void LI::kernelERI3Deriv1(const int la, const int lb, const int ld,
+                          const int cdepth_a, const int cdepth_b, const int cdepth_c,
+                          const double *exps_a, const double *exps_b, const double *exps_c,
+                          const double *coords_a, const double *coords_b, const double *coords_d,
+                          const double *ecoeffs_ab, const double *ecoeffs_c, 
+                          const BoysGrid &boys_grid, double *eri3_batch)
+{
+    LIT::kernelERI3Deriv1(la, lb, ld, cdepth_a, cdepth_b, cdepth_c, exps_a, exps_b, exps_c,
+                          coords_a, coords_b, coords_d, ecoeffs_ab, ecoeffs_c, boys_grid,
+                          eri3_batch);
 }
 
 #ifdef _LIBLE_USE_HIP_

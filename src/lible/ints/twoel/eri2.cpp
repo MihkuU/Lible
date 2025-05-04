@@ -169,7 +169,8 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
 void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                            const double *exps_a, const double *exps_b, const double *coords_a,
                            const double *coords_b, const double *ecoeffs_a,
-                           const double *ecoeffs_b_tsp, const BoysGrid &boys_grid,
+                           const double *ecoeffs_b_tsp, const double *norms_a,
+                           const double *norms_b, const BoysGrid &boys_grid,
                            double *eri2_batch)
 {
     int lab = la + lb;
@@ -249,5 +250,20 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs5], n_sph_b, 1.0,
                     &eri2_batch[5 * n_sph_ab], n_sph_b);
+    }
+
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+    {
+        for (int a = 0; a < n_sph_a; a++)
+            for (int b = 0; b < n_sph_b; b++)
+            {
+                int ab = a * n_sph_b + b;
+                int idx = ideriv * n_sph_ab + ab;
+
+                double norm_a = norms_a[a];
+                double norm_b = norms_b[b];
+
+                eri2_batch[idx] *= norm_a * norm_b;
+            }
     }
 }
