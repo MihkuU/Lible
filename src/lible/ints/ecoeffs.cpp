@@ -725,6 +725,26 @@ LI::ecoeffsSphericalSPDatas_Bra(const vector<pair<int, int>> &l_pairs,
     return ecoeffs;
 }
 
+vector<vector<double>>
+LI::ecoeffsSphericalSPDatas_Bra_Deriv1(const vector<pair<int, int>> &l_pairs,
+                                       const vector<ShellPairData> &sp_datas)
+{
+    if (l_pairs.size() != sp_datas.size())
+        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
+
+    vector<vector<double>> ecoeffs(l_pairs.size());
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+
+        auto ecoeffs_ipair = ecoeffsSphericalSPData_Bra_Deriv1(la, lb, sp_datas[ipair]);
+
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+    }
+
+    return ecoeffs;
+}
+
 pair<vector<vector<double>>, vector<vector<double>>>
 LI::ecoeffsSphericalSPDatas_BraKet(const vector<pair<int, int>> &l_pairs,
                                    const vector<ShellPairData> &sp_datas)
