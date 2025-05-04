@@ -160,13 +160,13 @@ vector<double> LI::calcRInts_ERI3_deriv1(const int l, const double fac, const do
     int dim_tuv_c = tuv_idxs_c.size();
     int dim_tuv_abc = dim_tuv_ab * dim_tuv_c;
 
-    int ofs0 = dim_tuv_ab * 0;
-    int ofs1 = dim_tuv_ab * 1;
-    int ofs2 = dim_tuv_ab * 2;
-    int ofs3 = dim_tuv_ab * 3;
-    int ofs4 = dim_tuv_ab * 4;
-    int ofs5 = dim_tuv_ab * 5;
-    int ofs6 = dim_tuv_ab * 5;
+    int ofs0 = dim_tuv_abc * 0;
+    int ofs1 = dim_tuv_abc * 1;
+    int ofs2 = dim_tuv_abc * 2;
+    int ofs3 = dim_tuv_abc * 3;
+    int ofs4 = dim_tuv_abc * 4;
+    int ofs5 = dim_tuv_abc * 5;
+    int ofs6 = dim_tuv_abc * 5;
 
     vector<double> rints_out(7 * dim_tuv_abc, 0);
     for (size_t j = 0; j < tuv_idxs_c.size(); j++)
