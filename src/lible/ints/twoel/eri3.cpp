@@ -222,18 +222,22 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
                         eri3_batch[idx5] += (b / p) * eri3_batch_PR[idx2] - eri3_batch_PR[idx5];
                     }
         }
-    
-    
-        for (int mu = 0, munu = 0; mu < n_sph_a; mu++)
-            for (int nu = 0; nu < n_sph_b; nu++, munu++)
-                for (int ka = 0; ka < n_sph_c; ka++)
-                {
-                    int munuka = munu * n_sph_c + ka;
-    
-                    double norm_a = norms_a[mu];
-                    double norm_b = norms_b[nu];
-                    double norm_c = norms_c[ka];
 
-                    eri3_batch[munuka] *= norm_a * norm_b * norm_c;
-                }        
+    for (int ideriv = 0; ideriv < 9; ideriv++)
+    {
+        int ofs = ideriv * n_sph_abc;
+        for (int a = 0, ab = 0; a < n_sph_a; a++)
+            for (int b = 0; b < n_sph_b; b++, ab++)
+                for (int c = 0; c < n_sph_c; c++)
+                {
+                    int abc = ab * n_sph_c + c;
+                    int idx = ofs + abc;
+
+                    double norm_a = norms_a[a];
+                    double norm_b = norms_b[b];
+                    double norm_c = norms_c[c];
+
+                    eri3_batch[idx] *= norm_a * norm_b * norm_c;
+                }
+    }
 }
