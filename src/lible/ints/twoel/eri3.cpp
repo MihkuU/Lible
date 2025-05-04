@@ -161,8 +161,8 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
             int ofs5 = start + 5 * n_R_x_E;
             int ofs6 = start + 6 * n_R_x_E;
 
-            int ofs_ecoeffs = ia * n_ecoeffs_ab;
-            int ofs_ecoeffs_deriv1 = 3 * ia * n_ecoeffs_ab;
+            int ofs_ecoeffs = iab * n_ecoeffs_ab;
+            int ofs_ecoeffs_deriv1 = 3 * iab * n_ecoeffs_ab;
 
             // P
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c,
