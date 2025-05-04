@@ -256,11 +256,12 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
 
     for (int ideriv = 0; ideriv < 6; ideriv++)
     {
+        int ofs = ideriv * n_sph_ab;
         for (int a = 0; a < n_sph_a; a++)
             for (int b = 0; b < n_sph_b; b++)
             {
                 int ab = a * n_sph_b + b;
-                int idx = ideriv * n_sph_ab + ab;
+                int idx = ofs + ab;
 
                 double norm_a = norms_a[a];
                 double norm_b = norms_b[b];
