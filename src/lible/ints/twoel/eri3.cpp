@@ -81,8 +81,9 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
                            const double *exps_a, const double *exps_b, const double *exps_c,
                            const double *coords_a, const double *coords_b, const double *coords_c,
                            const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
-                           const double *ecoeffs_c, const BoysGrid &boys_grid,
-                           double *eri3_batch)
+                           const double *ecoeffs_c, const double *norms_a,
+                           const double *norms_b, const double *norms_c,
+                           const BoysGrid &boys_grid, double *eri3_batch)
 {
     int lab = la + lb;
     int labc = lab + lc;
@@ -221,4 +222,18 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
                         eri3_batch[idx5] += (b / p) * eri3_batch_PR[idx2] - eri3_batch_PR[idx5];
                     }
         }
+    
+    
+        for (int mu = 0, munu = 0; mu < n_sph_a; mu++)
+            for (int nu = 0; nu < n_sph_b; nu++, munu++)
+                for (int ka = 0; ka < n_sph_c; ka++)
+                {
+                    int munuka = munu * n_sph_c + ka;
+    
+                    double norm_a = norms_a[mu];
+                    double norm_b = norms_b[nu];
+                    double norm_c = norms_c[ka];
+
+                    eri3_batch[munuka] *= norm_a * norm_b * norm_c;
+                }        
 }

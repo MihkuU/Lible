@@ -102,12 +102,12 @@ void LI::kernelERI3Deriv1(const int la, const int lb, const int lc,
                           const double *exps_a, const double *exps_b, const double *exps_c,
                           const double *coords_a, const double *coords_b, const double *coords_c,
                           const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
-                          const double *ecoeffs_c, const BoysGrid &boys_grid,
-                          double *eri3_batch)
+                          const double *ecoeffs_c, const double *norms_a, const double *norms_b,
+                          const double *norms_c, const BoysGrid &boys_grid, double *eri3_batch)
 {
     LIT::kernelERI3Deriv1(la, lb, lc, cdepth_a, cdepth_b, cdepth_c, exps_a, exps_b, exps_c,
                           coords_a, coords_b, coords_c, ecoeffs_ab, ecoeffs_deriv1_ab,
-                          ecoeffs_c, boys_grid, eri3_batch);
+                          ecoeffs_c, norms_a, norms_b, norms_c, boys_grid, eri3_batch);
 }
 
 #ifdef _LIBLE_USE_HIP_

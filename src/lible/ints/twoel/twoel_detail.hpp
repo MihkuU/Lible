@@ -98,7 +98,9 @@ namespace lible
                                   const double *coords_a, const double *coords_b, 
                                   const double *coords_c, const double *ecoeffs_ab, 
                                   const double *ecoeffs_deriv1_ab, const double *ecoeffs_c, 
-                                  const BoysGrid &boys_grid, double *eri3_batch);
+                                  const double *norms_a, const double *norms_b, 
+                                  const double *norms_c, const BoysGrid &boys_grid, 
+                                  double *eri3_batch);
         }
     }
 }
