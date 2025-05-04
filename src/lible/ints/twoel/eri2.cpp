@@ -193,7 +193,7 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
     double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
 
     int n_R_x_E = n_hermite_a * n_sph_b;
-    vector<double> R_x_E(6 * cdepth_a * cdepth_b * n_R_x_E, 0);
+    vector<double> R_x_E(6 * cdepth_a * n_R_x_E, 0);
     for (int ia = 0; ia < cdepth_a; ia++)
     {
         int ofs_R_x_E = 6 * ia * n_R_x_E;
