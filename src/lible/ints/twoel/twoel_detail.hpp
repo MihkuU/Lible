@@ -84,6 +84,12 @@ namespace lible
             kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int lc);
 
             kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
+
+            void kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                                  const double *exps_a, const double *exps_b, const double *coords_a,
+                                  const double *coords_b, const double *ecoeffs_a,
+                                  const double *ecoeffs_b_tsp, const BoysGrid &boys_grid,
+                                  double *eri2_batch);
         }
     }
 }

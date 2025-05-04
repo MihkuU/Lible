@@ -5,10 +5,11 @@
 
 #include <array>
 #include <stdexcept>
+#include <tuple>
 
 namespace LI = lible::ints;
 
-using std::array, std::pair, std::vector;
+using std::array, std::pair, std::tuple, std::vector;
 
 lible::vec3d LI::ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
                                     const double PA, const double PB, const double Kab)
@@ -353,13 +354,12 @@ vector<vector<double>> LI::ecoeffsShell(const int l, const vector<double> &exps)
 vector<double>
 LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &sp_data)
 {
-    arma::dmat sph_trafo_a = returnSphericalTrafo(la);
-    arma::dmat sph_trafo_b = returnSphericalTrafo(lb);
+    vector<tuple<int, int, double>> sph_trafo_a = sphericalTrafo(la);
+    vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);    
 
     const auto &cart_exps_a = cartExps(la);
     const auto &cart_exps_b = cartExps(lb);
 
-    int dim_a_cart = numCartesians(la);
     int dim_b_cart = numCartesians(lb);
     int dim_a_sph = numSphericals(la);
     int dim_b_sph = numSphericals(lb);
@@ -377,76 +377,153 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
     vector<double> ecoeffs(n_ecoeffs_sph, 0);    
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
-        int dim_a = sp_data.cdepths[2 * ipair + 0];
-        int dim_b = sp_data.cdepths[2 * ipair + 1];
-        int pos_a = sp_data.coffsets[2 * ipair + 0];
-        int pos_b = sp_data.coffsets[2 * ipair + 1];
+        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+        int cofs_a = sp_data.coffsets[2 * ipair + 0];
+        int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
-        array<double, 3> xyz_a{sp_data.coords[6 * ipair + 0],
-                               sp_data.coords[6 * ipair + 1],
-                               sp_data.coords[6 * ipair + 2]};
-
-        array<double, 3> xyz_b{sp_data.coords[6 * ipair + 3],
-                               sp_data.coords[6 * ipair + 4],
-                               sp_data.coords[6 * ipair + 5]};
+        const double* xyz_a = &sp_data.coords[6 * ipair + 0];
+        const double* xyz_b = &sp_data.coords[6 * ipair + 3];
 
         int offset_ecoeffs = sp_data.offsets_ecoeffs[ipair];
 
-        vec3d ecoeffs_ppair_cc(dim_a_cart, dim_b_cart, dim_tuv, 0);
-        vec3d ecoeffs_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
-        for (int ia = 0, iab = 0; ia < dim_a; ia++)
-            for (int ib = 0; ib < dim_b; ib++, iab++)
+        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
             {
-                double a = sp_data.exps[pos_a + ia];
-                double b = sp_data.exps[pos_b + ib];
+                double a = sp_data.exps[cofs_a + ia];
+                double b = sp_data.exps[cofs_b + ib];
 
-                auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] =
-                    ecoeffsPrimitivePair(a, b, la, lb, &xyz_a[0], &xyz_b[0]);
+                auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
 
-                ecoeffs_ppair_cc.set(0);
-                for (size_t mu = 0; mu < cart_exps_a.size(); mu++)
-                {
-                    auto [i, j, k] = cart_exps_a[mu];
-                    for (size_t nu = 0; nu < cart_exps_b.size(); nu++)
+                vec3d ecoeffs_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+                for (auto &[a, a_, val] : sph_trafo_a)
+                    for (size_t b_ = 0; b_ < cart_exps_b.size(); b_++)
                     {
-                        auto [i_, j_, k_] = cart_exps_b[nu];
+                        auto [i, j, k] = cart_exps_a[a_];
+                        auto [i_, j_, k_] = cart_exps_b[b_];
                         for (int t = 0; t <= i + i_; t++)
                             for (int u = 0; u <= j + j_; u++)
                                 for (int v = 0; v <= k + k_; v++)
                                 {
                                     int tuv = tuv_poss(t, u, v);
-                                    ecoeffs_ppair_cc(mu, nu, tuv) =
-                                        ecoeffs_x(i, i_, t) * ecoeffs_y(j, j_, u) * ecoeffs_z(k, k_, v);
+
+                                    ecoeffs_ppair_sc(a, b_, tuv) +=
+                                        val * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
                                 }
                     }
-                }
 
-                ecoeffs_ppair_sc.set(0);
-                for (int mu = 0; mu < dim_a_sph; mu++)
-                    for (int mu_ = 0; mu_ < dim_a_cart; mu_++)
-                        for (int nu = 0; nu < dim_b_cart; nu++)
-                            for (int tuv = 0; tuv < dim_tuv; tuv++)
-                                ecoeffs_ppair_sc(mu, nu, tuv) +=
-                                    ecoeffs_ppair_cc(mu_, nu, tuv) * sph_trafo_a(mu, mu_);
-
-                double da = sp_data.coeffs[pos_a + ia];
-                double db = sp_data.coeffs[pos_b + ib];
-                int pos = offset_ecoeffs + iab * n_ecoeffs;
-                for (int mu = 0, munu = 0; mu < dim_a_sph; mu++)
-                    for (int nu = 0; nu < dim_b_sph; nu++, munu++)
-                        for (int nu_ = 0; nu_ < dim_b_cart; nu_++)
-                            for (int tuv = 0; tuv < dim_tuv; tuv++)
-                            {
-                                double ecoeff = da * db * ecoeffs_ppair_sc(mu, nu_, tuv) *
-                                                sph_trafo_b(nu, nu_);
-
-                                int idx = pos + munu * dim_tuv + tuv;
-                                ecoeffs[idx] += ecoeff;
-                            }
+                double da = sp_data.coeffs[cofs_a + ia];
+                double db = sp_data.coeffs[cofs_b + ib];
+                double dadb = da * db;           
+                
+                int ofs = offset_ecoeffs + iab * n_ecoeffs;
+                for (auto &[b, b_, val] : sph_trafo_b)
+                    for (int a = 0; a < dim_a_sph; a++)
+                        for (int tuv = 0; tuv < dim_tuv; tuv++)
+                        {
+                            int ab = a * dim_b_sph + b;
+                            int idx = ofs + ab * dim_tuv + tuv;
+                            ecoeffs[idx] += dadb * val * ecoeffs_ppair_sc(a, b_, tuv);
+                        }
             }
     }
 
     return ecoeffs;
+}
+
+vector<double>
+LI::ecoeffsSphericalSPData_Bra_Deriv1(const int la, const int lb, const ShellPairData &sp_data)
+{
+    vector<tuple<int, int, double>> sph_trafo_a = sphericalTrafo(la);
+    vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);
+
+    const auto &cart_exps_a = cartExps(la);
+    const auto &cart_exps_b = cartExps(lb);
+
+    int dim_b_cart = numCartesians(lb);
+    int dim_a_sph = numSphericals(la);
+    int dim_b_sph = numSphericals(lb);
+    int dim_ab = dim_a_sph * dim_b_sph;
+
+    int lab = la + lb;
+    int dim_tuv = numHermites(lab);
+    int n_ecoeffs = dim_ab * dim_tuv;
+
+    vec3i tuv_poss = returnHermiteGaussianPositions(lab);
+
+    int n_ecoeffs_prims = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
+                          sp_data.n_prim_pairs;
+
+    vector<double> ecoeffs_100_010_001(3 * n_ecoeffs_prims, 0);
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+        int cofs_a = sp_data.coffsets[2 * ipair + 0];
+        int cofs_b = sp_data.coffsets[2 * ipair + 1];
+
+        const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+        const double *xyz_b = &sp_data.coords[6 * ipair + 3];
+
+        int offset_ecoeffs = sp_data.offsets_ecoeffs_deriv1[ipair];
+
+        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+            {
+                double a = sp_data.exps[cofs_a + ia];
+                double b = sp_data.exps[cofs_b + ib];
+
+                auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
+
+                auto [E1x, E1y, E1z] =
+                    ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b, {Ex, Ey, Ez});
+
+                vec3d ecoeffs100_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+                vec3d ecoeffs010_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+                vec3d ecoeffs001_ppair_sc(dim_a_sph, dim_b_cart, dim_tuv, 0);
+                for (auto &[a, a_, val] : sph_trafo_a)
+                    for (size_t b_ = 0; b_ < cart_exps_b.size(); b_++)
+                    {
+                        auto [i, j, k] = cart_exps_a[a_];
+                        auto [i_, j_, k_] = cart_exps_b[b_];
+                        for (int t = 0; t <= i + i_; t++)
+                            for (int u = 0; u <= j + j_; u++)
+                                for (int v = 0; v <= k + k_; v++)
+                                {
+                                    int tuv = tuv_poss(t, u, v);
+
+                                    ecoeffs100_ppair_sc(a, b_, tuv) +=
+                                        val * E1x(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
+                                    ecoeffs010_ppair_sc(a, b_, tuv) +=
+                                        val * Ex(i, i_, t) * E1y(j, j_, u) * Ez(k, k_, v);
+                                    ecoeffs001_ppair_sc(a, b_, tuv) +=
+                                        val * Ex(i, i_, t) * Ey(j, j_, u) * E1z(k, k_, v);
+                                }
+                    }
+
+                double da = sp_data.coeffs[cofs_a + ia];
+                double db = sp_data.coeffs[cofs_b + ib];
+                double dadb = da * db;
+
+                int ofs_100 = offset_ecoeffs + (iab + 0) * n_ecoeffs;
+                int ofs_010 = offset_ecoeffs + (iab + 1) * n_ecoeffs;
+                int ofs_001 = offset_ecoeffs + (iab + 2) * n_ecoeffs;
+                for (auto &[b, b_, val] : sph_trafo_b)
+                    for (int a = 0; a < dim_a_sph; a++)
+                        for (int tuv = 0; tuv < dim_tuv; tuv++)
+                        {
+                            int ab = a * dim_b_sph + b;
+                            int idx_100 = ofs_100 + ab * dim_tuv + tuv;
+                            int idx_010 = ofs_010 + ab * dim_tuv + tuv;
+                            int idx_001 = ofs_001 + ab * dim_tuv + tuv;
+                            ecoeffs_100_010_001[idx_100] += val * dadb * ecoeffs100_ppair_sc(a, b_, tuv);
+                            ecoeffs_100_010_001[idx_010] += val * dadb * ecoeffs010_ppair_sc(a, b_, tuv);
+                            ecoeffs_100_010_001[idx_001] += val * dadb * ecoeffs001_ppair_sc(a, b_, tuv);
+                        }
+            }
+    }
+
+    return ecoeffs_100_010_001;
 }
 
 pair<vector<double>, vector<double>>
@@ -491,10 +568,62 @@ LI::ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairDat
     return {ecoeffs, ecoeffs_tsp};
 }
 
+pair<vector<double>, vector<double>>
+LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb,
+                                         const ShellPairData &sp_data)
+{
+    int dim_a_sph = numSphericals(la);
+    int dim_b_sph = numSphericals(lb);
+    int dim_ab = dim_a_sph * dim_b_sph;
+
+    int lab = la + lb;
+    int dim_tuv = numHermites(lab);
+    int n_ecoeffs = dim_ab * dim_tuv;
+
+    int n_ecoeffs_sph_x1 = dim_ab * dim_tuv * sp_data.n_prim_pairs;
+    vector<double> ecoeffs = ecoeffsSphericalSPData_Bra_Deriv1(la, lb, sp_data);
+
+    vector<double> ecoeffs_tsp(3 * n_ecoeffs_sph_x1, 0);
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+        int offset_ecoeffs = sp_data.offsets_ecoeffs_deriv1[ipair];
+        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+            {
+                int ofs_100 = offset_ecoeffs + (iab + 0) * n_ecoeffs;
+                int ofs_010 = offset_ecoeffs + (iab + 1) * n_ecoeffs;
+                int ofs_001 = offset_ecoeffs + (iab + 2) * n_ecoeffs;
+                for (int a = 0; a < dim_a_sph; a++)
+                    for (int b = 0; b < dim_b_sph; b++)
+                        for (int tuv = 0; tuv < dim_tuv; tuv++)
+                        {
+                            int ab = a * dim_b_sph + b;
+                            int idx_100 = ofs_100 + ab * dim_tuv + tuv;
+                            int idx_010 = ofs_010 + ab * dim_tuv + tuv;
+                            int idx_001 = ofs_001 + ab * dim_tuv + tuv;
+                            double ecoeff_100 = ecoeffs[idx_100];
+                            double ecoeff_010 = ecoeffs[idx_010];
+                            double ecoeff_001 = ecoeffs[idx_001];
+
+                            int idx_100_tsp = ofs_100 + tuv * dim_ab + ab;
+                            int idx_010_tsp = ofs_010 + tuv * dim_ab + ab;
+                            int idx_001_tsp = ofs_001 + tuv * dim_ab + ab;
+                            ecoeffs_tsp[idx_100_tsp] = ecoeff_100;
+                            ecoeffs_tsp[idx_010_tsp] = ecoeff_010;
+                            ecoeffs_tsp[idx_001_tsp] = ecoeff_001;
+                        }
+            }
+    }
+
+    return {ecoeffs, ecoeffs_tsp};
+}
+
 vector<double>
 LI::ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data)
 {
-    arma::dmat sph_trafo = returnSphericalTrafo(l);
+    vector<tuple<int, int, double>> sph_trafo = sphericalTrafo(l);
 
     const auto &cart_exps = cartExps(l);
 
@@ -508,47 +637,36 @@ LI::ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data)
     int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_data.n_primitives;
 
     vector<double> ecoeffs(n_ecoeffs, 0);
-    vector<double> ecoeffs_tsp(n_ecoeffs, 0);
     for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
     {
-        int dim = sh_data.cdepths[ishell];
-        int pos = sh_data.coffsets[ishell];
+        int cdepth = sh_data.cdepths[ishell];
+        int cofs = sh_data.coffsets[ishell];
 
         int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
-
-        vec2d ecoeffs_c(dim_cart, dim_tuv, 0);
-        for (int i = 0; i < dim; i++)
+        
+        for (int i = 0; i < cdepth; i++)
         {
-            double a = sh_data.exps[pos + i];
-            auto [ecoeffs_x, ecoeffs_y, ecoeffs_z] = ecoeffsPrimitive(a, l);
+            double a = sh_data.exps[cofs + i];
 
-            for (size_t mu = 0; mu < cart_exps.size(); mu++)
+            auto [Ex, Ey, Ez] = ecoeffsPrimitive(a, l);
+
+            double d = sh_data.coeffs[cofs + i];
+            int ofs = offset_ecoeffs + i * dim_sph * dim_tuv;
+            for (auto &[a, a_, val] : sph_trafo)
             {
-                auto [i, j, k] = cart_exps[mu];
+                auto [i, j, k] = cart_exps[a_];
                 for (int t = 0; t <= i; t++)
                     for (int u = 0; u <= j; u++)
                         for (int v = 0; v <= k; v++)
                         {
+                            double ecoeff = d * Ex(i, t) * Ey(j, u) * Ez(k, v) * val;
+
                             int tuv = tuv_poss(t, u, v);
-                            ecoeffs_c(mu, tuv) = ecoeffs_x(i, t) * ecoeffs_y(j, u) *
-                                                 ecoeffs_z(k, v);
+
+                            int idx = ofs + a * dim_tuv + tuv;
+                            ecoeffs[idx] += ecoeff;
                         }
             }
-
-            double d = sh_data.coeffs[pos + i];
-            int pos_ecoeffs = offset_ecoeffs + i * dim_sph * dim_tuv;
-            for (int mu = 0; mu < dim_sph; mu++)
-                for (int mu_ = 0; mu_ < dim_cart; mu_++)
-                    for (int tuv = 0; tuv < dim_tuv; tuv++)
-                    {
-                        double ecoeff = d * ecoeffs_c(mu_, tuv) * sph_trafo(mu, mu_);
-
-                        int idx = pos_ecoeffs + mu * dim_tuv + tuv;
-                        ecoeffs[idx] += ecoeff;
-
-                        int idx_tsp = pos_ecoeffs + tuv * dim_sph + mu;
-                        ecoeffs_tsp[idx_tsp] += ecoeff;
-                    }
         }
     }
 
@@ -621,7 +739,31 @@ LI::ecoeffsSphericalSPDatas_BraKet(const vector<pair<int, int>> &l_pairs,
     {
         auto [la, lb] = l_pairs[ipair];
 
-        auto [ecoeffs_ipair, ecoeffs_tsp_ipair] = ecoeffsSphericalSPData_BraKet(la, lb, sp_datas[ipair]);
+        auto [ecoeffs_ipair, ecoeffs_tsp_ipair] =
+            ecoeffsSphericalSPData_BraKet(la, lb, sp_datas[ipair]);
+
+        ecoeffs[ipair] = std::move(ecoeffs_ipair);
+        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+    }
+
+    return {ecoeffs, ecoeffs_tsp};
+}
+
+pair<vector<vector<double>>, vector<vector<double>>>
+LI::ecoeffsSphericalSPDatas_BraKet_Deriv1(const vector<pair<int, int>> &l_pairs,
+                                          const vector<ShellPairData> &sp_datas)
+{
+    if (l_pairs.size() != sp_datas.size())
+        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
+
+    vector<vector<double>> ecoeffs(l_pairs.size());
+    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
+    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    {
+        auto [la, lb] = l_pairs[ipair];
+
+        auto [ecoeffs_ipair, ecoeffs_tsp_ipair] =
+            ecoeffsSphericalSPData_BraKet_Deriv1(la, lb, sp_datas[ipair]);
 
         ecoeffs[ipair] = std::move(ecoeffs_ipair);
         ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);

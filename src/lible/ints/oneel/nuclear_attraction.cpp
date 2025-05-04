@@ -84,7 +84,7 @@ void LI::externalChargesKernel(const int la, const int lb, const int cdepth_a, c
 
                 vector<double> fnx = calcBoysF(lab, x, boys_grid);
 
-                vec3d rints = calcRInts(lab, p, &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab, p, &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
@@ -156,7 +156,7 @@ void LI::externalChargesDerivKernel(const int la, const int lb, const int cdepth
 
                 vector<double> fnx = calcBoysF(lab + 1, x, boys_grid);
 
-                vec3d rints = calcRInts(lab + 1, p, &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab + 1, p, &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab + 1; t++)
                     for (int u = 0; u <= lab + 1; u++)
@@ -245,7 +245,7 @@ void LI::externalChargesOperatorDerivKernel(const int la, const int lb, const in
 
                 vector<double> fnx = calcBoysF(lab + 1, x, boys_grid);
 
-                vec3d rints = calcRInts(lab + 1, p, &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab + 1, p, &xyz_pc[0], &fnx[0]);
 
                 for (const auto &[i, j, k, mu] : cart_exps_a)
                     for (const auto &[i_, j_, k_, nu] : cart_exps_b)

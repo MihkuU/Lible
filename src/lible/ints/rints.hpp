@@ -9,19 +9,30 @@ namespace lible
 {
     namespace ints
     {
-        /** */
-        vec3d calcRInts(const int l, const double p, const double *xyz_ab, const double *fnx);
+        /**
+         * Calculates the Hermite Coulomb integrals as a flattened matrix,
+         *   R(t + t', u + u', v + v') -> R(tuv, t'u'v').
+         * This is used in the SHARK method.
+         */
+        std::vector<double> calcRIntsMatrix(const int l, const double fac, const double p,
+                                            const double *xyz_pq, const double *fnx,
+                                            const std::vector<std::array<int, 3>> &tuv_idxs_a,
+                                            const std::vector<std::array<int, 3>> &tuv_idxs_b);
 
-        /** Calculates the Hermite Coulomb integrals as a 3D-array. */
-        void calcRInts_(const int la, const int lb, const double p,
-                        const std::array<double, 3> &xyz_ab, const std::vector<double> &fnx,
-                        vec4d &rints_tmp, vec3d &rints_out);
+        /** Calculates the Hermite Coulomb integrals as a 3D array R(t, u, v). */
+        vec3d calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx);
 
-        /** Calculates the Hermite Coulomb integrals as a flattened vector. */
-        void calcRInts_(const int la, const int lb, const double fac, const double p,
-                        const std::array<double, 3> &xyz_pq, const std::vector<double> &fnx,
-                        const std::vector<std::array<int, 3>> &tuv_idxs_a,
-                        const std::vector<std::array<int, 3>> &tuv_idxs_b,
-                        vec4d &rints_tmp, std::vector<double> &rints_out);
+        /** TODO: dox */
+        std::vector<double> calcRInts_ERI4_Deriv1(const int l, const double fac, const double p,
+                                                  const double *xyz_pq, const double *fnx,
+                                                  const std::vector<std::array<int, 3>> &tuv_idxs_a,
+                                                  const std::vector<std::array<int, 3>> &tuv_idxs_b);
+
+
+        /** TODO: dox */
+        std::vector<double> calcRInts_ERI2_deriv1(const int l, const double fac, const double p,
+                                                  const double *xyz_ab, const double *fnx,
+                                                  const std::vector<std::array<int, 3>> &tuv_idxs_a,
+                                                  const std::vector<std::array<int, 3>> &tuv_idxs_b);                                                  
     }
 }

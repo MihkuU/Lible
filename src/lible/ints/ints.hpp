@@ -262,6 +262,15 @@ namespace lible
          */
         kernel_eri2_t deployERI2Kernel(const int la, const int lb);
 
+        /** 
+         * TODO: this is for testing
+        */
+        void kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                              const double *exps_a, const double *exps_b, const double *coords_a,
+                              const double *coords_b, const double *ecoeffs_a,
+                              const double *ecoeffs_b_tsp, const BoysGrid &boys_grid,
+                              double *eri2_batch);
+
         /**
          * \ingroup ints
          * Constructs the shell data corresponding to the auxilary basis set.

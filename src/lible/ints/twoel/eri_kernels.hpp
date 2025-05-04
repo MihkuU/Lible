@@ -224,7 +224,6 @@ namespace lible
                 std::array<double, 3> xyz_ab{coords_a[0] - coords_b[0],
                                              coords_a[1] - coords_b[1],
                                              coords_a[2] - coords_b[2]};
-
                 double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
                 double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
 

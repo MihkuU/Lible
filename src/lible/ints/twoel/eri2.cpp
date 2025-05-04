@@ -18,8 +18,8 @@ namespace lible::ints::two
     void kernelERI2Diagonal(const int ishell, const int la, const vector<double> &ecoeffs_a,
                             const vector<double> &ecoeffs_a_tsp,
                             const vector<array<int, 3>> &idxs_tuv_a, const BoysF &boys_f,
-                            const ShellData &sh_data_a, vector<double> &fnx, vector<double> &rints,
-                            vec4d &rints_tmp, vector<double> &eri2_shells_sph)
+                            const ShellData &sh_data_a, vector<double> &fnx,
+                            vector<double> &eri2_shells_sph)
     {
         int laa = la + la;
         int dim_a = sh_data_a.cdepths[ishell];
@@ -46,8 +46,9 @@ namespace lible::ints::two
                 boys_f.calcFnx(laa, x, fnx);
 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-                calcRInts_(la, la, fac, alpha, xyz_aa, fnx, idxs_tuv_a, idxs_tuv_a, rints_tmp,
-                           rints);
+
+                vector<double> rints = calcRIntsMatrix(laa, fac, alpha, xyz_aa.data(), fnx.data(),
+                                                       idxs_tuv_a, idxs_tuv_a);
 
                 int pos_ecoeffs_b = sh_data_a.offsets_ecoeffs[ishell] + ib * dim_ecoeffs_a;
 
@@ -140,7 +141,6 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
         int n_shells_a = sh_data_a.n_shells;
 
         int dim_sph_a = numSphericals(la);
-        int dim_tuv_a = numHermites(la);
 
         int laa = la + la;
         BoysF boys_f(laa);
@@ -150,20 +150,104 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
 
         vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
 
-        vector<double> rints(std::pow(dim_tuv_a, 2), 0);
         vector<double> fnx(laa + 1, 0);
-        vec4d rints_tmp(laa + 1, 0);
 
         for (int ishell = 0; ishell < n_shells_a; ishell++)
         {
             vector<double> eri2_shells_sph(dim_sph_a * dim_sph_a, 0);
 
             kernelERI2Diagonal(ishell, la, ecoeffs_a, ecoeffs_a_tsp, idxs_tuv_a, boys_f, sh_data_a,
-                               fnx, rints, rints_tmp, eri2_shells_sph);
+                               fnx, eri2_shells_sph);
 
             transferIntsERI2Diag(ishell, sh_data_a, eri2_shells_sph, eri2_diagonal);
         }
     }
 
     return eri2_diagonal;
+}
+
+void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+                           const double *exps_a, const double *exps_b, const double *coords_a,
+                           const double *coords_b, const double *ecoeffs_a,
+                           const double *ecoeffs_b_tsp, const BoysGrid &boys_grid,
+                           double *eri2_batch)
+{
+    int lab = la + lb;
+
+    vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
+    vector<array<int, 3>> idxs_tuv_b = returnHermiteGaussianIdxs(lb);
+
+    int n_sph_a = numSphericals(la);
+    int n_sph_b = numSphericals(lb);
+    int n_sph_ab = n_sph_a * n_sph_b;
+    int n_hermite_a = numHermites(la);
+    int n_hermite_b = numHermites(lb);
+    int n_ecoeffs_b = n_sph_b * n_hermite_b;
+
+    array<double, 3> xyz_ab{coords_a[0] - coords_b[0], coords_a[1] - coords_b[1],
+                            coords_a[2] - coords_b[2]};
+    double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
+    double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
+
+    int n_R_x_E = n_hermite_a * n_sph_b;
+    vector<double> R_x_E(6 * cdepth_a * cdepth_b * n_R_x_E, 0);
+    for (int ia = 0; ia < cdepth_a; ia++)
+    {
+        int ofs_R_x_E = 6 * ia * n_R_x_E;
+        for (int ib = 0; ib < cdepth_b; ib++)
+        {
+            double a = exps_a[ia];
+            double b = exps_b[ib];
+
+            double alpha = a * b / (a + b);
+            double x = alpha * xyz_ab_dot;
+            double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
+
+            vector<double> fnx = calcBoysF(lab + 1, x, boys_grid);
+
+            vector<double> rints = calcRInts_ERI2_deriv1(lab, fac, alpha, xyz_ab.data(),
+                                                         fnx.data(), idxs_tuv_a, idxs_tuv_b);
+
+            int ofs_ecoeffs_b = ib * n_ecoeffs_b;
+            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 6 * n_hermite_a,
+                        n_sph_b, n_hermite_b, 1.0, &rints[0], n_hermite_b,
+                        &ecoeffs_b_tsp[ofs_ecoeffs_b], n_sph_b, 1.0,
+                        &R_x_E[ofs_R_x_E], n_sph_b);
+        }
+    }
+
+    for (int ia = 0; ia < cdepth_a; ia++)
+    {
+        int start = ia * 6 * n_R_x_E;
+        int ofs0 = start + 0 * n_R_x_E;
+        int ofs1 = start + 1 * n_R_x_E;
+        int ofs2 = start + 2 * n_R_x_E;
+        int ofs3 = start + 3 * n_R_x_E;
+        int ofs4 = start + 4 * n_R_x_E;
+        int ofs5 = start + 5 * n_R_x_E;
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
+                    1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs0], n_sph_b, 1.0,
+                    &eri2_batch[0 * n_sph_ab], n_sph_b);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
+                    1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs1], n_sph_b, 1.0,
+                    &eri2_batch[1 * n_sph_ab], n_sph_b);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
+                    1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs2], n_sph_b, 1.0,
+                    &eri2_batch[2 * n_sph_ab], n_sph_b);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
+                    1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs3], n_sph_b, 1.0,
+                    &eri2_batch[3 * n_sph_ab], n_sph_b);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
+                    1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs4], n_sph_b, 1.0,
+                    &eri2_batch[4 * n_sph_ab], n_sph_b);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
+                    1.0, &ecoeffs_a[0], n_hermite_a, &R_x_E[ofs5], n_sph_b, 1.0,
+                    &eri2_batch[5 * n_sph_ab], n_sph_b);
+    }
 }
