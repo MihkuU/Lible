@@ -152,7 +152,7 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
             double b = exps_b[ib];
             double p = a + b;
 
-            int start = ia * 7 * n_R_x_E;
+            int start = iab * 7 * n_R_x_E;
             int ofs0 = start + 0 * n_R_x_E;
             int ofs1 = start + 1 * n_R_x_E;
             int ofs2 = start + 2 * n_R_x_E;
