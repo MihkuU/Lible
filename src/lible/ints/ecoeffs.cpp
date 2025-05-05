@@ -517,8 +517,8 @@ LI::ecoeffsSphericalSPData_Bra_Deriv1(const int la, const int lb, const ShellPai
                             int idx_010 = ofs_010 + ab * dim_tuv + tuv;
                             int idx_001 = ofs_001 + ab * dim_tuv + tuv;
                             ecoeffs_100_010_001[idx_100] += val * dadb * ecoeffs100_ppair_sc(a, b_, tuv);
-                            ecoeffs_100_010_001[idx_010] += val * dadb * ecoeffs010_ppair_sc(a, b_, tuv);
-                            ecoeffs_100_010_001[idx_001] += val * dadb * ecoeffs001_ppair_sc(a, b_, tuv);
+                            // ecoeffs_100_010_001[idx_010] += val * dadb * ecoeffs010_ppair_sc(a, b_, tuv);
+                            // ecoeffs_100_010_001[idx_001] += val * dadb * ecoeffs001_ppair_sc(a, b_, tuv);
                         }
             }
     }
