@@ -975,7 +975,7 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
                             int idx4 = 4 * n_sph_abcd + munukata;
                             int idx5 = 5 * n_sph_abcd + munukata;
 
-                            // A 
+                            // A
                             eri4_batch[idx0] += (a / p) * E_x_R_x_E_PR[idx0] + E_x_R_x_E_PR[idx3];
                             eri4_batch[idx1] += (a / p) * E_x_R_x_E_PR[idx1] + E_x_R_x_E_PR[idx4];
                             eri4_batch[idx2] += (a / p) * E_x_R_x_E_PR[idx2] + E_x_R_x_E_PR[idx5];
@@ -983,7 +983,27 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
                             // B
                             eri4_batch[idx3] += (b / p) * E_x_R_x_E_PR[idx0] - E_x_R_x_E_PR[idx3];
                             eri4_batch[idx4] += (b / p) * E_x_R_x_E_PR[idx1] - E_x_R_x_E_PR[idx4];
-                            eri4_batch[idx5] += (b / p) * E_x_R_x_E_PR[idx2] - E_x_R_x_E_PR[idx5];                            
+                            eri4_batch[idx5] += (b / p) * E_x_R_x_E_PR[idx2] - E_x_R_x_E_PR[idx5];
                         }
         }
+
+    for (int ideriv = 0; ideriv < 12; ideriv++)
+    {
+        int ofs = ideriv * n_sph_abcd;
+        for (int a = 0, ab = 0; a < n_sph_a; a++)
+            for (int b = 0; b < n_sph_b; b++, ab++)
+                for (int c = 0, cd = 0; c < n_sph_c; c++)
+                    for (int d = 0; d < n_sph_d; d++, cd++)
+                    {
+                        int abcd = ab * n_sph_cd + cd;
+                        int idx = ofs + abcd;
+
+                        double norm_a = norms_a[a];
+                        double norm_b = norms_b[b];
+                        double norm_c = norms_c[c];
+                        double norm_d = norms_d[d];
+
+                        eri3_batch[idx] *= norm_a * norm_b * norm_c * norm_d;
+                    }
+    }
 }
