@@ -105,7 +105,6 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
     std::fill(eri3_batch, eri3_batch + 9 * n_sph_abc, 0);
 
     int n_R_x_E = n_hermite_ab * n_sph_c;
-    // vector<double> R_x_E(7 * cdepth_a * cdepth_b * n_R_x_E, 0);
 
     vector<double> R_x_E(9 * cdepth_a * cdepth_b * n_R_x_E, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
@@ -180,7 +179,7 @@ void LIT::kernelERI3Deriv1(const int la, const int lb, const int lc,
             }
         }
 
-    vector<double> eri3_batch_PR(6 * n_sph_ab * n_sph_c, 0);
+    vector<double> eri3_batch_PR(6 * n_sph_abc, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {

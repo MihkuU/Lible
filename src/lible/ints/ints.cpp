@@ -110,6 +110,24 @@ void LI::kernelERI3Deriv1(const int la, const int lb, const int lc,
                           ecoeffs_c, norms_a, norms_b, norms_c, boys_grid, eri3_batch);
 }
 
+void LI::kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
+                          const int cdepth_a, const int cdepth_b, const int cdepth_c,
+                          const int cdepth_d, const double *exps_a, const double *exps_b,
+                          const double *exps_c, const double *exps_d,
+                          const double *xyz_a, const double *xyz_b,
+                          const double *xyz_c, const double *xyz_d,
+                          const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
+                          const double *ecoeffs_cd_tsp, const double *ecoeffs_deriv1_cd_tsp,
+                          const double *norms_a, const double *norms_b,
+                          const double *norms_c, const double *norms_d,
+                          const BoysGrid &boys_grid, double *eri4_batch)
+{
+    LIT::kernelERI4Deriv1(la, lb, lc, ld, cdepth_a, cdepth_b, cdepth_c, cdepth_d, exps_a, exps_b,
+                          exps_c, exps_d, xyz_a, xyz_b, xyz_c, xyz_d, ecoeffs_ab, 
+                          ecoeffs_deriv1_ab, ecoeffs_cd_tsp, ecoeffs_deriv1_cd_tsp,
+                          norms_a, norms_b, norms_c, norms_d, boys_grid, eri4_batch);
+}
+
 #ifdef _LIBLE_USE_HIP_
 namespace LIG = lible::ints::gpu;
 

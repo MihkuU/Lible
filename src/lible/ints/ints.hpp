@@ -278,12 +278,27 @@ namespace lible
         void kernelERI3Deriv1(const int la, const int lb, const int lc,
                               const int cdepth_a, const int cdepth_b, const int cdepth_c,
                               const double *exps_a, const double *exps_b, const double *exps_c,
-                              const double *coords_a, const double *coords_b, 
-                              const double *coords_c, const double *ecoeffs_ab, 
-                              const double *ecoeffs_deriv1_ab, const double *ecoeffs_c, 
-                              const double *norms_a, const double *norms_b, 
+                              const double *coords_a, const double *coords_b,
+                              const double *coords_c, const double *ecoeffs_ab,
+                              const double *ecoeffs_deriv1_ab, const double *ecoeffs_c,
+                              const double *norms_a, const double *norms_b,
                               const double *norms_c, const BoysGrid &boys_grid,
                               double *eri3_batch);
+
+        /**
+         * TODO:
+         */                              
+        void kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
+                              const int cdepth_a, const int cdepth_b, const int cdepth_c,
+                              const int cdepth_d, const double *exps_a, const double *exps_b,
+                              const double *exps_c, const double *exps_d,
+                              const double *xyz_a, const double *xyz_b,
+                              const double *xyz_c, const double *xyz_d,
+                              const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
+                              const double *ecoeffs_cd_tsp, const double *ecoeffs_deriv1_cd_tsp,
+                              const double *norms_a, const double *norms_b,
+                              const double *norms_c, const double *norms_d,
+                              const BoysGrid &boys_grid, double *eri4_batch);
 
         /**
          * \ingroup ints
