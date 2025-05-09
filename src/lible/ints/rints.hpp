@@ -36,7 +36,7 @@ namespace lible
         /** TODO: dox */
         std::vector<double> calcRInts_ERI4_Deriv1(const int l, const double fac, const double p,
                                                   const double *xyz_pq, const double *fnx,
-                                                  const std::vector<std::array<int, 3>> &tuv_idxs_a,
-                                                  const std::vector<std::array<int, 3>> &tuv_idxs_b);
+                                                  const std::vector<std::array<int, 3>> &tuv_idxs_ab,
+                                                  const std::vector<std::array<int, 3>> &tuv_idxs_cd);
     }
 }

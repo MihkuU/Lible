@@ -714,3 +714,188 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 
     return eri4_diagonal;
 }
+
+void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
+                           const int cdepth_a, const int cdepth_b, const int cdepth_c,
+                           const int cdepth_d, const double *exps_a, const double *exps_b,
+                           const double *exps_c, const double *exps_d,
+                           const double *xyz_a, const double *xyz_b,
+                           const double *xyz_c, const double *xyz_d,
+                           const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
+                           const double *ecoeffs_cd_tsp, const double *ecoeffs_deriv1_cd_tsp,
+                           const double *norms_a, const double *norms_b,
+                           const double *norms_c, const double *norms_d,
+                           const BoysGrid &boys_grid, double *eri4_batch)
+{
+    int lab = la + lb;
+    int lcd = lc + ld;
+    int labcd = lab + lcd;
+
+    vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
+    vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
+
+    int n_sph_a = numSphericals(la);
+    int n_sph_b = numSphericals(lb);
+    int n_sph_c = numSphericals(lc);
+    int n_sph_d = numSphericals(ld);
+    int n_sph_ab = n_sph_a * n_sph_b;
+    int n_sph_cd = n_sph_c * n_sph_d;
+    int n_sph_abcd = n_sph_ab * n_sph_cd;
+    int n_hermite_ab = numHermites(lab);
+    int n_hermite_cd = numHermites(lcd);
+    int n_hermite_abcd = n_hermite_ab * n_hermite_cd;
+    int n_ecoeffs_cd = n_hermite_ab * n_sph_cd; 
+
+    std::fill(eri4_batch, eri4_batch + 12 * n_sph_abcd, 0);
+
+    int n_R_x_E = n_hermite_ab * n_sph_cd;
+
+    vector<double> R_x_E(12 * cdepth_a * cdepth_b * n_R_x_E, 0);
+    for (int ia = 0, iab = 0; ia < cdepth_a ; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            int ofs_R_x_E = 12 * iab * n_R_x_E;
+            vector<double> R_x_E_P_R_(6 * n_R_x_E, 0);
+            for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
+                for (int id = 0; id < cdepth_d; id++, icd++)
+                {
+                    double a = exps_a[ia];
+                    double b = exps_b[ib];
+                    double c = exps_c[ic];
+                    double d = exps_d[id];
+
+                    double p = a + b;
+                    double q = c + d;
+                    double alpha = p * q / (p + q);
+
+                    array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                           (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                           (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+                    array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
+                                           (c * xyz_c[1] + d * xyz_d[1]) / q,
+                                           (c * xyz_c[2] + d * xyz_d[2]) / q};
+
+                    array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0],
+                                            xyz_p[1] - xyz_q[1],
+                                            xyz_p[2] - xyz_q[2]};
+
+                    double xx{xyz_pq[0]}, xy{xyz_pq[1]}, xz{xyz_pq[2]};
+                    double x = alpha * (xx * xx + xy * xy + xz * xz);
+                    double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
+
+                    vector<double> fns = calcBoysF(labcd + 1, x, boys_grid);
+
+                    vector<double> rints = calcRInts_ERI4_Deriv1(labcd, fac, alpha, xyz_pq.data(),
+                                                                 fns.data(), idxs_tuv_ab,
+                                                                 idxs_tuv_cd);
+
+                    // P
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[0 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E[ofs_R_x_E + 0 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[1 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E[ofs_R_x_E + 1 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[2 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E[ofs_R_x_E + 2 * n_R_x_E], n_sph_cd);
+
+                    // R
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E[ofs_R_x_E + 3 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E[ofs_R_x_E + 4 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E[ofs_R_x_E + 5 * n_R_x_E], n_sph_cd);
+
+                    // P'
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[4 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E_P_R_[0 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[5 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E_P_R_[1 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[6 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E_P_R_[2 * n_R_x_E], n_sph_cd);
+
+                    // R'
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_deriv1_cd_tsp[(icd + 0) * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E_P_R_[3 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_deriv1_cd_tsp[(icd + 1) * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E_P_R_[4 * n_R_x_E], n_sph_cd);
+
+                    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
+                                n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
+                                &ecoeffs_deriv1_cd_tsp[(icd + 2) * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &R_x_E_P_R_[5 * n_R_x_E], n_sph_cd);
+
+                    // P'R' -> CD
+                    for (int tuv = 0; tuv < n_hermite_ab; tuv++)
+                        for (int ka = 0, kata = 0; ka < n_sph_c; ka++)
+                            for (int ta = 0; ta < n_sph_d; ta++, kata++)
+                            {
+                                int idx_e = tuv * n_sph_cd + kata;
+ 
+                                int idx0 = 0 * n_R_x_E + idx_e;
+                                int idx1 = 1 * n_R_x_E + idx_e;
+                                int idx2 = 2 * n_R_x_E + idx_e;
+
+                                int idx3 = 3 * n_R_x_E + idx_e;
+                                int idx4 = 4 * n_R_x_E + idx_e;
+                                int idx5 = 5 * n_R_x_E + idx_e;
+
+                                int idx0_ = ofs_R_x_E + 6 * n_R_x_E + idx_e;
+                                int idx1_ = ofs_R_x_E + 7 * n_R_x_E + idx_e;
+                                int idx2_ = ofs_R_x_E + 8 * n_R_x_E + idx_e;
+                                 
+                                int idx3_ = ofs_R_x_E + 9 * n_R_x_E + idx_e;
+                                int idx4_ = ofs_R_x_E + 10 * n_R_x_E + idx_e;
+                                int idx5_ = ofs_R_x_E + 11 * n_R_x_E + idx_e;
+
+                                // TODO: try BLAS here?
+
+                                // A
+                                R_x_E[idx0_] += (c / q) * R_x_E_P_R_[idx0] + R_x_E_P_R_[idx3];
+                                R_x_E[idx1_] += (c / q) * R_x_E_P_R_[idx1] + R_x_E_P_R_[idx4];
+                                R_x_E[idx2_] += (c / q) * R_x_E_P_R_[idx2] + R_x_E_P_R_[idx5];
+
+                                // B
+                                R_x_E[idx3_] += (d / q) * R_x_E_P_R_[idx0] - R_x_E_P_R_[idx3];
+                                R_x_E[idx4_] += (d / q) * R_x_E_P_R_[idx1] - R_x_E_P_R_[idx4];
+                                R_x_E[idx5_] += (d / q) * R_x_E_P_R_[idx2] - R_x_E_P_R_[idx5];
+                            }
+                }
+        }
+
+    vector<double> E_x_R_x_E_PR(6 * n_sph_ab * n_sph_cd, 0);
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+
+        }
+}
