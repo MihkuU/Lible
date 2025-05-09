@@ -1003,7 +1003,7 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
                         double norm_c = norms_c[c];
                         double norm_d = norms_d[d];
 
-                        eri3_batch[idx] *= norm_a * norm_b * norm_c * norm_d;
+                        eri4_batch[idx] *= norm_a * norm_b * norm_c * norm_d;
                     }
     }
 }

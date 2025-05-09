@@ -97,7 +97,7 @@ vector<double> LI::calcRInts_ERI4_Deriv1(const int l, const double fac, const do
     vec3d rints_3d = calcRInts3D(l + 1, p, xyz_pq, fnx);
 
     int dim_tuv_ab = tuv_idxs_ab.size();
-    int dim_tuv_bc = tuv_idxs_cd.size();
+    int dim_tuv_cd = tuv_idxs_cd.size();
     int dim_tuv_abcd = dim_tuv_ab * dim_tuv_cd;
 
     int ofs0 = dim_tuv_abcd * 0;
@@ -124,17 +124,17 @@ vector<double> LI::calcRInts_ERI4_Deriv1(const int l, const double fac, const do
             auto [t, u, v] = tuv_idxs_ab[i];
 
             // d/dP^(ab)
-            rints_out[ofs0 + i * dim_tuv_bc + j] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
-            rints_out[ofs1 + i * dim_tuv_bc + j] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
-            rints_out[ofs2 + i * dim_tuv_bc + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+            rints_out[ofs0 + i * dim_tuv_cd + j] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints_out[ofs1 + i * dim_tuv_cd + j] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints_out[ofs2 + i * dim_tuv_cd + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
 
             // d/dR^(ab) and d/dR^(cd)
-            rints_out[ofs3 + i * dim_tuv_bc + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
+            rints_out[ofs3 + i * dim_tuv_cd + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
 
             // d/dP^(cd)
-            rints_out[ofs4 + i * dim_tuv_bc + j] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
-            rints_out[ofs5 + i * dim_tuv_bc + j] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
-            rints_out[ofs6 + i * dim_tuv_bc + j] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+            rints_out[ofs4 + i * dim_tuv_cd + j] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints_out[ofs5 + i * dim_tuv_cd + j] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints_out[ofs6 + i * dim_tuv_cd + j] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
         }
     }
 
