@@ -451,10 +451,9 @@ LI::ecoeffsSphericalSPData_Bra_Deriv1(const int la, const int lb, const ShellPai
 
     vec3i tuv_poss = returnHermiteGaussianPositions(lab);
 
-    int n_ecoeffs_prims = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
-                          sp_data.n_prim_pairs;
+    int n_ecoeffs_prims = 3 * n_ecoeffs * sp_data.n_prim_pairs;
 
-    vector<double> ecoeffs_100_010_001(3 * n_ecoeffs_prims, 0);
+    vector<double> ecoeffs_100_010_001(n_ecoeffs_prims, 0);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
         int cdepth_a = sp_data.cdepths[2 * ipair + 0];
@@ -505,9 +504,9 @@ LI::ecoeffsSphericalSPData_Bra_Deriv1(const int la, const int lb, const ShellPai
                 double db = sp_data.coeffs[cofs_b + ib];
                 double dadb = da * db;
 
-                int ofs_100 = offset_ecoeffs + (iab + 0) * n_ecoeffs;
-                int ofs_010 = offset_ecoeffs + (iab + 1) * n_ecoeffs;
-                int ofs_001 = offset_ecoeffs + (iab + 2) * n_ecoeffs;
+                int ofs_100 = offset_ecoeffs + (3 * iab + 0) * n_ecoeffs;
+                int ofs_010 = offset_ecoeffs + (3 * iab + 1) * n_ecoeffs;
+                int ofs_001 = offset_ecoeffs + (3 * iab + 2) * n_ecoeffs;
                 for (auto &[b, b_, val] : sph_trafo_b)
                     for (int a = 0; a < dim_a_sph; a++)
                         for (int tuv = 0; tuv < dim_tuv; tuv++)

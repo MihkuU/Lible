@@ -73,27 +73,45 @@ namespace lible
          */
         vec2d nuclearAttraction(const Structure &structure);
 
-        /** */
+        /** 
+         * TODO:
+         */
         void externalChargesKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                                    const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
                                    const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                   const std::vector<std::array<double, 4>> charges, const BoysGrid &boys_grid,
+                                   const std::vector<std::array<double, 4>> &charges, const BoysGrid &boys_grid,
                                    double *ints_contracted);
 
-        /** */
+        /**
+         * TODO:
+         */
         void externalChargesDerivKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
                                         const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
                                         const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                        const std::vector<std::array<double, 4>> charges,
+                                        const std::vector<std::array<double, 4>> &charges,
                                         const BoysGrid &boys_grid, double *intderivs_contracted);
 
-        /** */
+        /**
+         * TODO:
+         */
+        void externalChargesDerivKernelTest(const int la, const int lb, const int cdepth_a,
+                                            const int cdepth_b, const double *cexps_a,
+                                            const double *cexps_b,  const double *xyz_a,
+                                            const double *xyz_b, const double *ecoeffs0,
+                                            const double *ecoeffs1, const double *norms_a,
+                                            const double *norms_b,
+                                            const std::vector<std::array<double, 4>> &charges,
+                                            const BoysGrid &boys_grid, double *intderivs_contracted);
+
+        /** 
+         * TODO:
+        */
         void externalChargesOperatorDerivKernel(const int la, const int lb, const int cdepth_a, 
                                                 const int cdepth_b, const double *cexps_a, 
                                                 const double *cexps_b, const double *ccoeffs_a,
                                                 const double *ccoeffs_b, const double *xyz_a, 
                                                 const double *xyz_b, 
-                                                const std::vector<std::array<double, 4>> charges,
+                                                const std::vector<std::array<double, 4>> &charges,
                                                 const BoysGrid &boys_grid, 
                                                 double *intderivs_contracted);
 

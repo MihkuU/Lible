@@ -8,6 +8,8 @@ namespace lible
     {
         /** \defgroup spdata */
 
+        // TODO: make variables private, add getters!
+
         /**
          * \ingroup spdata
          *
