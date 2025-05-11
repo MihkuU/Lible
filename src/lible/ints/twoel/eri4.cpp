@@ -615,8 +615,8 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
     int n_hermite_ab = numHermites(lab);
     int n_hermite_cd = numHermites(lcd);
     int n_hermite_abcd = n_hermite_ab * n_hermite_cd;
-    int n_ecoeffs_ab = n_hermite_cd * n_sph_ab; 
-    int n_ecoeffs_cd = n_hermite_ab * n_sph_cd; 
+    int n_ecoeffs_ab = n_sph_ab * n_hermite_cd; 
+    int n_ecoeffs_cd = n_sph_cd * n_hermite_ab;         
 
     std::fill(eri4_batch, eri4_batch + 12 * n_sph_abcd, 0);
 
@@ -711,21 +711,22 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
                                 n_hermite_cd, 1.0, &rints[6 * n_hermite_abcd], n_hermite_cd,
                                 &ecoeffs_cd_tsp[icd * n_ecoeffs_cd], n_sph_cd, 1.0,
                                 &R_x_E_P_R_[2 * n_R_x_E], n_sph_cd);
-
+                                
                     // R'
+                    int ofs_ecoeffs1_cd = 3 * icd * n_ecoeffs_cd;
                     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
                                 n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
-                                &ecoeffs_deriv1_cd_tsp[(icd + 0) * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &ecoeffs_deriv1_cd_tsp[ofs_ecoeffs1_cd + 0 * n_ecoeffs_cd], n_sph_cd, 1.0,
                                 &R_x_E_P_R_[3 * n_R_x_E], n_sph_cd);
 
                     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
                                 n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
-                                &ecoeffs_deriv1_cd_tsp[(icd + 1) * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &ecoeffs_deriv1_cd_tsp[ofs_ecoeffs1_cd + 1 * n_ecoeffs_cd], n_sph_cd, 1.0,
                                 &R_x_E_P_R_[4 * n_R_x_E], n_sph_cd);
 
                     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_hermite_ab, n_sph_cd,
                                 n_hermite_cd, 1.0, &rints[3 * n_hermite_abcd], n_hermite_cd,
-                                &ecoeffs_deriv1_cd_tsp[(icd + 2) * n_ecoeffs_cd], n_sph_cd, 1.0,
+                                &ecoeffs_deriv1_cd_tsp[ofs_ecoeffs1_cd + 2 * n_ecoeffs_cd], n_sph_cd, 1.0,
                                 &R_x_E_P_R_[5 * n_R_x_E], n_sph_cd);
 
                     // P'R' -> CD
@@ -733,23 +734,23 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
                         for (int ka = 0, kata = 0; ka < n_sph_c; ka++)
                             for (int ta = 0; ta < n_sph_d; ta++, kata++)
                             {
-                                int idx_e = tuv * n_sph_cd + kata;
+                                int idx = tuv * n_sph_cd + kata;
  
-                                int idx0 = 0 * n_R_x_E + idx_e;
-                                int idx1 = 1 * n_R_x_E + idx_e;
-                                int idx2 = 2 * n_R_x_E + idx_e;
+                                int idx0 = 0 * n_R_x_E + idx;
+                                int idx1 = 1 * n_R_x_E + idx;
+                                int idx2 = 2 * n_R_x_E + idx;
 
-                                int idx3 = 3 * n_R_x_E + idx_e;
-                                int idx4 = 4 * n_R_x_E + idx_e;
-                                int idx5 = 5 * n_R_x_E + idx_e;
+                                int idx3 = 3 * n_R_x_E + idx;
+                                int idx4 = 4 * n_R_x_E + idx;
+                                int idx5 = 5 * n_R_x_E + idx;
 
-                                int idx0_ = ofs_R_x_E + 6 * n_R_x_E + idx_e;
-                                int idx1_ = ofs_R_x_E + 7 * n_R_x_E + idx_e;
-                                int idx2_ = ofs_R_x_E + 8 * n_R_x_E + idx_e;
+                                int idx0_ = ofs_R_x_E + 6 * n_R_x_E + idx;
+                                int idx1_ = ofs_R_x_E + 7 * n_R_x_E + idx;
+                                int idx2_ = ofs_R_x_E + 8 * n_R_x_E + idx;
                                  
-                                int idx3_ = ofs_R_x_E + 9 * n_R_x_E + idx_e;
-                                int idx4_ = ofs_R_x_E + 10 * n_R_x_E + idx_e;
-                                int idx5_ = ofs_R_x_E + 11 * n_R_x_E + idx_e;
+                                int idx3_ = ofs_R_x_E + 9 * n_R_x_E + idx;
+                                int idx4_ = ofs_R_x_E + 10 * n_R_x_E + idx;
+                                int idx5_ = ofs_R_x_E + 11 * n_R_x_E + idx;
 
                                 // TODO: try BLAS here?
 
@@ -769,13 +770,13 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
     vector<double> E_x_R_x_E_PR(6 * n_sph_abcd, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
-        {
-            std::fill(E_x_R_x_E_PR.begin(), E_x_R_x_E_PR.end(), 0);
-
+        {            
             int ofs_R_x_E = iab * 12 * n_R_x_E;
 
             int ofs_ecoeffs0_ab = iab * n_ecoeffs_ab;
             int ofs_ecoeffs1_ab = iab * 3 * n_ecoeffs_ab;
+
+            std::fill(E_x_R_x_E_PR.begin(), E_x_R_x_E_PR.end(), 0);
 
             // P
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
@@ -792,41 +793,44 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
 
             // R
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs1_ab[ofs_ecoeffs1_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 3 * n_R_x_E],
-                        n_sph_cd, 1.0, &E_x_R_x_E_PR[3 * n_sph_abcd], n_sph_cd);
+                        1.0, &ecoeffs1_ab[ofs_ecoeffs1_ab + 0 * n_ecoeffs_ab], n_hermite_ab,
+                        &R_x_E[ofs_R_x_E + 3 * n_R_x_E], n_sph_cd, 1.0, &E_x_R_x_E_PR[3 * n_sph_abcd],
+                        n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs1_ab[ofs_ecoeffs1_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 3 * n_R_x_E],
-                        n_sph_cd, 1.0, &E_x_R_x_E_PR[4 * n_sph_abcd], n_sph_cd);
+                        1.0, &ecoeffs1_ab[ofs_ecoeffs1_ab + 1 * n_ecoeffs_ab], n_hermite_ab, 
+                        &R_x_E[ofs_R_x_E + 4 * n_R_x_E], n_sph_cd, 1.0, &E_x_R_x_E_PR[4 * n_sph_abcd], 
+                        n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs1_ab[ofs_ecoeffs1_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 3 * n_R_x_E],
-                        n_sph_cd, 1.0, &E_x_R_x_E_PR[5 * n_sph_abcd], n_sph_cd);
+                        1.0, &ecoeffs1_ab[ofs_ecoeffs1_ab +  2 * n_ecoeffs_ab], n_hermite_ab, 
+                        &R_x_E[ofs_R_x_E + 5 * n_R_x_E], n_sph_cd, 1.0, &E_x_R_x_E_PR[5 * n_sph_abcd], 
+                        n_sph_cd);
 
             // C
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 4 * n_R_x_E],
+                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 6 * n_R_x_E],
                         n_sph_cd, 1.0, &eri4_batch[6 * n_sph_abcd], n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 5 * n_R_x_E],
+                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 7 * n_R_x_E],
                         n_sph_cd, 1.0, &eri4_batch[7 * n_sph_abcd], n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 6 * n_R_x_E],
+                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 8 * n_R_x_E],
                         n_sph_cd, 1.0, &eri4_batch[8 * n_sph_abcd], n_sph_cd);
 
             // D
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 3 * n_R_x_E],
+                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 9 * n_R_x_E],
                         n_sph_cd, 1.0, &eri4_batch[9 * n_sph_abcd], n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 3 * n_R_x_E],
+                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 10 * n_R_x_E],
                         n_sph_cd, 1.0, &eri4_batch[10 * n_sph_abcd], n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
-                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 3 * n_R_x_E],
+                        1.0, &ecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 11 * n_R_x_E],
                         n_sph_cd, 1.0, &eri4_batch[11 * n_sph_abcd], n_sph_cd);
 
             // PR -> AB

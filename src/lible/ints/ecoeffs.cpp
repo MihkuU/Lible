@@ -568,8 +568,7 @@ LI::ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairDat
 }
 
 pair<vector<double>, vector<double>>
-LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb,
-                                         const ShellPairData &sp_data)
+LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb, const ShellPairData &sp_data) // TODO: la, lb are redundant
 {
     int dim_a_sph = numSphericals(la);
     int dim_b_sph = numSphericals(lb);
@@ -578,10 +577,10 @@ LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb,
     int lab = la + lb;
     int dim_tuv = numHermites(lab);
     int n_ecoeffs = dim_ab * dim_tuv;
-
-    int n_ecoeffs_sph_x1 = dim_ab * dim_tuv * sp_data.n_prim_pairs;
+    
     vector<double> ecoeffs = ecoeffsSphericalSPData_Bra_Deriv1(la, lb, sp_data);
 
+    int n_ecoeffs_sph_x1 = dim_ab * dim_tuv * sp_data.n_prim_pairs;
     vector<double> ecoeffs_tsp(3 * n_ecoeffs_sph_x1, 0);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
@@ -591,9 +590,9 @@ LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb,
         for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
             for (int ib = 0; ib < cdepth_b; ib++, iab++)
             {
-                int ofs_100 = offset_ecoeffs + (iab + 0) * n_ecoeffs;
-                int ofs_010 = offset_ecoeffs + (iab + 1) * n_ecoeffs;
-                int ofs_001 = offset_ecoeffs + (iab + 2) * n_ecoeffs;
+                int ofs_100 = offset_ecoeffs + (3 * iab + 0) * n_ecoeffs;
+                int ofs_010 = offset_ecoeffs + (3 * iab + 1) * n_ecoeffs;
+                int ofs_001 = offset_ecoeffs + (3 * iab + 2) * n_ecoeffs;
                 for (int a = 0; a < dim_a_sph; a++)
                     for (int b = 0; b < dim_b_sph; b++)
                         for (int tuv = 0; tuv < dim_tuv; tuv++)
