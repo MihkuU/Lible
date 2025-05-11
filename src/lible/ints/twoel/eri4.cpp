@@ -615,8 +615,8 @@ void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int l
     int n_hermite_ab = numHermites(lab);
     int n_hermite_cd = numHermites(lcd);
     int n_hermite_abcd = n_hermite_ab * n_hermite_cd;
-    int n_ecoeffs_ab = n_sph_ab * n_hermite_cd; 
-    int n_ecoeffs_cd = n_sph_cd * n_hermite_ab;         
+    int n_ecoeffs_ab = n_sph_ab * n_hermite_ab; 
+    int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;         
 
     std::fill(eri4_batch, eri4_batch + 12 * n_sph_abcd, 0);
 
