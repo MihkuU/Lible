@@ -130,8 +130,13 @@ array<lible::vec3d, 3> LI::ecoeffsPrimitivePair(const double a, const double b, 
         Kab[i] = std::exp(-mu * std::pow(xyz_a[i] - xyz_b[i], 2));
     }
 
-    array<double, 3> xyz_pa{xyz_p[0] - xyz_a[0], xyz_p[1] - xyz_a[1], xyz_p[2] - xyz_a[2]};
-    array<double, 3> xyz_pb{xyz_p[0] - xyz_b[0], xyz_p[1] - xyz_b[1], xyz_p[2] - xyz_b[2]};
+    array<double, 3> xyz_pa;
+    array<double, 3> xyz_pb;
+    for (int i = 0; i < 3; i++)
+    {
+        xyz_pa[i] = xyz_p[i] - xyz_a[i];
+        xyz_pb[i] = xyz_p[i] - xyz_b[i];
+    }
 
     vec3d ecoeffs_x = ecoeffsRecurrence2(a, b, la, lb, xyz_pa[0], xyz_pb[0], Kab[0]);
     vec3d ecoeffs_y = ecoeffsRecurrence2(a, b, la, lb, xyz_pa[1], xyz_pb[1], Kab[1]);

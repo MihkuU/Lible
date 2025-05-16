@@ -21,12 +21,14 @@ namespace lible
         /**
          *
          */
-        std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
-
+        arma::dmat returnSphericalTrafo(const int l);         
+         
         /**
          *
          */
-        arma::dmat returnSphericalTrafo(const int l);
+        std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
+
+        vec2d trafo2Spherical(const int la, const int lb, const vec2d &ints_cart);
 
         // TODO: rename the eri2_shells to eri2_shellbatch or something alike?
 

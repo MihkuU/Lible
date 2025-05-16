@@ -25,15 +25,15 @@ namespace lible
                 overlap
             };
 
-            /** */
+            /** TODO: rename?  */
             template <Option opt>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
-                        vec2d &ints_out);
+                        vec2d &ints_out); // TODO: remove la, lb
 
-            /** */
+            /** TODO: rename? */
             template <Option opt, typename T>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
-                        const T& arg, std::array<vec2d, 3> &ints_out);
+                        const T& arg, std::array<vec2d, 3> &ints_out); // TODO: remove la, lb
 
             /** For various one-electron integrals. */
             template <Option opt>

@@ -687,10 +687,32 @@ vector<tuple<int, int, double>> LI::sphericalTrafo(const int l)
         {
             double val = sph_trafo_mat(i, j);
             if (std::fabs(val) != 0)
-                sph_trafo.push_back(std::make_tuple(i, j, val));
+                sph_trafo.push_back({i, j, val});
         }
 
     return sph_trafo;
+}
+
+lible::vec2d LI::trafo2Spherical(const int la, const int lb, const vec2d &ints_cart)
+{
+    int n_cart_a = numCartesians(la);
+    int n_sph_a = numSphericals(la);
+    int n_sph_b = numSphericals(lb);
+
+    vector<tuple<int, int, double>> trafo_a = sphericalTrafo(la);
+    vector<tuple<int, int, double>> trafo_b = sphericalTrafo(lb);
+
+    vec2d ints_cart_sph(n_cart_a, n_sph_b, 0);
+    for (int ia = 0; ia < n_cart_a; ia++)
+        for (auto &[isph, icart, val] : trafo_b)
+            ints_cart_sph(ia, isph) += val * ints_cart(ia, icart);
+
+    vec2d ints_out(n_sph_a, n_sph_b, 0);
+    for (int ib = 0; ib < n_sph_b; ib++)
+        for (auto &[isph, icart, val] : trafo_a)
+            ints_out(isph, ib) += val * ints_cart_sph(icart, ib);
+
+    return ints_out;
 }
 
 void LI::transferInts1El(const int ipair, const ShellPairData &sp_data,

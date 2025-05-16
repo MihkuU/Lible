@@ -38,16 +38,17 @@ namespace lible
          */
         vec2d overlap(const Structure &structure);
 
-        /** */
-        void overlapKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                           const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                           const double *ccoeffs_b, double *ints_contracted);
+        /**
+         * Calculates a batch of normalized overlap integrals for the shell pair 'ipair'.
+         * In spherical basis.
+         */
+        vec2d overlapKernel(const int ipair, const ShellPairData &sp_data);
 
-        /** */
-        void overlapDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                 const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                 const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                 double *intderivs_contracted);
+        /**
+         * Calculates a batch of normalized overlap integral derivatives for the shell pair
+         * 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz). In spherical basis.
+         */
+        std::array<vec2d, 6> overlapDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -55,17 +56,17 @@ namespace lible
          */
         vec2d kineticEnergy(const Structure &structure);
 
-        /** */
-        void kineticEnergyKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                 const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                 const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                 double *ints_contracted);
+        /**
+         * Calculates a batch of normalized kinetic energy integrals for the shell pair 'ipair'.
+         * In spherical basis.
+         */
+        vec2d kineticEnergyKernel(const int ipair, const ShellPairData &sp_data);
 
-        /** */
-        void kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                       const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                       const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                       double *intderivs_contracted);
+        /**
+         * Calculates a batch of normalized kinetic energy integral derivatives for the shell pair
+         * 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz). In spherical basis.
+         */
+        std::array<vec2d, 6> kineticEnergyDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -73,47 +74,32 @@ namespace lible
          */
         vec2d nuclearAttraction(const Structure &structure);
 
-        /** 
-         * TODO:
+        /**
+         * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
+         * pair 'ipair'. In spherical basis. The charges should be given as a list
+         * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
+         * initialized for lab = la + lb in the given shell pair data.
          */
-        void externalChargesKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                   const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                   const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                   const std::vector<std::array<double, 4>> &charges, const BoysGrid &boys_grid,
-                                   double *ints_contracted);
+        vec2d externalChargesKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+        /**
+         * Calculates a batch of normalized Coulombic interaction energy integral derivatives for
+         * the shell pair 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz).
+         * In spherical basis. The charges should be given as a list  {(x, y, z, charge)}, with
+         * xyz-coordinates in atomic units. The Boys grid should be initialized for lab = la + lb
+         * in the given shell pair data.
+         */
+        std::array<vec2d, 6>
+        externalChargesDerivKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                   const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * TODO:
          */
-        void externalChargesDerivKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                        const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                        const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                        const std::vector<std::array<double, 4>> &charges,
-                                        const BoysGrid &boys_grid, double *intderivs_contracted);
-
-        /**
-         * TODO:
-         */
-        void externalChargesDerivKernelTest(const int la, const int lb, const int cdepth_a,
-                                            const int cdepth_b, const double *cexps_a,
-                                            const double *cexps_b,  const double *xyz_a,
-                                            const double *xyz_b, const double *ecoeffs0,
-                                            const double *ecoeffs1, const double *norms_a,
-                                            const double *norms_b,
-                                            const std::vector<std::array<double, 4>> &charges,
-                                            const BoysGrid &boys_grid, double *intderivs_contracted);
-
-        /** 
-         * TODO:
-        */
-        void externalChargesOperatorDerivKernel(const int la, const int lb, const int cdepth_a, 
-                                                const int cdepth_b, const double *cexps_a, 
-                                                const double *cexps_b, const double *ccoeffs_a,
-                                                const double *ccoeffs_b, const double *xyz_a, 
-                                                const double *xyz_b, 
-                                                const std::vector<std::array<double, 4>> &charges,
-                                                const BoysGrid &boys_grid, 
-                                                double *intderivs_contracted);
+        std::vector<std::array<vec2d, 3>>
+        externalChargesOperatorDerivKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                           const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -122,11 +108,13 @@ namespace lible
         std::array<vec2d, 3> dipoleMoment(const std::array<double, 3> &origin,
                                           const Structure &structure);
 
-        /** */
-        void dipoleMomentKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                const double *origin, double *ints_contracted);
+        /**
+         * Calculates a batch of normalized dipole moment integrals for the shell pair 'ipair'.
+         * In spherical basis. The integrals are given as (x, y, z). The origin is expected in
+         * atomic units (bohr).
+         */
+        std::array<vec2d, 3> dipoleMomentKernel(const int ipair, const std::array<double, 3> &origin,
+                                                const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -305,7 +293,7 @@ namespace lible
 
         /**
          * TODO:
-         */                              
+         */
         void kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
                               const int cdepth_a, const int cdepth_b, const int cdepth_c,
                               const int cdepth_d, const double *exps_a, const double *exps_b,
@@ -368,7 +356,7 @@ namespace lible
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
-                                                  const int lb, const double *xyz_a, 
+                                                  const int lb, const double *xyz_a,
                                                   const double *xyz_b);
 
         /** */
@@ -440,7 +428,7 @@ namespace lible
         ecoeffsSphericalSPDatas_BraKet(const std::vector<std::pair<int, int>> &l_pairs,
                                        const std::vector<ShellPairData> &sp_datas);
 
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */                                       
+        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
         ecoeffsSphericalSPDatas_BraKet_Deriv1(const std::vector<std::pair<int, int>> &l_pairs,
                                               const std::vector<ShellPairData> &sp_datas);
@@ -486,10 +474,10 @@ namespace lible
          * angular momentum.
          */
         std::vector<std::array<int, 3>> cartExps(const int l);
-                
+
         /**
          * \ingroup ints
-         * Returns a list of angular momentum pairs such that la >= lb: 
+         * Returns a list of angular momentum pairs such that la >= lb:
          *   {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
          */
         std::vector<std::pair<int, int>> getLPairsSymm(const int l_max);
@@ -498,7 +486,7 @@ namespace lible
          * \ingroup ints
          * Returns a list of angular momentum pairs: {(0, 0), (1, 0), (0, 1), ..., (l_max, l_max)}.
          */
-        std::vector<std::pair<int, int>> getLPairsNoSymm(const int l_max);        
+        std::vector<std::pair<int, int>> getLPairsNoSymm(const int l_max);
 
 #ifdef _LIBLE_USE_HIP_
         namespace gpu

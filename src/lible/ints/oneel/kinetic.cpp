@@ -14,16 +14,10 @@ using std::array, std::vector;
 namespace lible::ints
 {
     // Forward declaration
-    void kineticEnergyKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                             const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                             const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                             double *ints_contracted);
+    vec2d kineticEnergyKernel(const int ipair, const ShellPairData &sp_data);     
 
     // Forward declaration
-    void kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                   const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                   const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                   double *intderivs_contracted);
+    array<vec2d, 6> kineticEnergyDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
 
     // A helper function for 'kineticEnergyDeriv1Kernel'.
     auto kinEDeriv1Helper = [](const double b, const double b2, const double fac,
@@ -68,28 +62,37 @@ namespace lible::ints
     };
 }
 
-void LI::kineticEnergyKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                             const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                             const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                             double *ints_contracted)
+lible::vec2d LI::kineticEnergyKernel(const int ipair, const ShellPairData &sp_data)
 {
     // Formula taken from https://gqcg-res.github.io/knowdes/the-mcmurchie-davidson-integral-scheme.html.
 
-    int n_a_cart = numCartesians(la);
-    int n_b_cart = numCartesians(lb);
-    int n_ab_cart = n_a_cart * n_b_cart;
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+    int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
-    std::fill(ints_contracted, ints_contracted + n_ab_cart, 0);
+    const double *cexps_a = &sp_data.exps[cofs_a];
+    const double *cexps_b = &sp_data.exps[cofs_b];
+    const double *ccoeffs_a = &sp_data.coeffs[cofs_a];
+    const double *ccoeffs_b = &sp_data.coeffs[cofs_b];
+    const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+    const double *xyz_b = &sp_data.coords[6 * ipair + 3];
 
     const auto &cart_exps_a = cart_exps[la];
     const auto &cart_exps_b = cart_exps[lb];
 
+    int n_cart_a = numCartesians(la);
+    int n_cart_b = numCartesians(lb);
+
+    vec2d ints_cart(n_cart_a, n_cart_b, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
             double a = cexps_a[ia];
             double b = cexps_b[ib];
-            double b2 = std::pow(b, 2);
+            double b2 = b * b;
             double da = ccoeffs_a[ia];
             double db = ccoeffs_b[ib];
 
@@ -127,33 +130,59 @@ void LI::kineticEnergyKernel(const int la, const int lb, const int cdepth_a, con
                              b * (2 * k_ + 1) * Ez(k, k_, 0) -
                              0.5 * k_ * (k_ - 1) * Ez(k, k_ - 2, 0);
 
-                    ints_contracted[mu * n_b_cart + nu] += fac * Tx * Ey(j, j_, 0) * Ez(k, k_, 0);
-                    ints_contracted[mu * n_b_cart + nu] += fac * Ex(i, i_, 0) * Ty * Ez(k, k_, 0);
-                    ints_contracted[mu * n_b_cart + nu] += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * Tz;
+                    ints_cart(mu, nu) += fac * Tx * Ey(j, j_, 0) * Ez(k, k_, 0);
+                    ints_cart(mu, nu) += fac * Ex(i, i_, 0) * Ty * Ez(k, k_, 0);
+                    ints_cart(mu, nu) += fac * Ex(i, i_, 0) * Ey(j, j_, 0) * Tz;
                 }
         }
+
+    vec2d ints_sph = trafo2Spherical(la, lb, ints_cart);
+
+    int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
+    int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+    for (size_t mu = 0; mu < ints_sph.getDim(0); mu++)
+        for (size_t nu = 0; nu < ints_sph.getDim(1); nu++)
+        {
+            double norm_a = sp_data.norms[ofs_norm_a + mu];
+            double norm_b = sp_data.norms[ofs_norm_b + nu];
+            ints_sph(mu, nu) *= norm_a * norm_b;
+        }
+
+    return ints_sph;
 }
 
-void LI::kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                                   const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                                   const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                                   double *intderivs_contracted)
+array<lible::vec2d, 6> LI::kineticEnergyDeriv1Kernel(const int ipair, const ShellPairData &sp_data)
 {
-    int n_a_cart = numCartesians(la);
-    int n_b_cart = numCartesians(lb);
-    int n_ab_cart = n_a_cart * n_b_cart;
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+    int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
-    std::fill(intderivs_contracted, intderivs_contracted + 6 * n_ab_cart, 0);
+    const double *cexps_a = &sp_data.exps[cofs_a];
+    const double *cexps_b = &sp_data.exps[cofs_b];
+    const double *ccoeffs_a = &sp_data.coeffs[cofs_a];
+    const double *ccoeffs_b = &sp_data.coeffs[cofs_b];
+    const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+    const double *xyz_b = &sp_data.coords[6 * ipair + 3];
 
     const auto &cart_exps_a = cart_exps[la];
     const auto &cart_exps_b = cart_exps[lb];
+
+    int n_cart_a = numCartesians(la);
+    int n_cart_b = numCartesians(lb);
+
+    array<vec2d, 6> ints_cart;
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        ints_cart[ideriv] = vec2d(n_cart_a, n_cart_b, 0);
 
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
             double a = cexps_a[ia];
             double b = cexps_b[ib];
-            double b2 = std::pow(b, 2);
+            double b2 = b * b;
             double da = ccoeffs_a[ia];
             double db = ccoeffs_b[ib];
 
@@ -168,24 +197,39 @@ void LI::kineticEnergyDeriv1Kernel(const int la, const int lb, const int cdepth_
 
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
-                {
-                    int munu = mu * n_b_cart + nu;
-
+                {                    
                     double kin_x = kinEDeriv1Helper(b, b2, fac, E1x, Ey, Ez, {i, j, k}, {i_, j_, k_});
                     double kin_y = kinEDeriv1Helper(b, b2, fac, Ex, E1y, Ez, {i, j, k}, {i_, j_, k_});
                     double kin_z = kinEDeriv1Helper(b, b2, fac, Ex, Ey, E1z, {i, j, k}, {i_, j_, k_});
 
                     // d/dA
-                    intderivs_contracted[0 * n_ab_cart + munu] += kin_x;
-                    intderivs_contracted[1 * n_ab_cart + munu] += kin_y;
-                    intderivs_contracted[2 * n_ab_cart + munu] += kin_z;
+                    ints_cart[0](mu, nu) += kin_x;
+                    ints_cart[1](mu, nu) += kin_y;
+                    ints_cart[2](mu, nu) += kin_z;
 
                     // d/dB
-                    intderivs_contracted[3 * n_ab_cart + munu] -= kin_x;
-                    intderivs_contracted[4 * n_ab_cart + munu] -= kin_y;
-                    intderivs_contracted[5 * n_ab_cart + munu] -= kin_z;
+                    ints_cart[3](mu, nu) -= kin_x;
+                    ints_cart[4](mu, nu) -= kin_y;
+                    ints_cart[5](mu, nu) -= kin_z;
                 }
         }
+
+    array<vec2d, 6> ints_sph;
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        ints_sph[ideriv] = trafo2Spherical(la, lb, ints_cart[ideriv]);
+
+    int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
+    int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        for (size_t mu = 0; mu < ints_sph[ideriv].getDim(0); mu++)
+            for (size_t nu = 0; nu < ints_sph[ideriv].getDim(1); nu++)
+            {
+                double norm_a = sp_data.norms[ofs_norm_a + mu];
+                double norm_b = sp_data.norms[ofs_norm_b + nu];
+                ints_sph[ideriv](mu, nu) *= norm_a * norm_b;
+            }
+
+    return ints_sph;
 }
 
 template <>
@@ -193,33 +237,17 @@ void LIO::kernel<LIO::Option::kinetic_energy>(const int la, const int lb,
                                               const ShellPairData &sp_data,
                                               vec2d &ints_out)
 {
-    int n_a_cart = numCartesians(sp_data.la);
-    int n_b_cart = numCartesians(sp_data.lb);
-
-    vector<CartExps> cart_exps_a = cart_exps[la];
-    vector<CartExps> cart_exps_b = cart_exps[lb];
-
-    arma::dmat sph_trafo_bra = returnSphericalTrafo(sp_data.la);
-    arma::dmat sph_trafo_ket = returnSphericalTrafo(sp_data.lb).t();
-
-    arma::dmat ints_contracted(n_b_cart, n_a_cart);
-    arma::dmat ints_sph;
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
-        ints_contracted.zeros();
+        vec2d ints_ipair = kineticEnergyKernel(ipair, sp_data);
 
-        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
-        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
-        int cofs_a = sp_data.coffsets[2 * ipair + 0];
-        int cofs_b = sp_data.coffsets[2 * ipair + 1];
-
-        kineticEnergyKernel(la, lb, cdepth_a, cdepth_b, &sp_data.exps[cofs_a], &sp_data.exps[cofs_b],
-                            &sp_data.coeffs[cofs_a], &sp_data.coeffs[cofs_b],
-                            &sp_data.coords[6 * ipair + 0], &sp_data.coords[6 * ipair + 3],
-                            ints_contracted.memptr());
-
-        ints_sph = sph_trafo_bra * ints_contracted.t() * sph_trafo_ket;
-
-        transferInts1El(ipair, sp_data, ints_sph, ints_out);
+        int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
+        int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
+        for (size_t mu = 0; mu < ints_ipair.getDim(0); mu++)
+            for (size_t nu = 0; nu < ints_ipair.getDim(1); nu++)
+            {
+                ints_out(ofs_a + mu, ofs_b + nu) = ints_ipair(mu, nu);
+                ints_out(ofs_b + nu, ofs_a + mu) = ints_ipair(mu, nu);
+            }
     }
 }

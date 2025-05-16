@@ -12,25 +12,36 @@ using std::array, std::vector;
 namespace lible::ints
 {
     // Forward declaration
-    void dipoleMomentKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                            const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                            const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                            const double *origin, double *ints_contracted);
+    array<vec2d, 3> dipoleMomentKernel(const int ipair, const array<double, 3> &origin,
+                                       const ShellPairData &sp_data);
 }
 
-void LI::dipoleMomentKernel(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                            const double *cexps_a, const double *cexps_b, const double *ccoeffs_a,
-                            const double *ccoeffs_b, const double *xyz_a, const double *xyz_b,
-                            const double *origin, double *ints_contracted)
+array<lible::vec2d, 3> LI::dipoleMomentKernel(const int ipair, const array<double, 3> &origin,
+                                              const ShellPairData &sp_data)
 {
-    int n_a_cart = numCartesians(la);
-    int n_b_cart = numCartesians(lb);
-    int n_ab_cart = n_a_cart * n_b_cart;
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+    int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
-    std::fill(ints_contracted, ints_contracted + n_ab_cart, 0);
+    const double *cexps_a = &sp_data.exps[cofs_a];
+    const double *cexps_b = &sp_data.exps[cofs_b];
+    const double *ccoeffs_a = &sp_data.coeffs[cofs_a];
+    const double *ccoeffs_b = &sp_data.coeffs[cofs_b];
+    const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+    const double *xyz_b = &sp_data.coords[6 * ipair + 3];
 
     const auto &cart_exps_a = cart_exps[la];
     const auto &cart_exps_b = cart_exps[lb];
+
+    int n_cart_a = numCartesians(la);
+    int n_cart_b = numCartesians(lb);
+
+    array<vec2d, 3> ints_cart;
+    for (int icart = 0; icart < 3; icart++)
+        ints_cart[icart] = vec2d(n_cart_a, n_cart_b, 0);
 
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -68,15 +79,30 @@ void LI::dipoleMomentKernel(const int la, const int lb, const int cdepth_a, cons
 
                     double valz = fac *
                                   (Ex(i, i_, 0)) * Ey(j, j_, 0) *
-                                  (Ez(k, k_, 1) + xyz_po[2] * Ez(k, k_, 0));
+                                  (Ez(k, k_, 1) + xyz_po[2] * Ez(k, k_, 0));                    
 
-                    int munu = mu * n_b_cart + nu;
-
-                    ints_contracted[0 * n_ab_cart + munu] += valx;
-                    ints_contracted[1 * n_ab_cart + munu] += valy;
-                    ints_contracted[2 * n_ab_cart + munu] += valz;
+                    ints_cart[0](mu, nu) += valx;
+                    ints_cart[1](mu, nu) += valy;
+                    ints_cart[2](mu, nu) += valz;
                 }
         }
+
+    array<vec2d, 3> ints_sph;
+    for (int icart = 0; icart < 3; icart++)
+        ints_sph[icart] = trafo2Spherical(la, lb, ints_cart[icart]);
+
+    int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
+    int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+    for (int icart = 0; icart < 3; icart++)
+        for (size_t mu = 0; mu < ints_sph[icart].getDim(0); mu++)
+            for (size_t nu = 0; nu < ints_sph[icart].getDim(1); nu++)
+            {
+                double norm_a = sp_data.norms[ofs_norm_a + mu];
+                double norm_b = sp_data.norms[ofs_norm_b + nu];
+                ints_sph[icart](mu, nu) *= norm_a * norm_b;
+            }
+
+    return ints_sph;
 }
 
 template <>
@@ -85,40 +111,18 @@ void LIO::kernel<LIO::Option::dipole_moment, array<double, 3>>(const int la, con
                                                                const array<double, 3> &origin,
                                                                array<lible::vec2d, 3> &ints_out)
 {
-    int dim_a_cart = numCartesians(sp_data.la);
-    int dim_b_cart = numCartesians(sp_data.lb);
-    int dim_ab_cart = dim_a_cart * dim_b_cart;
-
-    vector<CartExps> cart_exps_a = cart_exps[la];
-    vector<CartExps> cart_exps_b = cart_exps[lb];
-
-    arma::dmat sph_trafo_bra = returnSphericalTrafo(sp_data.la);
-    arma::dmat sph_trafo_ket = returnSphericalTrafo(sp_data.lb).t();
-
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
-        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
-        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
-        int cofs_a = sp_data.coffsets[2 * ipair + 0];
-        int cofs_b = sp_data.coffsets[2 * ipair + 1];
+        array<vec2d, 3> ints_ipair = dipoleMomentKernel(ipair, origin, sp_data);
 
-        vector<double> ints_contracted(dim_ab_cart * 3);
-        dipoleMomentKernel(la, lb, cdepth_a, cdepth_b, &sp_data.exps[cofs_a], &sp_data.exps[cofs_b],
-                           &sp_data.coeffs[cofs_a], &sp_data.coeffs[cofs_b],
-                           &sp_data.coords[6 * ipair + 0], &sp_data.coords[6 * ipair + 3],
-                           origin.data(), ints_contracted.data());
-
-        std::array<arma::dmat, 3> ints_contracted_arma;
-        for (int i = 0; i < 3; i++)
-            ints_contracted_arma[i] = arma::dmat(ints_contracted.data() + i * dim_ab_cart, dim_b_cart, dim_a_cart);
-
-        std::array<arma::dmat, 3> ints_sph;
-        ints_sph[0] = sph_trafo_bra * ints_contracted_arma[0].t() * sph_trafo_ket;
-        ints_sph[1] = sph_trafo_bra * ints_contracted_arma[1].t() * sph_trafo_ket;
-        ints_sph[2] = sph_trafo_bra * ints_contracted_arma[2].t() * sph_trafo_ket;
-
-        transferInts1El(ipair, sp_data, ints_sph[0], ints_out[0]);
-        transferInts1El(ipair, sp_data, ints_sph[1], ints_out[1]);
-        transferInts1El(ipair, sp_data, ints_sph[2], ints_out[2]);
+        int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
+        int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
+        for (int icart = 0; icart < 3; icart++)
+            for (size_t mu = 0; mu < ints_ipair[icart].getDim(0); mu++)
+                for (size_t nu = 0; nu < ints_ipair[icart].getDim(1); nu++)
+                {
+                    ints_out[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
+                    ints_out[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);
+                }
     }
 }
