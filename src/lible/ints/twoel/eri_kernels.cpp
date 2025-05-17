@@ -1364,7 +1364,7 @@ kernel_eri2_t LIT::deployERI2Kernel(const int la, const int lb)
         throw std::runtime_error(msg);
     }
 
-    return eri2_kernels.at(std::make_tuple(la, lb));
+    return eri2_kernels.at({la, lb});
 }
 
 kernel_eri3_t LIT::deployERI3Kernel(const int la, const int lb, const int lc)
@@ -1384,7 +1384,7 @@ kernel_eri3_t LIT::deployERI3Kernel(const int la, const int lb, const int lc)
         throw std::runtime_error(msg);
     }
 
-    return eri3_kernels.at(std::make_tuple(la, lb, lc));
+    return eri3_kernels.at({la, lb, lc});
 }
 
 kernel_eri4_t LIT::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
@@ -1404,5 +1404,5 @@ kernel_eri4_t LIT::deployERI4Kernel(const int la, const int lb, const int lc, co
         throw std::runtime_error(msg);
     }
 
-    return eri4_kernels.at(std::make_tuple(la, lb, lc, ld));
+    return eri4_kernels.at({la, lb, lc, ld});
 }

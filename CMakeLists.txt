@@ -69,7 +69,7 @@ endif()
 ### the main target
 add_library(lible SHARED)
 add_library(lible::lible ALIAS lible)
-target_compile_options(lible PRIVATE -Wall)
+target_compile_options(lible PRIVATE -Wall -Wno-unused-local-typedefs)
 
 set_target_properties(lible PROPERTIES PREFIX "")
 

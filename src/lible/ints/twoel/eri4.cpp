@@ -321,8 +321,6 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
             int n_sph_b = numSphericals(lb);
             int n_sph_c = numSphericals(lc);
             int n_sph_d = numSphericals(ld);
-            int n_sph_ab = n_sph_a * n_sph_b;
-            int n_sph_cd = n_sph_c * n_sph_d;
 
             const ShellPairData &sp_data_ab = sp_datas[lalb];
             const ShellPairData &sp_data_cd = sp_datas[lcld];
@@ -335,33 +333,39 @@ lible::vec4d LIT::calcERI4New(const Structure &structure)
 
             kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
 
-            vector<double> eri4_batch(n_sph_ab * n_sph_cd);
             for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
             {
                 int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
                 for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
-                    int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
-                    int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
-                    int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
-                    int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+                    vec4d eri4_batch = kernel_eri4(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                                                   sp_data_ab, sp_data_cd);
 
-                    kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
-                                sp_data_ab.cdepths[2 * ipair_ab + 1],
-                                sp_data_cd.cdepths[2 * ipair_cd],
-                                sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
-                                &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
-                                &sp_data_ab.coords[6 * ipair_ab],
-                                &sp_data_ab.coords[6 * ipair_ab + 3],
-                                &sp_data_cd.coords[6 * ipair_cd],
-                                &sp_data_cd.coords[6 * ipair_cd + 3],
-                                &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
-                                &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
-                                &eri4_batch[0]);
+                    int ofs_a = sp_data_ab.offsets_sph[2 * ipair_ab];
+                    int ofs_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
+                    int ofs_c = sp_data_cd.offsets_sph[2 * ipair_cd];
+                    int ofs_d = sp_data_cd.offsets_sph[2 * ipair_cd + 1];
 
-                    transferIntsERI4(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                     eri4_batch, eri4);
+                    for (int ia = 0; ia < n_sph_a; ia++)
+                        for (int ib = 0; ib < n_sph_b; ib++)
+                            for (int ic = 0; ic < n_sph_c; ic++)
+                                for (int id = 0; id < n_sph_d; id++)
+                                {
+                                    int mu = ofs_a + ia;
+                                    int nu = ofs_b + ib;
+                                    int ka = ofs_c + ic;
+                                    int ta = ofs_d + id;
+
+                                    double integral = eri4_batch(ia, ib, ic, id);
+                                    eri4(mu, nu, ka, ta) = integral;
+                                    eri4(mu, nu, ta, ka) = integral;
+                                    eri4(nu, mu, ka, ta) = integral;
+                                    eri4(nu, mu, ta, ka) = integral;
+                                    eri4(ka, ta, mu, nu) = integral;
+                                    eri4(ka, ta, nu, mu) = integral;
+                                    eri4(ta, ka, mu, nu) = integral;
+                                    eri4(ta, ka, nu, mu) = integral;
+                                }
                 }
             }
         }
@@ -476,13 +480,6 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
             auto [la, lb] = l_pairs[lalb];
             auto [lc, ld] = l_pairs[lcld];
 
-            int n_sph_a = numSphericals(la);
-            int n_sph_b = numSphericals(lb);
-            int n_sph_c = numSphericals(lc);
-            int n_sph_d = numSphericals(ld);
-            int n_sph_ab = n_sph_a * n_sph_b;
-            int n_sph_cd = n_sph_c * n_sph_d;
-
             const ShellPairData &sp_data_ab = sp_datas[lalb];
             const ShellPairData &sp_data_cd = sp_datas[lcld];
 
@@ -495,30 +492,13 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
             kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
 
             size_t n_shells_abcd = 0;
-            vector<double> eri4_batch(n_sph_ab * n_sph_cd);
             for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
             {
                 int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
                 for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
-                    int pos_a = sp_data_ab.coffsets[2 * ipair_ab];
-                    int pos_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
-                    int pos_c = sp_data_cd.coffsets[2 * ipair_cd];
-                    int pos_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
-
-                    kernel_eri4(sp_data_ab.cdepths[2 * ipair_ab],
-                                sp_data_ab.cdepths[2 * ipair_ab + 1],
-                                sp_data_cd.cdepths[2 * ipair_cd],
-                                sp_data_cd.cdepths[2 * ipair_cd + 1],
-                                &sp_data_ab.exps[pos_a], &sp_data_ab.exps[pos_b],
-                                &sp_data_cd.exps[pos_c], &sp_data_cd.exps[pos_d],
-                                &sp_data_ab.coords[6 * ipair_ab],
-                                &sp_data_ab.coords[6 * ipair_ab + 3],
-                                &sp_data_cd.coords[6 * ipair_cd],
-                                &sp_data_cd.coords[6 * ipair_cd + 3],
-                                &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]],
-                                &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]],
-                                &eri4_batch[0]);
+                    vec4d eri4_batch = kernel_eri4(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                                                   sp_data_ab, sp_data_cd);
 
                     n_shells_abcd++;
                 }

@@ -21,27 +21,26 @@ def writeKernelInstantiate(lbra, lket):
 		# Write ERI4 kernels
 		for la, lb in lalb_list:
 			for lc, ld in lcld_list:
-				file_str += 'template void lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int, const int, const int, const int,\n'.format(la, lb, lc, ld)
-				file_str += '                                                       const double*, const double*,\n'
-				file_str += '                                                       const double*, const double*,\n'
-				file_str += '                                                       const double*, const double*,\n'
-				file_str += '                                                       const double*, const double*,\n'
-				file_str += '                                                       const double*, const double*,\n'
-				file_str += '                                                       double*);\n\n'
+				file_str += 'template lible::vec4d lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
+				file_str += '                                                               const std::vector<double> &ecoeffs_ab,\n'
+				file_str += '                                                               const std::vector<double> &ecoeffs_cd_tsp,\n'
+				file_str += '                                                               const ShellPairData &sp_data_ab,\n'
+				file_str += '                                                               const ShellPairData &sp_data_cd);\n\n'
 		
 		# Write ERI3 kernels
 		for la, lb in lalb_list:
-			file_str += 'template void lible::ints::two::eri3Kernel<{}, {}, {}>(const int, const int, const int,\n'.format(la, lb, lket)
-			file_str += '                                                    const double*, const double*, const double*,\n'
-			file_str += '                                                    const double*, const double*, const double*,\n'
-			file_str += '                                                    const double*, const double*, double*);\n\n'
+			file_str += 'template lible::vec3d lible::ints::two::eri3Kernel<{}, {}, {}>(const int ipair_ab, const int ishell_c,\n'.format(la, lb, lket)
+			file_str += '                                                             const std::vector<double> &ecoeffs_ab,\n'
+			file_str += '                                                             const std::vector<double> &ecoeffs_c,\n'
+			file_str += '                                                             const ShellPairData &sp_data_ab,\n'
+			file_str += '                                                             const ShellData &sh_data_c);\n\n'
 
 		# Write ERI2 kernels
-		file_str += 'template void lible::ints::two::eri2Kernel<{}, {}>(const int, const int,\n'.format(lbra, lket)
-		file_str += '                                                 const double*, const double*,\n'
-		file_str += '                                                 const double*, const double*,\n'
-		file_str += '                                                 const double*, const double*,\n'
-		file_str += '                                                 double*);\n\n'
+		file_str += 'template lible::vec2d lible::ints::two::eri2Kernel<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(lbra, lket)
+		file_str += '                                                         const std::vector<double> &ecoeffs_a,\n'
+		file_str += '                                                         const std::vector<double> &ecoeffs_b_tsp,\n'
+		file_str += '                                                         const ShellData &sh_data_a,\n'
+		file_str += '                                                         const ShellData &sh_data_b);\n\n'
 
 		file.write(file_str)
 
@@ -65,15 +64,34 @@ def writeKernelGenerate(lbra, lket):
 	# Write ERI4 kernels
 	for la, lb in lalb_list:
 		for lc, ld in lcld_list:
-			file_str += 'template<> void lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int cdepth_a, const int cdepth_b,\n'.format(la, lb, lc, ld)
-			file_str += '                                                         const int cdepth_c, const int cdepth_d,\n'
-			file_str += '                                                         const double *exps_a, const double *exps_b,\n'
-			file_str += '                                                         const double *exps_c, const double *exps_d,\n'
-			file_str += '                                                         const double *coords_a, const double *coords_b,\n'
-			file_str += '                                                         const double *coords_c, const double *coords_d,\n'
-			file_str += '                                                         const double *ecoeffs_ab, const double *ecoeffs_cd_tsp,\n'
-			file_str += '                                                         double *eri4_batch)\n'
+			file_str += 'template<> lible::vec4d\n'
+			file_str += 'lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
+			file_str += '                                         const std::vector<double> &ecoeffs_ab,\n'
+			file_str += '                                         const std::vector<double> &ecoeffs_cd_tsp,\n'
+			file_str += '                                         const ShellPairData &sp_data_ab,\n'
+			file_str += '                                         const ShellPairData &sp_data_cd)\n'
 			file_str += '{\n'
+			
+			file_str += '    const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];\n'
+			file_str += '    const int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];\n'
+			file_str += '    const int cdepth_c = sp_data_cd.cdepths[2 * ipair_cd];\n'
+			file_str += '    const int cdepth_d = sp_data_cd.cdepths[2 * ipair_cd + 1];\n'
+			file_str += '    const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];\n'
+			file_str += '    const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];\n'
+			file_str += '    const int cofs_c = sp_data_cd.coffsets[2 * ipair_cd];\n'
+			file_str += '    const int cofs_d = sp_data_cd.coffsets[2 * ipair_cd + 1];\n\n'
+			
+			file_str += '    const double *exps_a = &sp_data_ab.exps[cofs_a];\n'
+			file_str += '    const double *exps_b = &sp_data_ab.exps[cofs_b];\n'
+			file_str += '    const double *exps_c = &sp_data_cd.exps[cofs_c];\n'
+			file_str += '    const double *exps_d = &sp_data_cd.exps[cofs_d];\n'
+			file_str += '    const double *coords_a = &sp_data_ab.coords[6 * ipair_ab];\n'
+			file_str += '    const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];\n'
+			file_str += '    const double *coords_c = &sp_data_cd.coords[6 * ipair_cd];\n'
+			file_str += '    const double *coords_d = &sp_data_cd.coords[6 * ipair_cd + 3];\n'		
+			file_str += '    const double *pecoeffs_ab = &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]];\n'
+			file_str += '    const double *pecoeffs_cd_tsp = &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]];\n\n'
+
 			file_str += '    constexpr int la = {}, lb = {}, lc = {}, ld = {};\n'.format(la, lb, lc, ld)
 			file_str += '    constexpr int lab = la + lb;\n'
 			file_str += '    constexpr int lcd = lc + ld;\n'
@@ -87,10 +105,8 @@ def writeKernelGenerate(lbra, lket):
 			file_str += '    constexpr int n_hermite_cd = numHermitesC(lcd);\n'
 			file_str += '    constexpr int n_sph_ab = n_sph_a * n_sph_b;\n'
 			file_str += '    constexpr int n_sph_cd = n_sph_c * n_sph_d;\n'
-			file_str += '    constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;\n\n'
+			file_str += '    constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;\n'
 			file_str += '    constexpr int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;\n\n'
-
-			file_str += '    std::fill(eri4_batch, eri4_batch + n_sph_ab * n_sph_cd, 0);\n\n'
 
 			file_str += '    std::array<double, labcd + 1> fnx;\n'
 			file_str += '    BoysF2<labcd> boys_f;\n\n'
@@ -140,25 +156,60 @@ def writeKernelGenerate(lbra, lket):
 			file_str += '                }\n'
 			file_str += '        }\n\n'
 
+			file_str += '    vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);\n'
 			file_str += '    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)\n'
 			file_str += '        for (int ib = 0; ib < cdepth_b; ib++, iab++)\n'
 			file_str += '        {\n'
 
 			# Second rollout
-			file_str += rolloutERI4Second(la, lb, lc, ld)
-			file_str += '        }\n'
+			file_str += rolloutERI4Second(la, lb, lc, ld)			
+			file_str += '        }\n\n'	
+
+			file_str += '    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];\n'
+			file_str += '    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];\n'
+			file_str += '    int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];\n'
+			file_str += '    int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];\n'
+			file_str += '    for (int mu = 0; mu < n_sph_a; mu++)\n'
+			file_str += '        for (int nu = 0; nu < n_sph_b; nu++)\n'
+			file_str += '            for (int ka = 0; ka < n_sph_c; ka++)\n'
+			file_str += '                for (int ta = 0; ta < n_sph_d; ta++)\n'
+			file_str += '                {\n'
+			file_str += '                    double norm_a = sp_data_ab.norms[ofs_norm_a + mu];\n'
+			file_str += '                    double norm_b = sp_data_ab.norms[ofs_norm_b + nu];\n'
+			file_str += '                    double norm_c = sp_data_cd.norms[ofs_norm_c + ka];\n'
+			file_str += '                    double norm_d = sp_data_cd.norms[ofs_norm_d + ta];\n'
+			file_str += '                    eri4_batch(mu, nu, ka, ta) *= norm_a * norm_b * norm_c * norm_d;\n'
+			file_str += '                }\n\n'
+		
+			file_str += '    return eri4_batch;\n'
 			file_str += '}\n\n'
 			 
 
 	# Write ERI3 kernels
 	for la, lb in lalb_list:
-		file_str += 'template<> void lible::ints::two::eri3Kernel<{}, {}, {}>(const int cdepth_a, const int cdepth_b, const int cdepth_c,\n'.format(la, lb, lket)
-		file_str += '                                                      const double* exps_a, const double* exps_b,\n' 
-		file_str += '                                                      const double* exps_c, const double* coords_a,\n'
-		file_str += '                                                      const double* coords_b, const double* coords_c,\n'
-		file_str += '                                                      const double* ecoeffs_ab, const double* ecoeffs_c,\n'
-		file_str += '                                                      double* eri3_batch)\n'
+		file_str += 'template<> lible::vec3d\n'
+		file_str += 'lible::ints::two::eri3Kernel<{}, {}, {}>(const int ipair_ab, const int ishell_c,\n'.format(la, lb, lket)
+		file_str += '                                      const std::vector<double> &ecoeffs_ab,\n' 
+		file_str += '                                      const std::vector<double> &ecoeffs_c,\n'
+		file_str += '                                      const ShellPairData &sp_data_ab,\n'
+		file_str += '                                      const ShellData &sh_data_c)\n'		
 		file_str += '{\n'
+		file_str += '    const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];\n'
+		file_str += '    const int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];\n'
+		file_str += '    const int cdepth_c = sh_data_c.cdepths[ishell_c];\n'
+		file_str += '    const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];\n'
+		file_str += '    const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];\n'
+		file_str += '    const int cofs_c = sh_data_c.coffsets[ishell_c];\n\n'
+
+		file_str += '    const double *exps_a = &sp_data_ab.exps[cofs_a];\n'
+		file_str += '    const double *exps_b = &sp_data_ab.exps[cofs_b];\n'
+		file_str += '    const double *exps_c = &sh_data_c.exps[cofs_c];\n'
+		file_str += '    const double *coords_a = &sp_data_ab.coords[6 * ipair_ab];\n'
+		file_str += '    const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];\n'
+		file_str += '    const double *coords_c = &sh_data_c.coords[3 * ishell_c];\n'
+		file_str += '    const double *pecoeffs_ab = &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]];\n'
+		file_str += '    const double *pecoeffs_c = &ecoeffs_c[sh_data_c.offsets_ecoeffs[ishell_c]];\n\n'
+				
 		file_str += '    constexpr int la = {}, lb = {}, lc = {};\n'.format(la, lb, lc)
 		file_str += '    constexpr int lab = la + lb;\n'
 		file_str += '    constexpr int labc = lab + lc;\n'
@@ -171,8 +222,6 @@ def writeKernelGenerate(lbra, lket):
 		file_str += '    constexpr int n_sph_ab = n_sph_a * n_sph_b;\n'
 		file_str += '    constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;\n'
 		file_str += '    constexpr int n_ecoeffs_c = n_sph_c * n_hermite_c;\n\n'
-
-		file_str += '    std::fill(eri3_batch, eri3_batch + n_sph_ab * n_sph_c, 0);\n\n'
 
 		file_str += '    std::array<double, labc + 1> fnx;\n'
 		file_str += '    BoysF2<labc> boys_f;\n\n'
@@ -216,22 +265,51 @@ def writeKernelGenerate(lbra, lket):
 		file_str += '            }\n'
 		file_str +=         '}\n\n'
 
+		file_str += '    vec3d eri3_batch(n_sph_a, n_sph_b, n_sph_c, 0);\n'
 		file_str += '    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)\n'
 		file_str += '        for (int ib = 0; ib < cdepth_b; ib++, iab++)\n'
 		file_str += '        {\n'
 
 		# Second rollout
 		file_str += rolloutERI3Second(la, lb, lket)						
-		file_str += '        }\n'
+		file_str += '        }\n\n'
+
+		file_str += '    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];\n'
+		file_str += '    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];\n'
+		file_str += '    int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];\n'
+		file_str += '    for (int mu = 0; mu < n_sph_a; mu++)\n'
+		file_str += '        for (int nu = 0; nu < n_sph_b; nu++)\n'
+		file_str += '            for (int ka = 0; ka < n_sph_c; ka++)\n'
+		file_str += '            {\n'
+		file_str += '                double norm_a = sp_data_ab.norms[ofs_norm_a + mu];\n'
+		file_str += '                double norm_b = sp_data_ab.norms[ofs_norm_b + nu];\n'
+		file_str += '                double norm_c = sh_data_c.norms[ofs_norm_c + ka];\n'
+		file_str += '                eri3_batch(mu, nu, ka) *= norm_a * norm_b * norm_c;\n'
+		file_str += '            }\n\n'
+		
+		file_str += '    return eri3_batch;\n'
 		file_str += '}\n\n'
 
+
 	# Write ERI2 kernels
-	file_str += 'template<> void lible::ints::two::eri2Kernel<{}, {}>(const int cdepth_a, const int cdepth_b,\n'.format(lbra, lket)
-	file_str += '                                                   const double* exps_a, const double* exps_b,\n'
-	file_str += '                                                   const double* coords_a, const double* coords_b,\n'
-	file_str += '                                                   const double* ecoeffs_a, const double* ecoeffs_b_tsp,\n'
-	file_str += '                                                   double* eri2_batch)\n'	
+	file_str += 'template<> lible::vec2d\n'
+	file_str += 'lible::ints::two::eri2Kernel<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(lbra, lket)
+	file_str += '                                   const std::vector<double> &ecoeffs_a,\n'
+	file_str += '                                   const std::vector<double> &ecoeffs_b_tsp,\n'
+	file_str += '                                   const ShellData &sh_data_a, const ShellData &sh_data_b)\n'	
 	file_str += '{\n'
+	file_str += '    const int cdepth_a = sh_data_a.cdepths[ishell_a];\n'
+	file_str += '    const int cdepth_b = sh_data_b.cdepths[ishell_b];\n'
+	file_str += '    const int cofs_a = sh_data_a.coffsets[ishell_a];\n'
+	file_str += '    const int cofs_b = sh_data_b.coffsets[ishell_b];\n\n'
+
+	file_str += '    const double *exps_a = &sh_data_a.exps[cofs_a];\n'
+	file_str += '    const double *exps_b = &sh_data_b.exps[cofs_b];\n'
+	file_str += '    const double *coords_a = &sh_data_a.coords[3 * ishell_a];\n'
+	file_str += '    const double *coords_b = &sh_data_b.coords[3 * ishell_b];\n'
+	file_str += '    const double *pecoeffs_a = &ecoeffs_a[sh_data_a.offsets_ecoeffs[ishell_a]];\n'
+	file_str += '    const double *pecoeffs_b_tsp = &ecoeffs_b_tsp[sh_data_b.offsets_ecoeffs[ishell_b]];\n\n'
+		
 	file_str += '    constexpr int la = {}, lb = {};\n'.format(lbra, lket)
 	file_str += '    constexpr int lab = la + lb;\n'
 	file_str += '    constexpr int n_sph_a = numSphericalsC(la);\n'
@@ -240,8 +318,6 @@ def writeKernelGenerate(lbra, lket):
 	file_str += '    constexpr int n_hermite_b = numHermitesC(lb);\n'
 	file_str += '    constexpr int n_ecoeffs_a = n_sph_a * n_hermite_a;\n'
 	file_str += '    constexpr int n_ecoeffs_b = n_sph_b * n_hermite_b;\n\n'
-
-	file_str += '    std::fill(eri2_batch, eri2_batch + n_sph_a * n_sph_b, 0);\n\n'
 
 	file_str += '    std::array<double, lab + 1> fnx;\n'
 	file_str += '    BoysF2<lab> boys_f;\n\n'
@@ -279,25 +355,36 @@ def writeKernelGenerate(lbra, lket):
 	file_str += '        }\n'
 	file_str += '    }\n\n'
 
+	file_str += '    vec2d eri2_batch(n_sph_a, n_sph_b, 0);\n'
 	file_str += '    for (int ia = 0; ia < cdepth_a; ia++)\n'
 	file_str += '    {\n'
 
 	# Second rollout
 	file_str += rolloutERI2Second(lbra, lket)
-	file_str += '    }\n'
+	file_str += '    }\n\n'
+
+	file_str += '    int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];\n'
+	file_str += '    int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];\n'
+	file_str += '    for (int mu = 0; mu < n_sph_a; mu++)\n'
+	file_str += '        for (int nu = 0; nu < n_sph_b; nu++)\n'
+	file_str += '        {\n'
+	file_str += '            double norm_a = sh_data_a.norms[ofs_norm_a + mu];\n'
+	file_str += '            double norm_b = sh_data_b.norms[ofs_norm_b + nu];\n'
+	file_str += '            eri2_batch(mu, nu) *= norm_a * norm_b;\n'
+	file_str += '        }\n\n'
+
+	file_str += '    return eri2_batch;\n'
 	file_str += '}\n'
 	
 	with open('eri_kernels_{}_{}.cpp'.format(lbra, lket), 'w') as file:
 		file.write(file_str)
-
-#hermiteIdxs(4)
 
 l_max = 12
 l_max_generate = 4 # TODO: set to 6 later
 for lbra in range(0, l_max + 1):
 	for lket in range(0, l_max + 1): 
 		l_sum = lbra + lket
-		writeKernelInstantiate(lbra, lket)
+		# writeKernelInstantiate(lbra, lket)
 		if l_sum > l_max_generate:
 			writeKernelInstantiate(lbra, lket)
 		else:

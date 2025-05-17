@@ -1,14 +1,32 @@
 #include <lible/ints/twoel/eri_kernels.hpp>
 
-template<> void lible::ints::two::eri4Kernel<1, 0, 1, 1>(const int cdepth_a, const int cdepth_b,
-                                                         const int cdepth_c, const int cdepth_d,
-                                                         const double *exps_a, const double *exps_b,
-                                                         const double *exps_c, const double *exps_d,
-                                                         const double *coords_a, const double *coords_b,
-                                                         const double *coords_c, const double *coords_d,
-                                                         const double *ecoeffs_ab, const double *ecoeffs_cd_tsp,
-                                                         double *eri4_batch)
+template<> lible::vec4d
+lible::ints::two::eri4Kernel<1, 0, 1, 1>(const int ipair_ab, const int ipair_cd,
+                                         const std::vector<double> &ecoeffs_ab,
+                                         const std::vector<double> &ecoeffs_cd_tsp,
+                                         const ShellPairData &sp_data_ab,
+                                         const ShellPairData &sp_data_cd)
 {
+    const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
+    const int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];
+    const int cdepth_c = sp_data_cd.cdepths[2 * ipair_cd];
+    const int cdepth_d = sp_data_cd.cdepths[2 * ipair_cd + 1];
+    const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];
+    const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+    const int cofs_c = sp_data_cd.coffsets[2 * ipair_cd];
+    const int cofs_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
+    const double *exps_a = &sp_data_ab.exps[cofs_a];
+    const double *exps_b = &sp_data_ab.exps[cofs_b];
+    const double *exps_c = &sp_data_cd.exps[cofs_c];
+    const double *exps_d = &sp_data_cd.exps[cofs_d];
+    const double *coords_a = &sp_data_ab.coords[6 * ipair_ab];
+    const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];
+    const double *coords_c = &sp_data_cd.coords[6 * ipair_cd];
+    const double *coords_d = &sp_data_cd.coords[6 * ipair_cd + 3];
+    const double *pecoeffs_ab = &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]];
+    const double *pecoeffs_cd_tsp = &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]];
+
     constexpr int la = 1, lb = 0, lc = 1, ld = 1;
     constexpr int lab = la + lb;
     constexpr int lcd = lc + ld;
@@ -23,10 +41,7 @@ template<> void lible::ints::two::eri4Kernel<1, 0, 1, 1>(const int cdepth_a, con
     constexpr int n_sph_ab = n_sph_a * n_sph_b;
     constexpr int n_sph_cd = n_sph_c * n_sph_d;
     constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
-
     constexpr int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
-
-    std::fill(eri4_batch, eri4_batch + n_sph_ab * n_sph_cd, 0);
 
     std::array<double, labcd + 1> fnx;
     BoysF2<labcd> boys_f;
@@ -69,7 +84,7 @@ template<> void lible::ints::two::eri4Kernel<1, 0, 1, 1>(const int cdepth_a, con
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
                     calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
-                    const double* p_ecoeffs_cd_tsp = &ecoeffs_cd_tsp[icd * n_ecoeffs_cd];
+                    const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];
                     double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
 
                     p_rints_x_ecoeffs[0] += rints[0] * p_ecoeffs_cd_tsp[0];
@@ -207,78 +222,115 @@ template<> void lible::ints::two::eri4Kernel<1, 0, 1, 1>(const int cdepth_a, con
                 }
         }
 
+    vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
-            const double* p_ecoeffs_ab = &ecoeffs_ab[iab * n_ecoeffs_ab];
+            const double* p_ecoeffs_ab = &pecoeffs_ab[iab * n_ecoeffs_ab];
             const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[iab * n_rints_x_ecoeffs];
 
-            eri4_batch[0] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[0];
-            eri4_batch[0] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[27];
-            eri4_batch[1] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[1];
-            eri4_batch[1] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[28];
-            eri4_batch[2] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[2];
-            eri4_batch[2] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[29];
-            eri4_batch[3] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[3];
-            eri4_batch[3] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[30];
-            eri4_batch[4] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[4];
-            eri4_batch[4] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[31];
-            eri4_batch[5] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[5];
-            eri4_batch[5] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[32];
-            eri4_batch[6] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[6];
-            eri4_batch[6] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[33];
-            eri4_batch[7] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[7];
-            eri4_batch[7] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[34];
-            eri4_batch[8] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[8];
-            eri4_batch[8] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[35];
-            eri4_batch[9] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[9];
-            eri4_batch[9] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[0];
-            eri4_batch[10] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[10];
-            eri4_batch[10] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[1];
-            eri4_batch[11] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[11];
-            eri4_batch[11] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[2];
-            eri4_batch[12] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[12];
-            eri4_batch[12] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[3];
-            eri4_batch[13] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[13];
-            eri4_batch[13] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[4];
-            eri4_batch[14] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[14];
-            eri4_batch[14] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[5];
-            eri4_batch[15] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[15];
-            eri4_batch[15] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[6];
-            eri4_batch[16] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[16];
-            eri4_batch[16] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[7];
-            eri4_batch[17] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[17];
-            eri4_batch[17] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[8];
-            eri4_batch[18] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[0];
-            eri4_batch[18] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[18];
-            eri4_batch[19] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[1];
-            eri4_batch[19] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[19];
-            eri4_batch[20] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[2];
-            eri4_batch[20] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[20];
-            eri4_batch[21] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[3];
-            eri4_batch[21] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[21];
-            eri4_batch[22] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[4];
-            eri4_batch[22] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[22];
-            eri4_batch[23] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[5];
-            eri4_batch[23] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[23];
-            eri4_batch[24] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[6];
-            eri4_batch[24] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[24];
-            eri4_batch[25] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[7];
-            eri4_batch[25] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[25];
-            eri4_batch[26] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[8];
-            eri4_batch[26] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[26];
+            eri4_batch(0, 0, 0, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[0];
+            eri4_batch(0, 0, 0, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[27];
+            eri4_batch(0, 0, 0, 1) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[1];
+            eri4_batch(0, 0, 0, 1) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[28];
+            eri4_batch(0, 0, 0, 2) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[2];
+            eri4_batch(0, 0, 0, 2) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[29];
+            eri4_batch(0, 0, 1, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[3];
+            eri4_batch(0, 0, 1, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[30];
+            eri4_batch(0, 0, 1, 1) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[4];
+            eri4_batch(0, 0, 1, 1) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[31];
+            eri4_batch(0, 0, 1, 2) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[5];
+            eri4_batch(0, 0, 1, 2) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[32];
+            eri4_batch(0, 0, 2, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[6];
+            eri4_batch(0, 0, 2, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[33];
+            eri4_batch(0, 0, 2, 1) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[7];
+            eri4_batch(0, 0, 2, 1) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[34];
+            eri4_batch(0, 0, 2, 2) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[8];
+            eri4_batch(0, 0, 2, 2) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[35];
+            eri4_batch(1, 0, 0, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[9];
+            eri4_batch(1, 0, 0, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[0];
+            eri4_batch(1, 0, 0, 1) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[10];
+            eri4_batch(1, 0, 0, 1) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[1];
+            eri4_batch(1, 0, 0, 2) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[11];
+            eri4_batch(1, 0, 0, 2) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[2];
+            eri4_batch(1, 0, 1, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[12];
+            eri4_batch(1, 0, 1, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[3];
+            eri4_batch(1, 0, 1, 1) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[13];
+            eri4_batch(1, 0, 1, 1) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[4];
+            eri4_batch(1, 0, 1, 2) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[14];
+            eri4_batch(1, 0, 1, 2) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[5];
+            eri4_batch(1, 0, 2, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[15];
+            eri4_batch(1, 0, 2, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[6];
+            eri4_batch(1, 0, 2, 1) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[16];
+            eri4_batch(1, 0, 2, 1) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[7];
+            eri4_batch(1, 0, 2, 2) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[17];
+            eri4_batch(1, 0, 2, 2) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[8];
+            eri4_batch(2, 0, 0, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[0];
+            eri4_batch(2, 0, 0, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[18];
+            eri4_batch(2, 0, 0, 1) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[1];
+            eri4_batch(2, 0, 0, 1) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[19];
+            eri4_batch(2, 0, 0, 2) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[2];
+            eri4_batch(2, 0, 0, 2) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[20];
+            eri4_batch(2, 0, 1, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[3];
+            eri4_batch(2, 0, 1, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[21];
+            eri4_batch(2, 0, 1, 1) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[4];
+            eri4_batch(2, 0, 1, 1) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[22];
+            eri4_batch(2, 0, 1, 2) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[5];
+            eri4_batch(2, 0, 1, 2) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[23];
+            eri4_batch(2, 0, 2, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[6];
+            eri4_batch(2, 0, 2, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[24];
+            eri4_batch(2, 0, 2, 1) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[7];
+            eri4_batch(2, 0, 2, 1) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[25];
+            eri4_batch(2, 0, 2, 2) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[8];
+            eri4_batch(2, 0, 2, 2) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[26];
         }
+
+    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+    int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
+    int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
+    for (int mu = 0; mu < n_sph_a; mu++)
+        for (int nu = 0; nu < n_sph_b; nu++)
+            for (int ka = 0; ka < n_sph_c; ka++)
+                for (int ta = 0; ta < n_sph_d; ta++)
+                {
+                    double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
+                    double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
+                    double norm_c = sp_data_cd.norms[ofs_norm_c + ka];
+                    double norm_d = sp_data_cd.norms[ofs_norm_d + ta];
+                    eri4_batch(mu, nu, ka, ta) *= norm_a * norm_b * norm_c * norm_d;
+                }
+
+    return eri4_batch;
 }
 
-template<> void lible::ints::two::eri4Kernel<1, 0, 2, 0>(const int cdepth_a, const int cdepth_b,
-                                                         const int cdepth_c, const int cdepth_d,
-                                                         const double *exps_a, const double *exps_b,
-                                                         const double *exps_c, const double *exps_d,
-                                                         const double *coords_a, const double *coords_b,
-                                                         const double *coords_c, const double *coords_d,
-                                                         const double *ecoeffs_ab, const double *ecoeffs_cd_tsp,
-                                                         double *eri4_batch)
+template<> lible::vec4d
+lible::ints::two::eri4Kernel<1, 0, 2, 0>(const int ipair_ab, const int ipair_cd,
+                                         const std::vector<double> &ecoeffs_ab,
+                                         const std::vector<double> &ecoeffs_cd_tsp,
+                                         const ShellPairData &sp_data_ab,
+                                         const ShellPairData &sp_data_cd)
 {
+    const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
+    const int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];
+    const int cdepth_c = sp_data_cd.cdepths[2 * ipair_cd];
+    const int cdepth_d = sp_data_cd.cdepths[2 * ipair_cd + 1];
+    const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];
+    const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+    const int cofs_c = sp_data_cd.coffsets[2 * ipair_cd];
+    const int cofs_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
+    const double *exps_a = &sp_data_ab.exps[cofs_a];
+    const double *exps_b = &sp_data_ab.exps[cofs_b];
+    const double *exps_c = &sp_data_cd.exps[cofs_c];
+    const double *exps_d = &sp_data_cd.exps[cofs_d];
+    const double *coords_a = &sp_data_ab.coords[6 * ipair_ab];
+    const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];
+    const double *coords_c = &sp_data_cd.coords[6 * ipair_cd];
+    const double *coords_d = &sp_data_cd.coords[6 * ipair_cd + 3];
+    const double *pecoeffs_ab = &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]];
+    const double *pecoeffs_cd_tsp = &ecoeffs_cd_tsp[sp_data_cd.offsets_ecoeffs[ipair_cd]];
+
     constexpr int la = 1, lb = 0, lc = 2, ld = 0;
     constexpr int lab = la + lb;
     constexpr int lcd = lc + ld;
@@ -293,10 +345,7 @@ template<> void lible::ints::two::eri4Kernel<1, 0, 2, 0>(const int cdepth_a, con
     constexpr int n_sph_ab = n_sph_a * n_sph_b;
     constexpr int n_sph_cd = n_sph_c * n_sph_d;
     constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
-
     constexpr int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
-
-    std::fill(eri4_batch, eri4_batch + n_sph_ab * n_sph_cd, 0);
 
     std::array<double, labcd + 1> fnx;
     BoysF2<labcd> boys_f;
@@ -339,7 +388,7 @@ template<> void lible::ints::two::eri4Kernel<1, 0, 2, 0>(const int cdepth_a, con
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
                     calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
-                    const double* p_ecoeffs_cd_tsp = &ecoeffs_cd_tsp[icd * n_ecoeffs_cd];
+                    const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];
                     double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
 
                     p_rints_x_ecoeffs[0] += rints[2] * p_ecoeffs_cd_tsp[10];
@@ -441,52 +490,87 @@ template<> void lible::ints::two::eri4Kernel<1, 0, 2, 0>(const int cdepth_a, con
                 }
         }
 
+    vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
-            const double* p_ecoeffs_ab = &ecoeffs_ab[iab * n_ecoeffs_ab];
+            const double* p_ecoeffs_ab = &pecoeffs_ab[iab * n_ecoeffs_ab];
             const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[iab * n_rints_x_ecoeffs];
 
-            eri4_batch[0] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[0];
-            eri4_batch[0] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[15];
-            eri4_batch[1] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[1];
-            eri4_batch[1] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[16];
-            eri4_batch[2] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[2];
-            eri4_batch[2] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[17];
-            eri4_batch[3] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[3];
-            eri4_batch[3] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[18];
-            eri4_batch[4] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[4];
-            eri4_batch[4] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[19];
-            eri4_batch[5] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[5];
-            eri4_batch[5] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[0];
-            eri4_batch[6] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[6];
-            eri4_batch[6] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[1];
-            eri4_batch[7] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[7];
-            eri4_batch[7] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[2];
-            eri4_batch[8] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[8];
-            eri4_batch[8] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[3];
-            eri4_batch[9] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[9];
-            eri4_batch[9] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[4];
-            eri4_batch[10] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[0];
-            eri4_batch[10] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[10];
-            eri4_batch[11] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[1];
-            eri4_batch[11] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[11];
-            eri4_batch[12] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[2];
-            eri4_batch[12] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[12];
-            eri4_batch[13] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[3];
-            eri4_batch[13] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[13];
-            eri4_batch[14] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[4];
-            eri4_batch[14] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[14];
+            eri4_batch(0, 0, 0, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[0];
+            eri4_batch(0, 0, 0, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[15];
+            eri4_batch(0, 0, 1, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[1];
+            eri4_batch(0, 0, 1, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[16];
+            eri4_batch(0, 0, 2, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[2];
+            eri4_batch(0, 0, 2, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[17];
+            eri4_batch(0, 0, 3, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[3];
+            eri4_batch(0, 0, 3, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[18];
+            eri4_batch(0, 0, 4, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[4];
+            eri4_batch(0, 0, 4, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[19];
+            eri4_batch(1, 0, 0, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[5];
+            eri4_batch(1, 0, 0, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[0];
+            eri4_batch(1, 0, 1, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[6];
+            eri4_batch(1, 0, 1, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[1];
+            eri4_batch(1, 0, 2, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[7];
+            eri4_batch(1, 0, 2, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[2];
+            eri4_batch(1, 0, 3, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[8];
+            eri4_batch(1, 0, 3, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[3];
+            eri4_batch(1, 0, 4, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[9];
+            eri4_batch(1, 0, 4, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[4];
+            eri4_batch(2, 0, 0, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[0];
+            eri4_batch(2, 0, 0, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[10];
+            eri4_batch(2, 0, 1, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[1];
+            eri4_batch(2, 0, 1, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[11];
+            eri4_batch(2, 0, 2, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[2];
+            eri4_batch(2, 0, 2, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[12];
+            eri4_batch(2, 0, 3, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[3];
+            eri4_batch(2, 0, 3, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[13];
+            eri4_batch(2, 0, 4, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[4];
+            eri4_batch(2, 0, 4, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[14];
         }
+
+    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+    int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
+    int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
+    for (int mu = 0; mu < n_sph_a; mu++)
+        for (int nu = 0; nu < n_sph_b; nu++)
+            for (int ka = 0; ka < n_sph_c; ka++)
+                for (int ta = 0; ta < n_sph_d; ta++)
+                {
+                    double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
+                    double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
+                    double norm_c = sp_data_cd.norms[ofs_norm_c + ka];
+                    double norm_d = sp_data_cd.norms[ofs_norm_d + ta];
+                    eri4_batch(mu, nu, ka, ta) *= norm_a * norm_b * norm_c * norm_d;
+                }
+
+    return eri4_batch;
 }
 
-template<> void lible::ints::two::eri3Kernel<1, 0, 2>(const int cdepth_a, const int cdepth_b, const int cdepth_c,
-                                                      const double* exps_a, const double* exps_b,
-                                                      const double* exps_c, const double* coords_a,
-                                                      const double* coords_b, const double* coords_c,
-                                                      const double* ecoeffs_ab, const double* ecoeffs_c,
-                                                      double* eri3_batch)
+template<> lible::vec3d
+lible::ints::two::eri3Kernel<1, 0, 2>(const int ipair_ab, const int ishell_c,
+                                      const std::vector<double> &ecoeffs_ab,
+                                      const std::vector<double> &ecoeffs_c,
+                                      const ShellPairData &sp_data_ab,
+                                      const ShellData &sh_data_c)
 {
+    const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
+    const int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];
+    const int cdepth_c = sh_data_c.cdepths[ishell_c];
+    const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];
+    const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+    const int cofs_c = sh_data_c.coffsets[ishell_c];
+
+    const double *exps_a = &sp_data_ab.exps[cofs_a];
+    const double *exps_b = &sp_data_ab.exps[cofs_b];
+    const double *exps_c = &sh_data_c.exps[cofs_c];
+    const double *coords_a = &sp_data_ab.coords[6 * ipair_ab];
+    const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];
+    const double *coords_c = &sh_data_c.coords[3 * ishell_c];
+    const double *pecoeffs_ab = &ecoeffs_ab[sp_data_ab.offsets_ecoeffs[ipair_ab]];
+    const double *pecoeffs_c = &ecoeffs_c[sh_data_c.offsets_ecoeffs[ishell_c]];
+
     constexpr int la = 1, lb = 0, lc = 2;
     constexpr int lab = la + lb;
     constexpr int labc = lab + lc;
@@ -498,8 +582,6 @@ template<> void lible::ints::two::eri3Kernel<1, 0, 2>(const int cdepth_a, const 
     constexpr int n_sph_ab = n_sph_a * n_sph_b;
     constexpr int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
     constexpr int n_ecoeffs_c = n_sph_c * n_hermite_c;
-
-    std::fill(eri3_batch, eri3_batch + n_sph_ab * n_sph_c, 0);
 
     std::array<double, labc + 1> fnx;
     BoysF2<labc> boys_f;
@@ -538,153 +620,181 @@ template<> void lible::ints::two::eri3Kernel<1, 0, 2>(const int cdepth_a, const 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
                 calcRInts<lab, lc>(alpha, fac, &fnx[0], &xyz_pc[0], &rints[0]);
 
-                    const double* p_ecoeffs_c = &ecoeffs_c[ic * n_ecoeffs_c];
-                    double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
+                const double* p_ecoeffs_c = &pecoeffs_c[ic * n_ecoeffs_c];
+                double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
 
-                    p_rints_x_ecoeffs[0] += rints[2] * p_ecoeffs_c[2];
-                    p_rints_x_ecoeffs[0] += rints[7] * p_ecoeffs_c[7];
-                    p_rints_x_ecoeffs[0] += rints[0] * p_ecoeffs_c[0];
-                    p_rints_x_ecoeffs[0] += rints[1] * p_ecoeffs_c[1];
-                    p_rints_x_ecoeffs[0] += rints[9] * p_ecoeffs_c[9];
-                    p_rints_x_ecoeffs[0] += rints[4] * p_ecoeffs_c[4];
-                    p_rints_x_ecoeffs[0] += rints[3] * p_ecoeffs_c[3];
-                    p_rints_x_ecoeffs[1] += rints[1] * p_ecoeffs_c[11];
-                    p_rints_x_ecoeffs[1] += rints[0] * p_ecoeffs_c[10];
-                    p_rints_x_ecoeffs[1] += rints[3] * p_ecoeffs_c[13];
-                    p_rints_x_ecoeffs[1] += rints[6] * p_ecoeffs_c[16];
-                    p_rints_x_ecoeffs[2] += rints[0] * p_ecoeffs_c[20];
-                    p_rints_x_ecoeffs[2] += rints[3] * p_ecoeffs_c[23];
-                    p_rints_x_ecoeffs[2] += rints[2] * p_ecoeffs_c[22];
-                    p_rints_x_ecoeffs[2] += rints[8] * p_ecoeffs_c[28];
-                    p_rints_x_ecoeffs[3] += rints[2] * p_ecoeffs_c[32];
-                    p_rints_x_ecoeffs[3] += rints[7] * p_ecoeffs_c[37];
-                    p_rints_x_ecoeffs[3] += rints[0] * p_ecoeffs_c[30];
-                    p_rints_x_ecoeffs[3] += rints[1] * p_ecoeffs_c[31];
-                    p_rints_x_ecoeffs[3] += rints[4] * p_ecoeffs_c[34];
-                    p_rints_x_ecoeffs[4] += rints[1] * p_ecoeffs_c[41];
-                    p_rints_x_ecoeffs[4] += rints[0] * p_ecoeffs_c[40];
-                    p_rints_x_ecoeffs[4] += rints[5] * p_ecoeffs_c[45];
-                    p_rints_x_ecoeffs[4] += rints[2] * p_ecoeffs_c[42];
-                    p_rints_x_ecoeffs[5] += rints[12] * p_ecoeffs_c[2];
-                    p_rints_x_ecoeffs[5] += rints[17] * p_ecoeffs_c[7];
-                    p_rints_x_ecoeffs[5] += rints[10] * p_ecoeffs_c[0];
-                    p_rints_x_ecoeffs[5] += rints[11] * p_ecoeffs_c[1];
-                    p_rints_x_ecoeffs[5] += rints[19] * p_ecoeffs_c[9];
-                    p_rints_x_ecoeffs[5] += rints[14] * p_ecoeffs_c[4];
-                    p_rints_x_ecoeffs[5] += rints[13] * p_ecoeffs_c[3];
-                    p_rints_x_ecoeffs[6] += rints[11] * p_ecoeffs_c[11];
-                    p_rints_x_ecoeffs[6] += rints[10] * p_ecoeffs_c[10];
-                    p_rints_x_ecoeffs[6] += rints[13] * p_ecoeffs_c[13];
-                    p_rints_x_ecoeffs[6] += rints[16] * p_ecoeffs_c[16];
-                    p_rints_x_ecoeffs[7] += rints[10] * p_ecoeffs_c[20];
-                    p_rints_x_ecoeffs[7] += rints[13] * p_ecoeffs_c[23];
-                    p_rints_x_ecoeffs[7] += rints[12] * p_ecoeffs_c[22];
-                    p_rints_x_ecoeffs[7] += rints[18] * p_ecoeffs_c[28];
-                    p_rints_x_ecoeffs[8] += rints[12] * p_ecoeffs_c[32];
-                    p_rints_x_ecoeffs[8] += rints[17] * p_ecoeffs_c[37];
-                    p_rints_x_ecoeffs[8] += rints[10] * p_ecoeffs_c[30];
-                    p_rints_x_ecoeffs[8] += rints[11] * p_ecoeffs_c[31];
-                    p_rints_x_ecoeffs[8] += rints[14] * p_ecoeffs_c[34];
-                    p_rints_x_ecoeffs[9] += rints[11] * p_ecoeffs_c[41];
-                    p_rints_x_ecoeffs[9] += rints[10] * p_ecoeffs_c[40];
-                    p_rints_x_ecoeffs[9] += rints[15] * p_ecoeffs_c[45];
-                    p_rints_x_ecoeffs[9] += rints[12] * p_ecoeffs_c[42];
-                    p_rints_x_ecoeffs[10] += rints[22] * p_ecoeffs_c[2];
-                    p_rints_x_ecoeffs[10] += rints[27] * p_ecoeffs_c[7];
-                    p_rints_x_ecoeffs[10] += rints[20] * p_ecoeffs_c[0];
-                    p_rints_x_ecoeffs[10] += rints[21] * p_ecoeffs_c[1];
-                    p_rints_x_ecoeffs[10] += rints[29] * p_ecoeffs_c[9];
-                    p_rints_x_ecoeffs[10] += rints[24] * p_ecoeffs_c[4];
-                    p_rints_x_ecoeffs[10] += rints[23] * p_ecoeffs_c[3];
-                    p_rints_x_ecoeffs[11] += rints[21] * p_ecoeffs_c[11];
-                    p_rints_x_ecoeffs[11] += rints[20] * p_ecoeffs_c[10];
-                    p_rints_x_ecoeffs[11] += rints[23] * p_ecoeffs_c[13];
-                    p_rints_x_ecoeffs[11] += rints[26] * p_ecoeffs_c[16];
-                    p_rints_x_ecoeffs[12] += rints[20] * p_ecoeffs_c[20];
-                    p_rints_x_ecoeffs[12] += rints[23] * p_ecoeffs_c[23];
-                    p_rints_x_ecoeffs[12] += rints[22] * p_ecoeffs_c[22];
-                    p_rints_x_ecoeffs[12] += rints[28] * p_ecoeffs_c[28];
-                    p_rints_x_ecoeffs[13] += rints[22] * p_ecoeffs_c[32];
-                    p_rints_x_ecoeffs[13] += rints[27] * p_ecoeffs_c[37];
-                    p_rints_x_ecoeffs[13] += rints[20] * p_ecoeffs_c[30];
-                    p_rints_x_ecoeffs[13] += rints[21] * p_ecoeffs_c[31];
-                    p_rints_x_ecoeffs[13] += rints[24] * p_ecoeffs_c[34];
-                    p_rints_x_ecoeffs[14] += rints[21] * p_ecoeffs_c[41];
-                    p_rints_x_ecoeffs[14] += rints[20] * p_ecoeffs_c[40];
-                    p_rints_x_ecoeffs[14] += rints[25] * p_ecoeffs_c[45];
-                    p_rints_x_ecoeffs[14] += rints[22] * p_ecoeffs_c[42];
-                    p_rints_x_ecoeffs[15] += rints[32] * p_ecoeffs_c[2];
-                    p_rints_x_ecoeffs[15] += rints[37] * p_ecoeffs_c[7];
-                    p_rints_x_ecoeffs[15] += rints[30] * p_ecoeffs_c[0];
-                    p_rints_x_ecoeffs[15] += rints[31] * p_ecoeffs_c[1];
-                    p_rints_x_ecoeffs[15] += rints[39] * p_ecoeffs_c[9];
-                    p_rints_x_ecoeffs[15] += rints[34] * p_ecoeffs_c[4];
-                    p_rints_x_ecoeffs[15] += rints[33] * p_ecoeffs_c[3];
-                    p_rints_x_ecoeffs[16] += rints[31] * p_ecoeffs_c[11];
-                    p_rints_x_ecoeffs[16] += rints[30] * p_ecoeffs_c[10];
-                    p_rints_x_ecoeffs[16] += rints[33] * p_ecoeffs_c[13];
-                    p_rints_x_ecoeffs[16] += rints[36] * p_ecoeffs_c[16];
-                    p_rints_x_ecoeffs[17] += rints[30] * p_ecoeffs_c[20];
-                    p_rints_x_ecoeffs[17] += rints[33] * p_ecoeffs_c[23];
-                    p_rints_x_ecoeffs[17] += rints[32] * p_ecoeffs_c[22];
-                    p_rints_x_ecoeffs[17] += rints[38] * p_ecoeffs_c[28];
-                    p_rints_x_ecoeffs[18] += rints[32] * p_ecoeffs_c[32];
-                    p_rints_x_ecoeffs[18] += rints[37] * p_ecoeffs_c[37];
-                    p_rints_x_ecoeffs[18] += rints[30] * p_ecoeffs_c[30];
-                    p_rints_x_ecoeffs[18] += rints[31] * p_ecoeffs_c[31];
-                    p_rints_x_ecoeffs[18] += rints[34] * p_ecoeffs_c[34];
-                    p_rints_x_ecoeffs[19] += rints[31] * p_ecoeffs_c[41];
-                    p_rints_x_ecoeffs[19] += rints[30] * p_ecoeffs_c[40];
-                    p_rints_x_ecoeffs[19] += rints[35] * p_ecoeffs_c[45];
-                    p_rints_x_ecoeffs[19] += rints[32] * p_ecoeffs_c[42];
+                p_rints_x_ecoeffs[0] += rints[2] * p_ecoeffs_c[2];
+                p_rints_x_ecoeffs[0] += rints[7] * p_ecoeffs_c[7];
+                p_rints_x_ecoeffs[0] += rints[0] * p_ecoeffs_c[0];
+                p_rints_x_ecoeffs[0] += rints[1] * p_ecoeffs_c[1];
+                p_rints_x_ecoeffs[0] += rints[9] * p_ecoeffs_c[9];
+                p_rints_x_ecoeffs[0] += rints[4] * p_ecoeffs_c[4];
+                p_rints_x_ecoeffs[0] += rints[3] * p_ecoeffs_c[3];
+                p_rints_x_ecoeffs[1] += rints[1] * p_ecoeffs_c[11];
+                p_rints_x_ecoeffs[1] += rints[0] * p_ecoeffs_c[10];
+                p_rints_x_ecoeffs[1] += rints[3] * p_ecoeffs_c[13];
+                p_rints_x_ecoeffs[1] += rints[6] * p_ecoeffs_c[16];
+                p_rints_x_ecoeffs[2] += rints[0] * p_ecoeffs_c[20];
+                p_rints_x_ecoeffs[2] += rints[3] * p_ecoeffs_c[23];
+                p_rints_x_ecoeffs[2] += rints[2] * p_ecoeffs_c[22];
+                p_rints_x_ecoeffs[2] += rints[8] * p_ecoeffs_c[28];
+                p_rints_x_ecoeffs[3] += rints[2] * p_ecoeffs_c[32];
+                p_rints_x_ecoeffs[3] += rints[7] * p_ecoeffs_c[37];
+                p_rints_x_ecoeffs[3] += rints[0] * p_ecoeffs_c[30];
+                p_rints_x_ecoeffs[3] += rints[1] * p_ecoeffs_c[31];
+                p_rints_x_ecoeffs[3] += rints[4] * p_ecoeffs_c[34];
+                p_rints_x_ecoeffs[4] += rints[1] * p_ecoeffs_c[41];
+                p_rints_x_ecoeffs[4] += rints[0] * p_ecoeffs_c[40];
+                p_rints_x_ecoeffs[4] += rints[5] * p_ecoeffs_c[45];
+                p_rints_x_ecoeffs[4] += rints[2] * p_ecoeffs_c[42];
+                p_rints_x_ecoeffs[5] += rints[12] * p_ecoeffs_c[2];
+                p_rints_x_ecoeffs[5] += rints[17] * p_ecoeffs_c[7];
+                p_rints_x_ecoeffs[5] += rints[10] * p_ecoeffs_c[0];
+                p_rints_x_ecoeffs[5] += rints[11] * p_ecoeffs_c[1];
+                p_rints_x_ecoeffs[5] += rints[19] * p_ecoeffs_c[9];
+                p_rints_x_ecoeffs[5] += rints[14] * p_ecoeffs_c[4];
+                p_rints_x_ecoeffs[5] += rints[13] * p_ecoeffs_c[3];
+                p_rints_x_ecoeffs[6] += rints[11] * p_ecoeffs_c[11];
+                p_rints_x_ecoeffs[6] += rints[10] * p_ecoeffs_c[10];
+                p_rints_x_ecoeffs[6] += rints[13] * p_ecoeffs_c[13];
+                p_rints_x_ecoeffs[6] += rints[16] * p_ecoeffs_c[16];
+                p_rints_x_ecoeffs[7] += rints[10] * p_ecoeffs_c[20];
+                p_rints_x_ecoeffs[7] += rints[13] * p_ecoeffs_c[23];
+                p_rints_x_ecoeffs[7] += rints[12] * p_ecoeffs_c[22];
+                p_rints_x_ecoeffs[7] += rints[18] * p_ecoeffs_c[28];
+                p_rints_x_ecoeffs[8] += rints[12] * p_ecoeffs_c[32];
+                p_rints_x_ecoeffs[8] += rints[17] * p_ecoeffs_c[37];
+                p_rints_x_ecoeffs[8] += rints[10] * p_ecoeffs_c[30];
+                p_rints_x_ecoeffs[8] += rints[11] * p_ecoeffs_c[31];
+                p_rints_x_ecoeffs[8] += rints[14] * p_ecoeffs_c[34];
+                p_rints_x_ecoeffs[9] += rints[11] * p_ecoeffs_c[41];
+                p_rints_x_ecoeffs[9] += rints[10] * p_ecoeffs_c[40];
+                p_rints_x_ecoeffs[9] += rints[15] * p_ecoeffs_c[45];
+                p_rints_x_ecoeffs[9] += rints[12] * p_ecoeffs_c[42];
+                p_rints_x_ecoeffs[10] += rints[22] * p_ecoeffs_c[2];
+                p_rints_x_ecoeffs[10] += rints[27] * p_ecoeffs_c[7];
+                p_rints_x_ecoeffs[10] += rints[20] * p_ecoeffs_c[0];
+                p_rints_x_ecoeffs[10] += rints[21] * p_ecoeffs_c[1];
+                p_rints_x_ecoeffs[10] += rints[29] * p_ecoeffs_c[9];
+                p_rints_x_ecoeffs[10] += rints[24] * p_ecoeffs_c[4];
+                p_rints_x_ecoeffs[10] += rints[23] * p_ecoeffs_c[3];
+                p_rints_x_ecoeffs[11] += rints[21] * p_ecoeffs_c[11];
+                p_rints_x_ecoeffs[11] += rints[20] * p_ecoeffs_c[10];
+                p_rints_x_ecoeffs[11] += rints[23] * p_ecoeffs_c[13];
+                p_rints_x_ecoeffs[11] += rints[26] * p_ecoeffs_c[16];
+                p_rints_x_ecoeffs[12] += rints[20] * p_ecoeffs_c[20];
+                p_rints_x_ecoeffs[12] += rints[23] * p_ecoeffs_c[23];
+                p_rints_x_ecoeffs[12] += rints[22] * p_ecoeffs_c[22];
+                p_rints_x_ecoeffs[12] += rints[28] * p_ecoeffs_c[28];
+                p_rints_x_ecoeffs[13] += rints[22] * p_ecoeffs_c[32];
+                p_rints_x_ecoeffs[13] += rints[27] * p_ecoeffs_c[37];
+                p_rints_x_ecoeffs[13] += rints[20] * p_ecoeffs_c[30];
+                p_rints_x_ecoeffs[13] += rints[21] * p_ecoeffs_c[31];
+                p_rints_x_ecoeffs[13] += rints[24] * p_ecoeffs_c[34];
+                p_rints_x_ecoeffs[14] += rints[21] * p_ecoeffs_c[41];
+                p_rints_x_ecoeffs[14] += rints[20] * p_ecoeffs_c[40];
+                p_rints_x_ecoeffs[14] += rints[25] * p_ecoeffs_c[45];
+                p_rints_x_ecoeffs[14] += rints[22] * p_ecoeffs_c[42];
+                p_rints_x_ecoeffs[15] += rints[32] * p_ecoeffs_c[2];
+                p_rints_x_ecoeffs[15] += rints[37] * p_ecoeffs_c[7];
+                p_rints_x_ecoeffs[15] += rints[30] * p_ecoeffs_c[0];
+                p_rints_x_ecoeffs[15] += rints[31] * p_ecoeffs_c[1];
+                p_rints_x_ecoeffs[15] += rints[39] * p_ecoeffs_c[9];
+                p_rints_x_ecoeffs[15] += rints[34] * p_ecoeffs_c[4];
+                p_rints_x_ecoeffs[15] += rints[33] * p_ecoeffs_c[3];
+                p_rints_x_ecoeffs[16] += rints[31] * p_ecoeffs_c[11];
+                p_rints_x_ecoeffs[16] += rints[30] * p_ecoeffs_c[10];
+                p_rints_x_ecoeffs[16] += rints[33] * p_ecoeffs_c[13];
+                p_rints_x_ecoeffs[16] += rints[36] * p_ecoeffs_c[16];
+                p_rints_x_ecoeffs[17] += rints[30] * p_ecoeffs_c[20];
+                p_rints_x_ecoeffs[17] += rints[33] * p_ecoeffs_c[23];
+                p_rints_x_ecoeffs[17] += rints[32] * p_ecoeffs_c[22];
+                p_rints_x_ecoeffs[17] += rints[38] * p_ecoeffs_c[28];
+                p_rints_x_ecoeffs[18] += rints[32] * p_ecoeffs_c[32];
+                p_rints_x_ecoeffs[18] += rints[37] * p_ecoeffs_c[37];
+                p_rints_x_ecoeffs[18] += rints[30] * p_ecoeffs_c[30];
+                p_rints_x_ecoeffs[18] += rints[31] * p_ecoeffs_c[31];
+                p_rints_x_ecoeffs[18] += rints[34] * p_ecoeffs_c[34];
+                p_rints_x_ecoeffs[19] += rints[31] * p_ecoeffs_c[41];
+                p_rints_x_ecoeffs[19] += rints[30] * p_ecoeffs_c[40];
+                p_rints_x_ecoeffs[19] += rints[35] * p_ecoeffs_c[45];
+                p_rints_x_ecoeffs[19] += rints[32] * p_ecoeffs_c[42];
             }
 }
 
+    vec3d eri3_batch(n_sph_a, n_sph_b, n_sph_c, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
-            const double* p_ecoeffs_ab = &ecoeffs_ab[iab * n_ecoeffs_ab];
+            const double* p_ecoeffs_ab = &pecoeffs_ab[iab * n_ecoeffs_ab];
             const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[iab * n_rints_x_ecoeffs];
 
-            eri3_batch[0] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[0];
-            eri3_batch[0] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[15];
-            eri3_batch[1] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[1];
-            eri3_batch[1] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[16];
-            eri3_batch[2] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[2];
-            eri3_batch[2] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[17];
-            eri3_batch[3] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[3];
-            eri3_batch[3] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[18];
-            eri3_batch[4] += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[4];
-            eri3_batch[4] += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[19];
-            eri3_batch[5] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[5];
-            eri3_batch[5] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[0];
-            eri3_batch[6] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[6];
-            eri3_batch[6] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[1];
-            eri3_batch[7] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[7];
-            eri3_batch[7] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[2];
-            eri3_batch[8] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[8];
-            eri3_batch[8] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[3];
-            eri3_batch[9] += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[9];
-            eri3_batch[9] += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[4];
-            eri3_batch[10] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[0];
-            eri3_batch[10] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[10];
-            eri3_batch[11] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[1];
-            eri3_batch[11] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[11];
-            eri3_batch[12] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[2];
-            eri3_batch[12] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[12];
-            eri3_batch[13] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[3];
-            eri3_batch[13] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[13];
-            eri3_batch[14] += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[4];
-            eri3_batch[14] += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[14];
+            eri3_batch(0, 0, 0) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[0];
+            eri3_batch(0, 0, 0) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[15];
+            eri3_batch(0, 0, 1) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[1];
+            eri3_batch(0, 0, 1) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[16];
+            eri3_batch(0, 0, 2) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[2];
+            eri3_batch(0, 0, 2) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[17];
+            eri3_batch(0, 0, 3) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[3];
+            eri3_batch(0, 0, 3) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[18];
+            eri3_batch(0, 0, 4) += p_ecoeffs_ab[0] * p_rints_x_ecoeffs[4];
+            eri3_batch(0, 0, 4) += p_ecoeffs_ab[3] * p_rints_x_ecoeffs[19];
+            eri3_batch(1, 0, 0) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[5];
+            eri3_batch(1, 0, 0) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[0];
+            eri3_batch(1, 0, 1) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[6];
+            eri3_batch(1, 0, 1) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[1];
+            eri3_batch(1, 0, 2) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[7];
+            eri3_batch(1, 0, 2) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[2];
+            eri3_batch(1, 0, 3) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[8];
+            eri3_batch(1, 0, 3) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[3];
+            eri3_batch(1, 0, 4) += p_ecoeffs_ab[5] * p_rints_x_ecoeffs[9];
+            eri3_batch(1, 0, 4) += p_ecoeffs_ab[4] * p_rints_x_ecoeffs[4];
+            eri3_batch(2, 0, 0) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[0];
+            eri3_batch(2, 0, 0) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[10];
+            eri3_batch(2, 0, 1) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[1];
+            eri3_batch(2, 0, 1) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[11];
+            eri3_batch(2, 0, 2) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[2];
+            eri3_batch(2, 0, 2) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[12];
+            eri3_batch(2, 0, 3) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[3];
+            eri3_batch(2, 0, 3) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[13];
+            eri3_batch(2, 0, 4) += p_ecoeffs_ab[8] * p_rints_x_ecoeffs[4];
+            eri3_batch(2, 0, 4) += p_ecoeffs_ab[10] * p_rints_x_ecoeffs[14];
         }
+
+    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+    int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];
+    for (int mu = 0; mu < n_sph_a; mu++)
+        for (int nu = 0; nu < n_sph_b; nu++)
+            for (int ka = 0; ka < n_sph_c; ka++)
+            {
+                double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
+                double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
+                double norm_c = sh_data_c.norms[ofs_norm_c + ka];
+                eri3_batch(mu, nu, ka) *= norm_a * norm_b * norm_c;
+            }
+
+    return eri3_batch;
 }
 
-template<> void lible::ints::two::eri2Kernel<1, 2>(const int cdepth_a, const int cdepth_b,
-                                                   const double* exps_a, const double* exps_b,
-                                                   const double* coords_a, const double* coords_b,
-                                                   const double* ecoeffs_a, const double* ecoeffs_b_tsp,
-                                                   double* eri2_batch)
+template<> lible::vec2d
+lible::ints::two::eri2Kernel<1, 2>(const int ishell_a, const int ishell_b,
+                                   const std::vector<double> &ecoeffs_a,
+                                   const std::vector<double> &ecoeffs_b_tsp,
+                                   const ShellData &sh_data_a, const ShellData &sh_data_b)
 {
+    const int cdepth_a = sh_data_a.cdepths[ishell_a];
+    const int cdepth_b = sh_data_b.cdepths[ishell_b];
+    const int cofs_a = sh_data_a.coffsets[ishell_a];
+    const int cofs_b = sh_data_b.coffsets[ishell_b];
+
+    const double *exps_a = &sh_data_a.exps[cofs_a];
+    const double *exps_b = &sh_data_b.exps[cofs_b];
+    const double *coords_a = &sh_data_a.coords[3 * ishell_a];
+    const double *coords_b = &sh_data_b.coords[3 * ishell_b];
+    const double *pecoeffs_a = &ecoeffs_a[sh_data_a.offsets_ecoeffs[ishell_a]];
+    const double *pecoeffs_b_tsp = &ecoeffs_b_tsp[sh_data_b.offsets_ecoeffs[ishell_b]];
+
     constexpr int la = 1, lb = 2;
     constexpr int lab = la + lb;
     constexpr int n_sph_a = numSphericalsC(la);
@@ -693,8 +803,6 @@ template<> void lible::ints::two::eri2Kernel<1, 2>(const int cdepth_a, const int
     constexpr int n_hermite_b = numHermitesC(lb);
     constexpr int n_ecoeffs_a = n_sph_a * n_hermite_a;
     constexpr int n_ecoeffs_b = n_sph_b * n_hermite_b;
-
-    std::fill(eri2_batch, eri2_batch + n_sph_a * n_sph_b, 0);
 
     std::array<double, lab + 1> fnx;
     BoysF2<lab> boys_f;
@@ -727,142 +835,155 @@ template<> void lible::ints::two::eri2Kernel<1, 2>(const int cdepth_a, const int
             double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
             calcRInts<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);
 
-                    const double* p_ecoeffs_b = &ecoeffs_b_tsp[ib * n_ecoeffs_b];
-                    double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
+            const double* p_ecoeffs_b = &pecoeffs_b_tsp[ib * n_ecoeffs_b];
+            double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
 
-                    p_rints_x_ecoeffs[0] += rints[2] * p_ecoeffs_b[10];
-                    p_rints_x_ecoeffs[0] += rints[7] * p_ecoeffs_b[35];
-                    p_rints_x_ecoeffs[0] += rints[0] * p_ecoeffs_b[0];
-                    p_rints_x_ecoeffs[0] += rints[1] * p_ecoeffs_b[5];
-                    p_rints_x_ecoeffs[0] += rints[9] * p_ecoeffs_b[45];
-                    p_rints_x_ecoeffs[0] += rints[4] * p_ecoeffs_b[20];
-                    p_rints_x_ecoeffs[0] += rints[3] * p_ecoeffs_b[15];
-                    p_rints_x_ecoeffs[1] += rints[1] * p_ecoeffs_b[6];
-                    p_rints_x_ecoeffs[1] += rints[0] * p_ecoeffs_b[1];
-                    p_rints_x_ecoeffs[1] += rints[3] * p_ecoeffs_b[16];
-                    p_rints_x_ecoeffs[1] += rints[6] * p_ecoeffs_b[31];
-                    p_rints_x_ecoeffs[2] += rints[0] * p_ecoeffs_b[2];
-                    p_rints_x_ecoeffs[2] += rints[3] * p_ecoeffs_b[17];
-                    p_rints_x_ecoeffs[2] += rints[2] * p_ecoeffs_b[12];
-                    p_rints_x_ecoeffs[2] += rints[8] * p_ecoeffs_b[42];
-                    p_rints_x_ecoeffs[3] += rints[2] * p_ecoeffs_b[13];
-                    p_rints_x_ecoeffs[3] += rints[7] * p_ecoeffs_b[38];
-                    p_rints_x_ecoeffs[3] += rints[0] * p_ecoeffs_b[3];
-                    p_rints_x_ecoeffs[3] += rints[1] * p_ecoeffs_b[8];
-                    p_rints_x_ecoeffs[3] += rints[4] * p_ecoeffs_b[23];
-                    p_rints_x_ecoeffs[4] += rints[1] * p_ecoeffs_b[9];
-                    p_rints_x_ecoeffs[4] += rints[0] * p_ecoeffs_b[4];
-                    p_rints_x_ecoeffs[4] += rints[5] * p_ecoeffs_b[29];
-                    p_rints_x_ecoeffs[4] += rints[2] * p_ecoeffs_b[14];
-                    p_rints_x_ecoeffs[5] += rints[12] * p_ecoeffs_b[10];
-                    p_rints_x_ecoeffs[5] += rints[17] * p_ecoeffs_b[35];
-                    p_rints_x_ecoeffs[5] += rints[10] * p_ecoeffs_b[0];
-                    p_rints_x_ecoeffs[5] += rints[11] * p_ecoeffs_b[5];
-                    p_rints_x_ecoeffs[5] += rints[19] * p_ecoeffs_b[45];
-                    p_rints_x_ecoeffs[5] += rints[14] * p_ecoeffs_b[20];
-                    p_rints_x_ecoeffs[5] += rints[13] * p_ecoeffs_b[15];
-                    p_rints_x_ecoeffs[6] += rints[11] * p_ecoeffs_b[6];
-                    p_rints_x_ecoeffs[6] += rints[10] * p_ecoeffs_b[1];
-                    p_rints_x_ecoeffs[6] += rints[13] * p_ecoeffs_b[16];
-                    p_rints_x_ecoeffs[6] += rints[16] * p_ecoeffs_b[31];
-                    p_rints_x_ecoeffs[7] += rints[10] * p_ecoeffs_b[2];
-                    p_rints_x_ecoeffs[7] += rints[13] * p_ecoeffs_b[17];
-                    p_rints_x_ecoeffs[7] += rints[12] * p_ecoeffs_b[12];
-                    p_rints_x_ecoeffs[7] += rints[18] * p_ecoeffs_b[42];
-                    p_rints_x_ecoeffs[8] += rints[12] * p_ecoeffs_b[13];
-                    p_rints_x_ecoeffs[8] += rints[17] * p_ecoeffs_b[38];
-                    p_rints_x_ecoeffs[8] += rints[10] * p_ecoeffs_b[3];
-                    p_rints_x_ecoeffs[8] += rints[11] * p_ecoeffs_b[8];
-                    p_rints_x_ecoeffs[8] += rints[14] * p_ecoeffs_b[23];
-                    p_rints_x_ecoeffs[9] += rints[11] * p_ecoeffs_b[9];
-                    p_rints_x_ecoeffs[9] += rints[10] * p_ecoeffs_b[4];
-                    p_rints_x_ecoeffs[9] += rints[15] * p_ecoeffs_b[29];
-                    p_rints_x_ecoeffs[9] += rints[12] * p_ecoeffs_b[14];
-                    p_rints_x_ecoeffs[10] += rints[22] * p_ecoeffs_b[10];
-                    p_rints_x_ecoeffs[10] += rints[27] * p_ecoeffs_b[35];
-                    p_rints_x_ecoeffs[10] += rints[20] * p_ecoeffs_b[0];
-                    p_rints_x_ecoeffs[10] += rints[21] * p_ecoeffs_b[5];
-                    p_rints_x_ecoeffs[10] += rints[29] * p_ecoeffs_b[45];
-                    p_rints_x_ecoeffs[10] += rints[24] * p_ecoeffs_b[20];
-                    p_rints_x_ecoeffs[10] += rints[23] * p_ecoeffs_b[15];
-                    p_rints_x_ecoeffs[11] += rints[21] * p_ecoeffs_b[6];
-                    p_rints_x_ecoeffs[11] += rints[20] * p_ecoeffs_b[1];
-                    p_rints_x_ecoeffs[11] += rints[23] * p_ecoeffs_b[16];
-                    p_rints_x_ecoeffs[11] += rints[26] * p_ecoeffs_b[31];
-                    p_rints_x_ecoeffs[12] += rints[20] * p_ecoeffs_b[2];
-                    p_rints_x_ecoeffs[12] += rints[23] * p_ecoeffs_b[17];
-                    p_rints_x_ecoeffs[12] += rints[22] * p_ecoeffs_b[12];
-                    p_rints_x_ecoeffs[12] += rints[28] * p_ecoeffs_b[42];
-                    p_rints_x_ecoeffs[13] += rints[22] * p_ecoeffs_b[13];
-                    p_rints_x_ecoeffs[13] += rints[27] * p_ecoeffs_b[38];
-                    p_rints_x_ecoeffs[13] += rints[20] * p_ecoeffs_b[3];
-                    p_rints_x_ecoeffs[13] += rints[21] * p_ecoeffs_b[8];
-                    p_rints_x_ecoeffs[13] += rints[24] * p_ecoeffs_b[23];
-                    p_rints_x_ecoeffs[14] += rints[21] * p_ecoeffs_b[9];
-                    p_rints_x_ecoeffs[14] += rints[20] * p_ecoeffs_b[4];
-                    p_rints_x_ecoeffs[14] += rints[25] * p_ecoeffs_b[29];
-                    p_rints_x_ecoeffs[14] += rints[22] * p_ecoeffs_b[14];
-                    p_rints_x_ecoeffs[15] += rints[32] * p_ecoeffs_b[10];
-                    p_rints_x_ecoeffs[15] += rints[37] * p_ecoeffs_b[35];
-                    p_rints_x_ecoeffs[15] += rints[30] * p_ecoeffs_b[0];
-                    p_rints_x_ecoeffs[15] += rints[31] * p_ecoeffs_b[5];
-                    p_rints_x_ecoeffs[15] += rints[39] * p_ecoeffs_b[45];
-                    p_rints_x_ecoeffs[15] += rints[34] * p_ecoeffs_b[20];
-                    p_rints_x_ecoeffs[15] += rints[33] * p_ecoeffs_b[15];
-                    p_rints_x_ecoeffs[16] += rints[31] * p_ecoeffs_b[6];
-                    p_rints_x_ecoeffs[16] += rints[30] * p_ecoeffs_b[1];
-                    p_rints_x_ecoeffs[16] += rints[33] * p_ecoeffs_b[16];
-                    p_rints_x_ecoeffs[16] += rints[36] * p_ecoeffs_b[31];
-                    p_rints_x_ecoeffs[17] += rints[30] * p_ecoeffs_b[2];
-                    p_rints_x_ecoeffs[17] += rints[33] * p_ecoeffs_b[17];
-                    p_rints_x_ecoeffs[17] += rints[32] * p_ecoeffs_b[12];
-                    p_rints_x_ecoeffs[17] += rints[38] * p_ecoeffs_b[42];
-                    p_rints_x_ecoeffs[18] += rints[32] * p_ecoeffs_b[13];
-                    p_rints_x_ecoeffs[18] += rints[37] * p_ecoeffs_b[38];
-                    p_rints_x_ecoeffs[18] += rints[30] * p_ecoeffs_b[3];
-                    p_rints_x_ecoeffs[18] += rints[31] * p_ecoeffs_b[8];
-                    p_rints_x_ecoeffs[18] += rints[34] * p_ecoeffs_b[23];
-                    p_rints_x_ecoeffs[19] += rints[31] * p_ecoeffs_b[9];
-                    p_rints_x_ecoeffs[19] += rints[30] * p_ecoeffs_b[4];
-                    p_rints_x_ecoeffs[19] += rints[35] * p_ecoeffs_b[29];
-                    p_rints_x_ecoeffs[19] += rints[32] * p_ecoeffs_b[14];
+            p_rints_x_ecoeffs[0] += rints[2] * p_ecoeffs_b[10];
+            p_rints_x_ecoeffs[0] += rints[7] * p_ecoeffs_b[35];
+            p_rints_x_ecoeffs[0] += rints[0] * p_ecoeffs_b[0];
+            p_rints_x_ecoeffs[0] += rints[1] * p_ecoeffs_b[5];
+            p_rints_x_ecoeffs[0] += rints[9] * p_ecoeffs_b[45];
+            p_rints_x_ecoeffs[0] += rints[4] * p_ecoeffs_b[20];
+            p_rints_x_ecoeffs[0] += rints[3] * p_ecoeffs_b[15];
+            p_rints_x_ecoeffs[1] += rints[1] * p_ecoeffs_b[6];
+            p_rints_x_ecoeffs[1] += rints[0] * p_ecoeffs_b[1];
+            p_rints_x_ecoeffs[1] += rints[3] * p_ecoeffs_b[16];
+            p_rints_x_ecoeffs[1] += rints[6] * p_ecoeffs_b[31];
+            p_rints_x_ecoeffs[2] += rints[0] * p_ecoeffs_b[2];
+            p_rints_x_ecoeffs[2] += rints[3] * p_ecoeffs_b[17];
+            p_rints_x_ecoeffs[2] += rints[2] * p_ecoeffs_b[12];
+            p_rints_x_ecoeffs[2] += rints[8] * p_ecoeffs_b[42];
+            p_rints_x_ecoeffs[3] += rints[2] * p_ecoeffs_b[13];
+            p_rints_x_ecoeffs[3] += rints[7] * p_ecoeffs_b[38];
+            p_rints_x_ecoeffs[3] += rints[0] * p_ecoeffs_b[3];
+            p_rints_x_ecoeffs[3] += rints[1] * p_ecoeffs_b[8];
+            p_rints_x_ecoeffs[3] += rints[4] * p_ecoeffs_b[23];
+            p_rints_x_ecoeffs[4] += rints[1] * p_ecoeffs_b[9];
+            p_rints_x_ecoeffs[4] += rints[0] * p_ecoeffs_b[4];
+            p_rints_x_ecoeffs[4] += rints[5] * p_ecoeffs_b[29];
+            p_rints_x_ecoeffs[4] += rints[2] * p_ecoeffs_b[14];
+            p_rints_x_ecoeffs[5] += rints[12] * p_ecoeffs_b[10];
+            p_rints_x_ecoeffs[5] += rints[17] * p_ecoeffs_b[35];
+            p_rints_x_ecoeffs[5] += rints[10] * p_ecoeffs_b[0];
+            p_rints_x_ecoeffs[5] += rints[11] * p_ecoeffs_b[5];
+            p_rints_x_ecoeffs[5] += rints[19] * p_ecoeffs_b[45];
+            p_rints_x_ecoeffs[5] += rints[14] * p_ecoeffs_b[20];
+            p_rints_x_ecoeffs[5] += rints[13] * p_ecoeffs_b[15];
+            p_rints_x_ecoeffs[6] += rints[11] * p_ecoeffs_b[6];
+            p_rints_x_ecoeffs[6] += rints[10] * p_ecoeffs_b[1];
+            p_rints_x_ecoeffs[6] += rints[13] * p_ecoeffs_b[16];
+            p_rints_x_ecoeffs[6] += rints[16] * p_ecoeffs_b[31];
+            p_rints_x_ecoeffs[7] += rints[10] * p_ecoeffs_b[2];
+            p_rints_x_ecoeffs[7] += rints[13] * p_ecoeffs_b[17];
+            p_rints_x_ecoeffs[7] += rints[12] * p_ecoeffs_b[12];
+            p_rints_x_ecoeffs[7] += rints[18] * p_ecoeffs_b[42];
+            p_rints_x_ecoeffs[8] += rints[12] * p_ecoeffs_b[13];
+            p_rints_x_ecoeffs[8] += rints[17] * p_ecoeffs_b[38];
+            p_rints_x_ecoeffs[8] += rints[10] * p_ecoeffs_b[3];
+            p_rints_x_ecoeffs[8] += rints[11] * p_ecoeffs_b[8];
+            p_rints_x_ecoeffs[8] += rints[14] * p_ecoeffs_b[23];
+            p_rints_x_ecoeffs[9] += rints[11] * p_ecoeffs_b[9];
+            p_rints_x_ecoeffs[9] += rints[10] * p_ecoeffs_b[4];
+            p_rints_x_ecoeffs[9] += rints[15] * p_ecoeffs_b[29];
+            p_rints_x_ecoeffs[9] += rints[12] * p_ecoeffs_b[14];
+            p_rints_x_ecoeffs[10] += rints[22] * p_ecoeffs_b[10];
+            p_rints_x_ecoeffs[10] += rints[27] * p_ecoeffs_b[35];
+            p_rints_x_ecoeffs[10] += rints[20] * p_ecoeffs_b[0];
+            p_rints_x_ecoeffs[10] += rints[21] * p_ecoeffs_b[5];
+            p_rints_x_ecoeffs[10] += rints[29] * p_ecoeffs_b[45];
+            p_rints_x_ecoeffs[10] += rints[24] * p_ecoeffs_b[20];
+            p_rints_x_ecoeffs[10] += rints[23] * p_ecoeffs_b[15];
+            p_rints_x_ecoeffs[11] += rints[21] * p_ecoeffs_b[6];
+            p_rints_x_ecoeffs[11] += rints[20] * p_ecoeffs_b[1];
+            p_rints_x_ecoeffs[11] += rints[23] * p_ecoeffs_b[16];
+            p_rints_x_ecoeffs[11] += rints[26] * p_ecoeffs_b[31];
+            p_rints_x_ecoeffs[12] += rints[20] * p_ecoeffs_b[2];
+            p_rints_x_ecoeffs[12] += rints[23] * p_ecoeffs_b[17];
+            p_rints_x_ecoeffs[12] += rints[22] * p_ecoeffs_b[12];
+            p_rints_x_ecoeffs[12] += rints[28] * p_ecoeffs_b[42];
+            p_rints_x_ecoeffs[13] += rints[22] * p_ecoeffs_b[13];
+            p_rints_x_ecoeffs[13] += rints[27] * p_ecoeffs_b[38];
+            p_rints_x_ecoeffs[13] += rints[20] * p_ecoeffs_b[3];
+            p_rints_x_ecoeffs[13] += rints[21] * p_ecoeffs_b[8];
+            p_rints_x_ecoeffs[13] += rints[24] * p_ecoeffs_b[23];
+            p_rints_x_ecoeffs[14] += rints[21] * p_ecoeffs_b[9];
+            p_rints_x_ecoeffs[14] += rints[20] * p_ecoeffs_b[4];
+            p_rints_x_ecoeffs[14] += rints[25] * p_ecoeffs_b[29];
+            p_rints_x_ecoeffs[14] += rints[22] * p_ecoeffs_b[14];
+            p_rints_x_ecoeffs[15] += rints[32] * p_ecoeffs_b[10];
+            p_rints_x_ecoeffs[15] += rints[37] * p_ecoeffs_b[35];
+            p_rints_x_ecoeffs[15] += rints[30] * p_ecoeffs_b[0];
+            p_rints_x_ecoeffs[15] += rints[31] * p_ecoeffs_b[5];
+            p_rints_x_ecoeffs[15] += rints[39] * p_ecoeffs_b[45];
+            p_rints_x_ecoeffs[15] += rints[34] * p_ecoeffs_b[20];
+            p_rints_x_ecoeffs[15] += rints[33] * p_ecoeffs_b[15];
+            p_rints_x_ecoeffs[16] += rints[31] * p_ecoeffs_b[6];
+            p_rints_x_ecoeffs[16] += rints[30] * p_ecoeffs_b[1];
+            p_rints_x_ecoeffs[16] += rints[33] * p_ecoeffs_b[16];
+            p_rints_x_ecoeffs[16] += rints[36] * p_ecoeffs_b[31];
+            p_rints_x_ecoeffs[17] += rints[30] * p_ecoeffs_b[2];
+            p_rints_x_ecoeffs[17] += rints[33] * p_ecoeffs_b[17];
+            p_rints_x_ecoeffs[17] += rints[32] * p_ecoeffs_b[12];
+            p_rints_x_ecoeffs[17] += rints[38] * p_ecoeffs_b[42];
+            p_rints_x_ecoeffs[18] += rints[32] * p_ecoeffs_b[13];
+            p_rints_x_ecoeffs[18] += rints[37] * p_ecoeffs_b[38];
+            p_rints_x_ecoeffs[18] += rints[30] * p_ecoeffs_b[3];
+            p_rints_x_ecoeffs[18] += rints[31] * p_ecoeffs_b[8];
+            p_rints_x_ecoeffs[18] += rints[34] * p_ecoeffs_b[23];
+            p_rints_x_ecoeffs[19] += rints[31] * p_ecoeffs_b[9];
+            p_rints_x_ecoeffs[19] += rints[30] * p_ecoeffs_b[4];
+            p_rints_x_ecoeffs[19] += rints[35] * p_ecoeffs_b[29];
+            p_rints_x_ecoeffs[19] += rints[32] * p_ecoeffs_b[14];
         }
     }
 
+    vec2d eri2_batch(n_sph_a, n_sph_b, 0);
     for (int ia = 0; ia < cdepth_a; ia++)
     {
-            const double* p_ecoeffs_a = &ecoeffs_a[ia * n_ecoeffs_a];
-            const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[ia * n_rints_x_ecoeffs];
+        const double* p_ecoeffs_a = &pecoeffs_a[ia * n_ecoeffs_a];
+        const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[ia * n_rints_x_ecoeffs];
 
-            eri2_batch[0] += p_ecoeffs_a[0] * p_rints_x_ecoeffs[0];
-            eri2_batch[0] += p_ecoeffs_a[3] * p_rints_x_ecoeffs[15];
-            eri2_batch[1] += p_ecoeffs_a[0] * p_rints_x_ecoeffs[1];
-            eri2_batch[1] += p_ecoeffs_a[3] * p_rints_x_ecoeffs[16];
-            eri2_batch[2] += p_ecoeffs_a[0] * p_rints_x_ecoeffs[2];
-            eri2_batch[2] += p_ecoeffs_a[3] * p_rints_x_ecoeffs[17];
-            eri2_batch[3] += p_ecoeffs_a[0] * p_rints_x_ecoeffs[3];
-            eri2_batch[3] += p_ecoeffs_a[3] * p_rints_x_ecoeffs[18];
-            eri2_batch[4] += p_ecoeffs_a[0] * p_rints_x_ecoeffs[4];
-            eri2_batch[4] += p_ecoeffs_a[3] * p_rints_x_ecoeffs[19];
-            eri2_batch[5] += p_ecoeffs_a[5] * p_rints_x_ecoeffs[5];
-            eri2_batch[5] += p_ecoeffs_a[4] * p_rints_x_ecoeffs[0];
-            eri2_batch[6] += p_ecoeffs_a[5] * p_rints_x_ecoeffs[6];
-            eri2_batch[6] += p_ecoeffs_a[4] * p_rints_x_ecoeffs[1];
-            eri2_batch[7] += p_ecoeffs_a[5] * p_rints_x_ecoeffs[7];
-            eri2_batch[7] += p_ecoeffs_a[4] * p_rints_x_ecoeffs[2];
-            eri2_batch[8] += p_ecoeffs_a[5] * p_rints_x_ecoeffs[8];
-            eri2_batch[8] += p_ecoeffs_a[4] * p_rints_x_ecoeffs[3];
-            eri2_batch[9] += p_ecoeffs_a[5] * p_rints_x_ecoeffs[9];
-            eri2_batch[9] += p_ecoeffs_a[4] * p_rints_x_ecoeffs[4];
-            eri2_batch[10] += p_ecoeffs_a[8] * p_rints_x_ecoeffs[0];
-            eri2_batch[10] += p_ecoeffs_a[10] * p_rints_x_ecoeffs[10];
-            eri2_batch[11] += p_ecoeffs_a[8] * p_rints_x_ecoeffs[1];
-            eri2_batch[11] += p_ecoeffs_a[10] * p_rints_x_ecoeffs[11];
-            eri2_batch[12] += p_ecoeffs_a[8] * p_rints_x_ecoeffs[2];
-            eri2_batch[12] += p_ecoeffs_a[10] * p_rints_x_ecoeffs[12];
-            eri2_batch[13] += p_ecoeffs_a[8] * p_rints_x_ecoeffs[3];
-            eri2_batch[13] += p_ecoeffs_a[10] * p_rints_x_ecoeffs[13];
-            eri2_batch[14] += p_ecoeffs_a[8] * p_rints_x_ecoeffs[4];
-            eri2_batch[14] += p_ecoeffs_a[10] * p_rints_x_ecoeffs[14];
+        eri2_batch(0, 0) += p_ecoeffs_a[0] * p_rints_x_ecoeffs[0];
+        eri2_batch(0, 0) += p_ecoeffs_a[3] * p_rints_x_ecoeffs[15];
+        eri2_batch(0, 1) += p_ecoeffs_a[0] * p_rints_x_ecoeffs[1];
+        eri2_batch(0, 1) += p_ecoeffs_a[3] * p_rints_x_ecoeffs[16];
+        eri2_batch(0, 2) += p_ecoeffs_a[0] * p_rints_x_ecoeffs[2];
+        eri2_batch(0, 2) += p_ecoeffs_a[3] * p_rints_x_ecoeffs[17];
+        eri2_batch(0, 3) += p_ecoeffs_a[0] * p_rints_x_ecoeffs[3];
+        eri2_batch(0, 3) += p_ecoeffs_a[3] * p_rints_x_ecoeffs[18];
+        eri2_batch(0, 4) += p_ecoeffs_a[0] * p_rints_x_ecoeffs[4];
+        eri2_batch(0, 4) += p_ecoeffs_a[3] * p_rints_x_ecoeffs[19];
+        eri2_batch(1, 0) += p_ecoeffs_a[5] * p_rints_x_ecoeffs[5];
+        eri2_batch(1, 0) += p_ecoeffs_a[4] * p_rints_x_ecoeffs[0];
+        eri2_batch(1, 1) += p_ecoeffs_a[5] * p_rints_x_ecoeffs[6];
+        eri2_batch(1, 1) += p_ecoeffs_a[4] * p_rints_x_ecoeffs[1];
+        eri2_batch(1, 2) += p_ecoeffs_a[5] * p_rints_x_ecoeffs[7];
+        eri2_batch(1, 2) += p_ecoeffs_a[4] * p_rints_x_ecoeffs[2];
+        eri2_batch(1, 3) += p_ecoeffs_a[5] * p_rints_x_ecoeffs[8];
+        eri2_batch(1, 3) += p_ecoeffs_a[4] * p_rints_x_ecoeffs[3];
+        eri2_batch(1, 4) += p_ecoeffs_a[5] * p_rints_x_ecoeffs[9];
+        eri2_batch(1, 4) += p_ecoeffs_a[4] * p_rints_x_ecoeffs[4];
+        eri2_batch(2, 0) += p_ecoeffs_a[8] * p_rints_x_ecoeffs[0];
+        eri2_batch(2, 0) += p_ecoeffs_a[10] * p_rints_x_ecoeffs[10];
+        eri2_batch(2, 1) += p_ecoeffs_a[8] * p_rints_x_ecoeffs[1];
+        eri2_batch(2, 1) += p_ecoeffs_a[10] * p_rints_x_ecoeffs[11];
+        eri2_batch(2, 2) += p_ecoeffs_a[8] * p_rints_x_ecoeffs[2];
+        eri2_batch(2, 2) += p_ecoeffs_a[10] * p_rints_x_ecoeffs[12];
+        eri2_batch(2, 3) += p_ecoeffs_a[8] * p_rints_x_ecoeffs[3];
+        eri2_batch(2, 3) += p_ecoeffs_a[10] * p_rints_x_ecoeffs[13];
+        eri2_batch(2, 4) += p_ecoeffs_a[8] * p_rints_x_ecoeffs[4];
+        eri2_batch(2, 4) += p_ecoeffs_a[10] * p_rints_x_ecoeffs[14];
     }
+
+    int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
+    int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
+    for (int mu = 0; mu < n_sph_a; mu++)
+        for (int nu = 0; nu < n_sph_b; nu++)
+        {
+            double norm_a = sh_data_a.norms[ofs_norm_a + mu];
+            double norm_b = sh_data_b.norms[ofs_norm_b + nu];
+            eri2_batch(mu, nu) *= norm_a * norm_b;
+        }
+
+    return eri2_batch;
 }

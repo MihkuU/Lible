@@ -101,7 +101,7 @@ def rolloutERI4First(la, lb, lc, ld):
 	hermite_idxs_poss_cd = hermiteIdxsPoss(lc + ld)
 
 	rollout_str = ''
-	rollout_str += '                    const double* p_ecoeffs_cd_tsp = &ecoeffs_cd_tsp[icd * n_ecoeffs_cd];\n'
+	rollout_str += '                    const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];\n'
 	rollout_str += '                    double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];\n\n'
 
 	for tuv_ab in range(0, n_hermites_ab):		
@@ -154,7 +154,7 @@ def rolloutERI4Second(la, lb, lc, ld):
 	hermite_idxs_poss_ab = hermiteIdxsPoss(la + lb)
 
 	rollout_str = ''
-	rollout_str += '            const double* p_ecoeffs_ab = &ecoeffs_ab[iab * n_ecoeffs_ab];\n'
+	rollout_str += '            const double* p_ecoeffs_ab = &pecoeffs_ab[iab * n_ecoeffs_ab];\n'
 	rollout_str += '            const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[iab * n_rints_x_ecoeffs];\n\n'
 
 	for mu in range(0, n_sph_a):
@@ -185,11 +185,10 @@ def rolloutERI4Second(la, lb, lc, ld):
 					for tuv_ab_3 in hermite_idxs_ab:
 						tuv_ab = hermite_idxs_poss_ab[tuv_ab_3]
 
-						idx_ints = munu * n_sph_cd + kata 
 						idx_x = tuv_ab * n_sph_cd + kata
 						idx_e = munu * n_hermites_ab + tuv_ab
 
-						rollout_str += '            eri4_batch[{}] += p_ecoeffs_ab[{}] * p_rints_x_ecoeffs[{}];\n'.format(idx_ints, idx_e, idx_x)
+						rollout_str += '            eri4_batch({}, {}, {}, {}) += p_ecoeffs_ab[{}] * p_rints_x_ecoeffs[{}];\n'.format(mu, nu, ka, ta, idx_e, idx_x)
 
 	return rollout_str
 
@@ -205,8 +204,8 @@ def rolloutERI3First(la, lb, lc):
 	hermite_idxs_poss_c = hermiteIdxsPoss(lc)
 
 	rollout_str = ''
-	rollout_str += '                    const double* p_ecoeffs_c = &ecoeffs_c[ic * n_ecoeffs_c];\n'
-	rollout_str += '                    double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];\n\n'
+	rollout_str += '                const double* p_ecoeffs_c = &pecoeffs_c[ic * n_ecoeffs_c];\n'
+	rollout_str += '                double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];\n\n'
 
 	for tuv_ab in range(0, n_hermites_ab):		
 		for ka in range(0, len(m_list_c)):
@@ -224,7 +223,7 @@ def rolloutERI3First(la, lb, lc):
 				idx_r = tuv_ab * n_hermites_c + tuv_c
 				idx_e = ka * n_hermites_c + tuv_c
 
-				rollout_str += '                    p_rints_x_ecoeffs[{}] += rints[{}] * p_ecoeffs_c[{}];\n'.format(idx_x, idx_r, idx_e)
+				rollout_str += '                p_rints_x_ecoeffs[{}] += rints[{}] * p_ecoeffs_c[{}];\n'.format(idx_x, idx_r, idx_e)
 
 	return rollout_str
 
@@ -243,7 +242,7 @@ def rolloutERI3Second(la, lb, lc):
 	hermite_idxs_poss_ab = hermiteIdxsPoss(la + lb)
 
 	rollout_str = ''
-	rollout_str += '            const double* p_ecoeffs_ab = &ecoeffs_ab[iab * n_ecoeffs_ab];\n'
+	rollout_str += '            const double* p_ecoeffs_ab = &pecoeffs_ab[iab * n_ecoeffs_ab];\n'
 	rollout_str += '            const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[iab * n_rints_x_ecoeffs];\n\n'
 
 	for mu in range(0, n_sph_a):
@@ -272,11 +271,10 @@ def rolloutERI3Second(la, lb, lc):
 				for tuv_ab_3 in hermite_idxs_ab:
 					tuv_ab = hermite_idxs_poss_ab[tuv_ab_3]
 
-					idx_ints = munu * n_sph_c + ka
 					idx_x = tuv_ab * n_sph_c + ka
 					idx_e = munu * n_hermites_ab + tuv_ab
 
-					rollout_str += '            eri3_batch[{}] += p_ecoeffs_ab[{}] * p_rints_x_ecoeffs[{}];\n'.format(idx_ints, idx_e, idx_x)
+					rollout_str += '            eri3_batch({}, {}, {}) += p_ecoeffs_ab[{}] * p_rints_x_ecoeffs[{}];\n'.format(mu, nu, ka, idx_e, idx_x)
 
 	return rollout_str
 
@@ -292,8 +290,8 @@ def rolloutERI2First(la, lb):
 	hermite_idxs_poss_b = hermiteIdxsPoss(lb)
 
 	rollout_str = ''
-	rollout_str += '                    const double* p_ecoeffs_b = &ecoeffs_b_tsp[ib * n_ecoeffs_b];\n'
-	rollout_str += '                    double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];\n\n'
+	rollout_str += '            const double* p_ecoeffs_b = &pecoeffs_b_tsp[ib * n_ecoeffs_b];\n'
+	rollout_str += '            double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];\n\n'
 
 	for tuv_a in range(0, n_hermites_a):		
 		for nu in range(0, len(m_list_b)):
@@ -311,7 +309,7 @@ def rolloutERI2First(la, lb):
 				idx_r = tuv_a * n_hermites_b + tuv_b
 				idx_e = tuv_b * n_sph_b + nu
 
-				rollout_str += '                    p_rints_x_ecoeffs[{}] += rints[{}] * p_ecoeffs_b[{}];\n'.format(idx_x, idx_r, idx_e)
+				rollout_str += '            p_rints_x_ecoeffs[{}] += rints[{}] * p_ecoeffs_b[{}];\n'.format(idx_x, idx_r, idx_e)
 
 	return rollout_str
 
@@ -327,8 +325,8 @@ def rolloutERI2Second(la, lb):
 	hermite_idxs_poss_a = hermiteIdxsPoss(la)
 
 	rollout_str = ''
-	rollout_str += '            const double* p_ecoeffs_a = &ecoeffs_a[ia * n_ecoeffs_a];\n'
-	rollout_str += '            const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[ia * n_rints_x_ecoeffs];\n\n'
+	rollout_str += '        const double* p_ecoeffs_a = &pecoeffs_a[ia * n_ecoeffs_a];\n'
+	rollout_str += '        const double* p_rints_x_ecoeffs = &rints_x_ecoeffs[ia * n_rints_x_ecoeffs];\n\n'
 
 	for mu in range(0, n_sph_a):
 		for nu in range(0, n_sph_b):
@@ -342,10 +340,9 @@ def rolloutERI2Second(la, lb):
 				for tuv_a_3 in hermite_idxs_a:
 					tuv_a = hermite_idxs_poss_a[tuv_a_3]
 
-					idx_ints = mu * n_sph_b + nu
 					idx_x = tuv_a * n_sph_b + nu
 					idx_e = mu * n_hermites_a + tuv_a
 
-					rollout_str += '            eri2_batch[{}] += p_ecoeffs_a[{}] * p_rints_x_ecoeffs[{}];\n'.format(idx_ints, idx_e, idx_x)
+					rollout_str += '        eri2_batch({}, {}) += p_ecoeffs_a[{}] * p_rints_x_ecoeffs[{}];\n'.format(mu, nu, idx_e, idx_x)
 
 	return rollout_str	

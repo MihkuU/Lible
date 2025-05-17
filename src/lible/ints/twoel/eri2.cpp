@@ -97,24 +97,25 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
 
             kernel_eri2_t kernel_eri2 = deployERI2Kernel(la, lb);
 
-            vector<double> eri2_batch(n_sph_a * n_sph_b, 0);
             for (int ishell_a = 0; ishell_a < sh_data_a.n_shells; ishell_a++)
             {
                 int bound_b = (la == lb) ? ishell_a + 1 : sh_data_b.n_shells;
                 for (int ishell_b = 0; ishell_b < bound_b; ishell_b++)
                 {
-                    int pos_a = sh_data_a.coffsets[ishell_a];
-                    int pos_b = sh_data_b.coffsets[ishell_b];
+                    vec2d eri2_batch = kernel_eri2(ishell_a, ishell_b, ecoeffs_a, ecoeffs_b_tsp,
+                                                   sh_data_a, sh_data_b);
 
-                    kernel_eri2(sh_data_a.cdepths[ishell_a], sh_data_b.cdepths[ishell_b],
-                                &sh_data_a.exps[pos_a], &sh_data_b.exps[pos_b],
-                                &sh_data_a.coords[3 * ishell_a], &sh_data_b.coords[3 * ishell_b],
-                                &ecoeffs_a[sh_data_a.offsets_ecoeffs[ishell_a]],
-                                &ecoeffs_b_tsp[sh_data_b.offsets_ecoeffs[ishell_b]],
-                                &eri2_batch[0]);
+                    int ofs_a = sh_data_a.offsets_sph[ishell_a];
+                    int ofs_b = sh_data_b.offsets_sph[ishell_b];
 
-                    transferIntsERI2(ishell_a, ishell_b, sh_data_a, sh_data_b,
-                                     eri2_batch, eri2);
+                    for (int ia = 0; ia < n_sph_a; ia++)
+                        for (int ib = 0; ib < n_sph_b; ib++)
+                        {
+                            int mu = ofs_a + ia;
+                            int nu = ofs_b + ib;
+                            eri2(mu, nu) = eri2_batch(ia, ib);
+                            eri2(nu, mu) = eri2_batch(ia, ib);
+                        }
                 }
             }
         }

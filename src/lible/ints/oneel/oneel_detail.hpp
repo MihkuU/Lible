@@ -14,7 +14,7 @@ namespace lible
 {
     namespace ints
     {
-        namespace one
+        namespace one // TODO: remove one-namespace
         {
             /** */
             enum class Option

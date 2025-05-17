@@ -219,37 +219,31 @@ namespace lible
          * \ingroup ints
          * Type alias for the four-center two-electron repulsion integral kernel function.
          */
-        using kernel_eri4_t = std::function<void(const int cdepth_a, const int cdepth_b,
-                                                 const int cdepth_c, const int cdepth_d,
-                                                 const double *exps_a, const double *exps_b,
-                                                 const double *exps_c, const double *exps_d,
-                                                 const double *coords_a, const double *coords_b,
-                                                 const double *coords_c, const double *coords_d,
-                                                 const double *ecoeffs_ab,
-                                                 const double *ecoeffs_cd_tsp,
-                                                 double *eri4_batch)>;
+        using kernel_eri4_t = std::function<vec4d(const int ipair_ab, const int ipair_cd,
+                                                  const std::vector<double> &ecoeffs_a,
+                                                  const std::vector<double> &ecoeffs_b_tsp,
+                                                  const ShellPairData &sp_data_ab,
+                                                  const ShellPairData &sp_data_cd)>;
 
         /**
          * \ingroup ints
          * Type alias for the three-center two-electron repulsion integral kernel function.
          */
-        using kernel_eri3_t = std::function<void(const int cdepth_a, const int cdepth_b,
-                                                 const int cdepth_c, const double *exps_a,
-                                                 const double *exps_b, const double *exps_c,
-                                                 const double *coords_a, const double *coords_b,
-                                                 const double *coords_c, const double *ecoeffs_ab,
-                                                 const double *ecoeffs_c, double *eri3_batch)>;
+        using kernel_eri3_t = std::function<vec3d(const int ipair_ab, const int ishell_c,
+                                                  const std::vector<double> &ecoeffs_ab,
+                                                  const std::vector<double> &ecoeffs_c,
+                                                  const ShellPairData &sp_data_ab,
+                                                  const ShellData &sh_data_c)>;
 
         /**
          * \ingroup ints
          * Type alias for the two-center two-electron repulsion integral kernel function.
          */
-        using kernel_eri2_t = std::function<void(const int cdepth_a, const int cdepth_b,
-                                                 const double *exps_a, const double *exps_b,
-                                                 const double *coords_a, const double *coords_b,
-                                                 const double *ecoeffs_a,
-                                                 const double *ecoeffs_b_tsp,
-                                                 double *eri2_batch)>;
+        using kernel_eri2_t = std::function<vec2d(const int ishell_a, const int ishell_b,
+                                                  const std::vector<double> &ecoeffs_a,
+                                                  const std::vector<double> &ecoeffs_b_tsp,
+                                                  const ShellData &sh_data_a,
+                                                  const ShellData &sh_data_b)>;
 
         /**
          * \ingroup ints
