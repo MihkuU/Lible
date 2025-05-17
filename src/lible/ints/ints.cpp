@@ -86,46 +86,40 @@ LI::kernel_eri2_t LI::deployERI2Kernel(const int la, const int lb)
     return LIT::deployERI2Kernel(la, lb);
 }
 
-void LI::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                          const double *exps_a, const double *exps_b, const double *coords_a,
-                          const double *coords_b, const double *ecoeffs_a,
-                          const double *ecoeffs_b_tsp, const double *norms_a,
-                          const double *norms_b, const BoysGrid &boys_grid,
-                          double *eri2_batch)
+std::array<lible::vec2d, 6> LI::kernelERI2Deriv1(const int ishell_a, const int ishell_b,
+                                                 const std::vector<double> &ecoeffs_a,
+                                                 const std::vector<double> &ecoeffs_b_tsp,
+                                                 const BoysGrid &boys_grid,
+                                                 const ShellData &sh_data_a,
+                                                 const ShellData &sh_data_b)
 {
-    LIT::kernelERI2Deriv1(la, lb, cdepth_a, cdepth_b, exps_a, exps_b, coords_a, coords_b,
-                          ecoeffs_a, ecoeffs_b_tsp, norms_a, norms_b, boys_grid, eri2_batch);
+    return LIT::kernelERI2Deriv1(ishell_a, ishell_b, ecoeffs_a, ecoeffs_b_tsp, boys_grid,
+                                 sh_data_a, sh_data_b);
 }
 
-void LI::kernelERI3Deriv1(const int la, const int lb, const int lc,
-                          const int cdepth_a, const int cdepth_b, const int cdepth_c,
-                          const double *exps_a, const double *exps_b, const double *exps_c,
-                          const double *coords_a, const double *coords_b, const double *coords_c,
-                          const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
-                          const double *ecoeffs_c, const double *norms_a, const double *norms_b,
-                          const double *norms_c, const BoysGrid &boys_grid, double *eri3_batch)
+std::array<lible::vec3d, 9> LI::kernelERI3Deriv1(const int ipair_ab, const int ishell_c,
+                                                 const std::vector<double> &ecoeffs_ab,
+                                                 const std::vector<double> &ecoeffs1_ab,
+                                                 const std::vector<double> &ecoeffs_c,
+                                                 const BoysGrid &boys_grid,
+                                                 const ShellPairData &sp_data_ab,
+                                                 const ShellData &sh_data_c)
 {
-    LIT::kernelERI3Deriv1(la, lb, lc, cdepth_a, cdepth_b, cdepth_c, exps_a, exps_b, exps_c,
-                          coords_a, coords_b, coords_c, ecoeffs_ab, ecoeffs_deriv1_ab,
-                          ecoeffs_c, norms_a, norms_b, norms_c, boys_grid, eri3_batch);
+    return LIT::kernelERI3Deriv1(ipair_ab, ishell_c, ecoeffs_ab, ecoeffs1_ab, ecoeffs_c, boys_grid,
+                                 sp_data_ab, sh_data_c);
 }
 
-void LI::kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
-                          const int cdepth_a, const int cdepth_b, const int cdepth_c,
-                          const int cdepth_d, const double *exps_a, const double *exps_b,
-                          const double *exps_c, const double *exps_d,
-                          const double *xyz_a, const double *xyz_b,
-                          const double *xyz_c, const double *xyz_d,
-                          const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
-                          const double *ecoeffs_cd_tsp, const double *ecoeffs_deriv1_cd_tsp,
-                          const double *norms_a, const double *norms_b,
-                          const double *norms_c, const double *norms_d,
-                          const BoysGrid &boys_grid, double *eri4_batch)
+std::array<lible::vec4d, 12> LI::kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
+                                                  const std::vector<double> &ecoeffs_ab,
+                                                  const std::vector<double> &ecoeffs1_ab,
+                                                  const std::vector<double> &ecoeffs_cd_tsp,
+                                                  const std::vector<double> &ecoeffs1_cd_tsp,
+                                                  const BoysGrid &boys_grid,
+                                                  const ShellPairData &sp_data_ab,
+                                                  const ShellPairData &sp_data_cd)
 {
-    LIT::kernelERI4Deriv1(la, lb, lc, ld, cdepth_a, cdepth_b, cdepth_c, cdepth_d, exps_a, exps_b,
-                          exps_c, exps_d, xyz_a, xyz_b, xyz_c, xyz_d, ecoeffs_ab, 
-                          ecoeffs_deriv1_ab, ecoeffs_cd_tsp, ecoeffs_deriv1_cd_tsp,
-                          norms_a, norms_b, norms_c, norms_d, boys_grid, eri4_batch);
+    return LIT::kernelERI4Deriv1(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs1_ab, ecoeffs_cd_tsp,
+                                 ecoeffs1_cd_tsp, boys_grid, sp_data_ab, sp_data_cd);
 }
 
 #ifdef _LIBLE_USE_HIP_

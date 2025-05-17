@@ -269,40 +269,35 @@ namespace lible
         /**
          * TODO:
          */
-        void kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                              const double *exps_a, const double *exps_b, const double *coords_a,
-                              const double *coords_b, const double *ecoeffs_a,
-                              const double *ecoeffs_b_tsp, const double *norms_a,
-                              const double *norms_b, const BoysGrid &boys_grid,
-                              double *eri2_batch);
+        std::array<vec2d, 6> kernelERI2Deriv1(const int ishell_a, const int ishell_b,
+                                              const std::vector<double> &ecoeffs_a,
+                                              const std::vector<double> &ecoeffs_b_tsp,
+                                              const BoysGrid &boys_grid,
+                                              const ShellData &sh_data_a,
+                                              const ShellData &sh_data_b);
 
         /**
          * TODO:
          */
-        void kernelERI3Deriv1(const int la, const int lb, const int lc,
-                              const int cdepth_a, const int cdepth_b, const int cdepth_c,
-                              const double *exps_a, const double *exps_b, const double *exps_c,
-                              const double *coords_a, const double *coords_b,
-                              const double *coords_c, const double *ecoeffs_ab,
-                              const double *ecoeffs_deriv1_ab, const double *ecoeffs_c,
-                              const double *norms_a, const double *norms_b,
-                              const double *norms_c, const BoysGrid &boys_grid,
-                              double *eri3_batch);
+        std::array<vec3d, 9> kernelERI3Deriv1(const int ipair_ab, const int ishell_c,
+                                              const std::vector<double> &ecoeffs_ab,
+                                              const std::vector<double> &ecoeffs1_ab,
+                                              const std::vector<double> &ecoeffs_c,
+                                              const BoysGrid &boys_grid,
+                                              const ShellPairData &sp_data_ab,
+                                              const ShellData &sh_data_c);
 
         /**
          * TODO:
          */
-        void kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
-                              const int cdepth_a, const int cdepth_b, const int cdepth_c,
-                              const int cdepth_d, const double *exps_a, const double *exps_b,
-                              const double *exps_c, const double *exps_d,
-                              const double *xyz_a, const double *xyz_b,
-                              const double *xyz_c, const double *xyz_d,
-                              const double *ecoeffs_ab, const double *ecoeffs_deriv1_ab,
-                              const double *ecoeffs_cd_tsp, const double *ecoeffs_deriv1_cd_tsp,
-                              const double *norms_a, const double *norms_b,
-                              const double *norms_c, const double *norms_d,
-                              const BoysGrid &boys_grid, double *eri4_batch);
+        std::array<vec4d, 12> kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
+                                               const std::vector<double> &ecoeffs_ab,
+                                               const std::vector<double> &ecoeffs1_ab,
+                                               const std::vector<double> &ecoeffs_cd_tsp,
+                                               const std::vector<double> &ecoeffs1_cd_tsp,
+                                               const BoysGrid &boys_grid,
+                                               const ShellPairData &sp_data_ab,
+                                               const ShellPairData &sp_data_cd);
 
         /**
          * \ingroup ints

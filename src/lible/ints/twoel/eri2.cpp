@@ -167,13 +167,33 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
     return eri2_diagonal;
 }
 
-void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                           const double *exps_a, const double *exps_b, const double *coords_a,
-                           const double *coords_b, const double *ecoeffs_a,
-                           const double *ecoeffs_b_tsp, const double *norms_a,
-                           const double *norms_b, const BoysGrid &boys_grid,
-                           double *eri2_batch)
+// void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
+//                            const double *exps_a, const double *exps_b, const double *coords_a,
+//                            const double *coords_b, const double *ecoeffs_a,
+//                            const double *ecoeffs_b_tsp, const double *norms_a,
+//                            const double *norms_b, const BoysGrid &boys_grid,
+//                            double *eri2_batch)
+std::array<lible::vec2d, 6> LIT::kernelERI2Deriv1(const int ishell_a, const int ishell_b,
+                                                  const vector<double> &ecoeffs_a,
+                                                  const vector<double> &ecoeffs_b_tsp,
+                                                  const BoysGrid &boys_grid,
+                                                  const ShellData &sh_data_a,
+                                                  const ShellData &sh_data_b)
 {
+    int la = sh_data_a.l;
+    int lb = sh_data_b.l;
+    int cdepth_a = sh_data_a.cdepths[ishell_a];
+    int cdepth_b = sh_data_b.cdepths[ishell_b];
+    int cofs_a = sh_data_a.coffsets[ishell_a];
+    int cofs_b = sh_data_b.coffsets[ishell_b];
+
+    const double *exps_a = &sh_data_a.exps[cofs_a];
+    const double *exps_b = &sh_data_b.exps[cofs_b];
+    const double *coords_a = &sh_data_a.coords[3 * ishell_a];
+    const double *coords_b = &sh_data_b.coords[3 * ishell_b];
+    const double *pecoeffs_a = &ecoeffs_a[sh_data_a.offsets_ecoeffs[ishell_a]];
+    const double *pecoeffs_b_tsp = &ecoeffs_b_tsp[sh_data_b.offsets_ecoeffs[ishell_b]];
+
     int lab = la + lb;
 
     vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
@@ -181,13 +201,10 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
 
     int n_sph_a = numSphericals(la);
     int n_sph_b = numSphericals(lb);
-    int n_sph_ab = n_sph_a * n_sph_b;
     int n_hermite_a = numHermites(la);
     int n_hermite_b = numHermites(lb);
     int n_ecoeffs_a = n_sph_a * n_hermite_a;
     int n_ecoeffs_b = n_sph_b * n_hermite_b;
-
-    std::fill(eri2_batch, eri2_batch + 6 * n_sph_ab, 0);
 
     array<double, 3> xyz_ab{coords_a[0] - coords_b[0], coords_a[1] - coords_b[1],
                             coords_a[2] - coords_b[2]};
@@ -216,10 +233,14 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
             int ofs_ecoeffs_b = ib * n_ecoeffs_b;
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 6 * n_hermite_a,
                         n_sph_b, n_hermite_b, 1.0, &rints[0], n_hermite_b,
-                        &ecoeffs_b_tsp[ofs_ecoeffs_b], n_sph_b, 1.0,
+                        &pecoeffs_b_tsp[ofs_ecoeffs_b], n_sph_b, 1.0,
                         &R_x_E[ofs_R_x_E], n_sph_b);
         }
     }
+
+    array<vec2d, 6> eri2_batch;
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        eri2_batch[ideriv] = vec2d(n_sph_a, n_sph_b, 0);
 
     for (int ia = 0; ia < cdepth_a; ia++)
     {
@@ -234,43 +255,45 @@ void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const
         int ofs_ecoeffs = ia * n_ecoeffs_a;
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
-                    1.0, &ecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs0], n_sph_b, 1.0,
-                    &eri2_batch[0 * n_sph_ab], n_sph_b);
+                    1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs0], n_sph_b, 1.0,
+                    eri2_batch[0].getData(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
-                    1.0, &ecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs1], n_sph_b, 1.0,
-                    &eri2_batch[1 * n_sph_ab], n_sph_b);
+                    1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs1], n_sph_b, 1.0,
+                    eri2_batch[1].getData(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
-                    1.0, &ecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs2], n_sph_b, 1.0,
-                    &eri2_batch[2 * n_sph_ab], n_sph_b);
+                    1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs2], n_sph_b, 1.0,
+                    eri2_batch[2].getData(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
-                    1.0, &ecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs3], n_sph_b, 1.0,
-                    &eri2_batch[3 * n_sph_ab], n_sph_b);
+                    1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs3], n_sph_b, 1.0,
+                    eri2_batch[3].getData(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
-                    1.0, &ecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs4], n_sph_b, 1.0,
-                    &eri2_batch[4 * n_sph_ab], n_sph_b);
+                    1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs4], n_sph_b, 1.0,
+                    eri2_batch[4].getData(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
-                    1.0, &ecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs5], n_sph_b, 1.0,
-                    &eri2_batch[5 * n_sph_ab], n_sph_b);
+                    1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs5], n_sph_b, 1.0,
+                    eri2_batch[5].getData(), n_sph_b);
     }
+
+    int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
+    int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
+
+    const double *norms_a = &sh_data_a.norms[ofs_norm_a];
+    const double *norms_b = &sh_data_b.norms[ofs_norm_b];
 
     for (int ideriv = 0; ideriv < 6; ideriv++)
-    {
-        int ofs = ideriv * n_sph_ab;
-        for (int a = 0; a < n_sph_a; a++)
-            for (int b = 0; b < n_sph_b; b++)
+        for (int mu = 0; mu < n_sph_a; mu++)
+            for (int nu = 0; nu < n_sph_b; nu++)
             {
-                int ab = a * n_sph_b + b;
-                int idx = ofs + ab;
+                double norm_a = norms_a[mu];
+                double norm_b = norms_b[nu];
 
-                double norm_a = norms_a[a];
-                double norm_b = norms_b[b];
-
-                eri2_batch[idx] *= norm_a * norm_b;
+                eri2_batch[ideriv](mu, nu) *= norm_a * norm_b;
             }
-    }
+
+    return eri2_batch;
 }
