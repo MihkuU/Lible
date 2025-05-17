@@ -116,7 +116,7 @@ lible::vec2d LI::ecoeffsRecurrence1(const double one_o_2a, const int l)
 }
 
 array<lible::vec3d, 3> LI::ecoeffsPrimitivePair(const double a, const double b, const int la,
-                                                const int lb, const double *xyz_a, 
+                                                const int lb, const double *xyz_a,
                                                 const double *xyz_b)
 {
     double p = a + b;
@@ -147,7 +147,7 @@ array<lible::vec3d, 3> LI::ecoeffsPrimitivePair(const double a, const double b, 
 
 array<lible::vec3d, 3> LI::ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                    const int lb, const double *xyz_a,
-                                                   const double *xyz_b, 
+                                                   const double *xyz_b,
                                                    const array<lible::vec3d, 3> &ecoeffs)
 {
     vec3d ecoeffs1_x = ecoeffsRecurrence2_n1(a, b, la, lb, xyz_a[0], xyz_b[0], ecoeffs[0]);
@@ -273,10 +273,12 @@ LI::ecoeffsShellPair_Eijt_Debug(const int la, const int lb, const int cdepth_a, 
     return ecoeffs;
 }
 
-
 vector<vector<lible::vec3d>>
-LI::ecoeffsSPData_Eij0(const int la, const int lb, const ShellPairData &sp_data)
+LI::ecoeffsSPData_Eij0(const ShellPairData &sp_data)
 {
+    int la = sp_data.la;
+    int lb = sp_data.la;
+
     vector<vector<vec3d>> ecoeffs(sp_data.n_pairs);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
@@ -298,8 +300,11 @@ LI::ecoeffsSPData_Eij0(const int la, const int lb, const ShellPairData &sp_data)
 }
 
 vector<vector<lible::vec4d>>
-LI::ecoeffsSPData_Eijt(const int la, const int lb, const ShellPairData &sp_data)
+LI::ecoeffsSPData_Eijt(const ShellPairData &sp_data)
 {
+    int la = sp_data.la;
+    int lb = sp_data.la;
+
     vector<vector<vec4d>> ecoeffs(sp_data.n_pairs);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
@@ -357,10 +362,13 @@ vector<vector<double>> LI::ecoeffsShell(const int l, const vector<double> &exps)
 }
 
 vector<double>
-LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &sp_data)
+LI::ecoeffsSphericalSPData_Bra(const ShellPairData &sp_data)
 {
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+
     vector<tuple<int, int, double>> sph_trafo_a = sphericalTrafo(la);
-    vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);    
+    vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);
 
     const auto &cart_exps_a = cartExps(la);
     const auto &cart_exps_b = cartExps(lb);
@@ -379,7 +387,7 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
     int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
                         sp_data.n_prim_pairs;
 
-    vector<double> ecoeffs(n_ecoeffs_sph, 0);    
+    vector<double> ecoeffs(n_ecoeffs_sph, 0);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
         int cdepth_a = sp_data.cdepths[2 * ipair + 0];
@@ -387,8 +395,8 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
         int cofs_a = sp_data.coffsets[2 * ipair + 0];
         int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
-        const double* xyz_a = &sp_data.coords[6 * ipair + 0];
-        const double* xyz_b = &sp_data.coords[6 * ipair + 3];
+        const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+        const double *xyz_b = &sp_data.coords[6 * ipair + 3];
 
         int offset_ecoeffs = sp_data.offsets_ecoeffs[ipair];
 
@@ -419,8 +427,8 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
 
                 double da = sp_data.coeffs[cofs_a + ia];
                 double db = sp_data.coeffs[cofs_b + ib];
-                double dadb = da * db;           
-                
+                double dadb = da * db;
+
                 int ofs = offset_ecoeffs + iab * n_ecoeffs;
                 for (auto &[b, b_, val] : sph_trafo_b)
                     for (int a = 0; a < dim_a_sph; a++)
@@ -437,8 +445,11 @@ LI::ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &
 }
 
 vector<double>
-LI::ecoeffsSphericalSPData_Bra_Deriv1(const int la, const int lb, const ShellPairData &sp_data)
+LI::ecoeffsSphericalSPData_Bra_Deriv1(const ShellPairData &sp_data)
 {
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+
     vector<tuple<int, int, double>> sph_trafo_a = sphericalTrafo(la);
     vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);
 
@@ -531,8 +542,11 @@ LI::ecoeffsSphericalSPData_Bra_Deriv1(const int la, const int lb, const ShellPai
 }
 
 pair<vector<double>, vector<double>>
-LI::ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairData &sp_data)
+LI::ecoeffsSphericalSPData_BraKet(const ShellPairData &sp_data)
 {
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+
     int dim_a_sph = numSphericals(la);
     int dim_b_sph = numSphericals(lb);
     int dim_ab = dim_a_sph * dim_b_sph;
@@ -544,7 +558,7 @@ LI::ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairDat
     int n_ecoeffs_sph = numSphericals(la) * numSphericals(lb) * numHermites(lab) *
                         sp_data.n_prim_pairs;
 
-    vector<double> ecoeffs = ecoeffsSphericalSPData_Bra(la, lb, sp_data);
+    vector<double> ecoeffs = ecoeffsSphericalSPData_Bra(sp_data);
 
     vector<double> ecoeffs_tsp(n_ecoeffs_sph, 0);
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
@@ -573,8 +587,11 @@ LI::ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairDat
 }
 
 pair<vector<double>, vector<double>>
-LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb, const ShellPairData &sp_data) // TODO: la, lb are redundant
+LI::ecoeffsSphericalSPData_BraKet_Deriv1(const ShellPairData &sp_data)
 {
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+
     int dim_a_sph = numSphericals(la);
     int dim_b_sph = numSphericals(lb);
     int dim_ab = dim_a_sph * dim_b_sph;
@@ -582,8 +599,8 @@ LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb, const Shell
     int lab = la + lb;
     int dim_tuv = numHermites(lab);
     int n_ecoeffs = dim_ab * dim_tuv;
-    
-    vector<double> ecoeffs = ecoeffsSphericalSPData_Bra_Deriv1(la, lb, sp_data);
+
+    vector<double> ecoeffs = ecoeffsSphericalSPData_Bra_Deriv1(sp_data);
 
     int n_ecoeffs_sph_x1 = dim_ab * dim_tuv * sp_data.n_prim_pairs;
     vector<double> ecoeffs_tsp(3 * n_ecoeffs_sph_x1, 0);
@@ -624,8 +641,10 @@ LI::ecoeffsSphericalSPData_BraKet_Deriv1(const int la, const int lb, const Shell
 }
 
 vector<double>
-LI::ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data)
+LI::ecoeffsSphericalShellData_Bra(const ShellData &sh_data)
 {
+    int l = sh_data.l;
+
     vector<tuple<int, int, double>> sph_trafo = sphericalTrafo(l);
 
     const auto &cart_exps = cartExps(l);
@@ -645,7 +664,7 @@ LI::ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data)
         int cofs = sh_data.coffsets[ishell];
 
         int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
-        
+
         for (int i = 0; i < cdepth; i++)
         {
             double a = sh_data.exps[cofs + i];
@@ -676,14 +695,16 @@ LI::ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data)
 }
 
 pair<vector<double>, vector<double>>
-LI::ecoeffsSphericalShellData_BraKet(const int l, const ShellData &sh_data)
+LI::ecoeffsSphericalShellData_BraKet(const ShellData &sh_data)
 {
+    int l = sh_data.l;
+
     int dim_sph = numSphericals(l);
     int dim_tuv = numHermites(l);
 
     int n_ecoeffs = numSphericals(l) * numHermites(l) * sh_data.n_primitives;
 
-    vector<double> ecoeffs = ecoeffsSphericalShellData_Bra(l, sh_data);
+    vector<double> ecoeffs = ecoeffsSphericalShellData_Bra(sh_data);
 
     vector<double> ecoeffs_tsp(n_ecoeffs, 0);
     for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
@@ -709,119 +730,76 @@ LI::ecoeffsSphericalShellData_BraKet(const int l, const ShellData &sh_data)
 }
 
 vector<vector<double>>
-LI::ecoeffsSphericalSPDatas_Bra(const vector<pair<int, int>> &l_pairs,
-                                const vector<ShellPairData> &sp_datas)
+LI::ecoeffsSphericalSPDatas_Bra(const vector<ShellPairData> &sp_datas)
 {
-    if (l_pairs.size() != sp_datas.size())
-        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
-
-    vector<vector<double>> ecoeffs(l_pairs.size());
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-    {
-        auto [la, lb] = l_pairs[ipair];
-
-        auto ecoeffs_ipair = ecoeffsSphericalSPData_Bra(la, lb, sp_datas[ipair]);
-
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-    }
+    vector<vector<double>> ecoeffs(sp_datas.size());
+    for (size_t idata = 0; idata < sp_datas.size(); idata++)
+        ecoeffs[idata] = ecoeffsSphericalSPData_Bra(sp_datas[idata]);
 
     return ecoeffs;
 }
 
 vector<vector<double>>
-LI::ecoeffsSphericalSPDatas_Bra_Deriv1(const vector<pair<int, int>> &l_pairs,
-                                       const vector<ShellPairData> &sp_datas)
+LI::ecoeffsSphericalSPDatas_Bra_Deriv1(const vector<ShellPairData> &sp_datas)
 {
-    if (l_pairs.size() != sp_datas.size())
-        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
-
-    vector<vector<double>> ecoeffs(l_pairs.size());
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-    {
-        auto [la, lb] = l_pairs[ipair];
-
-        auto ecoeffs_ipair = ecoeffsSphericalSPData_Bra_Deriv1(la, lb, sp_datas[ipair]);
-
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-    }
+    vector<vector<double>> ecoeffs(sp_datas.size());
+    for (size_t idata = 0; idata < sp_datas.size(); idata++)
+        ecoeffs[idata] = ecoeffsSphericalSPData_Bra_Deriv1(sp_datas[idata]);
 
     return ecoeffs;
 }
 
 pair<vector<vector<double>>, vector<vector<double>>>
-LI::ecoeffsSphericalSPDatas_BraKet(const vector<pair<int, int>> &l_pairs,
-                                   const vector<ShellPairData> &sp_datas)
+LI::ecoeffsSphericalSPDatas_BraKet(const vector<ShellPairData> &sp_datas)
 {
-    if (l_pairs.size() != sp_datas.size())
-        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
-
-    vector<vector<double>> ecoeffs(l_pairs.size());
-    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    vector<vector<double>> ecoeffs(sp_datas.size());
+    vector<vector<double>> ecoeffs_tsp(sp_datas.size());
+    for (size_t idata = 0; idata < sp_datas.size(); idata++)
     {
-        auto [la, lb] = l_pairs[ipair];
+        auto [ecoeffs_idata, ecoeffs_tsp_idata] = ecoeffsSphericalSPData_BraKet(sp_datas[idata]);
 
-        auto [ecoeffs_ipair, ecoeffs_tsp_ipair] =
-            ecoeffsSphericalSPData_BraKet(la, lb, sp_datas[ipair]);
-
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+        ecoeffs[idata] = std::move(ecoeffs_idata);
+        ecoeffs_tsp[idata] = std::move(ecoeffs_tsp_idata);
     }
 
     return {ecoeffs, ecoeffs_tsp};
 }
 
 pair<vector<vector<double>>, vector<vector<double>>>
-LI::ecoeffsSphericalSPDatas_BraKet_Deriv1(const vector<pair<int, int>> &l_pairs,
-                                          const vector<ShellPairData> &sp_datas)
+LI::ecoeffsSphericalSPDatas_BraKet_Deriv1(const vector<ShellPairData> &sp_datas)
 {
-    if (l_pairs.size() != sp_datas.size())
-        throw std::runtime_error("The sizes of sp_datas and l_pairs don't match!\n");
-
-    vector<vector<double>> ecoeffs(l_pairs.size());
-    vector<vector<double>> ecoeffs_tsp(l_pairs.size());
-    for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
+    vector<vector<double>> ecoeffs(sp_datas.size());
+    vector<vector<double>> ecoeffs_tsp(sp_datas.size());
+    for (size_t idata = 0; idata < sp_datas.size(); idata++)
     {
-        auto [la, lb] = l_pairs[ipair];
+        auto [ecoeffs_idata, ecoeffs_tsp_idata] =
+            ecoeffsSphericalSPData_BraKet_Deriv1(sp_datas[idata]);
 
-        auto [ecoeffs_ipair, ecoeffs_tsp_ipair] =
-            ecoeffsSphericalSPData_BraKet_Deriv1(la, lb, sp_datas[ipair]);
-
-        ecoeffs[ipair] = std::move(ecoeffs_ipair);
-        ecoeffs_tsp[ipair] = std::move(ecoeffs_tsp_ipair);
+        ecoeffs[idata] = std::move(ecoeffs_idata);
+        ecoeffs_tsp[idata] = std::move(ecoeffs_tsp_idata);
     }
 
     return {ecoeffs, ecoeffs_tsp};
 }
 
 vector<vector<double>>
-LI::ecoeffsSphericalShellDatas_Bra(const int l_max_aux, const vector<ShellData> &sh_datas)
+LI::ecoeffsSphericalShellDatas_Bra(const vector<ShellData> &sh_datas)
 {
-    if (size_t(l_max_aux + 1) != (size_t)sh_datas.size())
-        throw std::runtime_error("The size of sh_datas doesn't match (l_max_aux + 1)\n");
-
     vector<vector<double>> ecoeffs(sh_datas.size());
-    for (int l = 0; l <= l_max_aux; l++)
-    {
-        auto ecoeffs_l = ecoeffsSphericalShellData_Bra(l, sh_datas[l]);
-
-        ecoeffs[l] = std::move(ecoeffs_l);
-    }
+    for (size_t l = 0; l < sh_datas.size(); l++)
+        ecoeffs[l] = ecoeffsSphericalShellData_Bra(sh_datas[l]);
 
     return ecoeffs;
 }
 
 pair<vector<vector<double>>, vector<vector<double>>>
-LI::ecoeffsSphericalShellDatas_BraKet(const int l_max_aux, const vector<ShellData> &sh_datas)
+LI::ecoeffsSphericalShellDatas_BraKet(const vector<ShellData> &sh_datas)
 {
-    if (size_t(l_max_aux + 1) != (size_t)sh_datas.size())
-        throw std::runtime_error("The size of sh_datas doesn't match (l_max_aux + 1)\n");
-
     vector<vector<double>> ecoeffs(sh_datas.size());
     vector<vector<double>> ecoeffs_tsp(sh_datas.size());
-    for (int l = 0; l <= l_max_aux; l++)
+    for (size_t l = 0; l < sh_datas.size(); l++)
     {
-        auto [ecoeffs_l, ecoeffs_tsp_l] = ecoeffsSphericalShellData_BraKet(l, sh_datas[l]);
+        auto [ecoeffs_l, ecoeffs_tsp_l] = ecoeffsSphericalShellData_BraKet(sh_datas[l]);
 
         ecoeffs[l] = std::move(ecoeffs_l);
         ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);

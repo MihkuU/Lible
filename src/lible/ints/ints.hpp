@@ -144,8 +144,8 @@ namespace lible
          */
         vec4d eri4(const Structure &structure);
 
-        /** */
-        vec4d eri4New(const Structure &structure);
+        // /** */
+        // vec4d eri4New(const Structure &structure);
 
         /**
          * \ingroup ints
@@ -381,58 +381,54 @@ namespace lible
          * pair of Gaussian primitives in each shell pair.
          */
         std::vector<std::vector<vec3d>>
-        ecoeffsSPData_Eij0(const int la, const int lb, const ShellPairData &sp_data);
+        ecoeffsSPData_Eij0(const ShellPairData &sp_data);
 
         /**
          * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
          * pair of Gaussian primitives in each shell pair.
          */
         std::vector<std::vector<vec4d>>
-        ecoeffsSPData_Eijt(const int la, const int lb, const ShellPairData &sp_data);
+        ecoeffsSPData_Eijt(const ShellPairData &sp_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<double>
-        ecoeffsSphericalSPData_Bra(const int la, const int lb, const ShellPairData &sp_data);
+        ecoeffsSphericalSPData_Bra(const ShellPairData &sp_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<double>, std::vector<double>>
-        ecoeffsSphericalSPData_BraKet(const int la, const int lb, const ShellPairData &sp_data);
+        ecoeffsSphericalSPData_BraKet(const ShellPairData &sp_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<double>
-        ecoeffsSphericalShellData_Bra(const int l, const ShellData &sh_data);
+        ecoeffsSphericalShellData_Bra(const ShellData &sh_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<double>, std::vector<double>>
-        ecoeffsSphericalShellData_BraKet(const int l, const ShellData &sh_data);
+        ecoeffsSphericalShellData_BraKet(const ShellData &sh_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<std::vector<double>>
-        ecoeffsSphericalSPDatas_Bra(const std::vector<std::pair<int, int>> &l_pairs,
-                                    const std::vector<ShellPairData> &sp_datas);
+        ecoeffsSphericalSPDatas_Bra(const std::vector<ShellPairData> &sp_datas);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<std::vector<double>>
-        ecoeffsSphericalSPDatas_Bra_Deriv1(const std::vector<std::pair<int, int>> &l_pairs,
-                                           const std::vector<ShellPairData> &sp_datas);
+        ecoeffsSphericalSPDatas_Bra_Deriv1(const std::vector<ShellPairData> &sp_datas);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        ecoeffsSphericalSPDatas_BraKet(const std::vector<std::pair<int, int>> &l_pairs,
-                                       const std::vector<ShellPairData> &sp_datas);
+        ecoeffsSphericalSPDatas_BraKet(const std::vector<ShellPairData> &sp_datas);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        ecoeffsSphericalSPDatas_BraKet_Deriv1(const std::vector<std::pair<int, int>> &l_pairs,
-                                              const std::vector<ShellPairData> &sp_datas);
+        ecoeffsSphericalSPDatas_BraKet_Deriv1(const std::vector<ShellPairData> &sp_datas);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<std::vector<double>>
-        ecoeffsSphericalShellDatas_Bra(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        ecoeffsSphericalShellDatas_Bra(const std::vector<ShellData> &sh_datas);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        ecoeffsSphericalShellDatas_BraKet(const int l_max_aux, const std::vector<ShellData> &sh_datas);
+        ecoeffsSphericalShellDatas_BraKet(const std::vector<ShellData> &sh_datas);
 
         /** TODO: */
         class BoysGrid;

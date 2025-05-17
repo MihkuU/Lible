@@ -23,7 +23,7 @@ namespace lible
 
             vec4d calcERI4(const Structure &structure);
 
-            vec4d calcERI4New(const Structure &structure);
+            // vec4d calcERI4New(const Structure &structure);
 
             void calcERI4Benchmark(const Structure &structure);
 

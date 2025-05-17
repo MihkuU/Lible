@@ -69,6 +69,27 @@ namespace lible::ints::two
                         dim_sph_a);
         }
     }
+
+    void transferIntsERI2Diag(const int ishell, const ShellData &sh_data,
+                              const vector<double> &eri2_shells_sph,
+                              vector<double> &eri2_diagonal)
+    {
+        int dim_a = numSphericals(sh_data.l);
+        int pos_a = sh_data.offsets_sph[ishell];
+        int pos_norm_a = sh_data.offsets_norms[ishell];
+    
+        for (int mu = 0; mu < dim_a; mu++)
+        {
+            int munu = mu * dim_a + mu;
+    
+            double norm_a = sh_data.norms[pos_norm_a];
+            double normalized_int = norm_a * norm_a * eri2_shells_sph[munu];
+    
+            int a = pos_a + mu;
+    
+            eri2_diagonal[a] = normalized_int;
+        }        
+    }
 }
 
 lible::vec2d LIT::calcERI2(const Structure &structure)
@@ -79,7 +100,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
     int l_max_aux = structure.getMaxLAux();
     vector<ShellData> sh_datas = shellDatasAux(l_max_aux, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(l_max_aux, sh_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(sh_datas);
 
     size_t dim_ao_aux = structure.getDimAOAux();
     vec2d eri2(dim_ao_aux, dim_ao_aux, 0);
@@ -131,7 +152,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
     int l_max_aux = structure.getMaxLAux();
     vector<ShellData> sh_datas = shellDatasAux(l_max_aux, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(l_max_aux, sh_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(sh_datas);
 
     size_t dim_ao_aux = structure.getDimAOAux();
     vector<double> eri2_diagonal(dim_ao_aux, 0);

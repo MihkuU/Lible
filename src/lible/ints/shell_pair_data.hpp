@@ -120,8 +120,7 @@ namespace lible
          * If la != lb, shell pair data is created for pairs (ishellA, ishellB). When la == lb,
          * the data is create for (ishellA, ishellA') pairs such that ishellA >= ishellA'.
          */
-        ShellPairData shellPairDataSymm(const int la, const int lb,
-                                                 const Structure &structure);
+        ShellPairData shellPairDataSymm(const int la, const int lb, const Structure &structure);
 
         /**
          * \ingroup spdata
@@ -129,8 +128,7 @@ namespace lible
          * Constructs the shell pair data corresponding to the main basis set. No symmetries are
          * being used in this version.
          */
-        ShellPairData shellPairDataNoSymm(const int la, const int lb,
-                                                   const Structure &structure);
+        ShellPairData shellPairDataNoSymm(const int la, const int lb, const Structure &structure);
 
         /**
          * \ingroup spdata
@@ -159,7 +157,7 @@ namespace lible
          */
         std::vector<ShellPairData>
         shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                                    const Structure &structure);
+                           const Structure &structure);
 
         /**
          * \ingroup spdata

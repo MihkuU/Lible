@@ -77,13 +77,13 @@ LI::ShellData LI::shellDataAux(const int l, const Structure &structure)
 }
 
 LI::ShellPairData LI::shellPairDataSymm(const int la, const int lb,
-                                                 const Structure &structure)
+                                        const Structure &structure)
 {
     return constructShellPairData(true, la, lb, structure);
 }
 
 LI::ShellPairData LI::shellPairDataNoSymm(const int la, const int lb,
-                                                   const Structure &structure)
+                                          const Structure &structure)
 {
     return constructShellPairData(false, la, lb, structure);
 }
@@ -266,7 +266,7 @@ vector<LI::ShellData> LI::shellDatasAux(const int l_max, const Structure &struct
 }
 
 vector<LI::ShellPairData> LI::shellPairDatasSymm(const vector<pair<int, int>> &l_pairs,
-                                                          const Structure &structure)
+                                                 const Structure &structure)
 {
     vector<ShellPairData> sp_datas;
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
@@ -279,7 +279,7 @@ vector<LI::ShellPairData> LI::shellPairDatasSymm(const vector<pair<int, int>> &l
 }
 
 vector<LI::ShellPairData> LI::shellPairDatasNoSymm(const vector<pair<int, int>> &l_pairs,
-                                                            const Structure &structure)
+                                                   const Structure &structure)
 {
     vector<ShellPairData> sp_datas;
     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
