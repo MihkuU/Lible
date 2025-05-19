@@ -54,7 +54,9 @@ namespace lible
             int getMaxN() const;
 
             /** */
-            std::vector<double> getFnxGrid() const;
+            // std::vector<double> getFnxGrid() const;
+
+            const std::vector<double>& getFnxGrid() const;
 
         private:
             double boys_f_threshold = 1e-16; /** */

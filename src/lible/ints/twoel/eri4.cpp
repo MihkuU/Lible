@@ -598,17 +598,6 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
     return eri4_diagonal;
 }
 
-// void LIT::kernelERI4Deriv1(const int la, const int lb, const int lc, const int ld,
-//                            const int cdepth_a, const int cdepth_b, const int cdepth_c,
-//                            const int cdepth_d, const double *exps_a, const double *exps_b,
-//                            const double *exps_c, const double *exps_d,
-//                            const double *xyz_a, const double *xyz_b,
-//                            const double *xyz_c, const double *xyz_d,
-//                            const double *ecoeffs_ab, const double *ecoeffs1_ab,
-//                            const double *ecoeffs_cd_tsp, const double *ecoeffs_deriv1_cd_tsp,
-//                            const double *norms_a, const double *norms_b,
-//                            const double *norms_c, const double *norms_d,
-//                            const BoysGrid &boys_grid, double *eri4_batch)
 array<lible::vec4d, 12> LIT::kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
                                               const vector<double> &ecoeffs_ab,
                                               const vector<double> &ecoeffs1_ab,
@@ -802,7 +791,7 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1(const int ipair_ab, const int ipai
                                 int idx4_ = ofs_R_x_E + 10 * n_R_x_E + idx;
                                 int idx5_ = ofs_R_x_E + 11 * n_R_x_E + idx;
 
-                                // TODO: try BLAS here?
+                                // TODO: try BLAS here? lol actually not, CBLAS was slower here
 
                                 // C
                                 R_x_E[idx0_] += (c / q) * R_x_E_P_R_[idx0] + R_x_E_P_R_[idx3];
@@ -891,31 +880,19 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1(const int ipair_ab, const int ipai
             double a = exps_a[ia];
             double b = exps_b[ib];
             double p = a + b;
-            for (int mu = 0, munu = 0; mu < n_sph_a; mu++)
-                for (int nu = 0; nu < n_sph_b; nu++, munu++)
-                    for (int ka = 0, kata = 0; ka < n_sph_c; ka++)
-                        for (int ta = 0; ta < n_sph_d; ta++, kata++)
-                        {
-                            int munukata = munu * n_sph_cd + kata;
+            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[0 * n_sph_abcd], 1, eri4_batch[0].getData(), 1);
+            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[1 * n_sph_abcd], 1, eri4_batch[1].getData(), 1);
+            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[2 * n_sph_abcd], 1, eri4_batch[2].getData(), 1);
+            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[3 * n_sph_abcd], 1, eri4_batch[0].getData(), 1);
+            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[4 * n_sph_abcd], 1, eri4_batch[1].getData(), 1);
+            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[5 * n_sph_abcd], 1, eri4_batch[2].getData(), 1);
 
-                            int idx0 = 0 * n_sph_abcd + munukata;
-                            int idx1 = 1 * n_sph_abcd + munukata;
-                            int idx2 = 2 * n_sph_abcd + munukata;
-
-                            int idx3 = 3 * n_sph_abcd + munukata;
-                            int idx4 = 4 * n_sph_abcd + munukata;
-                            int idx5 = 5 * n_sph_abcd + munukata;
-
-                            // A
-                            eri4_batch[0](mu, nu, ka, ta) += (a / p) * E_x_R_x_E_PR[idx0] + E_x_R_x_E_PR[idx3];
-                            eri4_batch[1](mu, nu, ka, ta) += (a / p) * E_x_R_x_E_PR[idx1] + E_x_R_x_E_PR[idx4];
-                            eri4_batch[2](mu, nu, ka, ta) += (a / p) * E_x_R_x_E_PR[idx2] + E_x_R_x_E_PR[idx5];
-
-                            // B
-                            eri4_batch[3](mu, nu, ka, ta) += (b / p) * E_x_R_x_E_PR[idx0] - E_x_R_x_E_PR[idx3];
-                            eri4_batch[4](mu, nu, ka, ta) += (b / p) * E_x_R_x_E_PR[idx1] - E_x_R_x_E_PR[idx4];
-                            eri4_batch[5](mu, nu, ka, ta) += (b / p) * E_x_R_x_E_PR[idx2] - E_x_R_x_E_PR[idx5];
-                        }
+            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[0 * n_sph_abcd], 1, eri4_batch[3].getData(), 1);
+            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[1 * n_sph_abcd], 1, eri4_batch[4].getData(), 1);
+            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[2 * n_sph_abcd], 1, eri4_batch[5].getData(), 1);
+            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[3 * n_sph_abcd], 1, eri4_batch[3].getData(), 1);
+            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[4 * n_sph_abcd], 1, eri4_batch[4].getData(), 1);
+            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[5 * n_sph_abcd], 1, eri4_batch[5].getData(), 1);
         }
 
     int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab + 0];

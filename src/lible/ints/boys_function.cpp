@@ -96,7 +96,7 @@ int LI::BoysGrid::getMaxN() const
     return max_n;
 }
 
-vector<double> LI::BoysGrid::getFnxGrid() const
+const vector<double>& LI::BoysGrid::getFnxGrid() const
 {
     return fnx_grid;
 }

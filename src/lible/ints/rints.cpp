@@ -184,6 +184,10 @@ vector<double> LI::calcRInts_ERI3_deriv1(const int l, const double fac, const do
             rints_out[ofs3 + i * dim_tuv_c + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
 
             // d/dC
+            // rints_out[ofs4 + i * (3 * dim_tuv_c) + j + 0 * dim_tuv_c] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            // rints_out[ofs4 + i * (3 * dim_tuv_c) + j + 1 * dim_tuv_c] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            // rints_out[ofs4 + i * (3 * dim_tuv_c) + j + 2 * dim_tuv_c] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+
             rints_out[ofs4 + i * dim_tuv_c + j] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
             rints_out[ofs5 + i * dim_tuv_c + j] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
             rints_out[ofs6 + i * dim_tuv_c + j] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);

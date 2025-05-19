@@ -188,12 +188,6 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
     return eri2_diagonal;
 }
 
-// void LIT::kernelERI2Deriv1(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-//                            const double *exps_a, const double *exps_b, const double *coords_a,
-//                            const double *coords_b, const double *ecoeffs_a,
-//                            const double *ecoeffs_b_tsp, const double *norms_a,
-//                            const double *norms_b, const BoysGrid &boys_grid,
-//                            double *eri2_batch)
 std::array<lible::vec2d, 6> LIT::kernelERI2Deriv1(const int ishell_a, const int ishell_b,
                                                   const vector<double> &ecoeffs_a,
                                                   const vector<double> &ecoeffs_b_tsp,
