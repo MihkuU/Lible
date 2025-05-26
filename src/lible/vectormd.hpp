@@ -7,16 +7,6 @@
 #include <stdexcept>
 #include <vector>
 
-#ifndef NDEBUG
-#define NODEBUG false
-#else
-#define NODEBUG true
-#endif
-
-#ifndef DEBUG
-#define DEBUG !NODEBUG
-#endif
-
 namespace lible
 {
     /** Object for initializing an VectorMD object to a given value. */
@@ -81,7 +71,7 @@ namespace lible
         // Member functions
 
         /** */
-        template<std::size_t idim>
+        template <std::size_t idim>
         std::size_t dim() const
         {
             static_assert(idim < N);
@@ -96,25 +86,25 @@ namespace lible
         }
 
         /** */
-        const std::vector<T>::const_iterator begin() const 
+        const std::vector<T>::const_iterator begin() const
         {
             return data.begin();
         }
 
         /** */
-        const std::vector<T>::const_iterator end() const 
+        const std::vector<T>::const_iterator end() const
         {
             return data.end();
         }
 
         /** */
-        T* memptr()
+        T *memptr()
         {
             return data.data();
         }
 
         /** */
-        const T* memptr() const 
+        const T *memptr() const
         {
             return data.data();
         }
@@ -180,7 +170,7 @@ namespace lible
 
         /** */
         template <std::integral... Args>
-        T& operator()(Args... idxs)
+        T &operator()(Args... idxs)
         {
             static_assert(sizeof...(idxs) == N);
 
@@ -191,7 +181,7 @@ namespace lible
 
         /** */
         template <std::integral... Args>
-        const T& operator()(Args... idxs) const        
+        const T &operator()(Args... idxs) const
         {
             static_assert(sizeof...(idxs) == N);
 
@@ -201,13 +191,13 @@ namespace lible
         }
 
         /** */
-        T& operator[](std::size_t idx)
+        T &operator[](std::size_t idx)
         {
             return data[idx];
         }
 
         /** */
-        const T& operator[](std::size_t idx) const 
+        const T &operator[](std::size_t idx) const
         {
             return data[idx];
         }
@@ -215,7 +205,7 @@ namespace lible
         /** */
         VectorMD operator+(const VectorMD &other) const
         {
-#ifdef DEBUG
+#ifndef NDEBUG
             if (this->dimensions != other.dimensions)
                 throw std::out_of_range("VectorMD::operator+: dimensions don't match");
 #endif
@@ -230,7 +220,7 @@ namespace lible
         /** */
         VectorMD operator-(const VectorMD &other) const
         {
-#ifdef DEBUG
+#ifndef NDEBUG
             if (this->dimensions != other.dimensions)
                 throw std::out_of_range("VectorMD::operator-: dimensions don't match");
 #endif
@@ -245,7 +235,7 @@ namespace lible
         /** */
         VectorMD &operator+=(const VectorMD &other)
         {
-#ifdef DEBUG
+#ifndef NDEBUG
             if (this->dimensions != other.dimensions)
                 throw std::out_of_range("VectorMD::operator+=: dimensions don't match");
 #endif
@@ -257,9 +247,9 @@ namespace lible
         }
 
         /** */
-        VectorMD& operator-=(const VectorMD &other)
+        VectorMD &operator-=(const VectorMD &other)
         {
-#ifdef DEBUG
+#ifndef NDEBUG
             if (this->dimensions != other.dimensions)
                 throw std::out_of_range("VectorMD::operator-=: dimensions don't match");
 #endif
@@ -280,7 +270,7 @@ namespace lible
         }
 
         /** */
-        VectorMD& operator*=(T val)
+        VectorMD &operator*=(T val)
         {
             for (std::size_t i = 0; i < data.size(); i++)
                 this->data[i] *= val;
@@ -311,7 +301,7 @@ namespace lible
         template <typename U>
         std::size_t calcIdx(U idx) const
         {
-#ifdef DEBUG
+#ifndef NDEBUG
             // It is assumed that calcIdx() is used by operator() only.
             constexpr std::size_t idim = N - 1;
             if ((std::size_t)idx > (dimensions[idim] - 1))
@@ -328,7 +318,7 @@ namespace lible
         std::size_t calcIdx(U idx, Idxs... idxs) const
         {
             constexpr std::size_t idim = N - sizeof...(idxs) - 1;
-#ifdef DEBUG
+#ifndef NDEBUG
             // It is assumed that calcIdx() is used by operator() only.
             if ((std::size_t)idx > (dimensions[idim] - 1))
                 throw std::out_of_range(std::format("VectorMD::operator(): index value {} along "

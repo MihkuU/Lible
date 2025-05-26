@@ -22,6 +22,10 @@ namespace lible
         /** Calculates the Hermite Coulomb integrals as a 3D array R(t, u, v). */
         vec3d calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx);
 
+        // vec3d calcRInts3D_R(const int l, const double p, const double *xyz_ab, const double *fnx);
+
+        // void rrecurrence(const int l, const double p, const double *xyz_ab, const double *fnx);
+
         /** TODO: dox */
         std::vector<double> calcRInts_ERI2_deriv1(const int l, const double fac, const double p,
                                                   const double *xyz_ab, const double *fnx,
