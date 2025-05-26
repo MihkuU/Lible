@@ -707,12 +707,12 @@ lible::vec2d LI::trafo2Spherical(const int la, const int lb, const vec2d &ints_c
     vector<tuple<int, int, double>> trafo_a = sphericalTrafo(la);
     vector<tuple<int, int, double>> trafo_b = sphericalTrafo(lb);
 
-    vec2d ints_cart_sph(n_cart_a, n_sph_b, 0);
+    vec2d ints_cart_sph(Fill(0), n_cart_a, n_sph_b);
     for (int ia = 0; ia < n_cart_a; ia++)
         for (auto &[isph, icart, val] : trafo_b)
             ints_cart_sph(ia, isph) += val * ints_cart(ia, icart);
 
-    vec2d ints_out(n_sph_a, n_sph_b, 0);
+    vec2d ints_out(Fill(0), n_sph_a, n_sph_b);
     for (int ib = 0; ib < n_sph_b; ib++)
         for (auto &[isph, icart, val] : trafo_a)
             ints_out(isph, ib) += val * ints_cart_sph(icart, ib);

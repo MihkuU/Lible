@@ -42,7 +42,7 @@ lible::vec2d LI::overlapKernel(const int ipair, const ShellPairData &sp_data)
     int n_cart_a = numCartesians(la);
     int n_cart_b = numCartesians(lb);
 
-    vec2d ints_cart(n_cart_a, n_cart_b, 0);
+    vec2d ints_cart(Fill(0), n_cart_a, n_cart_b);
     for (int ia = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++)
         {
@@ -65,8 +65,8 @@ lible::vec2d LI::overlapKernel(const int ipair, const ShellPairData &sp_data)
 
     int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
     int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
-    for (size_t mu = 0; mu < ints_sph.getDim(0); mu++)
-        for (size_t nu = 0; nu < ints_sph.getDim(1); nu++)
+    for (size_t mu = 0; mu < ints_sph.dim<0>(); mu++)
+        for (size_t nu = 0; nu < ints_sph.dim<1>(); nu++)
         {
             double norm_a = sp_data.norms[ofs_norm_a + mu];
             double norm_b = sp_data.norms[ofs_norm_b + nu];
@@ -100,7 +100,7 @@ array<lible::vec2d, 6> LI::overlapDeriv1Kernel(const int ipair, const ShellPairD
 
     array<vec2d, 6> ints_cart;
     for (int ideriv = 0; ideriv < 6; ideriv++)
-        ints_cart[ideriv] = vec2d(n_cart_a, n_cart_b, 0);
+        ints_cart[ideriv] = vec2d(Fill(0), n_cart_a, n_cart_b);
 
     for (int ia = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++)
@@ -140,8 +140,8 @@ array<lible::vec2d, 6> LI::overlapDeriv1Kernel(const int ipair, const ShellPairD
     int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
     int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
     for (int ideriv = 0; ideriv < 6; ideriv++)
-        for (size_t mu = 0; mu < ints_sph[ideriv].getDim(0); mu++)
-            for (size_t nu = 0; nu < ints_sph[ideriv].getDim(1); nu++)
+        for (size_t mu = 0; mu < ints_sph[ideriv].dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph[ideriv].dim<1>(); nu++)
             {
                 double norm_a = sp_data.norms[ofs_norm_a + mu];
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
@@ -161,8 +161,8 @@ void LIO::kernel<LIO::Option::overlap>(const int la, const int lb, const ShellPa
 
         int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
         int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
-        for (size_t mu = 0; mu < ints_ipair.getDim(0); mu++)
-            for (size_t nu = 0; nu < ints_ipair.getDim(1); nu++)
+        for (size_t mu = 0; mu < ints_ipair.dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_ipair.dim<1>(); nu++)
             {
                 ints_out(ofs_a + mu, ofs_b + nu) = ints_ipair(mu, nu);
                 ints_out(ofs_b + nu, ofs_a + mu) = ints_ipair(mu, nu);

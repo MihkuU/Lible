@@ -117,7 +117,7 @@ namespace lible
                             }
                     }
 
-                vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);
+                vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
                 for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
                     for (int ib = 0; ib < cdepth_b; ib++, iab++)
                     {
@@ -126,7 +126,7 @@ namespace lible
 
                         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd,
                                     n_hermite_ab, 1.0, &pecoeffs_ab[ofs_ecoeffs_ab], n_hermite_ab,
-                                    &R_x_E[ofs_R_x_E], n_sph_cd, 1.0, eri4_batch.getData(),
+                                    &R_x_E[ofs_R_x_E], n_sph_cd, 1.0, eri4_batch.memptr(),
                                     n_sph_cd);
                     }
 
@@ -230,7 +230,7 @@ namespace lible
                         }
                     }
 
-                vec3d eri3_batch(n_sph_a, n_sph_b, n_sph_c, 0);
+                vec3d eri3_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c);
                 for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
                     for (int ib = 0; ib < cdepth_b; ib++, iab++)
                     {
@@ -239,7 +239,7 @@ namespace lible
 
                         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c,
                                     n_hermite_ab, 1.0, &pecoeffs_ab[ofs_ecoeffs_ab], n_hermite_ab,
-                                    &R_x_E[ofs_R_x_E], n_sph_c, 1.0, eri3_batch.getData(), n_sph_c);
+                                    &R_x_E[ofs_R_x_E], n_sph_c, 1.0, eri3_batch.memptr(), n_sph_c);
                     }
 
                 int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
@@ -324,7 +324,7 @@ namespace lible
                     }
                 }
 
-                vec2d eri2_batch(n_sph_a, n_sph_b, 0);
+                vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);
                 for (int ia = 0; ia < cdepth_a; ia++)
                 {
                     int ofs_R_x_E = ia * n_R_x_E;
@@ -332,7 +332,7 @@ namespace lible
 
                     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b,
                                 n_hermite_a, 1.0, &pecoeffs_a[pos_ecoeffs_a], n_hermite_a,
-                                &R_x_E[ofs_R_x_E], n_sph_b, 1.0, eri2_batch.getData(), n_sph_b);
+                                &R_x_E[ofs_R_x_E], n_sph_b, 1.0, eri2_batch.memptr(), n_sph_b);
                 }
 
                 int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];

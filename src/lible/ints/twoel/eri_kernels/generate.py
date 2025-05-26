@@ -156,7 +156,7 @@ def writeKernelGenerate(lbra, lket):
 			file_str += '                }\n'
 			file_str += '        }\n\n'
 
-			file_str += '    vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);\n'
+			file_str += '    vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);\n'
 			file_str += '    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)\n'
 			file_str += '        for (int ib = 0; ib < cdepth_b; ib++, iab++)\n'
 			file_str += '        {\n'
@@ -265,7 +265,7 @@ def writeKernelGenerate(lbra, lket):
 		file_str += '            }\n'
 		file_str +=         '}\n\n'
 
-		file_str += '    vec3d eri3_batch(n_sph_a, n_sph_b, n_sph_c, 0);\n'
+		file_str += '    vec3d eri3_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c);\n'
 		file_str += '    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)\n'
 		file_str += '        for (int ib = 0; ib < cdepth_b; ib++, iab++)\n'
 		file_str += '        {\n'
@@ -355,7 +355,7 @@ def writeKernelGenerate(lbra, lket):
 	file_str += '        }\n'
 	file_str += '    }\n\n'
 
-	file_str += '    vec2d eri2_batch(n_sph_a, n_sph_b, 0);\n'
+	file_str += '    vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);\n'
 	file_str += '    for (int ia = 0; ia < cdepth_a; ia++)\n'
 	file_str += '    {\n'
 

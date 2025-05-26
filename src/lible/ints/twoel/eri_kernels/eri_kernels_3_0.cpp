@@ -110,7 +110,7 @@ lible::ints::two::eri4Kernel<2, 1, 0, 0>(const int ipair_ab, const int ipair_cd,
                 }
         }
 
-    vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);
+    vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
@@ -370,7 +370,7 @@ lible::ints::two::eri4Kernel<3, 0, 0, 0>(const int ipair_ab, const int ipair_cd,
                 }
         }
 
-    vec4d eri4_batch(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);
+    vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
@@ -566,7 +566,7 @@ lible::ints::two::eri3Kernel<2, 1, 0>(const int ipair_ab, const int ishell_c,
             }
 }
 
-    vec3d eri3_batch(n_sph_a, n_sph_b, n_sph_c, 0);
+    vec3d eri3_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
@@ -811,7 +811,7 @@ lible::ints::two::eri3Kernel<3, 0, 0>(const int ipair_ab, const int ishell_c,
             }
 }
 
-    vec3d eri3_batch(n_sph_a, n_sph_b, n_sph_c, 0);
+    vec3d eri3_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
@@ -990,7 +990,7 @@ lible::ints::two::eri2Kernel<3, 0>(const int ishell_a, const int ishell_b,
         }
     }
 
-    vec2d eri2_batch(n_sph_a, n_sph_b, 0);
+    vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);
     for (int ia = 0; ia < cdepth_a; ia++)
     {
         const double* p_ecoeffs_a = &pecoeffs_a[ia * n_ecoeffs_a];

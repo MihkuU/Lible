@@ -6,7 +6,7 @@ using std::array, std::vector;
 
 lible::vec3d LI::calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx)
 {
-    vec4d rints_buff(l + 1, 0);
+    vec4d rints_buff(Fill(0), l + 1);
 
     rints_buff(0, 0, 0, 0) = fnx[0];
 
@@ -50,7 +50,7 @@ lible::vec3d LI::calcRInts3D(const int l, const double p, const double *xyz_ab, 
                 }
     }
 
-    vec3d rints(l + 1, 0);
+    vec3d rints(Fill(0), l + 1);
     for (int t = 0; t <= l; t++)
         for (int u = 0; u <= l - t; u++)
             for (int v = 0; v <= l - t - u; v++)

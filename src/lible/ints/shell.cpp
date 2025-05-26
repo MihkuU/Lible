@@ -16,7 +16,7 @@ vector<double> LI::calcShellNorms(const int l, const vector<double> &coeffs,
     vector<vector<double>> e_coeffs = ecoeffsShell(l, exps);        
 
     int dim_cart = numCartesians(l);    
-    vec2d ints_cart(dim_cart, dim_cart, 0);
+    vec2d ints_cart(Fill(0), dim_cart, dim_cart);
     for (size_t ia = 0, iab = 0; ia < k; ia++)
         for (size_t ib = 0; ib < k; ib++, iab++)
         {

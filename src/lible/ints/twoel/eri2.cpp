@@ -103,7 +103,7 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalShellDatas_BraKet(sh_datas);
 
     size_t dim_ao_aux = structure.getDimAOAux();
-    vec2d eri2(dim_ao_aux, dim_ao_aux, 0);
+    vec2d eri2(Fill(0), dim_ao_aux, dim_ao_aux);
     for (int la = 0; la <= l_max_aux; la++)
         for (int lb = 0; lb <= la; lb++)
         {
@@ -255,7 +255,7 @@ std::array<lible::vec2d, 6> LIT::kernelERI2Deriv1(const int ishell_a, const int 
 
     array<vec2d, 6> eri2_batch;
     for (int ideriv = 0; ideriv < 6; ideriv++)
-        eri2_batch[ideriv] = vec2d(n_sph_a, n_sph_b, 0);
+        eri2_batch[ideriv] = vec2d(Fill(0), n_sph_a, n_sph_b);
 
     for (int ia = 0; ia < cdepth_a; ia++)
     {
@@ -271,27 +271,27 @@ std::array<lible::vec2d, 6> LIT::kernelERI2Deriv1(const int ishell_a, const int 
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs0], n_sph_b, 1.0,
-                    eri2_batch[0].getData(), n_sph_b);
+                    eri2_batch[0].memptr(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs1], n_sph_b, 1.0,
-                    eri2_batch[1].getData(), n_sph_b);
+                    eri2_batch[1].memptr(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs2], n_sph_b, 1.0,
-                    eri2_batch[2].getData(), n_sph_b);
+                    eri2_batch[2].memptr(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs3], n_sph_b, 1.0,
-                    eri2_batch[3].getData(), n_sph_b);
+                    eri2_batch[3].memptr(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs4], n_sph_b, 1.0,
-                    eri2_batch[4].getData(), n_sph_b);
+                    eri2_batch[4].memptr(), n_sph_b);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_a, n_sph_b, n_hermite_a,
                     1.0, &pecoeffs_a[ofs_ecoeffs], n_hermite_a, &R_x_E[ofs5], n_sph_b, 1.0,
-                    eri2_batch[5].getData(), n_sph_b);
+                    eri2_batch[5].memptr(), n_sph_b);
     }
 
     int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];

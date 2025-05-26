@@ -21,6 +21,7 @@ array<lible::vec2d, 3> LI::dipoleMomentKernel(const int ipair, const array<doubl
 {
     int la = sp_data.la;
     int lb = sp_data.lb;
+    int lab = la + lb;
     int cdepth_a = sp_data.cdepths[2 * ipair + 0];
     int cdepth_b = sp_data.cdepths[2 * ipair + 1];
     int cofs_a = sp_data.coffsets[2 * ipair + 0];
@@ -41,7 +42,7 @@ array<lible::vec2d, 3> LI::dipoleMomentKernel(const int ipair, const array<doubl
 
     array<vec2d, 3> ints_cart;
     for (int icart = 0; icart < 3; icart++)
-        ints_cart[icart] = vec2d(n_cart_a, n_cart_b, 0);
+        ints_cart[icart] = vec2d(Fill(0), n_cart_a, n_cart_b);
 
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -68,22 +69,35 @@ array<lible::vec2d, 3> LI::dipoleMomentKernel(const int ipair, const array<doubl
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                 {
-                    double valx = fac *
-                                  (Ex(i, i_, 1) + xyz_po[0] * Ex(i, i_, 0)) *
-                                  Ey(j, j_, 0) * Ez(k, k_, 0);
+                    double dx, dy, dz;
+                    if (lab > 0)
+                    {
+                        dx = fac * (Ex(i, i_, 1) + xyz_po[0] * Ex(i, i_, 0)) *
+                             Ey(j, j_, 0) * Ez(k, k_, 0);
 
-                    double valy = fac *
-                                  (Ex(i, i_, 0)) *
-                                  (Ey(j, j_, 1) + xyz_po[1] * Ey(j, j_, 0)) *
-                                  Ez(k, k_, 0);
+                        dy = fac * (Ex(i, i_, 0)) *
+                             (Ey(j, j_, 1) + xyz_po[1] * Ey(j, j_, 0)) *
+                             Ez(k, k_, 0);
 
-                    double valz = fac *
-                                  (Ex(i, i_, 0)) * Ey(j, j_, 0) *
-                                  (Ez(k, k_, 1) + xyz_po[2] * Ez(k, k_, 0));                    
+                        dz = fac * (Ex(i, i_, 0)) * Ey(j, j_, 0) *
+                             (Ez(k, k_, 1) + xyz_po[2] * Ez(k, k_, 0));
+                    }
+                    else
+                    {
+                        dx = fac * (xyz_po[0] * Ex(i, i_, 0)) *
+                             Ey(j, j_, 0) * Ez(k, k_, 0);
 
-                    ints_cart[0](mu, nu) += valx;
-                    ints_cart[1](mu, nu) += valy;
-                    ints_cart[2](mu, nu) += valz;
+                        dy = fac * (Ex(i, i_, 0)) *
+                             (xyz_po[1] * Ey(j, j_, 0)) *
+                             Ez(k, k_, 0);
+
+                        dz = fac * (Ex(i, i_, 0)) * Ey(j, j_, 0) *
+                             (xyz_po[2] * Ez(k, k_, 0));
+                    }
+
+                    ints_cart[0](mu, nu) += dx;
+                    ints_cart[1](mu, nu) += dy;
+                    ints_cart[2](mu, nu) += dz;
                 }
         }
 
@@ -94,8 +108,8 @@ array<lible::vec2d, 3> LI::dipoleMomentKernel(const int ipair, const array<doubl
     int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
     int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
     for (int icart = 0; icart < 3; icart++)
-        for (size_t mu = 0; mu < ints_sph[icart].getDim(0); mu++)
-            for (size_t nu = 0; nu < ints_sph[icart].getDim(1); nu++)
+        for (size_t mu = 0; mu < ints_sph[icart].dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph[icart].dim<1>(); nu++)
             {
                 double norm_a = sp_data.norms[ofs_norm_a + mu];
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
@@ -118,8 +132,8 @@ void LIO::kernel<LIO::Option::dipole_moment, array<double, 3>>(const int la, con
         int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
         int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
         for (int icart = 0; icart < 3; icart++)
-            for (size_t mu = 0; mu < ints_ipair[icart].getDim(0); mu++)
-                for (size_t nu = 0; nu < ints_ipair[icart].getDim(1); nu++)
+            for (size_t mu = 0; mu < ints_ipair[icart].dim<0>(); mu++)
+                for (size_t nu = 0; nu < ints_ipair[icart].dim<1>(); nu++)
                 {
                     ints_out[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
                     ints_out[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);

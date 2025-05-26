@@ -29,7 +29,7 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
 
     size_t dim_ao = structure.getDimAO();
     size_t dim_ao_aux = structure.getDimAOAux();
-    vec3d eri3(dim_ao, dim_ao, dim_ao_aux, 0);
+    vec3d eri3(Fill(0), dim_ao, dim_ao, dim_ao_aux);
     for (size_t lalb = 0; lalb < l_pairs.size(); lalb++)
         for (int lc = 0; lc <= l_max_aux; lc++)
         {
@@ -192,7 +192,7 @@ array<lible::vec3d, 9> LIT::kernelERI3Deriv1(const int ipair_ab, const int ishel
 
     array<vec3d, 9> eri3_batch;
     for (int ideriv = 0; ideriv < 9; ideriv++)
-        eri3_batch[ideriv] = vec3d(n_sph_a, n_sph_b, n_sph_c, 0);
+        eri3_batch[ideriv] = vec3d(Fill(0), n_sph_a, n_sph_b, n_sph_c);
 
     vector<double> eri3_batch_PR(6 * n_sph_abc, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
@@ -237,15 +237,15 @@ array<lible::vec3d, 9> LIT::kernelERI3Deriv1(const int ipair_ab, const int ishel
             // C
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c, n_hermite_ab, 
                         1.0, &pecoeffs_ab[ofs_ecoeffs0], n_hermite_ab, &R_x_E[ofs4], n_sph_c, 1.0, 
-                        eri3_batch[6].getData(), n_sph_c);
+                        eri3_batch[6].memptr(), n_sph_c);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c, n_hermite_ab, 
                         1.0, &pecoeffs_ab[ofs_ecoeffs0], n_hermite_ab, &R_x_E[ofs5], n_sph_c, 1.0, 
-                        eri3_batch[7].getData(), n_sph_c);
+                        eri3_batch[7].memptr(), n_sph_c);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_c, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0], n_hermite_ab, &R_x_E[ofs6], n_sph_c, 1.0,
-                        eri3_batch[8].getData(), n_sph_c);
+                        eri3_batch[8].memptr(), n_sph_c);
 
             // // C
             // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, n_sph_ab, n_sph_c, n_hermite_c,

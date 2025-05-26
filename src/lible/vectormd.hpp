@@ -19,7 +19,7 @@
 
 namespace lible
 {
-    /** Object for initializing VectorMD to a given value. */
+    /** Object for initializing an VectorMD object to a given value. */
     template <typename T>
     struct Fill
     {
@@ -190,8 +190,8 @@ namespace lible
         }
 
         /** */
-        template<std::integral... Args>
-        const T& operator()(Args... idxs) const 
+        template <std::integral... Args>
+        const T& operator()(Args... idxs) const        
         {
             static_assert(sizeof...(idxs) == N);
 
@@ -314,7 +314,7 @@ namespace lible
 #ifdef DEBUG
             // It is assumed that calcIdx() is used by operator() only.
             constexpr std::size_t idim = N - 1;
-            if (idx > (dimensions[idim] - 1))
+            if ((std::size_t)idx > (dimensions[idim] - 1))
                 throw std::out_of_range(std::format("VectorMD::operator(): index value {} along "
                                                     "dimension {} is out of bounds",
                                                     idx, idim));
@@ -330,7 +330,7 @@ namespace lible
             constexpr std::size_t idim = N - sizeof...(idxs) - 1;
 #ifdef DEBUG
             // It is assumed that calcIdx() is used by operator() only.
-            if (idx > (dimensions[idim] - 1))
+            if ((std::size_t)idx > (dimensions[idim] - 1))
                 throw std::out_of_range(std::format("VectorMD::operator(): index value {} along "
                                                     "dimension {} is out of bounds",
                                                     idx, idim));

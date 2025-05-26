@@ -92,7 +92,7 @@ map<int, vector<pair<int, int>>> LI::getLPairsMap(const int l_max)
 
 lible::vec3i LI::returnHermiteGaussianPositions(const int l)
 {
-    vec3i tuv_poss(l + 1, l + 1, l + 1, -1);
+    vec3i tuv_poss(Fill(-1), l + 1, l + 1, l + 1);
     for (int n = 0, tuv = 0; n <= l; n++)
         for (int t = n; t >= 0; t--)
             for (int u = n - t; u >= 0; u--, tuv++)

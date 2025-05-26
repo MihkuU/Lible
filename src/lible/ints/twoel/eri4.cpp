@@ -342,7 +342,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
 
     size_t dim_ao = structure.getDimAO();
-    vec4d eri4(dim_ao, 0);
+    vec4d eri4(Fill(0), dim_ao);
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
         for (int lcld = 0; lcld <= lalb; lcld++)
         {
@@ -454,7 +454,7 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
             vector<double> rints(dim_tuv_ab * dim_tuv_cd, 0);
             vector<double> fnx(labcd + 1, 0);
-            vec4d rints_tmp(labcd + 1, 0);
+            vec4d rints_tmp(Fill(0), labcd + 1);
 
             size_t n_shells_abcd = 0;
             if (lalb == lcld)
@@ -557,7 +557,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
 
     size_t dim_ao = structure.getDimAO();
-    vec2d eri4_diagonal(dim_ao, dim_ao, 0);
+    vec2d eri4_diagonal(Fill(0), dim_ao, dim_ao);
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
     {
         const auto &sp_data_ab = sp_datas[lalb];
@@ -583,7 +583,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 
         vector<double> rints(dim_tuv_ab * dim_tuv_ab, 0);
         vector<double> fnx(labab + 1, 0);
-        vec4d rints_tmp(labab + 1, 0);
+        vec4d rints_tmp(Fill(0), labab + 1);
 
         for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
         {
@@ -808,7 +808,7 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1(const int ipair_ab, const int ipai
 
     array<vec4d, 12> eri4_batch;
     for (int ideriv = 0; ideriv < 12; ideriv++)
-        eri4_batch[ideriv] = vec4d(n_sph_a, n_sph_b, n_sph_c, n_sph_d, 0);
+        eri4_batch[ideriv] = vec4d(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
 
     vector<double> E_x_R_x_E_PR(6 * n_sph_abcd, 0);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
@@ -853,46 +853,46 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1(const int ipair_ab, const int ipai
             // C
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 6 * n_R_x_E],
-                        n_sph_cd, 1.0, eri4_batch[6].getData(), n_sph_cd);
+                        n_sph_cd, 1.0, eri4_batch[6].memptr(), n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 7 * n_R_x_E],
-                        n_sph_cd, 1.0, eri4_batch[7].getData(), n_sph_cd);
+                        n_sph_cd, 1.0, eri4_batch[7].memptr(), n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 8 * n_R_x_E],
-                        n_sph_cd, 1.0, eri4_batch[8].getData(), n_sph_cd);
+                        n_sph_cd, 1.0, eri4_batch[8].memptr(), n_sph_cd);
 
             // D
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 9 * n_R_x_E],
-                        n_sph_cd, 1.0, eri4_batch[9].getData(), n_sph_cd);
+                        n_sph_cd, 1.0, eri4_batch[9].memptr(), n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 10 * n_R_x_E],
-                        n_sph_cd, 1.0, eri4_batch[10].getData(), n_sph_cd);
+                        n_sph_cd, 1.0, eri4_batch[10].memptr(), n_sph_cd);
 
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n_sph_ab, n_sph_cd, n_hermite_ab,
                         1.0, &pecoeffs_ab[ofs_ecoeffs0_ab], n_hermite_ab, &R_x_E[ofs_R_x_E + 11 * n_R_x_E],
-                        n_sph_cd, 1.0, eri4_batch[11].getData(), n_sph_cd);
+                        n_sph_cd, 1.0, eri4_batch[11].memptr(), n_sph_cd);
 
             // PR -> AB
             double a = exps_a[ia];
             double b = exps_b[ib];
             double p = a + b;
-            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[0 * n_sph_abcd], 1, eri4_batch[0].getData(), 1);
-            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[1 * n_sph_abcd], 1, eri4_batch[1].getData(), 1);
-            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[2 * n_sph_abcd], 1, eri4_batch[2].getData(), 1);
-            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[3 * n_sph_abcd], 1, eri4_batch[0].getData(), 1);
-            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[4 * n_sph_abcd], 1, eri4_batch[1].getData(), 1);
-            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[5 * n_sph_abcd], 1, eri4_batch[2].getData(), 1);
+            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[0 * n_sph_abcd], 1, eri4_batch[0].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[1 * n_sph_abcd], 1, eri4_batch[1].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, (a / p), &E_x_R_x_E_PR[2 * n_sph_abcd], 1, eri4_batch[2].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[3 * n_sph_abcd], 1, eri4_batch[0].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[4 * n_sph_abcd], 1, eri4_batch[1].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, 1, &E_x_R_x_E_PR[5 * n_sph_abcd], 1, eri4_batch[2].memptr(), 1);
 
-            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[0 * n_sph_abcd], 1, eri4_batch[3].getData(), 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[1 * n_sph_abcd], 1, eri4_batch[4].getData(), 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[2 * n_sph_abcd], 1, eri4_batch[5].getData(), 1);
-            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[3 * n_sph_abcd], 1, eri4_batch[3].getData(), 1);
-            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[4 * n_sph_abcd], 1, eri4_batch[4].getData(), 1);
-            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[5 * n_sph_abcd], 1, eri4_batch[5].getData(), 1);
+            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[0 * n_sph_abcd], 1, eri4_batch[3].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[1 * n_sph_abcd], 1, eri4_batch[4].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, (b / p), &E_x_R_x_E_PR[2 * n_sph_abcd], 1, eri4_batch[5].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[3 * n_sph_abcd], 1, eri4_batch[3].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[4 * n_sph_abcd], 1, eri4_batch[4].memptr(), 1);
+            cblas_daxpy(n_sph_abcd, -1, &E_x_R_x_E_PR[5 * n_sph_abcd], 1, eri4_batch[5].memptr(), 1);
         }
 
     int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab + 0];

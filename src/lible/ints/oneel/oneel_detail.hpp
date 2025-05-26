@@ -42,7 +42,7 @@ namespace lible
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
 
-                vec2d ints(dim_ao, dim_ao, 0);
+                vec2d ints(Fill(0), dim_ao, dim_ao);
                 for (int la = l_max; la >= 0; la--)
                 {
                     ShellPairData sp_data = shellPairDataSymm(la, la, structure);
@@ -68,9 +68,9 @@ namespace lible
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
 
-                std::array<vec2d, 3> ints{vec2d(dim_ao, dim_ao, 0),
-                                          vec2d(dim_ao, dim_ao, 0),
-                                          vec2d(dim_ao, dim_ao, 0)};
+                std::array<vec2d, 3> ints{vec2d(Fill(0), dim_ao, dim_ao),
+                                          vec2d(Fill(0), dim_ao, dim_ao),
+                                          vec2d(Fill(0), dim_ao, dim_ao)};
 
                 for (int la = l_max; la >= 0; la--)
                 {
