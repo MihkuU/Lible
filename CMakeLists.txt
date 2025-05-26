@@ -125,6 +125,7 @@ if(lible_is_top_level)
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vec2d.hpp") 
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vec3d.hpp") 
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vec4d.hpp") 
+	list(APPEND lible_basic_headers "${src_dir}/src/lible/vectormd.hpp") 
 
 	if(LIBLE_BUILD_DAVIDSON)
 	endif()
