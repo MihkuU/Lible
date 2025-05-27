@@ -22,4 +22,6 @@ for la in range(0, l_max + 1):
 # ERI2 kernels
 for la in range(0, l_max_ket + 1):
 	for lb in range(0, l_max_ket + 1):
-		print('{{{{{}, {}}}, eri2Kernel<{}, {}>}},'.format(la, lb, la, lb))
+		#continue
+		#print('{{{{{}, {}}}, eri2Kernel<{}, {}>}},'.format(la, lb, la, lb))
+		print('{{{{{}, {}}}, eri2d1Kernel<{}, {}>}},'.format(la, lb, la, lb))

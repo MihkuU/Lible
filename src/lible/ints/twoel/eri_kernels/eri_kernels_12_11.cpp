@@ -300,3 +300,9 @@ template lible::vec2d lible::ints::two::eri2Kernel<12, 11>(const int ishell_a, c
                                                          const ShellData &sh_data_a,
                                                          const ShellData &sh_data_b);
 
+template std::array<lible::vec2d, 6> lible::ints::two::eri2d1Kernel<12, 11>(const int ishell_a, const int ishell_b,
+                                                                          const std::vector<double> &ecoeffs_a,
+                                                                          const std::vector<double> &ecoeffs_b_tsp,
+                                                                          const ShellData &sh_data_a,
+                                                                          const ShellData &sh_data_b);
+

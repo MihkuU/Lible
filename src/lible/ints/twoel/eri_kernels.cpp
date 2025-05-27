@@ -3,20 +3,9 @@
 #include <lible/ints/utils.hpp>
 
 #include <format>
-#include <map>
 #include <tuple>
 
-#ifdef _LIBLE_USE_MKL_
-#include <mkl_cblas.h>
-#else
-#include <cblas.h>
-#endif
-
 namespace LIT = lible::ints::two;
-
-using LIT::kernel_eri2_t;
-using LIT::kernel_eri3_t;
-using LIT::kernel_eri4_t;
 
 using std::array, std::string, std::vector;
 
@@ -1347,7 +1336,7 @@ namespace lible::ints::two
         {{12, 12}, eri2Kernel<12, 12>}};
 }
 
-kernel_eri2_t LIT::deployERI2Kernel(const int la, const int lb)
+LIT::kernel_eri2_t LIT::deployERI2Kernel(const int la, const int lb)
 {
     int lab = la + lb;
     int l_max = _eri_kernel_max_l_;
@@ -1367,7 +1356,7 @@ kernel_eri2_t LIT::deployERI2Kernel(const int la, const int lb)
     return eri2_kernels.at({la, lb});
 }
 
-kernel_eri3_t LIT::deployERI3Kernel(const int la, const int lb, const int lc)
+LIT::kernel_eri3_t LIT::deployERI3Kernel(const int la, const int lb, const int lc)
 {
     int labc = la + lb + lc;
     int l_max = _eri_kernel_max_l_;
@@ -1387,7 +1376,7 @@ kernel_eri3_t LIT::deployERI3Kernel(const int la, const int lb, const int lc)
     return eri3_kernels.at({la, lb, lc});
 }
 
-kernel_eri4_t LIT::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
+LIT::kernel_eri4_t LIT::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
 {
     int labcd = la + lb + lc + ld;
     int l_max = _eri_kernel_max_l_;

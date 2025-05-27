@@ -82,7 +82,7 @@ lible::ints::two::eri4Kernel<0, 0, 2, 2>(const int ipair_ab, const int ipair_cd,
                     boys_f.calcFnx(x, &fnx[0]);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                    calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
+                    calcRInts_ERI<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
                     const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];
                     double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
@@ -616,7 +616,7 @@ lible::ints::two::eri4Kernel<0, 0, 3, 1>(const int ipair_ab, const int ipair_cd,
                     boys_f.calcFnx(x, &fnx[0]);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                    calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
+                    calcRInts_ERI<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
                     const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];
                     double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
@@ -1087,7 +1087,7 @@ lible::ints::two::eri4Kernel<0, 0, 4, 0>(const int ipair_ab, const int ipair_cd,
                     boys_f.calcFnx(x, &fnx[0]);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                    calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
+                    calcRInts_ERI<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
                     const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];
                     double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
@@ -1367,7 +1367,7 @@ lible::ints::two::eri3Kernel<0, 0, 4>(const int ipair_ab, const int ishell_c,
                 boys_f.calcFnx(x, &fnx[0]);
 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
-                calcRInts<lab, lc>(alpha, fac, &fnx[0], &xyz_pc[0], &rints[0]);
+                calcRInts_ERI<lab, lc>(alpha, fac, &fnx[0], &xyz_pc[0], &rints[0]);
 
                 const double* p_ecoeffs_c = &pecoeffs_c[ic * n_ecoeffs_c];
                 double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
@@ -1630,7 +1630,7 @@ lible::ints::two::eri2Kernel<0, 4>(const int ishell_a, const int ishell_b,
             boys_f.calcFnx(x, &fnx[0]);
 
             double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-            calcRInts<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);
+            calcRInts_ERI<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);
 
             const double* p_ecoeffs_b = &pecoeffs_b_tsp[ib * n_ecoeffs_b];
             double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];
@@ -1832,3 +1832,10 @@ lible::ints::two::eri2Kernel<0, 4>(const int ishell_a, const int ishell_b,
 
     return eri2_batch;
 }
+
+template std::array<lible::vec2d, 6> lible::ints::two::eri2d1Kernel<0, 4>(const int ishell_a, const int ishell_b,
+                                                                          const std::vector<double> &ecoeffs_a,
+                                                                          const std::vector<double> &ecoeffs_b_tsp,
+                                                                          const ShellData &sh_data_a,
+                                                                          const ShellData &sh_data_b);
+

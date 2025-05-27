@@ -97,6 +97,20 @@ namespace lible
                                                    const BoysGrid &boys_grid,
                                                    const ShellPairData &sp_data_ab,
                                                    const ShellPairData &sp_data_cd);
+
+            using kernel_eri2d1_t = std::function<std::array<vec2d, 6>(
+                const int ishell_a, const int ishell_b,
+                const std::vector<double> &ecoeffs_a,
+                const std::vector<double> &ecoeffs_b_tsp,
+                const ShellData &sh_data_a, const ShellData &sh_data_b)>;
+
+            kernel_eri2d1_t deployERI2Deriv1Kernel(const int la, const int lb);
+
+            template <int la, int lb>
+            std::array<vec2d, 6> eri2d1Kernel(const int ishell_a, const int ishell_b,
+                                              const std::vector<double> &ecoeffs_a,
+                                              const std::vector<double> &ecoeffs_b_tsp,
+                                              const ShellData &sh_data_a, const ShellData &sh_data_b);
         }
     }
 }

@@ -59,51 +59,6 @@ lible::vec3d LI::calcRInts3D(const int l, const double p, const double *xyz_ab, 
     return rints;
 }
 
-// lible::vec3d LI::calcRInts3D_RR(const int l, const double p, const double *xyz_ab, const double *fnx)
-// {
-//     vec4d rints_buff(Fill(0), l + 1);
-
-//     rints_buff(0, 0, 0, 0) = fnx[0];
-
-//     double x = -2 * p;
-//     double y = x;
-//     for (int n = 1; n <= l; n++)
-//     {
-//         rints_buff(n, 0, 0, 0) = fnx[n] * y;
-//         y *= x;
-//     }
-
-//     vec3d rints(Fill(0), l + 1);
-//     for (int t = 0; t <= l; t++)
-//         for (int u = 0; u <= l - t; u++)
-//             for (int v = 0; v <= l - t - u; v++)
-//                 rints(t, u, v) = rints_buff(0, t, u, v);
-
-//     return rints;
-// }
-
-// double LI::rrecurrence(const double *xyz_pq, const int &m, int n, int t, int u, int v, vec4d &rints)
-// {
-//     if (t < 0 || u < 0 || v < 0)
-//     {
-//         return;
-//     }
-    
-//     if (n == m)
-//     {
-
-//         return;
-//     }
-
-//     rints(n, t + 1, u, v) = t * rrecurrence(n + 1, t - 1, u, v) + xyz_pq[0] * rrecurrence(n + 1, t, u, v);
-//     rints(n, t, u + 1, v) = u * rrecurrence(n + 1, t, u - 1, v) + xyz_pq[1] * rrecurrence(n + 1, t, u, v);
-//     rints(n, t, u, v + 1) = v * rrecurrence(n + 1, t, u, v - 1) + xyz_pq[2] * rrecurrence(n + 1, t, u, v);
-
-//     rrecurrence();
-
-//     rrecurrence();
-// }
-
 vector<double> LI::calcRIntsMatrix(const int l, const double fac, const double p,
                                    const double *xyz_pq, const double *fnx,
                                    const vector<array<int, 3>> &tuv_idxs_a,

@@ -1,14 +1,14 @@
-#include <lible/ints/utils.hpp>
+#include <lible/ints/rints_meta.hpp>
 
 namespace lible::ints
 {
 template <int la, int lb>
-void calcRInts(const double alpha, const double fac, const double *fnx, const double *xyz_ab,
-               double *rints_out);
+void calcRInts_ERI(const double alpha, const double fac, const double *fnx, const double *xyz_ab,
+                   double *rints_out);
 
 template<>
-void calcRInts<0, 3>(const double alpha, const double fac, const double *fnx,
-                     const double *xyz_ab, double *rints_out)
+void calcRInts_ERI<0, 3>(const double alpha, const double fac, const double *fnx,
+                         const double *xyz_ab, double *rints_out)
 {
     constexpr int lab = 3;
     constexpr int buff_size = 23;
@@ -79,3 +79,5 @@ void calcRInts<0, 3>(const double alpha, const double fac, const double *fnx,
     rints_out[19] = -1.0 * fac * rints_buff[22];
 }
 }
+
+template void lible::ints::calcRInts_ERI2_deriv1<0, 3>(const double, const double, const double*, const double*, double*);

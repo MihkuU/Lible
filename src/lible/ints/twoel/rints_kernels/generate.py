@@ -6,7 +6,10 @@ def writeKernelInstantiate(la, lb):
 
 	file_str += '#include <lible/ints/rints_meta.hpp>\n\n'
 
-	file_str += 'template void lible::ints::calcRInts<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
+	file_str += 'template void lible::ints::calcRInts_ERI<{}, {}>(const double, const double, const double*, const double*, double*);\n\n'.format(la, lb)
+
+	# ERI2-deriv R-ints kernel instantiationo
+	file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
 
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		 file.write(file_str)
@@ -16,18 +19,19 @@ def writeKernelGenerate(la, lb):
 
 	file_str = ''
 
-	file_str += '#include <lible/ints/utils.hpp>\n\n'
+	#file_str += '#include <lible/ints/utils.hpp>\n\n'
+	file_str += '#include <lible/ints/rints_meta.hpp>\n\n'
 
 	file_str += 'namespace lible::ints\n'
 	file_str += '{\n'
 
 	file_str += 'template <int la, int lb>\n'
-	file_str += 'void calcRInts(const double alpha, const double fac, const double *fnx, const double *xyz_ab,\n'
-	file_str += '               double *rints_out);\n\n'
+	file_str += 'void calcRInts_ERI(const double alpha, const double fac, const double *fnx, const double *xyz_ab,\n'
+	file_str += '                   double *rints_out);\n\n'
 	
 	file_str += 'template<>\n'
-	file_str += 'void calcRInts<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
-	file_str += '                     const double *xyz_ab, double *rints_out)\n'
+	file_str += 'void calcRInts_ERI<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
+	file_str += '                         const double *xyz_ab, double *rints_out)\n'
 	file_str += '{\n'
 
 	file_str += '    constexpr int lab = {};\n'.format(la + lb)
@@ -108,9 +112,13 @@ def writeKernelGenerate(la, lb):
 			rollout_str += '    rints_out[{}] = {} * fac * rints_buff[{}];\n'.format(idx_lhs, sign, idx_rhs)
 
 	file_str += rollout_str
+
 	
 	file_str += '}\n'	
-	file_str += '}'	
+	file_str += '}\n\n'	
+
+	# ERI2-deriv R-ints kernel instantiation
+	file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
 
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		file.write(file_str)

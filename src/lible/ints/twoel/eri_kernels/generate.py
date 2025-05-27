@@ -42,6 +42,12 @@ def writeKernelInstantiate(lbra, lket):
 		file_str += '                                                         const ShellData &sh_data_a,\n'
 		file_str += '                                                         const ShellData &sh_data_b);\n\n'
 
+		file_str += 'template lible::vec2d lible::ints::two::eri2d1Kernel<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(lbra, lket)
+		file_str += '                                                           const std::vector<double> &ecoeffs_a,\n'
+		file_str += '                                                           const std::vector<double> &ecoeffs_b_tsp,\n'
+		file_str += '                                                           const ShellData &sh_data_a,\n'
+		file_str += '                                                           const ShellData &sh_data_b);\n\n'		
+
 		file.write(file_str)
 
 def writeKernelGenerate(lbra, lket):
@@ -149,7 +155,7 @@ def writeKernelGenerate(lbra, lket):
 			file_str += '                    boys_f.calcFnx(x, &fnx[0]);\n\n'
 
 			file_str += '                    double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));\n'
-			file_str += '                    calcRInts<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);\n\n'
+			file_str += '                    calcRInts_ERI<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);\n\n'
 
 			# First rollout
 			file_str += rolloutERI4First(la, lb, lc, ld)
@@ -258,7 +264,7 @@ def writeKernelGenerate(lbra, lket):
 		file_str += '                boys_f.calcFnx(x, &fnx[0]);\n\n'
 
 		file_str += '                double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));\n'
-		file_str += '                calcRInts<lab, lc>(alpha, fac, &fnx[0], &xyz_pc[0], &rints[0]);\n\n'
+		file_str += '                calcRInts_ERI<lab, lc>(alpha, fac, &fnx[0], &xyz_pc[0], &rints[0]);\n\n'
 
 		# First rollout
 		file_str += rolloutERI3First(la, lb, lket)
@@ -348,7 +354,7 @@ def writeKernelGenerate(lbra, lket):
 	file_str += '            boys_f.calcFnx(x, &fnx[0]);\n\n'
 
 	file_str += '            double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));\n'
-	file_str += '            calcRInts<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);\n\n'
+	file_str += '            calcRInts_ERI<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);\n\n'
 
 	# First rollout
 	file_str += rolloutERI2First(lbra, lket)
@@ -374,7 +380,13 @@ def writeKernelGenerate(lbra, lket):
 	file_str += '        }\n\n'
 
 	file_str += '    return eri2_batch;\n'
-	file_str += '}\n'
+	file_str += '}\n\n'
+
+	file_str += 'template lible::vec2d lible::ints::two::eri2d1Kernel<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(lbra, lket)
+	file_str += '                                                           const std::vector<double> &ecoeffs_a,\n'
+	file_str += '                                                           const std::vector<double> &ecoeffs_b_tsp,\n'
+	file_str += '                                                           const ShellData &sh_data_a,\n'
+	file_str += '                                                           const ShellData &sh_data_b);\n\n'			
 	
 	with open('eri_kernels_{}_{}.cpp'.format(lbra, lket), 'w') as file:
 		file.write(file_str)
