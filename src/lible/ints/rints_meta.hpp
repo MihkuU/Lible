@@ -268,6 +268,48 @@ namespace lible
         }
 
         template <int la, int lb>
+        void calcRInts_ERI_new(const double alpha, const double fac, const double *fnx, 
+                               const double *xyz_pq, const int n_cols, const int ofs_row, 
+                               const int ofs_col, double *rints_out)
+        {
+            constexpr int lab = la + lb;
+
+            constexpr int buff_size = numHermitesC(lab) + lab;
+            std::array<double, buff_size> rints_buff{};
+            calcRInts<lab>(alpha, fac, fnx, xyz_pq, &rints_buff[0]);
+
+            constexpr int n_hermites_a = numHermitesC(la);
+            constexpr int n_hermites_b = numHermitesC(lb);
+            constexpr std::array<std::array<int, 3>, n_hermites_a> idxs_a = generateHermiteIdxs<la>();
+            constexpr std::array<std::array<int, 3>, n_hermites_b> idxs_b = generateHermiteIdxs<lb>();
+
+            for (int j = 0; j < n_hermites_b; j++)
+            {
+                auto& [t_, u_, v_] = idxs_b[j];
+
+                double sign = 1.0;
+                if ((t_ + u_ + v_) % 2 != 0)
+                    sign = -1.0;
+
+                for (int i = 0; i < n_hermites_a; i++)
+                {
+                    auto& [t, u, v] = idxs_a[i];
+
+                    int tt_ = t + t_;
+                    int uu_ = u + u_;
+                    int vv_ = v + v_;                              
+
+                    int irow = ofs_row + i;
+                    int icol = ofs_col + j;
+                    int idx_lhs = irow * n_cols + icol;   
+                    int idx_rhs = indexRRollout(lab, tt_, uu_, vv_);
+
+                    rints_out[idx_lhs] = sign * fac * rints_buff[idx_rhs];
+                }
+            }
+        }        
+
+        template <int la, int lb>
         void calcRInts_ERI2_deriv1(const double alpha, const double fac, const double *fnx,
                                    const double *xyz_pq, double *rints_out)
         {

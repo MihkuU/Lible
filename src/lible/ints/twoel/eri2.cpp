@@ -1,7 +1,8 @@
-#include <lible/ints/twoel/twoel_detail.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
+#include <lible/ints/twoel/eri_kernels.hpp>
+#include <lible/ints/twoel/twoel_detail.hpp>
 
 #ifdef _LIBLE_USE_MKL_
 #include <mkl_cblas.h>
@@ -113,18 +114,14 @@ lible::vec2d LIT::calcERI2(const Structure &structure)
             int n_sph_a = numSphericals(la);
             int n_sph_b = numSphericals(lb);
 
-            const vector<double> &ecoeffs_a = ecoeffs[la];
-            const vector<double> &ecoeffs_b_tsp = ecoeffs_tsp[lb];
-
-            kernel_eri2_t kernel_eri2 = deployERI2Kernel(la, lb);
+            ERI2Kernel eri2_kernel = deployERI2Kernel(sh_data_a, sh_data_b);
 
             for (int ishell_a = 0; ishell_a < sh_data_a.n_shells; ishell_a++)
             {
                 int bound_b = (la == lb) ? ishell_a + 1 : sh_data_b.n_shells;
                 for (int ishell_b = 0; ishell_b < bound_b; ishell_b++)
                 {
-                    vec2d eri2_batch = kernel_eri2(ishell_a, ishell_b, ecoeffs_a, ecoeffs_b_tsp,
-                                                   sh_data_a, sh_data_b);
+                    vec2d eri2_batch = eri2_kernel(ishell_a, ishell_b, sh_data_a, sh_data_b);
 
                     int ofs_a = sh_data_a.offsets_sph[ishell_a];
                     int ofs_b = sh_data_b.offsets_sph[ishell_b];
@@ -170,7 +167,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
         const vector<double> &ecoeffs_a = ecoeffs[la];
         const vector<double> &ecoeffs_a_tsp = ecoeffs_tsp[la];
 
-        vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
+        vector<array<int, 3>> idxs_tuv_a = getHermiteGaussianIdxs(la);
 
         vector<double> fnx(laa + 1, 0);
 
@@ -181,7 +178,7 @@ vector<double> LIT::calcERI2Diagonal(const Structure &structure)
             kernelERI2Diagonal(ishell, la, ecoeffs_a, ecoeffs_a_tsp, idxs_tuv_a, boys_f, sh_data_a,
                                fnx, eri2_shells_sph);
 
-            transferIntsERI2Diag(ishell, sh_data_a, eri2_shells_sph, eri2_diagonal);
+            transferIntsERI2Diag(ishell, sh_data_a, eri2_shells_sph, eri2_diagonal); // TODO remove this function, do it here
         }
     }
 
@@ -211,8 +208,8 @@ std::array<lible::vec2d, 6> LIT::kernelERI2Deriv1(const int ishell_a, const int 
 
     int lab = la + lb;
 
-    vector<array<int, 3>> idxs_tuv_a = returnHermiteGaussianIdxs(la);
-    vector<array<int, 3>> idxs_tuv_b = returnHermiteGaussianIdxs(lb);
+    vector<array<int, 3>> idxs_tuv_a = getHermiteGaussianIdxs(la);
+    vector<array<int, 3>> idxs_tuv_b = getHermiteGaussianIdxs(lb);
 
     int n_sph_a = numSphericals(la);
     int n_sph_b = numSphericals(lb);

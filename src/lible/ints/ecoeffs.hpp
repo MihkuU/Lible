@@ -28,7 +28,7 @@ namespace lible
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
-                                                     const double *xyz_b, 
+                                                     const double *xyz_b,
                                                      const std::array<lible::vec3d, 3> &ecoeffs);
 
         /** */
@@ -116,5 +116,22 @@ namespace lible
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
         ecoeffsSphericalShellDatas_BraKet(const std::vector<ShellData> &sh_datas);
+
+        ////////////////////////////////
+        std::pair<std::vector<double>, std::vector<double>>
+        ecoeffsSphericalSPData_BraKet(const ShellPairData &sp_data);
+
+        ////////////////////////////////
+        std::vector<double>
+        ecoeffsSHARK(const ShellPairData &sp_data);
+
+        std::vector<double>
+        ecoeffsSHARK(const ShellData &sh_data);
+
+        std::vector<double>
+        ecoeffsSHARKShellPair(const int ipair, const ShellPairData &sp_data);
+
+        std::vector<double>
+        ecoeffsSHARKShell(const int ishell, const ShellData &sh_data);
     }
 }

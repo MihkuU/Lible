@@ -29,6 +29,8 @@ namespace lible
 
             void calcERI4BenchmarkNew(const Structure &structure);
 
+            void calcERI4BenchmarkTest(const Structure &structure);
+
             // TODO: remove E-coeffs arg?
             template <int la, int lb>
             vec2d eri2Kernel(const int ishell_a, const int ishell_b,
@@ -111,6 +113,34 @@ namespace lible
                                               const std::vector<double> &ecoeffs_a,
                                               const std::vector<double> &ecoeffs_b_tsp,
                                               const ShellData &sh_data_a, const ShellData &sh_data_b);
+
+        //     template<int la, int lb>            
+        //     struct ERI4Kernel
+        //     {
+        //         // std::vector<>
+        //         ERI4Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd)
+        //         {
+        //             // max cdepth ab _x_ max cdepth cd
+        //         }
+
+        //         std::vector<double> ecoeffs_bra;
+        //         std::vector<double> ecoeffs_ket;
+        //         std::vector<double> rints;
+        //         std::vector<double> R_x_E;
+
+        //         void operator()() const
+        //         {
+        //         }
+        //     };
         }
+
+        ///////////////////////////////////////////// NEW SHIT
+
+        // struct ERI4Kernel;
+
+        // template <int la, int lb, int lc, int ld>
+        // vec4d eri4KernelFun(const int ipair_ab, const int ipair_cd,
+        //                     const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
+        //                     const ERI4Kernel *eri4_kernel);        
     }
 }

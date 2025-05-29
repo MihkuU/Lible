@@ -86,7 +86,7 @@ def non0HermiteIdxs(cart_idxs_ab):
 
 	return hermite_idxs
 
-def rolloutERI4First(la, lb, lc, ld):
+def rolloutERI4FirstDepr(la, lb, lc, ld):
 	
 	n_sph_c = 2 * lc + 1
 	n_sph_d = 2 * ld + 1
@@ -135,6 +135,61 @@ def rolloutERI4First(la, lb, lc, ld):
 					idx_e = tuv_cd * n_sph_cd + kata
 
 					rollout_str += '                    p_rints_x_ecoeffs[{}] += rints[{}] * p_ecoeffs_cd_tsp[{}];\n'.format(idx_x, idx_r, idx_e)
+
+	return rollout_str
+
+def rolloutERI4First(la, lb, lc, ld):
+	
+	n_sph_c = 2 * lc + 1
+	n_sph_d = 2 * ld + 1
+	n_sph_cd = n_sph_c * n_sph_d
+
+	n_hermites_ab = numHermites(la + lb)
+	n_hermites_cd = numHermites(lc + ld)
+
+	m_list_c = [0] + list(itertools.chain.from_iterable([[m, -m] for m in range(1, lc + 1)]))
+	m_list_d = [0] + list(itertools.chain.from_iterable([[m, -m] for m in range(1, ld + 1)]))
+
+	hermite_idxs_poss_cd = hermiteIdxsPoss(lc + ld)
+
+	rollout_str = ''
+	# rollout_str += '                    const double* p_ecoeffs_cd_tsp = &pecoeffs_cd_tsp[icd * n_ecoeffs_cd];\n'
+	# rollout_str += '                    double* p_rints_x_ecoeffs = &rints_x_ecoeffs[pos_rints_x_ecoeffs];\n\n'
+
+	for tuv_ab in range(0, n_hermites_ab):		
+		for ka in range(0, len(m_list_c)):
+			for ta in range(0, len(m_list_d)):
+				kata = ka * n_sph_d + ta
+
+				mc = m_list_c[ka]
+				md = m_list_d[ta]
+
+				cart_idxs_c = non0CartIdxs(lc, mc)
+				cart_idxs_d = non0CartIdxs(ld, md)
+
+				cart_idxs_cd = set()
+
+				for [i, j, k] in cart_idxs_c:
+					for [i_, j_, k_] in cart_idxs_d:
+						ii_ = i + i_
+						jj_ = j + j_
+						kk_ = k + k_
+
+						cart_idxs_cd.add((ii_, jj_, kk_))
+
+				hermite_idxs_cd = non0HermiteIdxs(cart_idxs_cd)
+
+				for tuv_cd_3 in hermite_idxs_cd:
+					tuv_cd = hermite_idxs_poss_cd[tuv_cd_3]
+
+					idx_X = '(ofs_row + {}) * n_sph_cd + {}'.format(tuv_ab, kata) # abtuv * n_sph_cd + kata
+					idx_R = '(ofs_row + {}) * n_r_cols + (ofs_col + {})'.format(tuv_ab, tuv_cd) # abtuv * n_cols + cdt_u_v_
+					idx_E = '({} * n_r_cols + (ofs_col + {}))'.format(kata, tuv_cd) # kata * n_cols + cdt_u_v_
+
+					# rollout_str += '                    R_x_E[{}] += rints[{}] * ecoeffs_ket[{}];\n'.format(idx_X, idx_R, idx_E)
+					rollout_str += '                    R_x_E[{}] += rints[{}] * ecoeffs_ket[{}];\n'.format(idx_X, idx_R, idx_E)
+					# rollout_str += '                    R_x_E[{}] += rints[{}] * ecoeffs_ket[{}];\n'.format(0, idx_R, idx_E)
+
 
 	return rollout_str
 

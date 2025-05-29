@@ -1,9 +1,10 @@
-#include <lible/ints/twoel/twoel_detail.hpp>
 #include <lible/utils.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
 #include <lible/ints/utils.hpp>
+#include <lible/ints/twoel/twoel_detail.hpp>
+#include <lible/ints/twoel/eri_kernels.hpp>
 
 #include <chrono>
 #include <cstring>
@@ -102,10 +103,10 @@ namespace lible::ints::two
                         boys_f.calcFnx(labcd, x, fnx);
 
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-
+                        
                         vector<double> rints = calcRIntsMatrix(labcd, fac, alpha, xyz_pq.data(),
                                                                fnx.data(), idxs_tuv_ab, 
-                                                               idxs_tuv_cd);
+                                                               idxs_tuv_cd);              
 
                         int pos_ecoeffs_cd = sp_data_cd.offsets_ecoeffs[ipair_cd] +
                                              icd * dim_ecoeffs_cd;
@@ -128,6 +129,133 @@ namespace lible::ints::two
                             &rints_x_ecoeffs[pos_rints_x_ecoeffs], dim_sph_cd, 1.0,
                             &eri4_shells_sph[0], dim_sph_cd);
             }
+
+        int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
+        int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
+        int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
+        int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
+        for (int mu = 0, idx = 0; mu < dim_a_sph; mu++)
+            for (int nu = 0; nu < dim_b_sph; nu++)
+                for (int ka = 0; ka < dim_c_sph; ka++)
+                    for (int ta = 0; ta < dim_d_sph; ta++, idx++)
+                    {
+                        double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
+                        double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
+                        double norm_c = sp_data_cd.norms[ofs_norm_c + ka];
+                        double norm_d = sp_data_cd.norms[ofs_norm_d + ta];
+
+                        eri4_shells_sph[idx] *= norm_a * norm_b * norm_c * norm_d;
+                    }
+    }
+
+    // vec4d kernelERI4Test(const int ipair_ab, const int ipair_cd, const vector<double> &ecoeffs_bra,
+    //                      const vector<double> &ecoeffs_ket, const ShellPairData &sp_data_ab,
+    //                      const ShellPairData &sp_data_cd, const BoysGrid &boys_grid)
+    vec4d kernelERI4Test(const int ipair_ab, const int ipair_cd, const vector<double> &ecoeffs_bra,
+                         const vector<double> &ecoeffs_ket, const ShellPairData &sp_data_ab,
+                         const ShellPairData &sp_data_cd, const BoysGrid &boys_grid)
+    {
+        const int la = sp_data_ab.la;
+        const int lb = sp_data_ab.lb;
+        const int lc = sp_data_cd.la;
+        const int ld = sp_data_cd.lb;
+        const int lab = la + lb;
+        const int lcd = lc + ld;
+        const int labcd = lab + lcd;
+
+        const int n_sph_a = numSphericals(la);
+        const int n_sph_b = numSphericals(lb);
+        const int n_sph_c = numSphericals(lc);
+        const int n_sph_d = numSphericals(ld);
+        const int n_sph_ab = n_sph_a * n_sph_b;
+        const int n_sph_cd = n_sph_c * n_sph_d;
+        const int n_hermite_ab = numHermites(lab);
+        const int n_hermite_cd = numHermites(lcd);
+
+        const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
+        const int cdepth_b = sp_data_ab.cdepths[2 * ipair_ab + 1];
+        const int cdepth_c = sp_data_cd.cdepths[2 * ipair_cd];
+        const int cdepth_d = sp_data_cd.cdepths[2 * ipair_cd + 1];
+        const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];
+        const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
+        const int cofs_c = sp_data_cd.coffsets[2 * ipair_cd];
+        const int cofs_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
+
+        const double *xyz_a = &sp_data_ab.coords[6 * ipair_ab];
+        const double *xyz_b = &sp_data_ab.coords[6 * ipair_ab + 3];
+        const double *xyz_c = &sp_data_cd.coords[6 * ipair_cd];
+        const double *xyz_d = &sp_data_cd.coords[6 * ipair_cd + 3];
+
+        vector<array<int, 3>> idxs_tuv_ab = getHermiteGaussianIdxs(lab);
+        vector<array<int, 3>> idxs_tuv_cd = getHermiteGaussianIdxs(lcd);
+
+        int n_r_rows = (cdepth_a * cdepth_b * n_hermite_ab);
+        int n_r_cols = (cdepth_c * cdepth_d * n_hermite_cd);
+        int n_r_ints = n_r_rows * n_r_cols;
+        vector<double> rints(n_r_ints, 0);
+        for (int ia = 0, iab = 0, iabcd = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+                for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
+                    for (int id = 0; id < cdepth_d; id++, icd++)
+                    {
+                        double a = sp_data_ab.exps[cofs_a + ia];
+                        double b = sp_data_ab.exps[cofs_b + ib];
+                        double c = sp_data_cd.exps[cofs_c + ic];
+                        double d = sp_data_cd.exps[cofs_d + id];
+
+                        double p = a + b;
+                        double q = c + d;
+                        double alpha = p * q / (p + q);
+
+                        array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                               (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                               (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+                        array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
+                                               (c * xyz_c[1] + d * xyz_d[1]) / q,
+                                               (c * xyz_c[2] + d * xyz_d[2]) / q};
+
+                        array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0],
+                                                xyz_p[1] - xyz_q[1],
+                                                xyz_p[2] - xyz_q[2]};
+
+                        double xx{xyz_pq[0]}, xy{xyz_pq[1]}, xz{xyz_pq[2]};
+                        double x = alpha * (xx * xx + xy * xy + xz * xz);
+                        vector<double> fnx = calcBoysF(labcd, x, boys_grid);
+
+                        // std::fill(fnx.begin(), fnx.end(), 1); // tmp
+
+                        double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
+                        int ofs_row = iab * n_hermite_ab;
+                        int ofs_col = icd * n_hermite_cd;
+
+                        calcRIntsMatrixTest(labcd, n_r_cols, ofs_row, ofs_col, fac, alpha,
+                                            xyz_pq.data(), fnx.data(), idxs_tuv_ab, idxs_tuv_cd,
+                                            &rints[0]);
+
+                        iabcd++;
+                    }
+
+        int m = cdepth_a * cdepth_b * n_hermite_ab;
+        int n = n_sph_cd;
+        int k = cdepth_c * cdepth_d * n_hermite_cd;
+        int n_R_x_E = cdepth_a * cdepth_b * (n_hermite_ab * n_sph_cd);
+        int ofs_E_bra = sp_data_ab.offsets_ecoeffs[ipair_ab];
+        int ofs_E_ket = sp_data_cd.offsets_ecoeffs[ipair_cd];
+
+        vector<double> R_x_E(n_R_x_E, 0);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, m, n, k, 1.0, &rints[0], k,
+                    &ecoeffs_ket[ofs_E_ket], k, 1.0, &R_x_E[0], n);
+
+        m = n_sph_ab;
+        n = n_sph_cd;
+        k = cdepth_a * cdepth_b * n_hermite_ab;        
+
+        vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, &ecoeffs_bra[ofs_E_bra],
+                    k, &R_x_E[0], n, 1.0, &eri4_batch[0], n);
+
+        return eri4_batch;
     }
 
     void kernelERI4Diagonal(const int lab, const int ipair_ab, const vector<double> &ecoeffs_ab,
@@ -341,6 +469,8 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
     auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
 
+    double sum_eri4 = 0;
+
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
         for (int lcld = 0; lcld <= lalb; lcld++)
         {
@@ -369,9 +499,13 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
             const vector<double> &ecoeffs_ab = ecoeffs[lalb];
             const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+            // vector<double> ecoeffs_ab = ecoeffs[lalb];                  // tmp
+            // vector<double> ecoeffs_cd_tsp = ecoeffs_tsp[lcld];          // tmp
+            // std::fill(ecoeffs_ab.begin(), ecoeffs_ab.end(), 1);         // tmp
+            // std::fill(ecoeffs_cd_tsp.begin(), ecoeffs_cd_tsp.end(), 1); // tmp
 
-            vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
-            vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
+            vector<array<int, 3>> idxs_tuv_ab = getHermiteGaussianIdxs(lab);
+            vector<array<int, 3>> idxs_tuv_cd = getHermiteGaussianIdxs(lcd);
 
             int dim_tuv_ab = (lab + 1) * (lab + 2) * (lab + 3) / 6;
             int dim_tuv_cd = (lcd + 1) * (lcd + 2) * (lcd + 3) / 6;
@@ -381,28 +515,22 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             vec4d rints_tmp(Fill(0), labcd + 1);
 
             size_t n_shells_abcd = 0;
-            if (lalb == lcld)
-                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-                    for (int ipair_cd = 0; ipair_cd <= ipair_ab; ipair_cd++)
-                    {
-                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
-                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                   idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
-                                   eri4_shells_sph, fnx);
+            for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+            {
+                int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
+                for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                {
+                    vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
+                    kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+                               idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
+                               eri4_shells_sph, fnx);
 
-                        n_shells_abcd++;
-                    }
-            else
-                for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-                    for (int ipair_cd = 0; ipair_cd < n_pairs_cd; ipair_cd++)
-                    {
-                        vector<double> eri4_shells_sph(dim_ab_sph * dim_cd_sph, 0);
-                        kernelERI4(lab, lcd, ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                   idxs_tuv_ab, idxs_tuv_cd, sp_data_ab, sp_data_cd, boys_f,
-                                   eri4_shells_sph, fnx);
+                    for (double x : eri4_shells_sph)
+                        sum_eri4 += std::fabs(x);
 
-                        n_shells_abcd++;
-                    }
+                    n_shells_abcd++;
+                }
+            }
 
             auto end{std::chrono::steady_clock::now()};
             std::chrono::duration<double> duration{end - start};
@@ -410,6 +538,74 @@ void LIT::calcERI4Benchmark(const Structure &structure)
             palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
                                  n_shells_abcd, duration.count()));
         }
+
+    palPrint(std::format("   sum_eri4 = {:16.12f}\n", sum_eri4));
+
+    auto end{std::chrono::steady_clock::now()};
+    std::chrono::duration<double> duration{end - start};
+    palPrint(std::format("done {:.2e} s\n", duration.count()));
+}
+
+void LIT::calcERI4BenchmarkTest(const Structure &structure)
+{
+    palPrint(std::format("Lible::{:<40}\n", "ERI4 (Shark test) benchmark..."));
+
+    auto start{std::chrono::steady_clock::now()};
+
+    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
+
+    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
+
+    double sum_eri4 = 0;
+
+    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+        for (int lcld = 0; lcld <= lalb; lcld++)
+        {
+            auto start{std::chrono::steady_clock::now()};
+
+            auto [la, lb] = l_pairs[lalb];
+            auto [lc, ld] = l_pairs[lcld];
+
+            const auto &sp_data_ab = sp_datas[lalb];
+            const auto &sp_data_cd = sp_datas[lcld];
+
+            int n_pairs_ab = sp_data_ab.n_pairs;
+            int n_pairs_cd = sp_data_cd.n_pairs;            
+
+            // int labcd = la + lb + lc + ld;
+            // BoysGrid boys_grid(labcd);
+
+            // vector<double> ecoeffs_bra = ecoeffsSHARKSPData(sp_data_ab);
+            // vector<double> ecoeffs_ket = ecoeffsSHARKSPData(sp_data_cd);
+
+            ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
+
+            size_t n_shells_abcd = 0;
+            for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+            {
+                int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
+                for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                {
+                    // vec4d eri4_batch = kernelERI4Test(ipair_ab, ipair_cd, ecoeffs_bra, ecoeffs_ket, 
+                    //                                   sp_data_ab, sp_data_cd, boys_grid);
+
+                    vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd);
+
+                    for (double x : eri4_batch)
+                        sum_eri4 += std::fabs(x);
+
+                    n_shells_abcd++;
+                }
+            }
+
+            auto end{std::chrono::steady_clock::now()};
+            std::chrono::duration<double> duration{end - start};
+
+            palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
+                                 n_shells_abcd, duration.count()));
+        }
+
+    palPrint(std::format("   sum_eri4 = {:16.12f}\n", sum_eri4));
 
     auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
@@ -426,7 +622,7 @@ void LIT::calcERI4BenchmarkNew(const Structure &structure)
 
     vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
+    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);    
 
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
         for (int lcld = 0; lcld <= lalb; lcld++)
@@ -503,7 +699,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
         const vector<double> &ecoeffs_ab = ecoeffs[lalb];
         const vector<double> &ecoeffs_tsp_ab = ecoeffs_tsp[lalb];
 
-        vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
+        vector<array<int, 3>> idxs_tuv_ab = getHermiteGaussianIdxs(lab);
 
         vector<double> rints(dim_tuv_ab * dim_tuv_ab, 0);
         vector<double> fnx(labab + 1, 0);
@@ -515,7 +711,7 @@ lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
             kernelERI4Diagonal(lab, ipair_ab, ecoeffs_ab, ecoeffs_tsp_ab, idxs_tuv_ab, boys_f,
                                sp_data_ab, eri4_shells_sph, fnx);
 
-            transferIntsERI4Diag(ipair_ab, sp_data_ab, eri4_shells_sph, eri4_diagonal);
+            transferIntsERI4Diag(ipair_ab, sp_data_ab, eri4_shells_sph, eri4_diagonal); // TODO remove this function, do it here
         }
     }
 
@@ -565,8 +761,8 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1(const int ipair_ab, const int ipai
     int lcd = lc + ld;
     int labcd = lab + lcd;
 
-    vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
-    vector<array<int, 3>> idxs_tuv_cd = returnHermiteGaussianIdxs(lcd);
+    vector<array<int, 3>> idxs_tuv_ab = getHermiteGaussianIdxs(lab);
+    vector<array<int, 3>> idxs_tuv_cd = getHermiteGaussianIdxs(lcd);
 
     int n_sph_a = numSphericals(la);
     int n_sph_b = numSphericals(lb);

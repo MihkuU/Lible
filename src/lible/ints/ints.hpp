@@ -5,6 +5,7 @@
 #include <lible/ints/shell_pair_data.hpp>
 #include <lible/ints/structure.hpp>
 #include <lible/ints/utils.hpp>
+#include <lible/ints/twoel/eri_kernels.hpp>
 
 #include <array>
 #include <cassert>
@@ -157,6 +158,9 @@ namespace lible
         /** */
         void eri4BenchmarkNew(const Structure &structure);
 
+        /** */
+        void eri4BenchmarkTest(const Structure &structure);
+
         /**
          * \ingroup ints
          * Returns the names of all available basis sets in lower case.
@@ -265,6 +269,9 @@ namespace lible
          * repulsion integrals.
          */
         kernel_eri2_t deployERI2Kernel(const int la, const int lb);
+
+        ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
+                                    const ShellPairData &sp_data_cd);
 
         /**
          * TODO:

@@ -89,12 +89,12 @@ namespace lible
         /**
          *
          */
-        vec3i returnHermiteGaussianPositions(const int l);
+        vec3i getHermiteGaussianPositions(const int l);
 
         /**
          *
          */
-        std::vector<std::array<int, 3>> returnHermiteGaussianIdxs(const int l); 
+        std::vector<std::array<int, 3>> getHermiteGaussianIdxs(const int l); 
         
     }
 }

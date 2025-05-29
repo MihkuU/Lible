@@ -66,6 +66,11 @@ void LI::eri4BenchmarkNew(const Structure &structure)
     LIT::calcERI4BenchmarkNew(structure);
 }
 
+void LI::eri4BenchmarkTest(const Structure &structure)
+{
+    LIT::calcERI4BenchmarkTest(structure);
+}
+
 LI::kernel_eri4_t LI::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
 {
     return LIT::deployERI4Kernel(la, lb, lc, ld);

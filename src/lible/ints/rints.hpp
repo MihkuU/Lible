@@ -19,6 +19,15 @@ namespace lible
                                             const std::vector<std::array<int, 3>> &tuv_idxs_a,
                                             const std::vector<std::array<int, 3>> &tuv_idxs_b);
 
+        // void calcRIntsMatrixTest(const int l, const int n_cols, const int ofs_row, const int ofs_col,
+        //                          const double fac, const double p, const double *xyz_pq,
+        //                          const double *fnx, const std::vector<std::array<int, 3>> &tuv_idxs_a,
+        //                          const std::vector<std::array<int, 3>> &tuv_idxs_b, arma::dmat &rints);
+        void calcRIntsMatrixTest(const int l, const int n_cols, const int ofs_row, const int ofs_col,
+                                 const double fac, const double p, const double *xyz_pq,
+                                 const double *fnx, const std::vector<std::array<int, 3>> &tuv_idxs_a,
+                                 const std::vector<std::array<int, 3>> &tuv_idxs_b, double *rints);
+
         /** Calculates the Hermite Coulomb integrals as a 3D array R(t, u, v). */
         vec3d calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx);
 

@@ -90,7 +90,7 @@ map<int, vector<pair<int, int>>> LI::getLPairsMap(const int l_max)
     return l_pairs_map;
 }
 
-lible::vec3i LI::returnHermiteGaussianPositions(const int l)
+lible::vec3i LI::getHermiteGaussianPositions(const int l)
 {
     vec3i tuv_poss(Fill(-1), l + 1, l + 1, l + 1);
     for (int n = 0, tuv = 0; n <= l; n++)
@@ -104,7 +104,7 @@ lible::vec3i LI::returnHermiteGaussianPositions(const int l)
     return tuv_poss;
 }
 
-vector<array<int, 3>> LI::returnHermiteGaussianIdxs(const int l)
+vector<array<int, 3>> LI::getHermiteGaussianIdxs(const int l)
 {
     vector<array<int, 3>> idxs_tuv((l + 1) * (l + 2) * (l + 3) / 6);
     for (int n = 0, tuv = 0; n <= l; n++)

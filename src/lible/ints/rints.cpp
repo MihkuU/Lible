@@ -64,7 +64,7 @@ vector<double> LI::calcRIntsMatrix(const int l, const double fac, const double p
                                    const vector<array<int, 3>> &tuv_idxs_a,
                                    const vector<array<int, 3>> &tuv_idxs_b)
 {
-    vec3d rints_3d = calcRInts3D(l + 1, p, xyz_pq, fnx);
+    vec3d rints_3d = calcRInts3D(l, p, xyz_pq, fnx);
 
     int dim_tuv_a = tuv_idxs_a.size();
     int dim_tuv_b = tuv_idxs_b.size();
@@ -87,6 +87,44 @@ vector<double> LI::calcRIntsMatrix(const int l, const double fac, const double p
     }
 
     return rints_out;
+}
+
+// void LI::calcRIntsMatrixTest(const int l, const int n_cols, const int ofs_row, const int ofs_col,
+//                              const double fac, const double p, const double *xyz_pq, const double *fnx,
+//                              const vector<array<int, 3>> &tuv_idxs_a,
+//                              const vector<array<int, 3>> &tuv_idxs_b, arma::dmat &rints)
+void LI::calcRIntsMatrixTest(const int l, const int n_cols, const int ofs_row, const int ofs_col,
+                             const double fac, const double p, const double *xyz_pq, 
+                             const double *fnx, const vector<array<int, 3>> &tuv_idxs_a,
+                             const vector<array<int, 3>> &tuv_idxs_b, double *rints)
+{
+    vec3d rints_3d = calcRInts3D(l, p, xyz_pq, fnx);
+
+    int n_hermite_a = tuv_idxs_a.size();
+    int n_hermite_b = tuv_idxs_b.size();
+    
+    for (int j = 0; j < n_hermite_b; j++)
+    {
+        auto [t_, u_, v_] = tuv_idxs_b[j];
+
+        double sign = 1.0;
+        if ((t_ + u_ + v_) % 2 != 0)
+            sign = -1.0;
+
+        for (int i = 0; i < n_hermite_a; i++)
+        {
+            auto [t, u, v] = tuv_idxs_a[i];
+
+            // printf("idx = %d\n", idx);            
+            int irow = ofs_row + i;
+            int icol = ofs_col + j;
+            int idx = irow * n_cols + icol;            
+            rints[idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
+            // rints[idx] = 1.0; //sign * fac * rints_3d(t + t_, u + u_, v + v_);
+            // rints(irow, icol) = 1.0; //sign * fac * rints_3d(t + t_, u + u_, v + v_);
+            // rints(irow, icol) = sign * fac; //* rints_3d(t + t_, u + u_, v + v_); // tmp
+        }
+    }
 }
 
 vector<double> LI::calcRInts_ERI4_Deriv1(const int l, const double fac, const double p,

@@ -1,7 +1,8 @@
-#include <lible/ints/twoel/twoel_detail.hpp>
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
+#include <lible/ints/twoel/eri_kernels.hpp>
+#include <lible/ints/twoel/twoel_detail.hpp>
 
 #ifdef _LIBLE_USE_MKL_
 #include <mkl_cblas.h>
@@ -42,16 +43,25 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
             int n_sph_b = numSphericals(lb);
             int n_sph_c = numSphericals(lc);
 
-            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            const vector<double> &ecoeffs_c = ecoeffs_aux[lc];
+            // const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            // const vector<double> &ecoeffs_c = ecoeffs_aux[lc];
+            // vector<double> ecoeffs_ab = ecoeffs[lalb];
+            // vector<double> ecoeffs_c = ecoeffs_aux[lc];            
+            // std::fill(ecoeffs_ab.begin(), ecoeffs_ab.end(), 1);
+            // std::fill(ecoeffs_c.begin(), ecoeffs_c.end(), 1);
 
-            kernel_eri3_t kernel_eri3 = deployERI3Kernel(la, lb, lc);
+            // kernel_eri3_t kernel_eri3 = deployERI3Kernel(la, lb, lc);
+
+            ERI3Kernel eri3_kernel = deployERI3Kernel(sp_data_ab, sh_data_c);
 
             for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
                 for (int ishell_c = 0; ishell_c < sh_data_c.n_shells; ishell_c++)
                 {
-                    vec3d eri3_batch = kernel_eri3(ipair_ab, ishell_c, ecoeffs_ab, ecoeffs_c,
-                                                   sp_data_ab, sh_data_c);
+                    // vec3d eri3_batch = kernel_eri3(ipair_ab, ishell_c, ecoeffs_ab, ecoeffs_c,
+                    //                                sp_data_ab, sh_data_c);
+
+                    vec3d eri3_batch = eri3_kernel(ipair_ab, ishell_c, sp_data_ab,
+                                                   sh_data_c);
 
                     int ofs_a = sp_data_ab.offsets_sph[2 * ipair_ab];
                     int ofs_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
@@ -106,8 +116,8 @@ array<lible::vec3d, 9> LIT::kernelERI3Deriv1(const int ipair_ab, const int ishel
     const double *pecoeffs_deriv1_ab = &ecoeffs1_ab[eofs1_ab];
     const double *pecoeffs_c = &ecoeffs_c[eofs_c];
 
-    vector<array<int, 3>> idxs_tuv_ab = returnHermiteGaussianIdxs(lab);
-    vector<array<int, 3>> idxs_tuv_c = returnHermiteGaussianIdxs(lc);
+    vector<array<int, 3>> idxs_tuv_ab = getHermiteGaussianIdxs(lab);
+    vector<array<int, 3>> idxs_tuv_c = getHermiteGaussianIdxs(lc);
 
     int n_sph_a = numSphericals(la);
     int n_sph_b = numSphericals(lb);
