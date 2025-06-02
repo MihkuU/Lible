@@ -6,7 +6,13 @@ def writeKernelInstantiate(la, lb):
 
 	file_str += '#include <lible/ints/rints_meta.hpp>\n\n'
 
-	file_str += instantiateR0(la, lb)
+	file_str += instantiateR_generic(la, lb)
+
+	file_str += instantiateR_ERI2D1(la, lb)
+
+	file_str += instantiateR_ERI3D1(la, lb)
+
+	file_str += instantiateR_ERI4D1(la, lb)
 
 	file_str += 'template void lible::ints::calcRInts_ERI<{}, {}>(const double, const double, const double*, const double*, double*);\n\n'.format(la, lb)
 
@@ -16,12 +22,38 @@ def writeKernelInstantiate(la, lb):
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		 file.write(file_str)
 
-def instantiateR0(la, lb):
+def instantiateR_generic(la, lb):
 
 	file_str = 'template void lible::ints::calcRInts_ERI_new<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
-	file_str += '                                                   const double *xyz_pq,  const int n_cols, const int ofs_row, \n'
+	file_str += '                                                   const double *xyz_pq, const int n_cols, const int ofs_row, \n'
 	file_str += '                                                   const int ofs_col, double *rints_out);\n\n'
 	
+	return file_str
+
+def instantiateR_ERI2D1(la, lb):
+
+	file_str = 'template void lible::ints::calcRInts_ERI2D1<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
+	file_str += '                                                  const double *xyz_pq, const int n_rints, const int n_cols,\n'
+	file_str += '                                                  const int ofs_row, const int ofs_col, double *rints_out);\n\n'
+
+	return file_str
+
+
+def instantiateR_ERI3D1(la, lb):
+
+	file_str = 'template void lible::ints::calcRInts_ERI3D1<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
+	file_str += '                                                  const double *xyz_pq, const int n_rints, const int n_cols,\n'
+	file_str += '                                                  const int ofs_row, const int ofs_col, double *rints_out);\n\n'
+
+	return file_str
+
+def instantiateR_ERI4D1(la, lb):
+	
+	file_str = 'template void lible::ints::calcRInts_ERI4D1<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
+	file_str += '                                                  const double *xyz_pq, const int n_rints, const int ofs_row,\n'
+	file_str += '                                                  const int ofs_col, const int n_cols, const int n_rows,\n'
+	file_str += '                                                  double *rints_out);\n\n'
+
 	return file_str
 
 def specializeR0(la, lb):
@@ -217,6 +249,12 @@ def writeKernelGenerate(la, lb):
 
 	# ERI2-deriv R-ints kernel instantiation
 	file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
+
+	file_str += instantiateR_ERI2D1(la, lb)
+
+	file_str += instantiateR_ERI3D1(la, lb)
+
+	file_str += instantiateR_ERI4D1(la, lb)
 
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		file.write(file_str)

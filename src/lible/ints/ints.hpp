@@ -273,6 +273,18 @@ namespace lible
         ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
                                     const ShellPairData &sp_data_cd);
 
+        ERI3Kernel deployERI3Kernel(const ShellPairData &sp_data_ab,
+                                    const ShellData &sp_data_cd);
+
+        ERI2Kernel deployERI2Kernel(const ShellData &sp_data_a,
+                                    const ShellData &sp_data_b);
+
+        ERI2D1Kernel deployERI2D1Kernel(const ShellData &sp_data_a,
+                                        const ShellData &sp_data_b);
+
+        ERI3D1Kernel deployERI3D1Kernel(const ShellPairData &sp_data_ab,
+                                        const ShellData &sp_data_b);
+
         /**
          * TODO:
          */
@@ -297,6 +309,17 @@ namespace lible
         /**
          * TODO:
          */
+        std::array<vec3d, 9> kernelERI3Deriv1Test(const int ipair_ab, const int ishell_c,
+                                                  const std::vector<double> &ecoeffs0_bra,
+                                                  const std::vector<double> &ecoeffs1_bra,
+                                                  const std::vector<double> &ecoeffs0_ket,
+                                                  const BoysGrid &boys_grid,
+                                                  const ShellPairData &sp_data_ab,
+                                                  const ShellData &sh_data_c);
+
+        /**
+         * TODO:
+         */
         std::array<vec4d, 12> kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
                                                const std::vector<double> &ecoeffs_ab,
                                                const std::vector<double> &ecoeffs1_ab,
@@ -305,6 +328,18 @@ namespace lible
                                                const BoysGrid &boys_grid,
                                                const ShellPairData &sp_data_ab,
                                                const ShellPairData &sp_data_cd);
+
+        /**
+         * TODO:
+         */
+        std::array<vec4d, 12> kernelERI4Deriv1Test(const int ipair_ab, const int ipair_cd,
+                                                   const std::vector<double> &ecoeffs0_bra,
+                                                   const std::vector<double> &ecoeffs1_bra,
+                                                   const std::vector<double> &ecoeffs0_ket,
+                                                   const std::vector<double> &ecoeffs1_ket,
+                                                   const BoysGrid &boys_grid,
+                                                   const ShellPairData &sp_data_ab,
+                                                   const ShellPairData &sp_data_cd);
 
         using kernel_eri2d1_t = std::function<std::array<vec2d, 6>(
             const int ishell_a, const int ishell_b,

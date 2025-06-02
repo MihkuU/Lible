@@ -2694,8 +2694,6 @@ LI::ERI3Kernel::ERI3Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_
 {
     ecoeffs_bra = ecoeffsSHARK(sp_data_ab);
     ecoeffs_ket = ecoeffsSHARK(sh_data_c);
-    // std::fill(ecoeffs_bra.begin(), ecoeffs_bra.end(), 1);
-    // std::fill(ecoeffs_ket.begin(), ecoeffs_ket.end(), 1);
 }
 
 LI::ERI2Kernel::ERI2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,

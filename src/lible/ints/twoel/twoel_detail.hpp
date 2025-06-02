@@ -91,6 +91,23 @@ namespace lible
                                                   const ShellPairData &sp_data_ab,
                                                   const ShellData &sh_data_c);
 
+            std::array<vec3d, 9> kernelERI3Deriv1Test(const int ipair_ab, const int ishell_c,
+                                                      const std::vector<double> &ecoeffs0_bra,
+                                                      const std::vector<double> &ecoeffs1_bra,
+                                                      const std::vector<double> &ecoeffs0_ket,
+                                                      const BoysGrid &boys_grid,
+                                                      const ShellPairData &sp_data_ab,
+                                                      const ShellData &sh_data_c);
+
+            std::array<vec4d, 12> kernelERI4Deriv1Test(const int ipair_ab, const int ipair_cd,
+                                                       const std::vector<double> &ecoeffs0_bra,
+                                                       const std::vector<double> &ecoeffs1_bra,
+                                                       const std::vector<double> &ecoeffs0_ket,
+                                                       const std::vector<double> &ecoeffs1_ket,
+                                                       const BoysGrid &boys_grid,
+                                                       const ShellPairData &sp_data_ab,
+                                                       const ShellPairData &sp_data_cd);
+
             std::array<vec4d, 12> kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
                                                    const std::vector<double> &ecoeffs_ab,
                                                    const std::vector<double> &ecoeffs1_ab,

@@ -128,8 +128,14 @@ namespace lible
         std::vector<double>
         ecoeffsSHARK(const ShellData &sh_data);
 
+        std::vector<double> 
+        ecoeffsD1SHARK(const ShellPairData &sp_data);
+
         std::vector<double>
         ecoeffsSHARKShellPair(const int ipair, const ShellPairData &sp_data);
+
+        std::vector<double>
+        ecoeffsD1SHARKShellPair(const int ipair, const ShellPairData &sp_data);        
 
         std::vector<double>
         ecoeffsSHARKShell(const int ishell, const ShellData &sh_data);

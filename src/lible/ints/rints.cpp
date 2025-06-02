@@ -222,10 +222,6 @@ vector<double> LI::calcRInts_ERI3_deriv1(const int l, const double fac, const do
             rints_out[ofs3 + i * dim_tuv_c + j] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
 
             // d/dC
-            // rints_out[ofs4 + i * (3 * dim_tuv_c) + j + 0 * dim_tuv_c] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
-            // rints_out[ofs4 + i * (3 * dim_tuv_c) + j + 1 * dim_tuv_c] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
-            // rints_out[ofs4 + i * (3 * dim_tuv_c) + j + 2 * dim_tuv_c] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
-
             rints_out[ofs4 + i * dim_tuv_c + j] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
             rints_out[ofs5 + i * dim_tuv_c + j] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
             rints_out[ofs6 + i * dim_tuv_c + j] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
@@ -233,6 +229,114 @@ vector<double> LI::calcRInts_ERI3_deriv1(const int l, const double fac, const do
     }
 
     return rints_out;    
+}
+
+void LI::calcRInts_ERI3_deriv1_test(const int l, const double fac, const double p,
+                                    const double *xyz_pc, const double *fnx, const int n_rints,
+                                    const int ofs_row, const int ofs_col, const int n_cols,
+                                    const vector<array<int, 3>> &tuv_idxs_ab,
+                                    const vector<array<int, 3>> &tuv_idxs_c,
+                                    double *rints)
+{
+    vec3d rints_3d = calcRInts3D(l + 1, p, xyz_pc, fnx);
+
+    int ofs0 = n_rints * 0;
+    int ofs1 = n_rints * 1;
+    int ofs2 = n_rints * 2;
+    int ofs3 = n_rints * 3;
+    int ofs4 = n_rints * 4;
+    int ofs5 = n_rints * 5;
+    int ofs6 = n_rints * 6;
+
+    for (size_t j = 0; j < tuv_idxs_c.size(); j++)
+    {
+        auto [t_, u_, v_] = tuv_idxs_c[j];
+
+        double sign = 1.0;
+        if ((t_ + u_ + v_) % 2 != 0)
+            sign = -1.0;
+
+        double sign_ = sign * -1.0;
+
+        for (size_t i = 0; i < tuv_idxs_ab.size(); i++)
+        {
+            auto [t, u, v] = tuv_idxs_ab[i];
+
+            int irow = ofs_row + i;
+            int icol = ofs_col + j;
+            int idx_lhs = irow * n_cols + icol;
+
+            // d/dP
+            rints[ofs0 + idx_lhs] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints[ofs1 + idx_lhs] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints[ofs2 + idx_lhs] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+
+            // d/dR
+            rints[ofs3 + idx_lhs] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
+
+            // d/dC
+            rints[ofs4 + idx_lhs] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints[ofs5 + idx_lhs] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints[ofs6 + idx_lhs] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+        }
+    }
+}
+
+void LI::calcRInts_ERI4_deriv1_test(const int l, const double fac, const double p,
+                                    const double *xyz_pc, const double *fnx, const int n_rints,
+                                    const int ofs_row, const int ofs_col, const int n_cols,
+                                    const int n_rows, const vector<array<int, 3>> &tuv_idxs_ab,
+                                    const vector<array<int, 3>> &tuv_idxs_cd,
+                                    double *rints)
+{
+    vec3d rints_3d = calcRInts3D(l + 1, p, xyz_pc, fnx);
+
+    int ofs0 = n_rints * 0;
+    int ofs1 = n_rints * 1;
+    int ofs2 = n_rints * 2;
+    int ofs3 = n_rints * 3;
+    int ofs4 = n_rints * 4;
+    int ofs5 = n_rints * 5;
+    int ofs6 = n_rints * 6;
+    int ofs7 = n_rints * 7;
+
+    for (size_t j = 0; j < tuv_idxs_cd.size(); j++)
+    {
+        auto [t_, u_, v_] = tuv_idxs_cd[j];
+
+        double sign = 1.0;
+        if ((t_ + u_ + v_) % 2 != 0)
+            sign = -1.0;
+
+        double sign_ = sign * -1.0;
+
+        for (size_t i = 0; i < tuv_idxs_ab.size(); i++)
+        {
+            auto [t, u, v] = tuv_idxs_ab[i];
+
+            int irow = ofs_row + i;
+            int icol = ofs_col + j;
+            int idx_lhs = irow * n_cols + icol;
+
+            // d/dP
+            rints[ofs0 + idx_lhs] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints[ofs1 + idx_lhs] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints[ofs2 + idx_lhs] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+
+            // d/dR
+            rints[ofs3 + idx_lhs] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
+
+            int idx_lhs_tsp = icol * n_rows + irow;
+
+            // d/dQ
+            rints[ofs4 + idx_lhs_tsp] = sign_ * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints[ofs5 + idx_lhs_tsp] = sign_ * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints[ofs6 + idx_lhs_tsp] = sign_ * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+
+            // d/dS
+            rints[ofs7 + idx_lhs_tsp] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
+        }
+    }
 }
 
 vector<double> LI::calcRInts_ERI2_deriv1(const int l, const double fac, const double p,

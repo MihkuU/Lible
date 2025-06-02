@@ -109,6 +109,18 @@ std::array<lible::vec3d, 9> LI::kernelERI3Deriv1(const int ipair_ab, const int i
                                  sp_data_ab, sh_data_c);
 }
 
+std::array<lible::vec3d, 9> LI::kernelERI3Deriv1Test(const int ipair_ab, const int ishell_c,
+                                              const std::vector<double> &ecoeffs0_bra,
+                                              const std::vector<double> &ecoeffs1_bra,
+                                              const std::vector<double> &ecoeffs0_ket,
+                                              const BoysGrid &boys_grid,
+                                              const ShellPairData &sp_data_ab,
+                                              const ShellData &sh_data_c)
+{
+    return LIT::kernelERI3Deriv1Test(ipair_ab, ishell_c, ecoeffs0_bra, ecoeffs1_bra, ecoeffs0_ket,
+                                     boys_grid, sp_data_ab, sh_data_c);
+}
+
 std::array<lible::vec4d, 12> LI::kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
                                                   const std::vector<double> &ecoeffs_ab,
                                                   const std::vector<double> &ecoeffs1_ab,
@@ -120,6 +132,19 @@ std::array<lible::vec4d, 12> LI::kernelERI4Deriv1(const int ipair_ab, const int 
 {
     return LIT::kernelERI4Deriv1(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs1_ab, ecoeffs_cd_tsp,
                                  ecoeffs1_cd_tsp, boys_grid, sp_data_ab, sp_data_cd);
+}
+
+std::array<lible::vec4d, 12> LI::kernelERI4Deriv1Test(const int ipair_ab, const int ipair_cd,
+                                                      const std::vector<double> &ecoeffs0_bra,
+                                                      const std::vector<double> &ecoeffs1_bra,
+                                                      const std::vector<double> &ecoeffs0_ket,
+                                                      const std::vector<double> &ecoeffs1_ket,
+                                                      const BoysGrid &boys_grid,
+                                                      const ShellPairData &sp_data_ab,
+                                                      const ShellPairData &sp_data_cd)
+{
+    return LIT::kernelERI4Deriv1Test(ipair_ab, ipair_cd, ecoeffs0_bra, ecoeffs1_bra, ecoeffs0_ket,
+                                     ecoeffs1_ket, boys_grid, sp_data_ab, sp_data_cd);
 }
 
 #ifdef _LIBLE_USE_HIP_
