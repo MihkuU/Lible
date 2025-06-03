@@ -489,7 +489,7 @@ namespace lible
         void calcRInts_ERI3D1(const double alpha, const double fac, const double *fnx,
                               const double *xyz_pc, const int n_rints, const int n_cols,
                               const int ofs_row, const int ofs_col, double *rints_out)
-        {            
+        {
             constexpr int labc = lab + lc;
 
             constexpr int buff_size = numHermitesC(labc + 1) + (labc + 1);

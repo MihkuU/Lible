@@ -391,7 +391,7 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
     vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
+    // auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
 
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(Fill(0), dim_ao);
@@ -412,18 +412,18 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_pairs_cd = sp_data_cd.n_pairs;
 
-            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+            // const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+            // const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
 
-            kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+            // kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+            ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
 
             for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
             {
                 int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
                 for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
-                    vec4d eri4_batch = kernel_eri4(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                                   sp_data_ab, sp_data_cd);
+                    vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd);
 
                     int ofs_a = sp_data_ab.offsets_sph[2 * ipair_ab];
                     int ofs_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
@@ -612,61 +612,62 @@ void LIT::calcERI4BenchmarkTest(const Structure &structure)
     palPrint(std::format("done {:.2e} s\n", duration.count()));
 }
 
-void LIT::calcERI4BenchmarkNew(const Structure &structure)
-{
-    palPrint(std::format("Lible::{:<40}\n", "ERI4 (Shark flat new) benchmark..."));
+// void LIT::calcERI4BenchmarkNew(const Structure &structure)
+// {
+//     palPrint(std::format("Lible::{:<40}\n", "ERI4 (Shark flat new) benchmark..."));
 
-    auto start{std::chrono::steady_clock::now()};
+//     auto start{std::chrono::steady_clock::now()};
 
-    vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
+//     vector<pair<int, int>> l_pairs = getLPairsSymm(structure.getMaxL());
 
-    vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
+//     vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
-    auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
+//     // auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
 
-    for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
-        for (int lcld = 0; lcld <= lalb; lcld++)
-        {
-            auto start{std::chrono::steady_clock::now()};
+//     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
+//         for (int lcld = 0; lcld <= lalb; lcld++)
+//         {
+//             auto start{std::chrono::steady_clock::now()};
 
-            auto [la, lb] = l_pairs[lalb];
-            auto [lc, ld] = l_pairs[lcld];
+//             auto [la, lb] = l_pairs[lalb];
+//             auto [lc, ld] = l_pairs[lcld];
 
-            const ShellPairData &sp_data_ab = sp_datas[lalb];
-            const ShellPairData &sp_data_cd = sp_datas[lcld];
+//             const ShellPairData &sp_data_ab = sp_datas[lalb];
+//             const ShellPairData &sp_data_cd = sp_datas[lcld];
 
-            int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;
+//             int n_pairs_ab = sp_data_ab.n_pairs;
+//             int n_pairs_cd = sp_data_cd.n_pairs;
 
-            const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
+//             // const vector<double> &ecoeffs_ab = ecoeffs[lalb];
+//             // const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
 
-            kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+//             // kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
+//             ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
 
-            size_t n_shells_abcd = 0;
-            for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
-            {
-                int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
-                for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
-                {
-                    vec4d eri4_batch = kernel_eri4(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
-                                                   sp_data_ab, sp_data_cd);
+//             size_t n_shells_abcd = 0;
+//             for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+//             {
+//                 int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
+//                 for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+//                 {
+//                     vec4d eri4_batch = kernel_eri4(ipair_ab, ipair_cd, ecoeffs_ab, ecoeffs_cd_tsp,
+//                                                    sp_data_ab, sp_data_cd);
 
-                    n_shells_abcd++;
-                }
-            }
+//                     n_shells_abcd++;
+//                 }
+//             }
 
-            auto end{std::chrono::steady_clock::now()};
-            std::chrono::duration<double> duration{end - start};
+//             auto end{std::chrono::steady_clock::now()};
+//             std::chrono::duration<double> duration{end - start};
 
-            palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
-                                 n_shells_abcd, duration.count()));
-        }
+//             palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
+//                                  n_shells_abcd, duration.count()));
+//         }
 
-    auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
-    palPrint(std::format("done {:.2e} s\n", duration.count()));
-}
+//     auto end{std::chrono::steady_clock::now()};
+//     std::chrono::duration<double> duration{end - start};
+//     palPrint(std::format("done {:.2e} s\n", duration.count()));
+// }
 
 lible::vec2d LIT::calcERI4Diagonal(const Structure &structure)
 {
@@ -1062,10 +1063,10 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1Test(const int ipair_ab, const int 
     int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
     int cofs_c = sp_data_cd.coffsets[2 * ipair_cd + 0];
     int cofs_d = sp_data_cd.coffsets[2 * ipair_cd + 1];
-    int eofs0_ab = sp_data_ab.offsets_ecoeffs[ipair_ab];
-    int eofs1_ab = sp_data_ab.offsets_ecoeffs_deriv1[ipair_ab];
-    int eofs0_cd = sp_data_cd.offsets_ecoeffs[ipair_cd];
-    int eofs1_cd = sp_data_cd.offsets_ecoeffs_deriv1[ipair_cd];
+    // int eofs0_ab = sp_data_ab.offsets_ecoeffs[ipair_ab];
+    // int eofs1_ab = sp_data_ab.offsets_ecoeffs_deriv1[ipair_ab];
+    // int eofs0_cd = sp_data_cd.offsets_ecoeffs[ipair_cd];
+    // int eofs1_cd = sp_data_cd.offsets_ecoeffs_deriv1[ipair_cd];
 
     const double *exps_a = &sp_data_ab.exps[cofs_a];
     const double *exps_b = &sp_data_ab.exps[cofs_b];
@@ -1097,9 +1098,9 @@ array<lible::vec4d, 12> LIT::kernelERI4Deriv1Test(const int ipair_ab, const int 
     int n_sph_abcd = n_sph_ab * n_sph_cd;
     int n_hermite_ab = numHermites(lab);
     int n_hermite_cd = numHermites(lcd);
-    int n_hermite_abcd = n_hermite_ab * n_hermite_cd;
-    int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
-    int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
+    // int n_hermite_abcd = n_hermite_ab * n_hermite_cd;
+    // int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
+    // int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
 
 
     int n_r_rows = (cdepth_a * cdepth_b * n_hermite_ab);

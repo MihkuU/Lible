@@ -27,7 +27,7 @@ namespace lible
 
             void calcERI4Benchmark(const Structure &structure);
 
-            void calcERI4BenchmarkNew(const Structure &structure);
+            // void calcERI4BenchmarkNew(const Structure &structure);
 
             void calcERI4BenchmarkTest(const Structure &structure);
 
@@ -52,29 +52,29 @@ namespace lible
                              const std::vector<double> &ecoeffs_cd_tsp,
                              const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd);
 
-            using kernel_eri2_t = std::function<vec2d(const int ishell_a, const int ishell_b,
-                                                      const std::vector<double> &ecoeffs_a,
-                                                      const std::vector<double> &ecoeffs_b_tsp,
-                                                      const ShellData &sh_data_a,
-                                                      const ShellData &sh_data_b)>;
+            // using kernel_eri2_t = std::function<vec2d(const int ishell_a, const int ishell_b,
+            //                                           const std::vector<double> &ecoeffs_a,
+            //                                           const std::vector<double> &ecoeffs_b_tsp,
+            //                                           const ShellData &sh_data_a,
+            //                                           const ShellData &sh_data_b)>;
 
-            using kernel_eri3_t = std::function<vec3d(const int ipair_ab, const int ishell_c,
-                                                      const std::vector<double> &ecoeffs_ab,
-                                                      const std::vector<double> &ecoeffs_c,
-                                                      const ShellPairData &sp_data_ab,
-                                                      const ShellData &sh_data_c)>;
+            // using kernel_eri3_t = std::function<vec3d(const int ipair_ab, const int ishell_c,
+            //                                           const std::vector<double> &ecoeffs_ab,
+            //                                           const std::vector<double> &ecoeffs_c,
+            //                                           const ShellPairData &sp_data_ab,
+            //                                           const ShellData &sh_data_c)>;
 
-            using kernel_eri4_t = std::function<vec4d(const int ipair_ab, const int ipair_cd,
-                                                      const std::vector<double> &ecoeffs_ab,
-                                                      const std::vector<double> &ecoeffs_cd_tsp,
-                                                      const ShellPairData &sp_data_ab,
-                                                      const ShellPairData &sp_data_cd)>;
+            // using kernel_eri4_t = std::function<vec4d(const int ipair_ab, const int ipair_cd,
+            //                                           const std::vector<double> &ecoeffs_ab,
+            //                                           const std::vector<double> &ecoeffs_cd_tsp,
+            //                                           const ShellPairData &sp_data_ab,
+            //                                           const ShellPairData &sp_data_cd)>;
 
-            kernel_eri2_t deployERI2Kernel(const int la, const int lb);
+            // kernel_eri2_t deployERI2Kernel(const int la, const int lb);
 
-            kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int lc);
+            // kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int lc);
 
-            kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
+            // kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
 
             std::array<vec2d, 6> kernelERI2Deriv1(const int ishell_a, const int ishell_b,
                                                   const std::vector<double> &ecoeffs_a,

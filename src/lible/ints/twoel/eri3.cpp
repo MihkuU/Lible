@@ -43,23 +43,11 @@ lible::vec3d LIT::calcERI3(const Structure &structure)
             int n_sph_b = numSphericals(lb);
             int n_sph_c = numSphericals(lc);
 
-            // const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            // const vector<double> &ecoeffs_c = ecoeffs_aux[lc];
-            // vector<double> ecoeffs_ab = ecoeffs[lalb];
-            // vector<double> ecoeffs_c = ecoeffs_aux[lc];
-            // std::fill(ecoeffs_ab.begin(), ecoeffs_ab.end(), 1);
-            // std::fill(ecoeffs_c.begin(), ecoeffs_c.end(), 1);
-
-            // kernel_eri3_t kernel_eri3 = deployERI3Kernel(la, lb, lc);
-
             ERI3Kernel eri3_kernel = deployERI3Kernel(sp_data_ab, sh_data_c);
 
             for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
                 for (int ishell_c = 0; ishell_c < sh_data_c.n_shells; ishell_c++)
                 {
-                    // vec3d eri3_batch = kernel_eri3(ipair_ab, ishell_c, ecoeffs_ab, ecoeffs_c,
-                    //                                sp_data_ab, sh_data_c);
-
                     vec3d eri3_batch = eri3_kernel(ipair_ab, ishell_c, sp_data_ab,
                                                    sh_data_c);
 

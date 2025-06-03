@@ -75,6 +75,10 @@ void LI::BoysF::calcFnx(const int n, const double x, vector<double> &fnx) const
     }
 }
 
+LI::BoysGrid::BoysGrid()
+{
+}
+
 LI::BoysGrid::BoysGrid(const int max_n) : max_n(max_n + 6)
 {
     n_intervals = large_x / interval_size + 1;

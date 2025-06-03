@@ -644,6 +644,10 @@ namespace lible
 
             return eri4_batch;
         }
+        
+        vec4d eri4KernelFun(const int ipair_ab, const int ipair_cd,
+                            const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
+                            const ERI4Kernel *eri4_kernel); 
 
         template <int la, int lb, int lc>
         vec3d eri3KernelFun(const int ipair_ab, const int ishell_c,
@@ -753,6 +757,10 @@ namespace lible
             return eri3_batch;
         }
 
+        vec3d eri3KernelFun(const int ipair_ab, const int ishell_c,
+                            const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
+                            const ERI3Kernel *eri3_kernel);
+
         template <int la, int lb>
         vec2d eri2KernelFun(const int ishell_a, const int ishell_b,
                             const ShellData &sh_data_a, const ShellData &sh_data_b,
@@ -844,6 +852,10 @@ namespace lible
             return eri2_batch;
         }
 
+        vec2d eri2KernelFun(const int ishell_a, const int ishell_b,
+                            const ShellData &sh_data_a, const ShellData &sh_data_b,
+                            const ERI2Kernel *eri2_kernel);
+
         template <int la, int lb>
         std::array<vec2d, 6> eri2d1KernelFun(const int ishell_a, const int ishell_b,
                                              const ShellData &sh_data_a,
@@ -863,8 +875,8 @@ namespace lible
             const int cdepth_b = sh_data_b.cdepths[ishell_b];
             const int cofs_a = sh_data_a.coffsets[ishell_a];
             const int cofs_b = sh_data_b.coffsets[ishell_b];
-            int ofs_E_bra = sh_data_a.offsets_ecoeffs[ishell_a];
-            int ofs_E_ket = sh_data_b.offsets_ecoeffs[ishell_b];
+            const int ofs_E_bra = sh_data_a.offsets_ecoeffs[ishell_a];
+            const int ofs_E_ket = sh_data_b.offsets_ecoeffs[ishell_b];
 
             const double *exps_a = &sh_data_a.exps[cofs_a];
             const double *exps_b = &sh_data_b.exps[cofs_b];
@@ -963,10 +975,16 @@ namespace lible
 
             return eri2_batch;
         }
+        
+        std::array<vec2d, 6> eri2d1KernelFun(const int ishell_a, const int ishell_b,
+                                             const ShellData &sh_data_a,
+                                             const ShellData &sh_data_b,
+                                             const ERI2D1Kernel *eri2d1_kernel);
 
         template <int la, int lb, int lc>
         std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
-                                             const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
+                                             const ShellPairData &sp_data_ab, 
+                                             const ShellData &sh_data_c,
                                              const ERI3D1Kernel *eri3d1_kernel)
         {
             // Compile-time data
@@ -1131,6 +1149,11 @@ namespace lible
 
             return eri3_batch;
         }
+
+        std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
+                                             const ShellPairData &sp_data_ab,
+                                             const ShellData &sh_data_c,
+                                             const ERI3D1Kernel *eri3d1_kernel);
 
         template <int la, int lb, int lc, int ld>
         std::array<vec4d, 12> eri4d1KernelFun(const int ipair_ab, const int ipair_cd,

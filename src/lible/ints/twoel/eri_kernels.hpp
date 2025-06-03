@@ -1,5 +1,7 @@
 #pragma once
 
+#include <lible/ints/boys_function.hpp>
+#include <lible/ints/rints.hpp>
 #include <lible/ints/shell_pair_data.hpp>
 
 #include <functional>
@@ -60,6 +62,8 @@ namespace lible
             std::vector<double> ecoeffs_bra;
             std::vector<double> ecoeffs_ket;
             eri4_kernelfun_t eri4_kernelfun;
+
+            BoysGrid boys_grid;
         };
 
         struct ERI3Kernel
@@ -77,6 +81,8 @@ namespace lible
             std::vector<double> ecoeffs_bra;
             std::vector<double> ecoeffs_ket;
             eri3_kernelfun_t eri3_kernelfun;
+
+            BoysGrid boys_grid;
         };
 
         struct ERI2Kernel
@@ -94,6 +100,8 @@ namespace lible
             std::vector<double> ecoeffs_bra;
             std::vector<double> ecoeffs_ket;
             eri2_kernelfun_t eri2_kernelfun;
+
+            BoysGrid boys_grid;
         };
 
         struct ERI4D1Kernel
@@ -131,6 +139,8 @@ namespace lible
             std::vector<double> ecoeffs1_bra;
             std::vector<double> ecoeffs0_ket;
             eri3d1_kernelfun_t eri3d1_kernelfun;
+
+            BoysGrid boys_grid;
         };
 
         struct ERI2D1Kernel
@@ -148,6 +158,8 @@ namespace lible
             std::vector<double> ecoeffs_bra;
             std::vector<double> ecoeffs_ket;
             eri2d1_kernelfun_t eri2d1_kernelfun;
+
+            BoysGrid boys_grid;
         };
 
         ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,

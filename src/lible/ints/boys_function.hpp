@@ -42,6 +42,8 @@ namespace lible
         class BoysGrid
         {
         public:
+            BoysGrid();
+            
             BoysGrid(const int max_n);
 
             /** */
