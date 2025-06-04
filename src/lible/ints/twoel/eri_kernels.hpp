@@ -121,6 +121,8 @@ namespace lible
             std::vector<double> ecoeffs0_ket;
             std::vector<double> ecoeffs1_ket;
             eri4d1_kernelfun_t eri4d1_kernelfun;
+
+            BoysGrid boys_grid;
         };
 
         struct ERI3D1Kernel

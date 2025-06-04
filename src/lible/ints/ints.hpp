@@ -145,18 +145,12 @@ namespace lible
          */
         vec4d eri4(const Structure &structure);
 
-        // /** */
-        // vec4d eri4New(const Structure &structure);
-
         /**
          * \ingroup ints
          * Runs a benchmark of calculating the four-center ERIs for all shell quartets,
          * \f$(l_a l_b|l_c l_d)\f$ with \f$l_a \geq l_b\f$ and \f$(l_a l_b) \geq (l_c l_d)\f$.
          */
         void eri4Benchmark(const Structure &structure);
-
-        // /** */
-        // void eri4BenchmarkNew(const Structure &structure);
 
         /** */
         void eri4BenchmarkTest(const Structure &structure);
@@ -218,57 +212,6 @@ namespace lible
          * \f$\{(\text{i_spherical}, \text{i_cartesian}, \text{val})\}\f$.
          */
         std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
-
-        // /**
-        //  * \ingroup ints
-        //  * Type alias for the four-center two-electron repulsion integral kernel function.
-        //  */
-        // using kernel_eri4_t = std::function<vec4d(const int ipair_ab, const int ipair_cd,
-        //                                           const std::vector<double> &ecoeffs_a,
-        //                                           const std::vector<double> &ecoeffs_b_tsp,
-        //                                           const ShellPairData &sp_data_ab,
-        //                                           const ShellPairData &sp_data_cd)>;
-
-        // /**
-        //  * \ingroup ints
-        //  * Type alias for the three-center two-electron repulsion integral kernel function.
-        //  */
-        // using kernel_eri3_t = std::function<vec3d(const int ipair_ab, const int ishell_c,
-        //                                           const std::vector<double> &ecoeffs_ab,
-        //                                           const std::vector<double> &ecoeffs_c,
-        //                                           const ShellPairData &sp_data_ab,
-        //                                           const ShellData &sh_data_c)>;
-
-        // /**
-        //  * \ingroup ints
-        //  * Type alias for the two-center two-electron repulsion integral kernel function.
-        //  */
-        // using kernel_eri2_t = std::function<vec2d(const int ishell_a, const int ishell_b,
-        //                                           const std::vector<double> &ecoeffs_a,
-        //                                           const std::vector<double> &ecoeffs_b_tsp,
-        //                                           const ShellData &sh_data_a,
-        //                                           const ShellData &sh_data_b)>;
-
-        // /**
-        //  * \ingroup ints
-        //  * Function for deploying a kernel function for calculating the four-center two-electron
-        //  * repulsion integrals.
-        //  */
-        // kernel_eri4_t deployERI4Kernel(const int la, const int lb, const int lc, const int ld);
-
-        // /**
-        //  * \ingroup ints
-        //  * Function for deploying a kernel function for calculating the three-center two-electron
-        //  * repulsion integrals.
-        //  */
-        // kernel_eri3_t deployERI3Kernel(const int la, const int lb, const int ld);
-
-        // /**
-        //  * \ingroup ints
-        //  * Function for deploying a kernel function for calculating the two-center two-electron
-        //  * repulsion integrals.
-        //  */
-        // kernel_eri2_t deployERI2Kernel(const int la, const int lb);
 
         ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
                                     const ShellPairData &sp_data_cd);
@@ -340,14 +283,6 @@ namespace lible
                                                    const BoysGrid &boys_grid,
                                                    const ShellPairData &sp_data_ab,
                                                    const ShellPairData &sp_data_cd);
-
-        using kernel_eri2d1_t = std::function<std::array<vec2d, 6>(
-            const int ishell_a, const int ishell_b,
-            const std::vector<double> &ecoeffs_a,
-            const std::vector<double> &ecoeffs_b_tsp,
-            const ShellData &sh_data_a, const ShellData &sh_data_b)>;
-
-        kernel_eri2d1_t deployERI2Deriv1Kernel(const int la, const int lb);
 
         /**
          * \ingroup ints

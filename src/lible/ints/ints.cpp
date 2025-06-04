@@ -61,30 +61,10 @@ void LI::eri4Benchmark(const Structure &structure)
     LIT::calcERI4Benchmark(structure);
 }
 
-// void LI::eri4BenchmarkNew(const Structure &structure)
-// {
-//     LIT::calcERI4BenchmarkNew(structure);
-// }
-
 void LI::eri4BenchmarkTest(const Structure &structure)
 {
     LIT::calcERI4BenchmarkTest(structure);
 }
-
-// LI::kernel_eri4_t LI::deployERI4Kernel(const int la, const int lb, const int lc, const int ld)
-// {
-//     return LIT::deployERI4Kernel(la, lb, lc, ld);
-// }
-
-// LI::kernel_eri3_t LI::deployERI3Kernel(const int la, const int lb, const int lc)
-// {
-//     return LIT::deployERI3Kernel(la, lb, lc);
-// }
-
-// LI::kernel_eri2_t LI::deployERI2Kernel(const int la, const int lb)
-// {
-//     return LIT::deployERI2Kernel(la, lb);
-// }
 
 std::array<lible::vec2d, 6> LI::kernelERI2Deriv1(const int ishell_a, const int ishell_b,
                                                  const std::vector<double> &ecoeffs_a,

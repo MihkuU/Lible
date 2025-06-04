@@ -41,6 +41,13 @@ namespace lible
                               const std::vector<std::array<int, 3>> &hermite_idxs_ket,
                               double *rints_out);
 
+        void calcRInts_ERI4D1(const int l, const int n_rints, const int n_rows, const int n_cols,
+                              const int ofs_row, const int ofs_col, const double alpha,
+                              const double fac, const double *fnx, const double *xyz_pq,
+                              const std::vector<std::array<int, 3>> &hermite_idxs_bra,
+                              const std::vector<std::array<int, 3>> &hermite_idxs_ket,
+                              double *rints_out);
+
         /** TODO: dox */
         std::vector<double> calcRInts_ERI2_deriv1(const int l, const double fac, const double p,
                                                   const double *xyz_ab, const double *fnx,

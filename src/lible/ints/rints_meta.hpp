@@ -367,64 +367,6 @@ namespace lible
             }
         }
 
-        // template <int la, int lb>
-        // void calcRInts_ERI2_deriv1(const double alpha, const double fac, const double *fnx,
-        //                            const double *xyz_pq, double *rints_out)
-        // {
-        //     constexpr int lab = la + lb;
-
-        //     constexpr int buff_size = numHermitesC(lab + 1) + (lab + 1);
-        //     std::array<double, buff_size> rints_buff{};
-        //     calcRInts<lab + 1>(alpha, fac, fnx, xyz_pq, &rints_buff[0]);
-
-        //     constexpr int n_hermites_a = numHermitesC(la);
-        //     constexpr int n_hermites_b = numHermitesC(lb);
-        //     constexpr int n_hermites_ab = n_hermites_a * n_hermites_b;
-        //     constexpr int ofs0 = n_hermites_ab * 0;
-        //     constexpr int ofs1 = n_hermites_ab * 1;
-        //     constexpr int ofs2 = n_hermites_ab * 2;
-        //     constexpr int ofs3 = n_hermites_ab * 3;
-        //     constexpr int ofs4 = n_hermites_ab * 4;
-        //     constexpr int ofs5 = n_hermites_ab * 5;
-
-        //     constexpr std::array<std::array<int, 3>, n_hermites_a> idxs_a = generateHermiteIdxs<la>();
-        //     constexpr std::array<std::array<int, 3>, n_hermites_b> idxs_b = generateHermiteIdxs<lb>();
-        //     for (int j = 0; j < n_hermites_b; j++)
-        //     {
-        //         auto &[t_, u_, v_] = idxs_b[j];
-
-        //         double sign_A = 1.0;
-        //         if ((t_ + u_ + v_) % 2 != 0)
-        //             sign_A = -1.0;
-
-        //         double sign_B = sign_A * -1.0;
-
-        //         for (int i = 0; i < n_hermites_a; i++)
-        //         {
-        //             auto &[t, u, v] = idxs_a[i];
-
-        //             int tt_ = t + t_;
-        //             int uu_ = u + u_;
-        //             int vv_ = v + v_;
-
-        //             int idx_lhs = i * n_hermites_b + j;
-        //             int idx_rhs0 = indexRRollout(lab + 1, tt_ + 1, uu_, vv_); // TODO: precalc offset
-        //             int idx_rhs1 = indexRRollout(lab + 1, tt_, uu_ + 1, vv_); // TODO: precalc offset
-        //             int idx_rhs2 = indexRRollout(lab + 1, tt_, uu_, vv_ + 1); // TODO: precalc offset
-
-        //             // d/dA
-        //             rints_out[ofs0 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs0];
-        //             rints_out[ofs1 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs1];
-        //             rints_out[ofs2 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs2];
-
-        //             // d/dB
-        //             rints_out[ofs3 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs0];
-        //             rints_out[ofs4 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs1];
-        //             rints_out[ofs5 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs2];
-        //         }
-        //     }
-        // }
-
         template <int la, int lb>
         void calcRInts_ERI2D1(const double alpha, const double fac, const double *fnx,
                               const double *xyz_ab, const int n_rints, const int n_cols,
