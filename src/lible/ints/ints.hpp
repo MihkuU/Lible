@@ -75,6 +75,10 @@ namespace lible
          */
         vec2d nuclearAttraction(const Structure &structure);
 
+        /** Calculates the Coulombic interaction integral matrix with given point charges. */
+        vec2d externalCharges(const std::vector<std::array<double, 4>> &point_charges,
+                              const Structure &structure);
+
         /**
          * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
          * pair 'ipair'. In spherical basis. The charges should be given as a list

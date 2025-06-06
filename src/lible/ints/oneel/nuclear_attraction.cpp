@@ -12,20 +12,19 @@ using std::array, std::vector;
 
 namespace lible::ints
 {
-    // Forward declaration
     vec2d externalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // Forward declaration
     array<vec2d, 6> externalChargesD1Kernel(const int ipair,
-                                               const vector<array<double, 4>> &charges,
-                                               const BoysGrid &boys_grid,
-                                               const ShellPairData &sp_data);
+                                            const vector<array<double, 4>> &charges,
+                                            const BoysGrid &boys_grid,
+                                            const ShellPairData &sp_data);
 
-    // Forward declaration
     vector<array<vec2d, 3>>
     externalChargesOperatorD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
-                                       const BoysGrid &boys_grid, const ShellPairData &sp_data);
+                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+    vec2d externalCharges(const vector<array<double, 4>> &point_charges, const Structure &structure);
 }
 
 lible::vec2d LI::externalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
@@ -119,7 +118,7 @@ lible::vec2d LI::externalChargesKernel(const int ipair, const vector<array<doubl
 
 array<lible::vec2d, 6>
 LI::externalChargesD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
-                               const BoysGrid &boys_grid, const ShellPairData &sp_data)
+                            const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
     int la = sp_data.la;
     int lb = sp_data.lb;
@@ -234,7 +233,7 @@ LI::externalChargesD1Kernel(const int ipair, const vector<array<double, 4>> &cha
 
 vector<array<lible::vec2d, 3>>
 LI::externalChargesOperatorD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
-                                       const BoysGrid &boys_grid, const ShellPairData &sp_data)
+                                    const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
     int la = sp_data.la;
     int lb = sp_data.lb;
@@ -371,4 +370,41 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
                 ints_out(ofs_b + nu, ofs_a + mu) = ints_ipair(mu, nu);
             }
     }
+}
+
+lible::vec2d LI::externalCharges(const vector<array<double, 4>> &point_charges,
+                                 const Structure &structure)
+{
+    int l_max = structure.getMaxL();
+    int dim_ao = structure.getDimAO();
+
+    vec2d ints(Fill(0), dim_ao, dim_ao);
+    for (int la = l_max; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--)
+        {
+            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+
+            int lab = la + lb;
+            BoysGrid boys_grid(lab);
+
+            for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+            {
+                vec2d ints_ipair = externalChargesKernel(ipair, point_charges, boys_grid, sp_data);
+
+                int n_sph_a = 2 * la + 1;
+                int n_sph_b = 2 * lb + 1;
+                int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
+                int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
+                for (int a = 0; a < n_sph_a; a++)
+                    for (int b = 0; b < n_sph_b; b++)
+                    {
+                        int mu = ofs_a + a;
+                        int nu = ofs_b + b;
+                        ints(mu, nu) = ints_ipair(a, b);
+                        ints(nu, mu) = ints_ipair(a, b);
+                    }
+            }
+        }
+
+    return ints;
 }
