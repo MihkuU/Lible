@@ -17,7 +17,7 @@ namespace lible::ints
     vec2d overlapKernel(const int ipair, const ShellPairData &sp_data);
 
     // Forward declaration
-    array<vec2d, 6> overlapDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
+    array<vec2d, 6> overlapD1Kernel(const int ipair, const ShellPairData &sp_data);
 }
 
 lible::vec2d LI::overlapKernel(const int ipair, const ShellPairData &sp_data)
@@ -76,7 +76,7 @@ lible::vec2d LI::overlapKernel(const int ipair, const ShellPairData &sp_data)
     return ints_sph;
 }
 
-array<lible::vec2d, 6> LI::overlapDeriv1Kernel(const int ipair, const ShellPairData &sp_data)
+array<lible::vec2d, 6> LI::overlapD1Kernel(const int ipair, const ShellPairData &sp_data)
 {
     int la = sp_data.la;
     int lb = sp_data.lb;

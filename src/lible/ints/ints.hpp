@@ -49,7 +49,7 @@ namespace lible
          * Calculates a batch of normalized overlap integral derivatives for the shell pair
          * 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz). In spherical basis.
          */
-        std::array<vec2d, 6> overlapDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
+        std::array<vec2d, 6> overlapD1Kernel(const int ipair, const ShellPairData &sp_data); // TODO: rename to overlapD1Kernel
 
         /**
          * \ingroup ints
@@ -67,7 +67,7 @@ namespace lible
          * Calculates a batch of normalized kinetic energy integral derivatives for the shell pair
          * 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz). In spherical basis.
          */
-        std::array<vec2d, 6> kineticEnergyDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
+        std::array<vec2d, 6> kineticEnergyD1Kernel(const int ipair, const ShellPairData &sp_data); // TODO: rename to kineticEnergyD1Kernel
 
         /**
          * \ingroup ints
@@ -92,19 +92,19 @@ namespace lible
          * in the given shell pair data.
          */
         std::array<vec2d, 6>
-        externalChargesDerivKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
-                                   const BoysGrid &boys_grid, const ShellPairData &sp_data);
+        externalChargesD1Kernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                const BoysGrid &boys_grid, const ShellPairData &sp_data); // TODO: rename to externalChargesD1Kernel
 
         /**
-         * Calculates a batch of normalized Coulombic operator derivative integrals for the shell 
-         * pair 'ipair'. The derivatives are given for each charge as (Ax, Ay, Az). In spherical basis. 
-         * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in 
-         * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell 
+         * Calculates a batch of normalized Coulombic operator derivative integrals for the shell
+         * pair 'ipair'. The derivatives are given for each charge as (Ax, Ay, Az). In spherical basis.
+         * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
+         * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
          * pair data.
          */
         std::vector<std::array<vec2d, 3>>
-        externalChargesOperatorDerivKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
-                                           const BoysGrid &boys_grid, const ShellPairData &sp_data);
+        externalChargesOperatorD1Kernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                        const BoysGrid &boys_grid, const ShellPairData &sp_data); // TODO: rename to externalChargesOperatorD1Kernel
 
         /**
          * \ingroup ints
@@ -213,76 +213,29 @@ namespace lible
          */
         std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
 
+        /** */
         ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
                                     const ShellPairData &sp_data_cd);
 
+        /** */
         ERI3Kernel deployERI3Kernel(const ShellPairData &sp_data_ab,
                                     const ShellData &sp_data_cd);
 
+        /** */
         ERI2Kernel deployERI2Kernel(const ShellData &sp_data_a,
                                     const ShellData &sp_data_b);
 
-        ERI2D1Kernel deployERI2D1Kernel(const ShellData &sp_data_a,
-                                        const ShellData &sp_data_b);
+        /** */
+        ERI4D1Kernel deployERI4D1Kernel(const ShellPairData &sp_data_ab,
+                                        const ShellPairData &sp_data_cd);
 
+        /** */
         ERI3D1Kernel deployERI3D1Kernel(const ShellPairData &sp_data_ab,
                                         const ShellData &sp_data_b);
 
-        /**
-         * TODO:
-         */
-        std::array<vec2d, 6> kernelERI2Deriv1(const int ishell_a, const int ishell_b,
-                                              const std::vector<double> &ecoeffs_a,
-                                              const std::vector<double> &ecoeffs_b_tsp,
-                                              const BoysGrid &boys_grid,
-                                              const ShellData &sh_data_a,
-                                              const ShellData &sh_data_b);
-
-        /**
-         * TODO:
-         */
-        std::array<vec3d, 9> kernelERI3Deriv1(const int ipair_ab, const int ishell_c,
-                                              const std::vector<double> &ecoeffs_ab,
-                                              const std::vector<double> &ecoeffs1_ab,
-                                              const std::vector<double> &ecoeffs_c,
-                                              const BoysGrid &boys_grid,
-                                              const ShellPairData &sp_data_ab,
-                                              const ShellData &sh_data_c);
-
-        /**
-         * TODO:
-         */
-        std::array<vec3d, 9> kernelERI3Deriv1Test(const int ipair_ab, const int ishell_c,
-                                                  const std::vector<double> &ecoeffs0_bra,
-                                                  const std::vector<double> &ecoeffs1_bra,
-                                                  const std::vector<double> &ecoeffs0_ket,
-                                                  const BoysGrid &boys_grid,
-                                                  const ShellPairData &sp_data_ab,
-                                                  const ShellData &sh_data_c);
-
-        /**
-         * TODO:
-         */
-        std::array<vec4d, 12> kernelERI4Deriv1(const int ipair_ab, const int ipair_cd,
-                                               const std::vector<double> &ecoeffs_ab,
-                                               const std::vector<double> &ecoeffs1_ab,
-                                               const std::vector<double> &ecoeffs_cd_tsp,
-                                               const std::vector<double> &ecoeffs1_cd_tsp,
-                                               const BoysGrid &boys_grid,
-                                               const ShellPairData &sp_data_ab,
-                                               const ShellPairData &sp_data_cd);
-
-        /**
-         * TODO:
-         */
-        std::array<vec4d, 12> kernelERI4Deriv1Test(const int ipair_ab, const int ipair_cd,
-                                                   const std::vector<double> &ecoeffs0_bra,
-                                                   const std::vector<double> &ecoeffs1_bra,
-                                                   const std::vector<double> &ecoeffs0_ket,
-                                                   const std::vector<double> &ecoeffs1_ket,
-                                                   const BoysGrid &boys_grid,
-                                                   const ShellPairData &sp_data_ab,
-                                                   const ShellPairData &sp_data_cd);
+        /** */
+        ERI2D1Kernel deployERI2D1Kernel(const ShellData &sp_data_a,
+                                        const ShellData &sp_data_b);
 
         /**
          * \ingroup ints

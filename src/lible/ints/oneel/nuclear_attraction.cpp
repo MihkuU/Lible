@@ -17,14 +17,14 @@ namespace lible::ints
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
     // Forward declaration
-    array<vec2d, 6> externalChargesDerivKernel(const int ipair,
+    array<vec2d, 6> externalChargesD1Kernel(const int ipair,
                                                const vector<array<double, 4>> &charges,
                                                const BoysGrid &boys_grid,
                                                const ShellPairData &sp_data);
 
     // Forward declaration
     vector<array<vec2d, 3>>
-    externalChargesOperatorDerivKernel(const int ipair, const vector<array<double, 4>> &charges,
+    externalChargesOperatorD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
 }
 
@@ -118,7 +118,7 @@ lible::vec2d LI::externalChargesKernel(const int ipair, const vector<array<doubl
 }
 
 array<lible::vec2d, 6>
-LI::externalChargesDerivKernel(const int ipair, const vector<array<double, 4>> &charges,
+LI::externalChargesD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
                                const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
     int la = sp_data.la;
@@ -233,7 +233,7 @@ LI::externalChargesDerivKernel(const int ipair, const vector<array<double, 4>> &
 }
 
 vector<array<lible::vec2d, 3>>
-LI::externalChargesOperatorDerivKernel(const int ipair, const vector<array<double, 4>> &charges,
+LI::externalChargesOperatorD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
                                        const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
     int la = sp_data.la;

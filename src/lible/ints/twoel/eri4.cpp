@@ -391,8 +391,6 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
 
     vector<ShellPairData> sp_datas = shellPairDatasSymm(l_pairs, structure);
 
-    // auto [ecoeffs, ecoeffs_tsp] = ecoeffsSphericalSPDatas_BraKet(sp_datas);
-
     size_t dim_ao = structure.getDimAO();
     vec4d eri4(Fill(0), dim_ao);
     for (int lalb = 0; lalb < (int)l_pairs.size(); lalb++)
@@ -412,10 +410,6 @@ lible::vec4d LIT::calcERI4(const Structure &structure)
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_pairs_cd = sp_data_cd.n_pairs;
 
-            // const vector<double> &ecoeffs_ab = ecoeffs[lalb];
-            // const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
-
-            // kernel_eri4_t kernel_eri4 = deployERI4Kernel(la, lb, lc, ld);
             ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
 
             for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
@@ -499,10 +493,6 @@ void LIT::calcERI4Benchmark(const Structure &structure)
 
             const vector<double> &ecoeffs_ab = ecoeffs[lalb];
             const vector<double> &ecoeffs_cd_tsp = ecoeffs_tsp[lcld];
-            // vector<double> ecoeffs_ab = ecoeffs[lalb];                  // tmp
-            // vector<double> ecoeffs_cd_tsp = ecoeffs_tsp[lcld];          // tmp
-            // std::fill(ecoeffs_ab.begin(), ecoeffs_ab.end(), 1);         // tmp
-            // std::fill(ecoeffs_cd_tsp.begin(), ecoeffs_cd_tsp.end(), 1); // tmp
 
             vector<array<int, 3>> idxs_tuv_ab = getHermiteGaussianIdxs(lab);
             vector<array<int, 3>> idxs_tuv_cd = getHermiteGaussianIdxs(lcd);
@@ -572,12 +562,6 @@ void LIT::calcERI4BenchmarkTest(const Structure &structure)
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_pairs_cd = sp_data_cd.n_pairs;
 
-            // int labcd = la + lb + lc + ld;
-            // BoysGrid boys_grid(labcd);
-
-            // vector<double> ecoeffs_bra = ecoeffsSHARKSPData(sp_data_ab);
-            // vector<double> ecoeffs_ket = ecoeffsSHARKSPData(sp_data_cd);
-
             ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
 
             size_t n_shells_abcd = 0;
@@ -586,9 +570,6 @@ void LIT::calcERI4BenchmarkTest(const Structure &structure)
                 int bound_cd = (lalb == lcld) ? ipair_ab + 1 : n_pairs_cd;
                 for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
-                    // vec4d eri4_batch = kernelERI4Test(ipair_ab, ipair_cd, ecoeffs_bra, ecoeffs_ket,
-                    //                                   sp_data_ab, sp_data_cd, boys_grid);
-
                     vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd);
 
                     for (double x : eri4_batch)

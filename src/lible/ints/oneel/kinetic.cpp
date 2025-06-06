@@ -17,9 +17,9 @@ namespace lible::ints
     vec2d kineticEnergyKernel(const int ipair, const ShellPairData &sp_data);     
 
     // Forward declaration
-    array<vec2d, 6> kineticEnergyDeriv1Kernel(const int ipair, const ShellPairData &sp_data);
+    array<vec2d, 6> kineticEnergyD1Kernel(const int ipair, const ShellPairData &sp_data);
 
-    // A helper function for 'kineticEnergyDeriv1Kernel'.
+    // A helper function for 'kineticEnergyD1Kernel'.
     auto kinEDeriv1Helper = [](const double b, const double b2, const double fac,
                                const vec3d &ecoeffs_x, const vec3d &ecoeffs_y,
                                const vec3d &ecoeffs_z, const array<int, 3> &ijk,
@@ -151,7 +151,7 @@ lible::vec2d LI::kineticEnergyKernel(const int ipair, const ShellPairData &sp_da
     return ints_sph;
 }
 
-array<lible::vec2d, 6> LI::kineticEnergyDeriv1Kernel(const int ipair, const ShellPairData &sp_data)
+array<lible::vec2d, 6> LI::kineticEnergyD1Kernel(const int ipair, const ShellPairData &sp_data)
 {
     int la = sp_data.la;
     int lb = sp_data.lb;
