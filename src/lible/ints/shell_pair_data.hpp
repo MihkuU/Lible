@@ -24,12 +24,12 @@ namespace lible
             ShellData(const int l, const int n_shells, const int n_primitives,
                       const std::vector<double> &coeffs, const std::vector<double> &coords,
                       const std::vector<double> &exps, const std::vector<double> &norms,
-                      const std::vector<int> &cdepths, const std::vector<int> &coffsets,
-                      const std::vector<int> &offsets_ecoeffs, const std::vector<int> &offsets_norms,
-                      const std::vector<int> &offsets_sph)
+                      const std::vector<int> atomic_idxs, const std::vector<int> &cdepths, 
+                      const std::vector<int> &coffsets, const std::vector<int> &offsets_ecoeffs, 
+                      const std::vector<int> &offsets_norms, const std::vector<int> &offsets_sph)
                 : l(l), n_shells(n_shells), n_primitives(n_primitives), coeffs(coeffs),
-                  coords(coords), exps(exps), norms(norms), cdepths(cdepths),
-                  coffsets(coffsets), offsets_ecoeffs(offsets_ecoeffs),
+                  coords(coords), exps(exps), norms(norms),  atomic_idxs(atomic_idxs),
+                  cdepths(cdepths), coffsets(coffsets), offsets_ecoeffs(offsets_ecoeffs),
                   offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
             }
@@ -43,6 +43,7 @@ namespace lible
             std::vector<double> exps;   /** Exponents of the Gaussian primitives. */
             std::vector<double> norms;  /** Normalization constants of the atomic orbitals in spherical basis. */
 
+            std::vector<int> atomic_idxs;     /** Indices of atoms involved in the shells. */
             std::vector<int> cdepths;         /** Contraction depths corresponding to each shell. */
             std::vector<int> coffsets;        /** Offsets of the contraction data (coeffs and exps) for each shell.*/
             std::vector<int> offsets_ecoeffs; /** Offsets of the spherical Hermite expansion coefficients. */

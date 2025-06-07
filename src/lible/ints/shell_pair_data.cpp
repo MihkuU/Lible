@@ -29,6 +29,7 @@ LI::ShellData LI::shellDataAux(const int l, const Structure &structure)
     vector<double> exps(n_primitives);
     vector<double> norms(n_norms);
 
+    vector<int> atomic_idxs(n_shells);
     vector<int> cdepths(n_shells);
     vector<int> coffsets(n_shells);
 
@@ -68,10 +69,12 @@ LI::ShellData LI::shellDataAux(const int l, const Structure &structure)
             norms[pos_norms] = shell.norms[i];
             pos_norms++;
         }
+
+        atomic_idxs[ishell] = shell.atom_idx;
     }
 
-    ShellData sh_data(l, n_shells, n_primitives, coeffs, coords, exps, norms, cdepths, coffsets,
-                      offsets_ecoeffs, offsets_norms, offsets_sph);
+    ShellData sh_data(l, n_shells, n_primitives, coeffs, coords, exps, norms, atomic_idxs, cdepths,
+                      coffsets, offsets_ecoeffs, offsets_norms, offsets_sph);
 
     return sh_data;
 }
