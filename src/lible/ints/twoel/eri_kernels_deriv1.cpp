@@ -1,12 +1,10 @@
 #include <lible/ints/defs.hpp>
 #include <lible/ints/ecoeffs.hpp>
-#include <lible/ints/twoel/twoel_detail.hpp>
 #include <lible/ints/twoel/eri_kernels.hpp>
 
 #include <format>
 #include <tuple>
 
-namespace LIT = lible::ints::two;
 namespace LI = lible::ints;
 
 using std::string;

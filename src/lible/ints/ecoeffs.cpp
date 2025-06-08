@@ -1016,16 +1016,6 @@ LI::ecoeffsSphericalSPDatas_Bra(const vector<ShellPairData> &sp_datas)
     return ecoeffs;
 }
 
-vector<vector<double>>
-LI::ecoeffsSphericalSPDatas_Bra_Deriv1(const vector<ShellPairData> &sp_datas)
-{
-    vector<vector<double>> ecoeffs(sp_datas.size());
-    for (size_t idata = 0; idata < sp_datas.size(); idata++)
-        ecoeffs[idata] = ecoeffsSphericalSPData_Bra_Deriv1(sp_datas[idata]);
-
-    return ecoeffs;
-}
-
 pair<vector<vector<double>>, vector<vector<double>>>
 LI::ecoeffsSphericalSPDatas_BraKet(const vector<ShellPairData> &sp_datas)
 {
@@ -1037,49 +1027,6 @@ LI::ecoeffsSphericalSPDatas_BraKet(const vector<ShellPairData> &sp_datas)
 
         ecoeffs[idata] = std::move(ecoeffs_idata);
         ecoeffs_tsp[idata] = std::move(ecoeffs_tsp_idata);
-    }
-
-    return {ecoeffs, ecoeffs_tsp};
-}
-
-pair<vector<vector<double>>, vector<vector<double>>>
-LI::ecoeffsSphericalSPDatas_BraKet_Deriv1(const vector<ShellPairData> &sp_datas)
-{
-    vector<vector<double>> ecoeffs(sp_datas.size());
-    vector<vector<double>> ecoeffs_tsp(sp_datas.size());
-    for (size_t idata = 0; idata < sp_datas.size(); idata++)
-    {
-        auto [ecoeffs_idata, ecoeffs_tsp_idata] =
-            ecoeffsSphericalSPData_BraKet_Deriv1(sp_datas[idata]);
-
-        ecoeffs[idata] = std::move(ecoeffs_idata);
-        ecoeffs_tsp[idata] = std::move(ecoeffs_tsp_idata);
-    }
-
-    return {ecoeffs, ecoeffs_tsp};
-}
-
-vector<vector<double>>
-LI::ecoeffsSphericalShellDatas_Bra(const vector<ShellData> &sh_datas)
-{
-    vector<vector<double>> ecoeffs(sh_datas.size());
-    for (size_t l = 0; l < sh_datas.size(); l++)
-        ecoeffs[l] = ecoeffsSphericalShellData_Bra(sh_datas[l]);
-
-    return ecoeffs;
-}
-
-pair<vector<vector<double>>, vector<vector<double>>>
-LI::ecoeffsSphericalShellDatas_BraKet(const vector<ShellData> &sh_datas)
-{
-    vector<vector<double>> ecoeffs(sh_datas.size());
-    vector<vector<double>> ecoeffs_tsp(sh_datas.size());
-    for (size_t l = 0; l < sh_datas.size(); l++)
-    {
-        auto [ecoeffs_l, ecoeffs_tsp_l] = ecoeffsSphericalShellData_BraKet(sh_datas[l]);
-
-        ecoeffs[l] = std::move(ecoeffs_l);
-        ecoeffs_tsp[l] = std::move(ecoeffs_tsp_l);
     }
 
     return {ecoeffs, ecoeffs_tsp};
