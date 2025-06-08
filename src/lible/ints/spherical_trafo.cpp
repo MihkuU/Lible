@@ -682,22 +682,6 @@ vector<tuple<int, int, double>> LI::sphericalTrafo(const int l)
     }
 }
 
-// vector<tuple<int, int, double>> LI::sphericalTrafo(const int l)
-// {
-//     arma::dmat sph_trafo_mat = returnSphericalTrafo(l);
-
-//     vector<tuple<int, int, double>> sph_trafo;
-//     for (size_t i = 0; i < sph_trafo_mat.n_rows; i++)
-//         for (size_t j = 0; j < sph_trafo_mat.n_cols; j++)
-//         {
-//             double val = sph_trafo_mat(i, j);
-//             if (std::fabs(val) != 0)
-//                 sph_trafo.push_back({i, j, val});
-//         }
-
-//     return sph_trafo;
-// }
-
 lible::vec2d LI::trafo2Spherical(const int la, const int lb, const vec2d &ints_cart)
 {
     int n_cart_a = numCartesians(la);

@@ -16,6 +16,8 @@ namespace lible
 
         constexpr int _eri_kernel_max_l_ = 24;
 
+        constexpr int _max_l_rollout_ = 6;
+
         const std::map<int, std::string> angmom_to_label{
             {0, "s"},
             {1, "p"},

@@ -234,7 +234,7 @@ LI::ERI2Kernel::ERI2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_
     ecoeffs_ket = ecoeffsSHARK(sh_data_b);
 
     int lab = sh_data_a.l + sh_data_b.l;
-    boys_grid = BoysGrid(lab);    
+    boys_grid = BoysGrid(lab);
 }
 
 LI::ERI4Kernel LI::deployERI4Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd)
@@ -253,7 +253,7 @@ LI::ERI4Kernel LI::deployERI4Kernel(const ShellPairData &sp_data_ab, const Shell
         throw std::runtime_error(msg);
     }
 
-    if (labcd <= 6)
+    if (labcd <= _max_l_rollout_)
         return ERI4Kernel(sp_data_ab, sp_data_cd, eri4_kernelfuns.at({la, lb, lc, ld}));
     else
         return ERI4Kernel(sp_data_ab, sp_data_cd,
@@ -283,7 +283,7 @@ LI::ERI3Kernel LI::deployERI3Kernel(const ShellPairData &sp_data_ab,
         throw std::runtime_error(msg);
     }
 
-    if (labc <= 6)
+    if (labc <= _max_l_rollout_)
         return ERI3Kernel(sp_data_ab, sh_data_c, eri3_kernelfuns.at({la, lb, lc}));
     else
         return ERI3Kernel(sp_data_ab, sh_data_c,
@@ -312,7 +312,7 @@ LI::ERI2Kernel LI::deployERI2Kernel(const ShellData &sh_data_a,
         throw std::runtime_error(msg);
     }
 
-    if (lab <= 6)
+    if (lab <= _max_l_rollout_)
         return ERI2Kernel(sh_data_a, sh_data_b, eri2_kernelfuns.at({la, lb}));
     else
         return ERI2Kernel(sh_data_a, sh_data_b,

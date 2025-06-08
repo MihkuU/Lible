@@ -440,7 +440,7 @@ LI::ERI4D1Kernel LI::deployERI4D1Kernel(const ShellPairData &sp_data_ab,
         throw std::runtime_error(msg);
     }
 
-    if (labcd <= 6)
+    if (labcd <= _max_l_rollout_)
         return ERI4D1Kernel(sp_data_ab, sp_data_cd, eri4d1_kernelfuns.at({la, lb, lc, ld}));
     else
         return ERI4D1Kernel(sp_data_ab, sp_data_cd,
@@ -470,7 +470,7 @@ LI::ERI3D1Kernel LI::deployERI3D1Kernel(const ShellPairData &sp_data_ab,
         throw std::runtime_error(msg);
     }
 
-    if (labc <= 6)
+    if (labc <= _max_l_rollout_)
         return ERI3D1Kernel(sp_data_ab, sh_data_c, eri3d1_kernelfuns.at({la, lb, lc}));
     else
         return ERI3D1Kernel(sp_data_ab, sh_data_c,
@@ -499,7 +499,7 @@ LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a,
         throw std::runtime_error(msg);
     }
 
-    if (lab <= 6)
+    if (lab <= _max_l_rollout_)
         return ERI2D1Kernel(sh_data_a, sh_data_b, eri2d1_kernelfuns.at({la, lb}));
     else
         return ERI2D1Kernel(sh_data_a, sh_data_b,
