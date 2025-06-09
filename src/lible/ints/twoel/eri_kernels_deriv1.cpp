@@ -391,10 +391,10 @@ LI::ERI4D1Kernel::ERI4D1Kernel(const ShellPairData &sp_data_ab, const ShellPairD
                                const eri4d1_kernelfun_t &eri4d1_kernelfun)
     : eri4d1_kernelfun(eri4d1_kernelfun)
 {
-    ecoeffs0_bra = ecoeffsSHARKBig(sp_data_ab);
-    ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab);
-    ecoeffs0_ket = ecoeffsSHARKBig(sp_data_cd);
-    ecoeffs1_ket = ecoeffsD1SHARK(sp_data_cd);
+    ecoeffs0_bra = ecoeffsSHARKSmall(sp_data_ab, false);
+    ecoeffs1_bra = ecoeffsD1SHARKSmall(sp_data_ab, false);
+    ecoeffs0_ket = ecoeffsSHARKSmall(sp_data_cd, true);
+    ecoeffs1_ket = ecoeffsD1SHARKSmall(sp_data_cd, true);
 
     int labcd = sp_data_ab.la + sp_data_ab.lb + sp_data_cd.la + sp_data_cd.lb;
     boys_grid = BoysGrid(labcd + 1);
