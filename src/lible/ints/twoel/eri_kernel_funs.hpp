@@ -136,24 +136,6 @@ namespace lible
                     shark_mm_bra2<la, lb, lc, ld>(&ecoeffs_ab[ofs_ecoeffs_ab], &R_x_E[0], &eri4_batch[0]);
                 }
 
-            // Norms
-            int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
-            int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-            int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
-            int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
-            for (int mu = 0; mu < n_sph_a; mu++)
-                for (int nu = 0; nu < n_sph_b; nu++)
-                    for (int ka = 0; ka < n_sph_c; ka++)
-                        for (int ta = 0; ta < n_sph_d; ta++)
-                        {
-                            double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
-                            double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
-                            double norm_c = sp_data_cd.norms[ofs_norm_c + ka];
-                            double norm_d = sp_data_cd.norms[ofs_norm_d + ta];
-
-                            eri4_batch(mu, nu, ka, ta) *= norm_a * norm_b * norm_c * norm_d;
-                        }
-
             return eri4_batch;
         }
 
@@ -239,21 +221,6 @@ namespace lible
                     shark_mm_bra2<la, lb, lc>(&ecoeffs_ab[ofs_ecoeffs_ab], &R_x_E[0], &eri3_batch[0]);
                 }
 
-            // Norms
-            int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
-            int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-            int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];
-            for (int mu = 0; mu < n_sph_a; mu++)
-                for (int nu = 0; nu < n_sph_b; nu++)
-                    for (int ka = 0; ka < n_sph_c; ka++)
-                    {
-                        double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
-                        double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
-                        double norm_c = sh_data_c.norms[ofs_norm_c + ka];
-
-                        eri3_batch(mu, nu, ka) *= norm_a * norm_b * norm_c;
-                    }
-
             return eri3_batch;
         }
 
@@ -324,18 +291,6 @@ namespace lible
                 int ofs_ecoeffs_a = ia * n_ecoeffs_a;
                 shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[0], &eri2_batch[0]);
             }
-
-            // Norms
-            int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
-            int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
-            for (int mu = 0; mu < n_sph_a; mu++)
-                for (int nu = 0; nu < n_sph_b; nu++)
-                {
-                    double norm_a = sh_data_a.norms[ofs_norm_a + mu];
-                    double norm_b = sh_data_b.norms[ofs_norm_b + nu];
-
-                    eri2_batch(mu, nu) *= norm_a * norm_b;
-                }
 
             return eri2_batch;
         }
@@ -425,18 +380,6 @@ namespace lible
                 shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[4 * n_R_x_E], &eri2_batch[4][0]);
                 shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[5 * n_R_x_E], &eri2_batch[5][0]);
             }
-
-            int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
-            int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
-            for (int ideriv = 0; ideriv < 6; ideriv++)
-                for (int mu = 0; mu < n_sph_a; mu++)
-                    for (int nu = 0; nu < n_sph_b; nu++)
-                    {
-                        double norm_a = sh_data_a.norms[ofs_norm_a + mu];
-                        double norm_b = sh_data_b.norms[ofs_norm_b + nu];
-
-                        eri2_batch[ideriv](mu, nu) *= norm_a * norm_b;
-                    }
 
             return eri2_batch;
         }
@@ -578,22 +521,6 @@ namespace lible
                     shark_mm_bra2<la, lb, lc>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[5 * n_R_x_E], &eri3_batch[7][0]);
                     shark_mm_bra2<la, lb, lc>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[6 * n_R_x_E], &eri3_batch[8][0]);
                 }
-
-            // Norms
-            int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab + 0];
-            int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-            int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];
-            for (int ideriv = 0; ideriv < 9; ideriv++)
-                for (int a = 0; a < n_sph_a; a++)
-                    for (int b = 0; b < n_sph_b; b++)
-                        for (int c = 0; c < n_sph_c; c++)
-                        {
-                            double norm_a = sp_data_ab.norms[ofs_norm_a + a];
-                            double norm_b = sp_data_ab.norms[ofs_norm_b + b];
-                            double norm_c = sh_data_c.norms[ofs_norm_c + c];
-
-                            eri3_batch[ideriv](a, b, c) *= norm_a * norm_b * norm_c;
-                        }
 
             return eri3_batch;
         }
@@ -767,25 +694,6 @@ namespace lible
                     shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[11 * n_R_x_E], &eri4_batch[10][0]);
                     shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[12 * n_R_x_E], &eri4_batch[11][0]);
                 }
-
-            // Norms
-            int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab + 0];
-            int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-            int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd + 0];
-            int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
-            for (int ideriv = 0; ideriv < 12; ideriv++)
-                for (int a = 0; a < n_sph_a; a++)
-                    for (int b = 0; b < n_sph_b; b++)
-                        for (int c = 0; c < n_sph_c; c++)
-                            for (int d = 0; d < n_sph_d; d++)
-                            {
-                                double norm_a = sp_data_ab.norms[ofs_norm_a + a];
-                                double norm_b = sp_data_ab.norms[ofs_norm_b + b];
-                                double norm_c = sp_data_cd.norms[ofs_norm_c + c];
-                                double norm_d = sp_data_cd.norms[ofs_norm_d + d];
-
-                                eri4_batch[ideriv](a, b, c, d) *= norm_a * norm_b * norm_c * norm_d;
-                            }
 
             return eri4_batch;
         }

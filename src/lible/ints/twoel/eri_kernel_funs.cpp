@@ -96,24 +96,6 @@ lible::vec4d LI::eri4KernelFun(const int ipair_ab, const int ipair_cd,
             shark_mm_bra(n_sph_ab, n_sph_cd, n_hermite_ab, &ecoeffs_ab[ofs_ecoeffs_ab], &R_x_E[0], &eri4_batch[0]);
         }
 
-    // Norms
-    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
-    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-    int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
-    int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
-    for (int mu = 0; mu < n_sph_a; mu++)
-        for (int nu = 0; nu < n_sph_b; nu++)
-            for (int ka = 0; ka < n_sph_c; ka++)
-                for (int ta = 0; ta < n_sph_d; ta++)
-                {
-                    double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
-                    double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
-                    double norm_c = sp_data_cd.norms[ofs_norm_c + ka];
-                    double norm_d = sp_data_cd.norms[ofs_norm_d + ta];
-
-                    eri4_batch(mu, nu, ka, ta) *= norm_a * norm_b * norm_c * norm_d;
-                }
-
     return eri4_batch;
 }
 
@@ -196,21 +178,6 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
             shark_mm_bra(n_sph_ab, n_sph_c, n_hermite_ab, &ecoeffs_ab[ofs_ecoeffs_ab], &R_x_E[0], &eri3_batch[0]);
         }
 
-    // Norms
-    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
-    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-    int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];
-    for (int mu = 0; mu < n_sph_a; mu++)
-        for (int nu = 0; nu < n_sph_b; nu++)
-            for (int ka = 0; ka < n_sph_c; ka++)
-            {
-                double norm_a = sp_data_ab.norms[ofs_norm_a + mu];
-                double norm_b = sp_data_ab.norms[ofs_norm_b + nu];
-                double norm_c = sh_data_c.norms[ofs_norm_c + ka];
-
-                eri3_batch(mu, nu, ka) *= norm_a * norm_b * norm_c;
-            }
-
     return eri3_batch;
 }
 
@@ -277,18 +244,6 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
         int ofs_ecoeffs_a = ia * n_ecoeffs_a;
         shark_mm_bra(n_sph_a, n_sph_b, n_hermite_a, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[0], &eri2_batch[0]);
     }
-
-    // Norms
-    int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
-    int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
-    for (int mu = 0; mu < n_sph_a; mu++)
-        for (int nu = 0; nu < n_sph_b; nu++)
-        {
-            double norm_a = sh_data_a.norms[ofs_norm_a + mu];
-            double norm_b = sh_data_b.norms[ofs_norm_b + nu];
-
-            eri2_batch(mu, nu) *= norm_a * norm_b;
-        }
 
     return eri2_batch;
 }
@@ -379,19 +334,6 @@ std::array<lible::vec2d, 6> LI::eri2d1KernelFun(const int ishell_a, const int is
         shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[4 * n_R_x_E], &eri2_batch[4][0]);
         shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[5 * n_R_x_E], &eri2_batch[5][0]);
     }
-
-    // Norms
-    int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
-    int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
-    for (int ideriv = 0; ideriv < 6; ideriv++)
-        for (int mu = 0; mu < n_sph_a; mu++)
-            for (int nu = 0; nu < n_sph_b; nu++)
-            {
-                double norm_a = sh_data_a.norms[ofs_norm_a + mu];
-                double norm_b = sh_data_b.norms[ofs_norm_b + nu];
-
-                eri2_batch[ideriv](mu, nu) *= norm_a * norm_b;
-            }
 
     return eri2_batch;
 }
@@ -533,22 +475,6 @@ std::array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int is
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[5 * n_R_x_E], &eri3_batch[7][0]);
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[6 * n_R_x_E], &eri3_batch[8][0]);
         }
-
-    // Norms
-    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab + 0];
-    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-    int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];
-    for (int ideriv = 0; ideriv < 9; ideriv++)
-        for (int a = 0; a < n_sph_a; a++)
-            for (int b = 0; b < n_sph_b; b++)
-                for (int c = 0; c < n_sph_c; c++)
-                {
-                    double norm_a = sp_data_ab.norms[ofs_norm_a + a];
-                    double norm_b = sp_data_ab.norms[ofs_norm_b + b];
-                    double norm_c = sh_data_c.norms[ofs_norm_c + c];
-
-                    eri3_batch[ideriv](a, b, c) *= norm_a * norm_b * norm_c;
-                }
 
     return eri3_batch;
 }
@@ -723,24 +649,6 @@ array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[11 * n_R_x_E], &eri4_batch[10][0]);
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[12 * n_R_x_E], &eri4_batch[11][0]);
         }
-
-    int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab + 0];
-    int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
-    int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd + 0];
-    int ofs_norm_d = sp_data_cd.offsets_norms[2 * ipair_cd + 1];
-    for (int ideriv = 0; ideriv < 12; ideriv++)
-        for (int a = 0; a < n_sph_a; a++)
-            for (int b = 0; b < n_sph_b; b++)
-                for (int c = 0; c < n_sph_c; c++)
-                    for (int d = 0; d < n_sph_d; d++)
-                    {
-                        double norm_a = sp_data_ab.norms[ofs_norm_a + a];
-                        double norm_b = sp_data_ab.norms[ofs_norm_b + b];
-                        double norm_c = sp_data_cd.norms[ofs_norm_c + c];
-                        double norm_d = sp_data_cd.norms[ofs_norm_d + d];                        
-
-                        eri4_batch[ideriv](a, b, c, d) *= norm_a * norm_b * norm_c * norm_d;                                                        
-                    }
 
     return eri4_batch;
 }

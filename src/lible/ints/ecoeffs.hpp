@@ -105,37 +105,17 @@ namespace lible
         std::pair<std::vector<double>, std::vector<double>>
         ecoeffsSphericalSPData_BraKet(const ShellPairData &sp_data);
 
-        ////////////////////////////////
-        std::vector<double>
-        ecoeffsSHARKBig(const ShellPairData &sp_data);
+        ////////////////////////////////        
+
+        // SHARK E-coeffs contain norms and contraction coeffs TODO: mention that.
 
         std::vector<double>
-        ecoeffsSHARKBig(const ShellData &sh_data);
-
-        ///// only this >>>>>>>>>>>>>>>>>>>>>
+        ecoeffsSHARK(const ShellPairData &sp_data, const bool transpose = false);
 
         std::vector<double>
-        ecoeffsSHARKSmall(const ShellPairData &sp_data, const bool transpose = false);
+        ecoeffsSHARK(const ShellData &sh_data, const bool transpose = false);
 
         std::vector<double>
-        ecoeffsSHARKSmall(const ShellData &sh_data, const bool transpose = false);
-
-        std::vector<double>
-        ecoeffsD1SHARKSmall(const ShellPairData &sp_data, const bool transpose = false);
-
-        ///// only this <<<<<<<<<<<<<<<<<<<<<
-
-        std::vector<double> 
-        ecoeffsD1SHARK(const ShellPairData &sp_data);
-
-        std::vector<double>
-        ecoeffsSHARKShellPair(const int ipair, const ShellPairData &sp_data);
-
-        std::vector<double>
-        ecoeffsD1SHARKShellPair(const int ipair, const ShellPairData &sp_data);        
-
-        std::vector<double>
-        ecoeffsSHARKBigShell(const int ishell, const ShellData &sh_data);
-
+        ecoeffsD1SHARK(const ShellPairData &sp_data, const bool transpose = false);     
     }
 }
