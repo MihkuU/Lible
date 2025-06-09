@@ -636,6 +636,8 @@ l_max_generate = 4 # TODO: set to 6 later
 for lbra in range(0, l_max + 1):
 	for lket in range(0, l_max + 1): 
 		l_sum = lbra + lket
+		if l_sum > l_max:
+			continue
 		# writeKernelInstantiate(lbra, lket)
 		if l_sum > l_max_generate:
 			writeKernelInstantiate(lbra, lket)

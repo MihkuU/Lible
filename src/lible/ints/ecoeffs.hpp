@@ -107,10 +107,16 @@ namespace lible
 
         ////////////////////////////////
         std::vector<double>
-        ecoeffsSHARK(const ShellPairData &sp_data);
+        ecoeffsSHARKBig(const ShellPairData &sp_data);
 
         std::vector<double>
-        ecoeffsSHARK(const ShellData &sh_data);
+        ecoeffsSHARKBig(const ShellData &sh_data);
+
+        std::vector<double>
+        ecoeffsSHARKSmall(const ShellPairData &sp_data, const bool transpose = false);
+
+        std::vector<double>
+        ecoeffsSHARKSmall(const ShellData &sh_data, const bool transpose = false);
 
         std::vector<double> 
         ecoeffsD1SHARK(const ShellPairData &sp_data);
@@ -122,6 +128,7 @@ namespace lible
         ecoeffsD1SHARKShellPair(const int ipair, const ShellPairData &sp_data);        
 
         std::vector<double>
-        ecoeffsSHARKShell(const int ishell, const ShellData &sh_data);
+        ecoeffsSHARKBigShell(const int ishell, const ShellData &sh_data);
+
     }
 }

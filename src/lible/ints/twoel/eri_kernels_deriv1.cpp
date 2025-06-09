@@ -391,9 +391,9 @@ LI::ERI4D1Kernel::ERI4D1Kernel(const ShellPairData &sp_data_ab, const ShellPairD
                                const eri4d1_kernelfun_t &eri4d1_kernelfun)
     : eri4d1_kernelfun(eri4d1_kernelfun)
 {
-    ecoeffs0_bra = ecoeffsSHARK(sp_data_ab);
+    ecoeffs0_bra = ecoeffsSHARKBig(sp_data_ab);
     ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab);
-    ecoeffs0_ket = ecoeffsSHARK(sp_data_cd);
+    ecoeffs0_ket = ecoeffsSHARKBig(sp_data_cd);
     ecoeffs1_ket = ecoeffsD1SHARK(sp_data_cd);
 
     int labcd = sp_data_ab.la + sp_data_ab.lb + sp_data_cd.la + sp_data_cd.lb;
@@ -404,9 +404,9 @@ LI::ERI3D1Kernel::ERI3D1Kernel(const ShellPairData &sp_data_ab, const ShellData 
                                const eri3d1_kernelfun_t &eri3d1_kernelfun)
     : eri3d1_kernelfun(eri3d1_kernelfun)
 {
-    ecoeffs0_bra = ecoeffsSHARK(sp_data_ab);
+    ecoeffs0_bra = ecoeffsSHARKBig(sp_data_ab);
     ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab);
-    ecoeffs0_ket = ecoeffsSHARK(sh_data_c);
+    ecoeffs0_ket = ecoeffsSHARKBig(sh_data_c);
 
     int labc = sp_data_ab.la + sp_data_ab.lb + sh_data_c.l;
     boys_grid = BoysGrid(labc + 1);
@@ -416,8 +416,8 @@ LI::ERI2D1Kernel::ERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_d
                                const eri2d1_kernelfun_t &eri2d1_kernelfun)
     : eri2d1_kernelfun(eri2d1_kernelfun)
 {
-    ecoeffs_bra = ecoeffsSHARK(sh_data_a);
-    ecoeffs_ket = ecoeffsSHARK(sh_data_b);
+    ecoeffs_bra = ecoeffsSHARKBig(sh_data_a);
+    ecoeffs_ket = ecoeffsSHARKBig(sh_data_b);
 
     int lab = sh_data_a.l + sh_data_b.l;
     boys_grid = BoysGrid(lab + 1);

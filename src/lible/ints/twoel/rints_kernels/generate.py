@@ -259,7 +259,8 @@ def writeKernelGenerate(la, lb):
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		file.write(file_str)
 						
-l_max = 12
+#l_max = 12
+l_max = 6
 l_max_generate = 6
 for la in range(0, l_max + 1):
 	for lb in range(0, l_max + 1):

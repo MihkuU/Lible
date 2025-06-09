@@ -435,7 +435,7 @@ vector<double> LI::ecoeffsSHARKShellPair(const int ipair, const ShellPairData &s
     return ecoeffs;
 }
 
-vector<double> LI::ecoeffsSHARKShell(const int ishell, const ShellData &sh_data)
+vector<double> LI::ecoeffsSHARKBigShell(const int ishell, const ShellData &sh_data)
 {
     int l = sh_data.l;
 
@@ -571,7 +571,7 @@ vector<double> LI::ecoeffsD1SHARKShellPair(const int ipair, const ShellPairData 
     return ecoeffsd1;
 }
 
-vector<double> LI::ecoeffsSHARK(const ShellPairData &sp_data)
+vector<double> LI::ecoeffsSHARKBig(const ShellPairData &sp_data)
 {
     int la = sp_data.la;
     int lb = sp_data.lb;
@@ -617,7 +617,7 @@ vector<double> LI::ecoeffsD1SHARK(const ShellPairData &sp_data)
     return ecoeffsd1;
 }
 
-vector<double> LI::ecoeffsSHARK(const ShellData &sh_data)
+vector<double> LI::ecoeffsSHARKBig(const ShellData &sh_data)
 {
     int l = sh_data.l;
     int n_sph = numSphericals(l);
@@ -628,11 +628,146 @@ vector<double> LI::ecoeffsSHARK(const ShellData &sh_data)
     vector<double> ecoeffs(n_ecoeffs);
     for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
     {
-        vector<double> ecoeffs_ishell = ecoeffsSHARKShell(ishell, sh_data);
+        vector<double> ecoeffs_ishell = ecoeffsSHARKBigShell(ishell, sh_data);
 
         int ofs = sh_data.offsets_ecoeffs[ishell];
         for (size_t i = 0; i < ecoeffs_ishell.size(); i++)
             ecoeffs[ofs + i] = ecoeffs_ishell[i];
+    }
+
+    return ecoeffs;
+}
+
+vector<double> LI::ecoeffsSHARKSmall(const ShellData &sh_data, const bool transpose)
+{
+    const int l = sh_data.l;
+    const int n_sph = numSphericals(l);
+    const int n_hermite = numHermites(l);
+    const int n_ecoeffs_pp = n_sph * n_hermite;
+    const int n_ecoeffs = sh_data.n_primitives * n_ecoeffs_pp;    
+
+    const auto &cart_exps = cartExps(l);
+    const vec3i tuv_poss = getHermiteGaussianPositions(l);
+    const vector<tuple<int, int, double>> sph_trafo = sphericalTrafo(l);
+
+    vector<double> ecoeffs(n_ecoeffs, 0);
+    for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
+    {
+        int cdepth = sh_data.cdepths[ishell];
+        int cofs = sh_data.coffsets[ishell];
+
+        int offset_ecoeffs = sh_data.offsets_ecoeffs[ishell];
+
+        for (int ia = 0; ia < cdepth; ia++)
+        {
+            double a = sh_data.exps[cofs + ia];
+
+            auto [Ex, Ey, Ez] = ecoeffsPrimitive(a, l);
+
+            double d = sh_data.coeffs[cofs + ia];
+            int ofs = offset_ecoeffs + ia * n_sph * n_hermite;
+            for (auto &[a, a_, val] : sph_trafo)
+            {
+                auto [i, j, k] = cart_exps[a_];
+                for (int t = 0; t <= i; t++)
+                    for (int u = 0; u <= j; u++)
+                        for (int v = 0; v <= k; v++)
+                        {
+                            double ecoeff = d * Ex(i, t) * Ey(j, u) * Ez(k, v) * val;
+
+                            int tuv = tuv_poss(t, u, v);
+
+                            int idx;
+                            if (transpose)
+                                idx = ofs + tuv * n_sph + a;
+                            else 
+                                idx = ofs + a * n_hermite + tuv;
+
+                            ecoeffs[idx] += ecoeff;
+                        }
+            }
+        }
+    }
+
+    return ecoeffs;
+}
+
+vector<double> LI::ecoeffsSHARKSmall(const ShellPairData &sp_data, const bool transpose)
+{
+    const int la = sp_data.la;
+    const int lb = sp_data.lb;
+    const int lab = la + lb;
+    const int n_cart_b = numCartesians(lb);
+    const int n_sph_a = numSphericals(la);
+    const int n_sph_b = numSphericals(lb);
+    const int n_sph_ab = n_sph_a * n_sph_b;
+    const int n_hermite = numHermites(lab);
+    const int n_ecoeffs = n_sph_ab * n_hermite;
+
+    const vector<tuple<int, int, double>> sph_trafo_a = sphericalTrafo(la);
+    const vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);
+    const auto &cart_exps_a = cartExps(la);
+    const auto &cart_exps_b = cartExps(lb);        
+    const vec3i tuv_poss = getHermiteGaussianPositions(lab);
+
+    vector<double> ecoeffs(n_ecoeffs * sp_data.n_prim_pairs, 0);
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+        int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+        int cofs_a = sp_data.coffsets[2 * ipair + 0];
+        int cofs_b = sp_data.coffsets[2 * ipair + 1];
+
+        const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+        const double *xyz_b = &sp_data.coords[6 * ipair + 3];
+
+        int offset_ecoeffs = sp_data.offsets_ecoeffs[ipair];
+
+        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+            {
+                double a = sp_data.exps[cofs_a + ia];
+                double b = sp_data.exps[cofs_b + ib];
+
+                auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
+
+                vec3d ecoeffs_ppair_sc(Fill(0), n_sph_a, n_cart_b, n_hermite);
+                for (auto &[a, a_, val] : sph_trafo_a)
+                    for (size_t b_ = 0; b_ < cart_exps_b.size(); b_++)
+                    {
+                        auto [i, j, k] = cart_exps_a[a_];
+                        auto [i_, j_, k_] = cart_exps_b[b_];
+                        for (int t = 0; t <= i + i_; t++)
+                            for (int u = 0; u <= j + j_; u++)
+                                for (int v = 0; v <= k + k_; v++)
+                                {
+                                    int tuv = tuv_poss(t, u, v);
+
+                                    ecoeffs_ppair_sc(a, b_, tuv) +=
+                                        val * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
+                                }
+                    }
+
+                double da = sp_data.coeffs[cofs_a + ia];
+                double db = sp_data.coeffs[cofs_b + ib];
+                double dadb = da * db;
+
+                int ofs = offset_ecoeffs + iab * n_ecoeffs;
+                for (auto &[b, b_, val] : sph_trafo_b)
+                    for (int a = 0; a < n_sph_a; a++)
+                        for (int tuv = 0; tuv < n_hermite; tuv++)
+                        {
+                            int ab = a * n_sph_b + b;                            
+
+                            int idx;
+                            if (transpose)
+                                idx = ofs + tuv * n_sph_ab + ab;
+                            else 
+                                idx = ofs + ab * n_hermite + tuv;
+
+                            ecoeffs[idx] += dadb * val * ecoeffs_ppair_sc(a, b_, tuv);
+                        }
+            }
     }
 
     return ecoeffs;

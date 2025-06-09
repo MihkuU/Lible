@@ -27,6 +27,10 @@ lible::vec4d LI::eri4KernelFun(const int ipair_ab, const int ipair_cd,
     const int n_sph_cd = n_sph_c * n_sph_d;
     const int n_hermite_ab = numHermites(lab);
     const int n_hermite_cd = numHermites(lcd);
+    const int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
+    const int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
+    const int ofs_E_ab = sp_data_ab.offsets_ecoeffs[ipair_ab];
+    const int ofs_E_cd = sp_data_cd.offsets_ecoeffs[ipair_cd];
 
     // Read-in data
     const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
@@ -41,17 +45,18 @@ lible::vec4d LI::eri4KernelFun(const int ipair_ab, const int ipair_cd,
     const double *xyz_b = &sp_data_ab.coords[6 * ipair_ab + 3];
     const double *xyz_c = &sp_data_cd.coords[6 * ipair_cd];
     const double *xyz_d = &sp_data_cd.coords[6 * ipair_cd + 3];
+    const double *ecoeffs_ab = &eri4_kernel->ecoeffs_bra[ofs_E_ab];
+    const double *ecoeffs_cd = &eri4_kernel->ecoeffs_ket[ofs_E_cd];
 
-    // R-integrals
+    // SHARK integrals
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(lab);
     vector<array<int, 3>> hermite_idxs_ket = getHermiteGaussianIdxs(lcd);
 
-    int n_r_rows = (cdepth_a * cdepth_b * n_hermite_ab);
-    int n_r_cols = (cdepth_c * cdepth_d * n_hermite_cd);
-    int n_rints = n_r_rows * n_r_cols;
-    std::vector<double> rints(n_rints, 0);
+    vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            vector<double> R_x_E(n_hermite_ab * n_sph_cd, 0);
             for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
                 for (int id = 0; id < cdepth_d; id++, icd++)
                 {
@@ -80,34 +85,18 @@ lible::vec4d LI::eri4KernelFun(const int ipair_ab, const int ipair_cd,
                     double x = alpha * (dx * dx + dy * dy + dz * dz);
                     vector<double> fnx = calcBoysF(labcd, x, eri4_kernel->boys_grid);
 
-                    int ofs_row = iab * n_hermite_ab;
-                    int ofs_col = icd * n_hermite_cd;
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                    calcRIntsMatrixTest(labcd, n_r_cols, ofs_row, ofs_col, fac, alpha, &xyz_pq[0],
-                                        &fnx[0], hermite_idxs_bra, hermite_idxs_ket, &rints[0]);
+                    vector<double> rints = calcRIntsMatrix(labcd, fac, alpha, &xyz_pq[0], &fnx[0],
+                                                           hermite_idxs_bra, hermite_idxs_ket);
+
+                    int ofs_ecoeffs_cd = icd * n_ecoeffs_cd;
+                    shark_mm_ket(n_hermite_ab, n_sph_cd, n_hermite_cd, &rints[0], &ecoeffs_cd[ofs_ecoeffs_cd], &R_x_E[0]);
                 }
+            int ofs_ecoeffs_ab = iab * n_ecoeffs_ab;
+            shark_mm_bra(n_sph_ab, n_sph_cd, n_hermite_ab, &ecoeffs_ab[ofs_ecoeffs_ab], &R_x_E[0], &eri4_batch[0]);
+        }
 
-    // SHARK integrals
-    int m = cdepth_a * cdepth_b * n_hermite_ab;
-    int n = n_sph_cd;
-    int k = cdepth_c * cdepth_d * n_hermite_cd;
-    int n_R_x_E = cdepth_a * cdepth_b * (n_hermite_ab * n_sph_cd);
-    int ofs_E_bra = sp_data_ab.offsets_ecoeffs[ipair_ab];
-    int ofs_E_ket = sp_data_cd.offsets_ecoeffs[ipair_cd];
-
-    std::vector<double> R_x_E(n_R_x_E, 0);
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, m, n, k, 1.0, &rints[0], k,
-                &eri4_kernel->ecoeffs_ket[ofs_E_ket], k, 1.0, &R_x_E[0], n);
-
-    m = n_sph_ab;
-    n = n_sph_cd;
-    k = cdepth_a * cdepth_b * n_hermite_ab;
-
-    vec4d eri4_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0,
-                &eri4_kernel->ecoeffs_bra[ofs_E_bra], k, &R_x_E[0], n, 1.0,
-                &eri4_batch[0], n);
-
+    // Norms
     int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
     int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
     int ofs_norm_c = sp_data_cd.offsets_norms[2 * ipair_cd];
@@ -144,6 +133,8 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
     const int n_hermite_ab = numHermites(lab);
     const int n_hermite_c = numHermites(lc);
     const int n_sph_ab = n_sph_a * n_sph_b;
+    const int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
+    const int n_ecoeffs_c = n_sph_c * n_hermite_c;    
 
     // Read-in data
     const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
@@ -152,6 +143,8 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
     const int cofs_a = sp_data_ab.coffsets[2 * ipair_ab];
     const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
     const int cofs_c = sh_data_c.coffsets[ishell_c];
+    const int ofs_E_ab = sp_data_ab.offsets_ecoeffs[ipair_ab];
+    const int ofs_E_c = sh_data_c.offsets_ecoeffs[ishell_c];    
 
     const double *exps_a = &sp_data_ab.exps[cofs_a];
     const double *exps_b = &sp_data_ab.exps[cofs_b];
@@ -159,17 +152,18 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
     const double *coords_a = &sp_data_ab.coords[6 * ipair_ab];
     const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];
     const double *coords_c = &sh_data_c.coords[3 * ishell_c];
+    const double *ecoeffs_ab = &eri3_kernel->ecoeffs_bra[ofs_E_ab];
+    const double *ecoeffs_c = &eri3_kernel->ecoeffs_ket[ofs_E_c];    
 
-    // R-integrals
+    // SHARK integrals
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(lab);
     vector<array<int, 3>> hermite_idxs_ket = getHermiteGaussianIdxs(lc);
 
-    int n_r_rows = (cdepth_a * cdepth_b * n_hermite_ab);
-    int n_r_cols = (cdepth_c * n_hermite_c);
-    int n_rints = n_r_rows * n_r_cols;
-    std::vector<double> rints(n_rints, 0);
+    vec3d eri3_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            vector<double> R_x_E(n_hermite_ab * n_sph_c, 0);
             for (int ic = 0; ic < cdepth_c; ic++)
             {
                 double a = exps_a[ia];
@@ -192,33 +186,17 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
                 vector<double> fnx = calcBoysF(labc, x, eri3_kernel->boys_grid);
 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
-                int ofs_row = iab * n_hermite_ab;
-                int ofs_col = ic * n_hermite_c;
-                calcRIntsMatrixTest(labc, n_r_cols, ofs_row, ofs_col, fac, alpha, &xyz_pc[0],
-                                    &fnx[0], hermite_idxs_bra, hermite_idxs_ket, &rints[0]);
+                vector<double> rints = calcRIntsMatrix(labc, fac, alpha, &xyz_pc[0], &fnx[0],
+                                                       hermite_idxs_bra, hermite_idxs_ket);
+
+                int ofs_ecoeffs_c = ic * n_ecoeffs_c;
+                shark_mm_ket(n_hermite_ab, n_sph_c, n_hermite_c, &rints[0], &ecoeffs_c[ofs_ecoeffs_c], &R_x_E[0]);
             }
+            int ofs_ecoeffs_ab = iab * n_ecoeffs_ab;
+            shark_mm_bra(n_sph_ab, n_sph_c, n_hermite_ab, &ecoeffs_ab[ofs_ecoeffs_ab], &R_x_E[0], &eri3_batch[0]);
+        }
 
-    // SHARK integrals
-    int m = cdepth_a * cdepth_b * n_hermite_ab;
-    int n = n_sph_c;
-    int k = cdepth_c * n_hermite_c;
-    int n_R_x_E = cdepth_a * cdepth_b * (n_hermite_ab * n_sph_c);
-    int ofs_E_bra = sp_data_ab.offsets_ecoeffs[ipair_ab];
-    int ofs_E_ket = sh_data_c.offsets_ecoeffs[ishell_c];
-
-    std::vector<double> R_x_E(n_R_x_E, 0);
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, m, n, k, 1.0, &rints[0], k,
-                &eri3_kernel->ecoeffs_ket[ofs_E_ket], k, 1.0, &R_x_E[0], n);
-
-    m = n_sph_ab;
-    n = n_sph_c;
-    k = cdepth_a * cdepth_b * n_hermite_ab;
-
-    vec3d eri3_batch(Fill(0), n_sph_a, n_sph_b, n_sph_c);
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0,
-                &eri3_kernel->ecoeffs_bra[ofs_E_bra], k, &R_x_E[0], n, 1.0,
-                &eri3_batch[0], n);
-
+    // Norms
     int ofs_norm_a = sp_data_ab.offsets_norms[2 * ipair_ab];
     int ofs_norm_b = sp_data_ab.offsets_norms[2 * ipair_ab + 1];
     int ofs_norm_c = sh_data_c.offsets_norms[ishell_c];
@@ -248,33 +226,38 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
     const int n_sph_b = numSphericals(lb);
     const int n_hermite_a = numHermites(la);
     const int n_hermite_b = numHermites(lb);
+    const int n_ecoeffs_a = n_sph_a * n_hermite_a;
+    const int n_ecoeffs_b = n_sph_b * n_hermite_b;    
 
     // Read-in data
     const int cdepth_a = sh_data_a.cdepths[ishell_a];
     const int cdepth_b = sh_data_b.cdepths[ishell_b];
     const int cofs_a = sh_data_a.coffsets[ishell_a];
     const int cofs_b = sh_data_b.coffsets[ishell_b];
+    const int ofs_E_a = sh_data_a.offsets_ecoeffs[ishell_a];
+    const int ofs_E_b = sh_data_b.offsets_ecoeffs[ishell_b];
 
     const double *exps_a = &sh_data_a.exps[cofs_a];
     const double *exps_b = &sh_data_b.exps[cofs_b];
     const double *coords_a = &sh_data_a.coords[3 * ishell_a];
     const double *coords_b = &sh_data_b.coords[3 * ishell_b];
+    const double *ecoeffs_a = &eri2_kernel->ecoeffs_bra[ofs_E_a];
+    const double *ecoeffs_b = &eri2_kernel->ecoeffs_ket[ofs_E_b];    
 
-    // R-integrals
+    // SHARK integrals
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(la);
     vector<array<int, 3>> hermite_idxs_ket = getHermiteGaussianIdxs(lb);
 
-    std::array<double, 3> xyz_ab{coords_a[0] - coords_b[0],
-                                 coords_a[1] - coords_b[1],
-                                 coords_a[2] - coords_b[2]};
+    array<double, 3> xyz_ab{coords_a[0] - coords_b[0],
+                            coords_a[1] - coords_b[1],
+                            coords_a[2] - coords_b[2]};
     double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
     double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
 
-    int n_r_rows = (cdepth_a * n_hermite_a);
-    int n_r_cols = (cdepth_b * n_hermite_b);
-    int n_rints = n_r_rows * n_r_cols;
-    std::vector<double> rints(n_rints, 0);
+    vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);    
     for (int ia = 0; ia < cdepth_a; ia++)
+    {
+        vector<double> R_x_E(n_hermite_a * n_sph_b, 0);
         for (int ib = 0; ib < cdepth_b; ib++)
         {
             double a = exps_a[ia];
@@ -285,33 +268,17 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
             vector<double> fnx = calcBoysF(lab, x, eri2_kernel->boys_grid);
 
             double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-            int ofs_row = ia * n_hermite_a;
-            int ofs_col = ib * n_hermite_b;
-            calcRIntsMatrixTest(lab, n_r_cols, ofs_row, ofs_col, fac, alpha, &xyz_ab[0],
-                                &fnx[0], hermite_idxs_bra, hermite_idxs_ket, &rints[0]);
+            vector<double> rints = calcRIntsMatrix(lab, fac, alpha, &xyz_ab[0], &fnx[0],
+                                                   hermite_idxs_bra, hermite_idxs_ket);
+
+            int ofs_ecoeffs_b = ib * n_ecoeffs_b;
+            shark_mm_ket(n_hermite_a, n_sph_b, n_hermite_b, &rints[0], &ecoeffs_b[ofs_ecoeffs_b], &R_x_E[0]);
         }
+        int ofs_ecoeffs_a = ia * n_ecoeffs_a;
+        shark_mm_bra(n_sph_a, n_sph_b, n_hermite_a, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[0], &eri2_batch[0]);
+    }
 
-    // SHARK integrals
-    int m = cdepth_a * n_hermite_a;
-    int n = n_sph_b;
-    int k = cdepth_b * n_hermite_b;
-    int n_R_x_E = cdepth_a * (n_hermite_a * n_sph_b);
-    int ofs_E_bra = sh_data_a.offsets_ecoeffs[ishell_a];
-    int ofs_E_ket = sh_data_b.offsets_ecoeffs[ishell_b];
-
-    std::vector<double> R_x_E(n_R_x_E, 0);
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, m, n, k, 1.0, &rints[0], k,
-                &eri2_kernel->ecoeffs_ket[ofs_E_ket], k, 1.0, &R_x_E[0], n);
-
-    m = n_sph_a;
-    n = n_sph_b;
-    k = cdepth_a * n_hermite_a;
-
-    vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0,
-                &eri2_kernel->ecoeffs_bra[ofs_E_bra], k, &R_x_E[0], n, 1.0,
-                &eri2_batch[0], n);
-
+    // Norms
     int ofs_norm_a = sh_data_a.offsets_norms[ishell_a];
     int ofs_norm_b = sh_data_b.offsets_norms[ishell_b];
     for (int mu = 0; mu < n_sph_a; mu++)
