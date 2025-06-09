@@ -369,8 +369,7 @@ namespace lible
 
         template <int la, int lb>
         void calcRInts_ERI2D1(const double alpha, const double fac, const double *fnx,
-                              const double *xyz_ab, const int n_rints, const int n_cols,
-                              const int ofs_row, const int ofs_col, double *rints_out)
+                              const double *xyz_ab, double *rints)
         {
             constexpr int lab = la + lb;
 
@@ -380,12 +379,10 @@ namespace lible
 
             constexpr int n_hermites_a = numHermitesC(la);
             constexpr int n_hermites_b = numHermitesC(lb);
-            const int ofs0 = n_rints * 0;
-            const int ofs1 = n_rints * 1;
-            const int ofs2 = n_rints * 2;
-            const int ofs3 = n_rints * 3;
-            const int ofs4 = n_rints * 4;
-            const int ofs5 = n_rints * 5;
+            constexpr int n_rints = n_hermites_a * n_hermites_b;
+            constexpr int ofs0 = n_rints * 0;
+            constexpr int ofs1 = n_rints * 1;
+            constexpr int ofs2 = n_rints * 2;       
 
             constexpr std::array<std::array<int, 3>, n_hermites_a> idxs_a = generateHermiteIdxs<la>();
             constexpr std::array<std::array<int, 3>, n_hermites_b> idxs_b = generateHermiteIdxs<lb>();
@@ -393,11 +390,9 @@ namespace lible
             {
                 auto &[t_, u_, v_] = idxs_b[j];
 
-                double sign_A = 1.0;
+                double sign = 1.0;
                 if ((t_ + u_ + v_) % 2 != 0)
-                    sign_A = -1.0;
-
-                double sign_B = sign_A * -1.0;
+                    sign = -1.0;
 
                 for (int i = 0; i < n_hermites_a; i++)
                 {
@@ -407,30 +402,22 @@ namespace lible
                     int uu_ = u + u_;
                     int vv_ = v + v_;
 
-                    int irow = ofs_row + i;
-                    int icol = ofs_col + j;
-                    int idx_lhs = irow * n_cols + icol;
+                    int idx_lhs = i * n_hermites_b + j;
                     int idx_rhs0 = indexRRollout(lab + 1, tt_ + 1, uu_, vv_); // TODO: precalc offset
                     int idx_rhs1 = indexRRollout(lab + 1, tt_, uu_ + 1, vv_); // TODO: precalc offset
                     int idx_rhs2 = indexRRollout(lab + 1, tt_, uu_, vv_ + 1); // TODO: precalc offset
 
                     // d/dA
-                    rints_out[ofs0 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs0];
-                    rints_out[ofs1 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs1];
-                    rints_out[ofs2 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs2];
-
-                    // d/dB
-                    rints_out[ofs3 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs0];
-                    rints_out[ofs4 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs1];
-                    rints_out[ofs5 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs2];
+                    rints[ofs0 + idx_lhs] = sign * fac * rints_buff[idx_rhs0];
+                    rints[ofs1 + idx_lhs] = sign * fac * rints_buff[idx_rhs1];
+                    rints[ofs2 + idx_lhs] = sign * fac * rints_buff[idx_rhs2];               
                 }
             }
         }
 
         template <int lab, int lc>
         void calcRInts_ERI3D1(const double alpha, const double fac, const double *fnx,
-                              const double *xyz_pc, const int n_rints, const int n_cols,
-                              const int ofs_row, const int ofs_col, double *rints_out)
+                              const double *xyz_pc, double *rints)
         {
             constexpr int labc = lab + lc;
 
@@ -440,25 +427,22 @@ namespace lible
 
             constexpr int n_hermites_ab = numHermitesC(lab);
             constexpr int n_hermites_c = numHermitesC(lc);
-            const int ofs0 = n_rints * 0;
-            const int ofs1 = n_rints * 1;
-            const int ofs2 = n_rints * 2;
-            const int ofs3 = n_rints * 3;
-            const int ofs4 = n_rints * 4;
-            const int ofs5 = n_rints * 5;
-            const int ofs6 = n_rints * 6;
+            constexpr int n_rints = n_hermites_ab * n_hermites_c;
+            constexpr int ofs0 = n_rints * 0;
+            constexpr int ofs1 = n_rints * 1;
+            constexpr int ofs2 = n_rints * 2;
+            constexpr int ofs3 = n_rints * 3;
 
             constexpr std::array<std::array<int, 3>, n_hermites_ab> idxs_ab = generateHermiteIdxs<lab>();
             constexpr std::array<std::array<int, 3>, n_hermites_c> idxs_c = generateHermiteIdxs<lc>();
+
             for (int j = 0; j < n_hermites_c; j++)
             {
                 auto &[t_, u_, v_] = idxs_c[j];
 
-                double sign_AB = 1.0;
+                double sign = 1.0;
                 if ((t_ + u_ + v_) % 2 != 0)
-                    sign_AB = -1.0;
-
-                double sign_C = sign_AB * -1.0;
+                    sign = -1.0;                
 
                 for (int i = 0; i < n_hermites_ab; i++)
                 {
@@ -468,26 +452,19 @@ namespace lible
                     int uu_ = u + u_;
                     int vv_ = v + v_;
 
-                    int irow = ofs_row + i;
-                    int icol = ofs_col + j;
-                    int idx_lhs = irow * n_cols + icol;
+                    int idx_lhs = i * n_hermites_c + j;
                     int idx_rhs0 = indexRRollout(labc + 1, tt_ + 1, uu_, vv_);
                     int idx_rhs1 = indexRRollout(labc + 1, tt_, uu_ + 1, vv_);
                     int idx_rhs2 = indexRRollout(labc + 1, tt_, uu_, vv_ + 1);
                     int idx_rhs3 = indexRRollout(labc + 1, tt_, uu_, vv_);
 
                     // d/dP
-                    rints_out[ofs0 + idx_lhs] = sign_AB * fac * rints_buff[idx_rhs0];
-                    rints_out[ofs1 + idx_lhs] = sign_AB * fac * rints_buff[idx_rhs1];
-                    rints_out[ofs2 + idx_lhs] = sign_AB * fac * rints_buff[idx_rhs2];
+                    rints[ofs0 + idx_lhs] = sign * fac * rints_buff[idx_rhs0];
+                    rints[ofs1 + idx_lhs] = sign * fac * rints_buff[idx_rhs1];
+                    rints[ofs2 + idx_lhs] = sign * fac * rints_buff[idx_rhs2];
 
                     // d/dR
-                    rints_out[ofs3 + idx_lhs] = sign_AB * fac * rints_buff[idx_rhs3];
-
-                    // d/dC
-                    rints_out[ofs4 + idx_lhs] = sign_C * fac * rints_buff[idx_rhs0];
-                    rints_out[ofs5 + idx_lhs] = sign_C * fac * rints_buff[idx_rhs1];
-                    rints_out[ofs6 + idx_lhs] = sign_C * fac * rints_buff[idx_rhs2];
+                    rints[ofs3 + idx_lhs] = sign * fac * rints_buff[idx_rhs3];
                 }
             }
         }

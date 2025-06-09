@@ -112,11 +112,18 @@ namespace lible
         std::vector<double>
         ecoeffsSHARKBig(const ShellData &sh_data);
 
+        ///// only this >>>>>>>>>>>>>>>>>>>>>
+
         std::vector<double>
         ecoeffsSHARKSmall(const ShellPairData &sp_data, const bool transpose = false);
 
         std::vector<double>
         ecoeffsSHARKSmall(const ShellData &sh_data, const bool transpose = false);
+
+        std::vector<double>
+        ecoeffsD1SHARKSmall(const ShellPairData &sp_data, const bool transpose = false);
+
+        ///// only this <<<<<<<<<<<<<<<<<<<<<
 
         std::vector<double> 
         ecoeffsD1SHARK(const ShellPairData &sp_data);

@@ -33,8 +33,7 @@ def instantiateR_generic(la, lb):
 def instantiateR_ERI2D1(la, lb):
 
 	file_str = 'template void lible::ints::calcRInts_ERI2D1<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
-	file_str += '                                                  const double *xyz_pq, const int n_rints, const int n_cols,\n'
-	file_str += '                                                  const int ofs_row, const int ofs_col, double *rints_out);\n\n'
+	file_str += '                                                  const double *xyz_ab, double *rints);\n\n'
 
 	return file_str
 
@@ -42,8 +41,7 @@ def instantiateR_ERI2D1(la, lb):
 def instantiateR_ERI3D1(la, lb):
 
 	file_str = 'template void lible::ints::calcRInts_ERI3D1<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
-	file_str += '                                                  const double *xyz_pq, const int n_rints, const int n_cols,\n'
-	file_str += '                                                  const int ofs_row, const int ofs_col, double *rints_out);\n\n'
+	file_str += '                                                  const double *xyz_pc, double *rints);\n\n'
 
 	return file_str
 
@@ -265,6 +263,10 @@ l_max_generate = 6
 for la in range(0, l_max + 1):
 	for lb in range(0, l_max + 1):
 		l_sum = la + lb
+
+		if l_sum > l_max:
+			continue
+
 		if l_sum > l_max_generate:	
 			writeKernelInstantiate(la, lb)
 		else:
