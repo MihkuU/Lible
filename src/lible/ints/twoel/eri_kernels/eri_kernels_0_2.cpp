@@ -25,6 +25,11 @@ template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 0, 0, 2>(c
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
+template lible::vec4d lible::ints::eri4KernelFun<0, 0, 0, 2>(const int ipair_ab, const int ipair_cd,
+                                                             const ShellPairData &sp_data_ab,
+                                                             const ShellPairData &sp_data_cd,
+                                                             const ERI4Kernel *eri4_kernel);
+
 template lible::vec3d lible::ints::eri3KernelFun<0, 0, 2>(const int ipair_ab, const int ishell_c,
                                                           const ShellPairData &sp_data_ab,
                                                           const ShellData &sh_data_c,

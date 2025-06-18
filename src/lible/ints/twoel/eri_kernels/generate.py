@@ -212,16 +212,20 @@ def writeKernelInstantiate(lbra, lket):
 				
 				if lbra + lket <= 6:
 					file_str += instantiateERI4(la, lb, lc, ld)
-
 					file_str += instantiateERI4D1(la, lb, lc, ld)
 					if la != lb and lc == ld:
 						file_str += instantiateERI4D1(lb, la, lc, ld)
+						file_str += instantiateERI4(lb, la, lc, ld)
 					elif lc != ld and la == lb:
 						file_str += instantiateERI4D1(la, lb, ld, lc)
+						file_str += instantiateERI4(la, lb, ld, lc)
 					elif la != lb and lc != ld:
 						file_str += instantiateERI4D1(lb, la, ld, lc)
 						file_str += instantiateERI4D1(lb, la, lc, ld)
 						file_str += instantiateERI4D1(la, lb, ld, lc)
+						file_str += instantiateERI4(lb, la, ld, lc)
+						file_str += instantiateERI4(lb, la, lc, ld)
+						file_str += instantiateERI4(la, lb, ld, lc)
 			
 
 				# file_str += 'template lible::vec4d lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
@@ -287,16 +291,20 @@ def writeKernelGenerate(lbra, lket):
 		for lc, ld in lcld_list:
 			# file_str += specializeERI4(la, lb, lc, ld)
 			file_str += instantiateERI4(la, lb, lc, ld)			
-
 			file_str += instantiateERI4D1(la, lb, lc, ld)
 			if la != lb and lc == ld:
 				file_str += instantiateERI4D1(lb, la, lc, ld)
+				file_str += instantiateERI4(lb, la, lc, ld)			
 			elif lc != ld and la == lb:
 				file_str += instantiateERI4D1(la, lb, ld, lc)
+				file_str += instantiateERI4(la, lb, ld, lc)			
 			elif la != lb and lc != ld:
 				file_str += instantiateERI4D1(lb, la, ld, lc)
 				file_str += instantiateERI4D1(lb, la, lc, ld)
 				file_str += instantiateERI4D1(la, lb, ld, lc)
+				file_str += instantiateERI4(lb, la, ld, lc)
+				file_str += instantiateERI4(lb, la, lc, ld)
+				file_str += instantiateERI4(la, lb, ld, lc)
 			
 			# file_str += 'template<> lible::vec4d\n'
 			# file_str += 'lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
