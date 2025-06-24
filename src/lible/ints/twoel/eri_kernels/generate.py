@@ -36,6 +36,16 @@ def instantiateERI2D1(la, lb):
 
 	return file_str
 
+def instantiateERI2D2(la, lb):
+
+	file_str  = 'template std::array<std::array<lible::vec2d, 6>, 6> \n'
+	file_str += 'lible::ints::eri2d2KernelFun<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(la, lb)
+	file_str += '                                    const ShellData &sh_data_a,\n'
+	file_str += '                                    const ShellData &sh_data_b,\n'
+	file_str += '                                    const ERI2D2Kernel *eri2d2_kernel);\n\n'
+
+	return file_str
+
 def instantiateERI3D1(la, lb, lc):
 
 	file_str = 'template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<{}, {}, {}>(const int ipair_ab, const int ishell_c,\n'.format(la, lb, lc)
@@ -254,6 +264,7 @@ def writeKernelInstantiate(lbra, lket):
 		if (lbra + lket) <= 6:
 			file_str += instantiateERI2(lbra, lket)
 			file_str += instantiateERI2D1(lbra, lket)
+			file_str += instantiateERI2D2(lbra, lket)
 
 		# file_str += 'template lible::vec2d lible::ints::two::eri2Kernel<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(lbra, lket)
 		# file_str += '                                                         const std::vector<double> &ecoeffs_a,\n'
@@ -545,6 +556,7 @@ def writeKernelGenerate(lbra, lket):
 	if (lbra + lket) <= 6:
 		file_str += instantiateERI2(lbra, lket)
 		file_str += instantiateERI2D1(lbra, lket)
+		file_str += instantiateERI2D2(lbra, lket)
 
 	# file_str += 'template<> lible::vec2d\n'
 	# file_str += 'lible::ints::two::eri2Kernel<{}, {}>(const int ishell_a, const int ishell_b,\n'.format(lbra, lket)

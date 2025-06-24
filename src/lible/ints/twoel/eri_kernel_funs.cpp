@@ -69,17 +69,17 @@ lible::vec4d LI::eri4KernelFun(const int ipair_ab, const int ipair_cd,
                     double q = c + d;
                     double alpha = p * q / (p + q);
 
-                    std::array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
-                                                (a * xyz_a[1] + b * xyz_b[1]) / p,
-                                                (a * xyz_a[2] + b * xyz_b[2]) / p};
+                    array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                           (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                           (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-                    std::array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
-                                                (c * xyz_c[1] + d * xyz_d[1]) / q,
-                                                (c * xyz_c[2] + d * xyz_d[2]) / q};
+                    array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
+                                           (c * xyz_c[1] + d * xyz_d[1]) / q,
+                                           (c * xyz_c[2] + d * xyz_d[2]) / q};
 
-                    std::array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0],
-                                                 xyz_p[1] - xyz_q[1],
-                                                 xyz_p[2] - xyz_q[2]};
+                    array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0],
+                                            xyz_p[1] - xyz_q[1],
+                                            xyz_p[2] - xyz_q[2]};
 
                     double dx{xyz_pq[0]}, dy{xyz_pq[1]}, dz{xyz_pq[2]};
                     double x = alpha * (dx * dx + dy * dy + dz * dz);
@@ -116,7 +116,7 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
     const int n_hermite_c = numHermites(lc);
     const int n_sph_ab = n_sph_a * n_sph_b;
     const int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
-    const int n_ecoeffs_c = n_sph_c * n_hermite_c;    
+    const int n_ecoeffs_c = n_sph_c * n_hermite_c;
 
     // Read-in data
     const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab];
@@ -126,7 +126,7 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
     const int cofs_b = sp_data_ab.coffsets[2 * ipair_ab + 1];
     const int cofs_c = sh_data_c.coffsets[ishell_c];
     const int ofs_E_ab = sp_data_ab.offsets_ecoeffs[ipair_ab];
-    const int ofs_E_c = sh_data_c.offsets_ecoeffs[ishell_c];    
+    const int ofs_E_c = sh_data_c.offsets_ecoeffs[ishell_c];
 
     const double *exps_a = &sp_data_ab.exps[cofs_a];
     const double *exps_b = &sp_data_ab.exps[cofs_b];
@@ -135,7 +135,7 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
     const double *coords_b = &sp_data_ab.coords[6 * ipair_ab + 3];
     const double *coords_c = &sh_data_c.coords[3 * ishell_c];
     const double *ecoeffs_ab = &eri3_kernel->ecoeffs_bra[ofs_E_ab];
-    const double *ecoeffs_c = &eri3_kernel->ecoeffs_ket[ofs_E_c];    
+    const double *ecoeffs_c = &eri3_kernel->ecoeffs_ket[ofs_E_c];
 
     // SHARK integrals
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(lab);
@@ -155,11 +155,11 @@ lible::vec3d LI::eri3KernelFun(const int ipair_ab, const int ishell_c,
                 double p = a + b;
                 double alpha = p * c / (p + c);
 
-                std::array<double, 3> xyz_p{(a * coords_a[0] + b * coords_b[0]) / p,
+                array<double, 3> xyz_p{(a * coords_a[0] + b * coords_b[0]) / p,
                                             (a * coords_a[1] + b * coords_b[1]) / p,
                                             (a * coords_a[2] + b * coords_b[2]) / p};
 
-                std::array<double, 3> xyz_pc{xyz_p[0] - coords_c[0],
+                array<double, 3> xyz_pc{xyz_p[0] - coords_c[0],
                                              xyz_p[1] - coords_c[1],
                                              xyz_p[2] - coords_c[2]};
 
@@ -194,7 +194,7 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
     const int n_hermite_a = numHermites(la);
     const int n_hermite_b = numHermites(lb);
     const int n_ecoeffs_a = n_sph_a * n_hermite_a;
-    const int n_ecoeffs_b = n_sph_b * n_hermite_b;    
+    const int n_ecoeffs_b = n_sph_b * n_hermite_b;
 
     // Read-in data
     const int cdepth_a = sh_data_a.cdepths[ishell_a];
@@ -209,7 +209,7 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
     const double *coords_a = &sh_data_a.coords[3 * ishell_a];
     const double *coords_b = &sh_data_b.coords[3 * ishell_b];
     const double *ecoeffs_a = &eri2_kernel->ecoeffs_bra[ofs_E_a];
-    const double *ecoeffs_b = &eri2_kernel->ecoeffs_ket[ofs_E_b];    
+    const double *ecoeffs_b = &eri2_kernel->ecoeffs_ket[ofs_E_b];
 
     // SHARK integrals
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(la);
@@ -221,7 +221,7 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
     double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
     double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
 
-    vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);    
+    vec2d eri2_batch(Fill(0), n_sph_a, n_sph_b);
     for (int ia = 0; ia < cdepth_a; ia++)
     {
         vector<double> R_x_E(n_hermite_a * n_sph_b, 0);
@@ -248,10 +248,10 @@ lible::vec2d LI::eri2KernelFun(const int ishell_a, const int ishell_b,
     return eri2_batch;
 }
 
-std::array<lible::vec2d, 6> LI::eri2d1KernelFun(const int ishell_a, const int ishell_b,
-                                                const ShellData &sh_data_a,
-                                                const ShellData &sh_data_b,
-                                                const ERI2D1Kernel *eri2d1_kernel)
+array<lible::vec2d, 6> LI::eri2d1KernelFun(const int ishell_a, const int ishell_b,
+                                           const ShellData &sh_data_a,
+                                           const ShellData &sh_data_b,
+                                           const ERI2D1Kernel *eri2d1_kernel)
 {
     const int la = sh_data_a.l;
     const int lb = sh_data_b.l;
@@ -262,7 +262,7 @@ std::array<lible::vec2d, 6> LI::eri2d1KernelFun(const int ishell_a, const int is
     const int n_hermite_a = numHermites(la);
     const int n_hermite_b = numHermites(lb);
     const int n_ecoeffs_a = n_sph_a * n_hermite_a;
-    const int n_ecoeffs_b = n_sph_b * n_hermite_b;       
+    const int n_ecoeffs_b = n_sph_b * n_hermite_b;
     const int n_rints = n_hermite_a * n_hermite_b;
     const int n_R_x_E = n_hermite_a * n_sph_b;
 
@@ -315,13 +315,13 @@ std::array<lible::vec2d, 6> LI::eri2d1KernelFun(const int ishell_a, const int is
 
             int m = n_hermite_a, n = n_sph_b, k = n_hermite_b;
             int ofs_ecoeffs_b = ib * n_ecoeffs_b;
-            
+
             shark_mm_ket(m, n, k, &rints[0 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[0 * n_R_x_E]);
             shark_mm_ket(m, n, k, &rints[1 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[1 * n_R_x_E]);
             shark_mm_ket(m, n, k, &rints[2 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[2 * n_R_x_E]);
 
             cblas_daxpy(3 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);
-            cblas_daxpy(3 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[3 * n_R_x_E], 1);
+            cblas_daxpy(3 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[3 * n_R_x_E], 1); // TODO: not needed?
         }
 
         int m = n_sph_a, n = n_sph_b, k = n_hermite_a;
@@ -338,10 +338,130 @@ std::array<lible::vec2d, 6> LI::eri2d1KernelFun(const int ishell_a, const int is
     return eri2_batch;
 }
 
-std::array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int ishell_c,
-                                                const ShellPairData &sp_data_ab,
-                                                const ShellData &sh_data_c,
-                                                const ERI3D1Kernel *eri3d1_kernel)
+array<array<lible::vec2d, 6>, 6> LI::eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                                     const ShellData &sh_data_a,
+                                                     const ShellData &sh_data_b,
+                                                     const ERI2D2Kernel *eri2d2_kernel)
+{
+    const int la = sh_data_a.l;
+    const int lb = sh_data_b.l;
+    const int lab = la + lb;
+
+    const int n_sph_a = numSphericals(la);
+    const int n_sph_b = numSphericals(lb);
+    const int n_hermite_a = numHermites(la);
+    const int n_hermite_b = numHermites(lb);
+    const int n_ecoeffs_a = n_sph_a * n_hermite_a;
+    const int n_ecoeffs_b = n_sph_b * n_hermite_b;
+    const int n_rints = n_hermite_a * n_hermite_b;
+    const int n_R_x_E = n_hermite_a * n_sph_b;
+
+    // Read-in data
+    const int cdepth_a = sh_data_a.cdepths[ishell_a];
+    const int cdepth_b = sh_data_b.cdepths[ishell_b];
+    const int cofs_a = sh_data_a.coffsets[ishell_a];
+    const int cofs_b = sh_data_b.coffsets[ishell_b];
+    const int ofs_E_a = sh_data_a.offsets_ecoeffs[ishell_a];
+    const int ofs_E_b = sh_data_b.offsets_ecoeffs[ishell_b];
+
+    const double *exps_a = &sh_data_a.exps[cofs_a];
+    const double *exps_b = &sh_data_b.exps[cofs_b];
+    const double *coords_a = &sh_data_a.coords[3 * ishell_a];
+    const double *coords_b = &sh_data_b.coords[3 * ishell_b];
+    const double *ecoeffs_a = &eri2d2_kernel->ecoeffs_bra[ofs_E_a];
+    const double *ecoeffs_b = &eri2d2_kernel->ecoeffs_ket[ofs_E_b];
+
+    // SHARK integrals
+    vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(la);
+    vector<array<int, 3>> hermite_idxs_ket = getHermiteGaussianIdxs(lb);
+
+    array<double, 3> xyz_ab{coords_a[0] - coords_b[0],
+                            coords_a[1] - coords_b[1],
+                            coords_a[2] - coords_b[2]};
+    double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
+    double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
+
+    array<array<vec2d, 6>, 6> eri2_batch;
+    for (int i = 0; i < 6; i++)
+        for (int j = 0; j < 6; j++)
+            eri2_batch[i][j] = vec2d(Fill(0), n_sph_a, n_sph_b);
+
+    for (int ia = 0; ia < cdepth_a; ia++)
+    {
+        vector<double> R_x_E(18 * n_R_x_E, 0);
+        for (int ib = 0; ib < cdepth_b; ib++)
+        {
+            double a = exps_a[ia];
+            double b = exps_b[ib];
+
+            double alpha = a * b / (a + b);
+            double x = alpha * xyz_ab_dot;
+            vector<double> fnx = calcBoysF(lab + 1, x, eri2d2_kernel->boys_grid);
+
+            double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
+            vector<double> rints = calcRInts_ERI2D2(lab, alpha, fac, &fnx[0], &xyz_ab[0],
+                                                    hermite_idxs_bra, hermite_idxs_ket);
+
+            int m = n_hermite_a, n = n_sph_b, k = n_hermite_b;
+            int ofs_ecoeffs_b = ib * n_ecoeffs_b;
+
+            vector<double> I(6 * n_R_x_E, 0);
+            shark_mm_ket(m, n, k, &rints[0 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[0 * n_R_x_E]); // 200
+            shark_mm_ket(m, n, k, &rints[1 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[1 * n_R_x_E]); // 110
+            shark_mm_ket(m, n, k, &rints[2 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[2 * n_R_x_E]); // 101
+            shark_mm_ket(m, n, k, &rints[3 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[3 * n_R_x_E]); // 020
+            shark_mm_ket(m, n, k, &rints[4 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[4 * n_R_x_E]); // 011
+            shark_mm_ket(m, n, k, &rints[5 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[5 * n_R_x_E]); // 002
+
+            // TODO: remove?
+            cblas_daxpy(6 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);  // AA
+            cblas_daxpy(6 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[6 * n_R_x_E], 1); // AB
+            cblas_daxpy(6 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[12 * n_R_x_E], 1); // BB
+        }
+
+        int m = n_sph_a, n = n_sph_b, k = n_hermite_a;
+        int ofs_ecoeffs_a = ia * n_ecoeffs_a;
+
+        // AA
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[0 * n_R_x_E], &eri2_batch[0][0][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[1 * n_R_x_E], &eri2_batch[0][1][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[2 * n_R_x_E], &eri2_batch[0][2][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[3 * n_R_x_E], &eri2_batch[1][1][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[4 * n_R_x_E], &eri2_batch[1][2][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[5 * n_R_x_E], &eri2_batch[2][2][0]);
+
+        // AB
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[6 * n_R_x_E], &eri2_batch[0][0][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[7 * n_R_x_E], &eri2_batch[0][1][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[8 * n_R_x_E], &eri2_batch[0][2][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[7 * n_R_x_E], &eri2_batch[1][1][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[9 * n_R_x_E], &eri2_batch[1][2][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[10 * n_R_x_E], &eri2_batch[2][2][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[8 * n_R_x_E], &eri2_batch[1][1][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[10 * n_R_x_E], &eri2_batch[1][2][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[11 * n_R_x_E], &eri2_batch[2][2][0]);
+
+        // BB
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[12 * n_R_x_E], &eri2_batch[3][3][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[13 * n_R_x_E], &eri2_batch[3][4][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[14 * n_R_x_E], &eri2_batch[3][5][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[15 * n_R_x_E], &eri2_batch[4][4][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[16 * n_R_x_E], &eri2_batch[4][5][0]);
+        shark_mm_bra(m, n, k, &ecoeffs_a[ofs_ecoeffs_a], &R_x_E[17 * n_R_x_E], &eri2_batch[5][5][0]);
+    }
+
+    // i > j
+    for (int j = 0; j < 6; j++)
+        for (int i = j + 1; i < 6; i++)        
+            eri2_batch[i][j] = eri2_batch[j][i];
+
+    return eri2_batch;
+}
+
+array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int ishell_c,
+                                           const ShellPairData &sp_data_ab,
+                                           const ShellData &sh_data_c,
+                                           const ERI3D1Kernel *eri3d1_kernel)
 {
     const int la = sp_data_ab.la;
     const int lb = sp_data_ab.lb;
@@ -386,7 +506,7 @@ std::array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int is
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(lab);
     vector<array<int, 3>> hermite_idxs_ket = getHermiteGaussianIdxs(lc);
 
-    std::array<vec3d, 9> eri3_batch;
+    array<vec3d, 9> eri3_batch;
     for (int ideriv = 0; ideriv < 9; ideriv++)
         eri3_batch[ideriv] = vec3d(Fill(0), n_sph_a, n_sph_b, n_sph_c);
 
@@ -416,7 +536,7 @@ std::array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int is
                 double dx{xyz_pc[0]}, dy{xyz_pc[1]}, dz{xyz_pc[2]};
                 double x = alpha * (dx * dx + dy * dy + dz * dz);
                 vector<double> fnx = calcBoysF(labc + 1, x, eri3d1_kernel->boys_grid);
-   
+
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
                 vector<double> rints = calcRInts_ERI3D1(labc, alpha, fac, &fnx[0], &xyz_pc[0],
                                                         hermite_idxs_bra, hermite_idxs_ket);
@@ -433,7 +553,7 @@ std::array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int is
                 shark_mm_ket(m, n, k, &rints[3 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &R_x_E[3 * n_R_x_E]);
 
                 cblas_daxpy(3 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);
-                cblas_daxpy(3 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[4 * n_R_x_E], 1);                
+                cblas_daxpy(3 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[4 * n_R_x_E], 1);
             }
 
             int m = n_sph_ab, n = n_sph_c, k = n_hermite_ab;
@@ -441,8 +561,8 @@ std::array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int is
             int ofs_ecoeffs1_ab = 3 * iab * n_ecoeffs_ab;
 
             // P & R
-            std::vector<double> P(3 * n_sph_abc, 0);
-            std::vector<double> R(3 * n_sph_abc, 0);
+            vector<double> P(3 * n_sph_abc, 0);
+            vector<double> R(3 * n_sph_abc, 0);
 
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[0 * n_R_x_E], &P[0 * n_sph_abc]);
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[1 * n_R_x_E], &P[1 * n_sph_abc]);
@@ -487,7 +607,7 @@ array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_
     const int la = sp_data_ab.la;
     const int lb = sp_data_ab.lb;
     const int lc = sp_data_cd.la;
-    const int ld = sp_data_cd.lb;        
+    const int ld = sp_data_cd.lb;
     const int lab = la + lb;
     const int lcd = lc + ld;
     const int labcd = lab + lcd;
@@ -504,7 +624,7 @@ array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_
     const int n_rints = n_hermite_ab * n_hermite_cd;
     const int n_ecoeffs_ab = n_sph_ab * n_hermite_ab;
     const int n_ecoeffs_cd = n_sph_cd * n_hermite_cd;
-    const int n_R_x_E = n_hermite_ab * n_sph_cd;    
+    const int n_R_x_E = n_hermite_ab * n_sph_cd;
 
     // Read-in data
     const int cdepth_a = sp_data_ab.cdepths[2 * ipair_ab + 0];
@@ -537,10 +657,10 @@ array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_
     vector<array<int, 3>> hermite_idxs_bra = getHermiteGaussianIdxs(lab);
     vector<array<int, 3>> hermite_idxs_ket = getHermiteGaussianIdxs(lcd);
 
-    std::array<vec4d, 12> eri4_batch;
+    array<vec4d, 12> eri4_batch;
     for (int ideriv = 0; ideriv < 12; ideriv++)
-        eri4_batch[ideriv] = vec4d(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);    
-  
+        eri4_batch[ideriv] = vec4d(Fill(0), n_sph_a, n_sph_b, n_sph_c, n_sph_d);
+
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
         {
@@ -578,8 +698,8 @@ array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_
                     vector<double> rints = calcRInts_ERI3D1(labcd, alpha, fac, &fnx[0], &xyz_pq[0],
                                                             hermite_idxs_bra, hermite_idxs_ket);
 
-                    std::vector<double> I1(3 * n_R_x_E, 0);
-                    std::vector<double> I2(3 * n_R_x_E, 0);
+                    vector<double> I1(3 * n_R_x_E, 0);
+                    vector<double> I2(3 * n_R_x_E, 0);
 
                     int ofs_ecoeffs0_cd = icd * n_ecoeffs_cd;
                     int ofs_ecoeffs1_cd = 3 * icd * n_ecoeffs_cd;
@@ -611,8 +731,8 @@ array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_
             int m = n_sph_ab, n = n_sph_cd, k = n_hermite_ab;
 
             // P & R
-            std::vector<double> P(3 * n_sph_abcd, 0);
-            std::vector<double> R(3 * n_sph_abcd, 0);
+            vector<double> P(3 * n_sph_abcd, 0);
+            vector<double> R(3 * n_sph_abcd, 0);
 
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[0 * n_R_x_E], &P[0 * n_sph_abcd]);
             shark_mm_bra(m, n, k, &ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[1 * n_R_x_E], &P[1 * n_sph_abcd]);

@@ -616,6 +616,12 @@ vector<double> LI::ecoeffsD1SHARK(const ShellPairData &sp_data, const bool trans
 }
 
 vector<double>
+LI::ecoeffsD2SHARK(const ShellPairData &sp_data, const bool transpose)
+{
+
+}
+
+vector<double>
 LI::ecoeffsSphericalSPData_Bra(const ShellPairData &sp_data)
 {
     int la = sp_data.la;

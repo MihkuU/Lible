@@ -41,9 +41,9 @@ for la in range(0, l_max + 1):
 			if (la + lb + lc) > 6:
 				continue
 
-			print('{{{{{}, {}, {}}}, eri3KernelFun<{}, {}, {}>}},'.format(la, lb, lc, la, lb, lc))
-			if (la != lb):
-				print('{{{{{}, {}, {}}}, eri3KernelFun<{}, {}, {}>}},'.format(lb, la, lc, lb, la, lc))
+			#print('{{{{{}, {}, {}}}, eri3KernelFun<{}, {}, {}>}},'.format(la, lb, lc, la, lb, lc))
+			#if (la != lb):
+			#	print('{{{{{}, {}, {}}}, eri3KernelFun<{}, {}, {}>}},'.format(lb, la, lc, lb, la, lc))
 			#if (la + lb + lc) <= 6:
 			#	print('{{{{{}, {}, {}}}, eri3d1KernelFun<{}, {}, {}>}},'.format(la, lb, lc, la, lb, lc))
 			#	print('{{{{{}, {}, {}}}, eri3d1KernelFun<{}, {}, {}>}},'.format(lb, la, lc, lb, la, lc))
@@ -58,9 +58,10 @@ for la in range(0, l_max_ket + 1):
 	for lb in range(0, l_max_ket + 1):
 		#print('{{{{{}, {}}}, eri2KernelFun<{}, {}>}},'.format(la, lb, la, lb))
 
-		#if (la + lb) <= 6:			
+		if (la + lb) <= 6:			
 			#print('{{{{{}, {}}}, eri2KernelFun<{}, {}>}},'.format(la, lb, la, lb))
 			#print('{{{{{}, {}}}, eri2d1KernelFun<{}, {}>}},'.format(la, lb, la, lb))
+			print('{{{{{}, {}}}, eri2d2KernelFun<{}, {}>}},'.format(la, lb, la, lb))
 
 		continue
 		#print('{{{{{}, {}}}, eri2Kernel<{}, {}>}},'.format(la, lb, la, lb))

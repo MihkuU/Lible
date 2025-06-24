@@ -408,6 +408,9 @@ template void lible::ints::calcRInts_ERI2_deriv1<5, 0>(const double, const doubl
 template void lible::ints::calcRInts_ERI2D1<5, 0>(const double alpha, const double fac, const double *fnx,
                                                   const double *xyz_ab, double *rints);
 
+template void lible::ints::calcRInts_ERI2D2<5, 0>(const double alpha, const double fac, const double *fnx,
+                                                  const double *xyz_ab, double *rints);
+
 template void lible::ints::calcRInts_ERI3D1<5, 0>(const double alpha, const double fac, const double *fnx,
                                                   const double *xyz_pc, double *rints);
 

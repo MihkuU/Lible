@@ -158,6 +158,51 @@ vector<double> LI::calcRInts_ERI2D1(const int l, const double alpha, const doubl
     return rints;
 }
 
+vector<double> LI::calcRInts_ERI2D2(const int l, const double alpha, const double fac,
+                                    const double *fnx, const double *xyz_ab,
+                                    const std::vector<std::array<int, 3>> &hermite_idxs_a,
+                                    const std::vector<std::array<int, 3>> &hermite_idxs_b)
+{
+    vec3d rints_3d = calcRInts3D(l + 2, alpha, xyz_ab, fnx);
+
+    const int n_hermite_a = hermite_idxs_a.size();
+    const int n_hermite_b = hermite_idxs_b.size();
+    const int n_rints = n_hermite_a * n_hermite_b;
+    const int ofs0 = n_rints * 0;
+    const int ofs1 = n_rints * 1;
+    const int ofs2 = n_rints * 2;
+    const int ofs3 = n_rints * 3;
+    const int ofs4 = n_rints * 4;
+    const int ofs5 = n_rints * 5;
+
+    vector<double> rints(6 * n_rints);
+    for (int j = 0; j < n_hermite_b; j++)
+    {
+        auto [t_, u_, v_] = hermite_idxs_b[j];
+
+        double sign = 1.0;
+        if ((t_ + u_ + v_) % 2 != 0)
+            sign = -1.0;
+
+        for (int i = 0; i < n_hermite_a; i++)
+        {
+            auto [t, u, v] = hermite_idxs_a[i];
+            
+            int idx = i * n_hermite_b + j;
+
+            // d/dA
+            rints[ofs0 + idx] = sign * fac * rints_3d(t + t_ + 2, u + u_, v + v_);
+            rints[ofs1 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_ + 1, v + v_);
+            rints[ofs2 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_ + 1);
+            rints[ofs3 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 2, v + v_);
+            rints[ofs4 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_ + 1);
+            rints[ofs5 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 2);
+        }
+    }
+
+    return rints;
+}
+
 vector<double> LI::calcRInts_ERI3D1(const int l, const double alpha, const double fac,
                                     const double *fnx, const double *xyz_pc,
                                     const vector<array<int, 3>> &hermite_idxs_bra,

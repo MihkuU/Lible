@@ -9,6 +9,8 @@ namespace LI = lible::ints;
 
 using std::string;
 
+// TODO: rename this file or even merge into one: eri_kernels.cpp
+
 namespace lible::ints
 {
     template <int la, int lb>
@@ -19,6 +21,17 @@ namespace lible::ints
     std::array<vec2d, 6> eri2d1KernelFun(const int ishell_a, const int ishell_b,
                                          const ShellData &sh_data_a, const ShellData &sh_data_b,
                                          const ERI2D1Kernel *eri2d1_kernel);
+
+    template <int la, int lb>
+    std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                                        const ShellData &sh_data_a,
+                                                        const ShellData &sh_data_b,
+                                                        const ERI2D2Kernel *eri2d2_kernel);
+
+    std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                                        const ShellData &sh_data_a,
+                                                        const ShellData &sh_data_b,
+                                                        const ERI2D2Kernel *eri2d2_kernel);
 
     template <int la, int lb, int lc>
     std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
@@ -71,6 +84,36 @@ namespace lible::ints
         {{5, 0}, eri2d1KernelFun<5, 0>},
         {{5, 1}, eri2d1KernelFun<5, 1>},
         {{6, 0}, eri2d1KernelFun<6, 0>}};
+
+    const std::map<std::tuple<int, int>, eri2d2_kernelfun_t> eri2d2_kernelfuns{
+        {{0, 0}, eri2d2KernelFun<0, 0>},
+        {{0, 1}, eri2d2KernelFun<0, 1>},
+        {{0, 2}, eri2d2KernelFun<0, 2>},
+        {{0, 3}, eri2d2KernelFun<0, 3>},
+        {{0, 4}, eri2d2KernelFun<0, 4>},
+        {{0, 5}, eri2d2KernelFun<0, 5>},
+        {{0, 6}, eri2d2KernelFun<0, 6>},
+        {{1, 0}, eri2d2KernelFun<1, 0>},
+        {{1, 1}, eri2d2KernelFun<1, 1>},
+        {{1, 2}, eri2d2KernelFun<1, 2>},
+        {{1, 3}, eri2d2KernelFun<1, 3>},
+        {{1, 4}, eri2d2KernelFun<1, 4>},
+        {{1, 5}, eri2d2KernelFun<1, 5>},
+        {{2, 0}, eri2d2KernelFun<2, 0>},
+        {{2, 1}, eri2d2KernelFun<2, 1>},
+        {{2, 2}, eri2d2KernelFun<2, 2>},
+        {{2, 3}, eri2d2KernelFun<2, 3>},
+        {{2, 4}, eri2d2KernelFun<2, 4>},
+        {{3, 0}, eri2d2KernelFun<3, 0>},
+        {{3, 1}, eri2d2KernelFun<3, 1>},
+        {{3, 2}, eri2d2KernelFun<3, 2>},
+        {{3, 3}, eri2d2KernelFun<3, 3>},
+        {{4, 0}, eri2d2KernelFun<4, 0>},
+        {{4, 1}, eri2d2KernelFun<4, 1>},
+        {{4, 2}, eri2d2KernelFun<4, 2>},
+        {{5, 0}, eri2d2KernelFun<5, 0>},
+        {{5, 1}, eri2d2KernelFun<5, 1>},
+        {{6, 0}, eri2d2KernelFun<6, 0>}};
 
     const std::map<std::tuple<int, int, int>, eri3d1_kernelfun_t> eri3d1_kernelfuns{
         {{0, 0, 0}, eri3d1KernelFun<0, 0, 0>},
@@ -484,8 +527,7 @@ LI::ERI3D1Kernel LI::deployERI3D1Kernel(const ShellPairData &sp_data_ab,
                             });
 }
 
-LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a,
-                                        const ShellData &sh_data_b)
+LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b)
 {
     int la = sh_data_a.l;
     int lb = sh_data_b.l;
@@ -510,5 +552,33 @@ LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a,
                             {
                                 return eri2d1KernelFun(ish_a, ish_b, sh_data_a, sh_data_b,
                                                        eri2d1_kernel);
+                            });
+}
+
+LI::ERI2D2Kernel LI::deployERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b)
+{
+    int la = sh_data_a.l;
+    int lb = sh_data_b.l;
+
+    int lab = la + lb;
+    int l_max = _eri_kernel_max_l_;
+    if (lab > _eri_kernel_max_l_)
+    {
+        string msg = std::format("deployERI2D2Kernel(): la + lb = {} is larger than the allowed max: {}!\n",
+                                 lab, l_max);
+        throw std::runtime_error(msg);
+    }
+
+    if (lab <= _max_l_rollout_)
+        return ERI2D2Kernel(sh_data_a, sh_data_b, eri2d2_kernelfuns.at({la, lb}));
+    else
+        return ERI2D2Kernel(sh_data_a, sh_data_b,
+                            [](const int ish_a, const int ish_b,
+                               const ShellData &sh_data_a,
+                               const ShellData &sh_data_b,
+                               const ERI2D2Kernel *eri2d2_kernel) -> std::array<std::array<vec2d, 6>, 6>
+                            {
+                                return eri2d2KernelFun(ish_a, ish_b, sh_data_a, sh_data_b,
+                                                       eri2d2_kernel);
                             });
 }

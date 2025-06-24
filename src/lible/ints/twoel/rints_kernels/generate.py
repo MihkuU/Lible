@@ -10,6 +10,8 @@ def writeKernelInstantiate(la, lb):
 
 	file_str += instantiateR_ERI2D1(la, lb)
 
+	file_str += instantiateR_ERI2D2(la, lb)
+
 	file_str += instantiateR_ERI3D1(la, lb)
 
 	file_str += instantiateR_ERI4D1(la, lb)
@@ -37,6 +39,12 @@ def instantiateR_ERI2D1(la, lb):
 
 	return file_str
 
+def instantiateR_ERI2D2(la, lb):
+
+	file_str = 'template void lible::ints::calcRInts_ERI2D2<{}, {}>(const double alpha, const double fac, const double *fnx,\n'.format(la, lb)
+	file_str += '                                                  const double *xyz_ab, double *rints);\n\n'
+
+	return file_str
 
 def instantiateR_ERI3D1(la, lb):
 
@@ -249,6 +257,8 @@ def writeKernelGenerate(la, lb):
 	file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
 
 	file_str += instantiateR_ERI2D1(la, lb)
+
+	file_str += instantiateR_ERI2D2(la, lb)
 
 	file_str += instantiateR_ERI3D1(la, lb)
 

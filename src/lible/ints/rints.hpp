@@ -32,6 +32,11 @@ namespace lible
                                              const std::vector<std::array<int, 3>> &hermite_idxs_a,
                                              const std::vector<std::array<int, 3>> &hermite_idxs_b);
 
+        std::vector<double> calcRInts_ERI2D2(const int l, const double alpha, const double fac,
+                                             const double *fnx, const double *xyz_ab,
+                                             const std::vector<std::array<int, 3>> &hermite_idxs_a,
+                                             const std::vector<std::array<int, 3>> &hermite_idxs_b);
+
         std::vector<double> calcRInts_ERI3D1(const int l, const double alpha, const double fac,
                                              const double *fnx, const double *xyz_pc,
                                              const std::vector<std::array<int, 3>> &hermite_idxs_bra,

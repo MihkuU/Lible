@@ -117,5 +117,8 @@ namespace lible
 
         std::vector<double>
         ecoeffsD1SHARK(const ShellPairData &sp_data, const bool transpose = false);     
+
+        std::vector<double> 
+        ecoeffsD2SHARK(const ShellPairData &sp_data, const bool transpose = false);
     }
 }

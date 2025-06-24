@@ -90,3 +90,9 @@ template std::array<lible::vec2d, 6> lible::ints::eri2d1KernelFun<1, 2>(const in
                                                                         const ShellData &sh_data_b,
                                                                         const ERI2D1Kernel *eri2d1_kernel);
 
+template std::array<std::array<lible::vec2d, 6>, 6> 
+lible::ints::eri2d2KernelFun<1, 2>(const int ishell_a, const int ishell_b,
+                                    const ShellData &sh_data_a,
+                                    const ShellData &sh_data_b,
+                                    const ERI2D2Kernel *eri2d2_kernel);
+

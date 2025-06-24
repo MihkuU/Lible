@@ -309,6 +309,7 @@ namespace lible
             }
         }        
 
+        // TODO: remove
         template <int la, int lb>
         void calcRInts_ERI2_deriv1(const double alpha, const double fac, const double *fnx,
                                    const double *xyz_pq, double *rints_out)
@@ -543,8 +544,64 @@ namespace lible
         }
 
         template <int la, int lb>
-        void calcRInts_ERI4_deriv1()
+        void calcRInts_ERI2D2(const double alpha, const double fac, const double *fnx,
+                              const double *xyz_ab, double *rints)
         {
-        }
+            constexpr int lab = la + lb;
+
+            constexpr int buff_size = numHermitesC(lab + 2) + (lab + 2);
+            std::array<double, buff_size> rints_buff{};
+            calcRInts<lab + 2>(alpha, fac, fnx, xyz_ab, &rints_buff[0]);
+
+            constexpr int n_hermites_a = numHermitesC(la);
+            constexpr int n_hermites_b = numHermitesC(lb);
+            constexpr int n_rints = n_hermites_a * n_hermites_b;
+            constexpr int ofs0 = n_rints * 0;
+            constexpr int ofs1 = n_rints * 1;
+            constexpr int ofs2 = n_rints * 2;  
+            constexpr int ofs3 = n_rints * 3;
+            constexpr int ofs4 = n_rints * 4;
+            constexpr int ofs5 = n_rints * 5;                  
+
+            constexpr std::array<std::array<int, 3>, n_hermites_a> idxs_a = generateHermiteIdxs<la>();
+            constexpr std::array<std::array<int, 3>, n_hermites_b> idxs_b = generateHermiteIdxs<lb>();
+            for (int j = 0; j < n_hermites_b; j++)
+            {
+                auto &[t_, u_, v_] = idxs_b[j];
+
+                double sign = 1.0;
+                if ((t_ + u_ + v_) % 2 != 0)
+                    sign = -1.0;
+
+                for (int i = 0; i < n_hermites_a; i++)
+                {
+                    auto &[t, u, v] = idxs_a[i];
+
+                    int tt_ = t + t_;
+                    int uu_ = u + u_;
+                    int vv_ = v + v_;
+
+                    int idx_lhs = i * n_hermites_b + j;
+                    int idx_rhs0 = indexRRollout(lab + 2, tt_ + 2, uu_, vv_);     // TODO: precalc offset
+                    int idx_rhs1 = indexRRollout(lab + 2, tt_ + 1, uu_ + 1, vv_); // TODO: precalc offset
+                    int idx_rhs2 = indexRRollout(lab + 2, tt_ + 1, uu_, vv_ + 1); // TODO: precalc offset
+                    int idx_rhs3 = indexRRollout(lab + 2, tt_, uu_ + 2, vv_);     // TODO: precalc offset
+                    int idx_rhs4 = indexRRollout(lab + 2, tt_, uu_ + 1, vv_ + 1); // TODO: precalc offset
+                    int idx_rhs5 = indexRRollout(lab + 2, tt_, uu_, vv_ + 2);     // TODO: precalc offset
+
+                    // d/dA
+                    rints[ofs0 + idx_lhs] = sign * fac * rints_buff[idx_rhs0];
+                    rints[ofs1 + idx_lhs] = sign * fac * rints_buff[idx_rhs1];
+                    rints[ofs2 + idx_lhs] = sign * fac * rints_buff[idx_rhs2];
+                    rints[ofs3 + idx_lhs] = sign * fac * rints_buff[idx_rhs3];
+                    rints[ofs4 + idx_lhs] = sign * fac * rints_buff[idx_rhs4];
+                    rints[ofs5 + idx_lhs] = sign * fac * rints_buff[idx_rhs5];
+                }
+            }
+        }        
+        // template <int la, int lb>
+        // void calcRInts_ERI4_deriv1()
+        // {
+        // }
     }
 }

@@ -29,6 +29,10 @@ namespace lible
         void calcRInts_ERI2D1(const double alpha, const double fac, const double *fnx,
                               const double *xyz_ab, double *rints);
 
+        template <int la, int lb>
+        void calcRInts_ERI2D2(const double alpha, const double fac, const double *fnx,
+                              const double *xyz_ab, double *rints);                              
+
         template <int lab, int lc>
         void calcRInts_ERI3D1(const double alpha, const double fac, const double *fnx,
                               const double *xyz_pc, double *rints);
@@ -39,10 +43,10 @@ namespace lible
                               const int ofs_col, const int n_cols, const int n_rows,
                               double *rints);
 
-        // Forward decls.
-        struct ERI4Kernel;
-        struct ERI3Kernel;
-        struct ERI2Kernel;
+        // // Forward decls.
+        // struct ERI4Kernel;
+        // struct ERI3Kernel;
+        // struct ERI2Kernel;
 
         template <int la, int lb, int lc, int ld>
         vec4d eri4KernelFun(const int ipair_ab, const int ipair_cd,
@@ -388,6 +392,128 @@ namespace lible
                                              const ShellData &sh_data_a,
                                              const ShellData &sh_data_b,
                                              const ERI2D1Kernel *eri2d1_kernel);
+
+        template <int la, int lb>
+        std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                                            const ShellData &sh_data_a,
+                                                            const ShellData &sh_data_b,
+                                                            const ERI2D2Kernel *eri2d2_kernel)
+        {
+            // Compile-time data
+            constexpr int lab = la + lb;
+
+            constexpr int n_sph_a = numSphericalsC(la);
+            constexpr int n_sph_b = numSphericalsC(lb);
+            constexpr int n_hermite_a = numHermitesC(la);
+            constexpr int n_hermite_b = numHermitesC(lb);
+            constexpr int n_rints = n_hermite_a * n_hermite_b;
+            constexpr int n_ecoeffs_a = n_sph_a * n_hermite_a;
+            constexpr int n_ecoeffs_b = n_sph_b * n_hermite_b;
+            constexpr int n_R_x_E = n_hermite_a * n_sph_b;
+
+            // Read-in data
+            const int cdepth_a = sh_data_a.cdepths[ishell_a];
+            const int cdepth_b = sh_data_b.cdepths[ishell_b];
+            const int cofs_a = sh_data_a.coffsets[ishell_a];
+            const int cofs_b = sh_data_b.coffsets[ishell_b];
+            const int ofs_E_a = sh_data_a.offsets_ecoeffs[ishell_a];
+            const int ofs_E_b = sh_data_b.offsets_ecoeffs[ishell_b];
+
+            const double *exps_a = &sh_data_a.exps[cofs_a];
+            const double *exps_b = &sh_data_b.exps[cofs_b];
+            const double *coords_a = &sh_data_a.coords[3 * ishell_a];
+            const double *coords_b = &sh_data_b.coords[3 * ishell_b];
+            const double *ecoeffs_a = &eri2d2_kernel->ecoeffs_bra[ofs_E_a];
+            const double *ecoeffs_b = &eri2d2_kernel->ecoeffs_ket[ofs_E_b];
+
+            // SHARK integrals
+            std::array<double, lab + 3> fnx;
+            BoysF2<lab + 2> boys_f;
+
+            std::array<double, 3> xyz_ab{coords_a[0] - coords_b[0],
+                                         coords_a[1] - coords_b[1],
+                                         coords_a[2] - coords_b[2]};
+            double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
+            double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
+
+            std::array<std::array<vec2d, 6>, 6> eri2_batch;
+            for (int i = 0; i < 6; i++)
+                for (int j = 0; j < 6; j++)
+                    eri2_batch[i][j] = vec2d(Fill(0), n_sph_a, n_sph_b);
+
+            std::array<double, 6 * n_rints> rints{};
+            for (int ia = 0; ia < cdepth_a; ia++)
+            {
+                std::array<double, 18 * n_R_x_E> R_x_E{};
+                for (int ib = 0; ib < cdepth_b; ib++)
+                {
+                    double a = exps_a[ia];
+                    double b = exps_b[ib];
+
+                    double alpha = a * b / (a + b);
+                    double x = alpha * xyz_ab_dot;
+                    boys_f.calcFnx(x, &fnx[0]);
+
+                    double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
+                    calcRInts_ERI2D2<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);
+
+                    std::array<double, 6 * n_R_x_E> I{};
+
+                    int ofs_ecoeffs_b = ib * n_ecoeffs_b;
+                    shark_mm_ket1<la, lb>(&rints[0 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[0 * n_R_x_E]); // 200
+                    shark_mm_ket1<la, lb>(&rints[1 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[1 * n_R_x_E]); // 110
+                    shark_mm_ket1<la, lb>(&rints[2 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[2 * n_R_x_E]); // 101
+                    shark_mm_ket1<la, lb>(&rints[3 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[3 * n_R_x_E]); // 020
+                    shark_mm_ket1<la, lb>(&rints[4 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[4 * n_R_x_E]); // 011
+                    shark_mm_ket1<la, lb>(&rints[5 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[5 * n_R_x_E]); // 002
+
+                    // TODO: remove?
+                    cblas_daxpy(6 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);  // AA
+                    cblas_daxpy(6 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[6 * n_R_x_E], 1); // AB
+                    cblas_daxpy(6 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[12 * n_R_x_E], 1); // BB
+                }
+                int ofs_ecoeffs_a = ia * n_ecoeffs_a;
+
+                // AA
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[0 * n_R_x_E], &eri2_batch[0][0][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[1 * n_R_x_E], &eri2_batch[0][1][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[2 * n_R_x_E], &eri2_batch[0][2][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[3 * n_R_x_E], &eri2_batch[1][1][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[4 * n_R_x_E], &eri2_batch[1][2][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[5 * n_R_x_E], &eri2_batch[2][2][0]);
+
+                // AB
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[6 * n_R_x_E], &eri2_batch[0][0][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[7 * n_R_x_E], &eri2_batch[0][1][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[8 * n_R_x_E], &eri2_batch[0][2][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[7 * n_R_x_E], &eri2_batch[1][1][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[9 * n_R_x_E], &eri2_batch[1][2][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[10 * n_R_x_E], &eri2_batch[2][2][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[8 * n_R_x_E], &eri2_batch[1][1][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[10 * n_R_x_E], &eri2_batch[1][2][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[11 * n_R_x_E], &eri2_batch[2][2][0]);
+
+                // BB
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[12 * n_R_x_E], &eri2_batch[3][3][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[13 * n_R_x_E], &eri2_batch[3][4][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[14 * n_R_x_E], &eri2_batch[3][5][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[15 * n_R_x_E], &eri2_batch[4][4][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[16 * n_R_x_E], &eri2_batch[4][5][0]);
+                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[17 * n_R_x_E], &eri2_batch[5][5][0]);
+            }
+
+            // i > j
+            for (int j = 0; j < 6; j++)
+                for (int i = j + 1; i < 6; i++)
+                    eri2_batch[i][j] = eri2_batch[j][i];
+
+            return eri2_batch;
+        }
+
+        std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                                            const ShellData &sh_data_a,
+                                                            const ShellData &sh_data_b,
+                                                            const ERI2D2Kernel *eri2d2_kernel);
 
         template <int la, int lb, int lc>
         std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
