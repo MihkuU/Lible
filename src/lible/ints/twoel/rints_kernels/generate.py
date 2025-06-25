@@ -14,12 +14,12 @@ def writeKernelInstantiate(la, lb):
 
 	file_str += instantiateR_ERI3D1(la, lb)
 
-	file_str += instantiateR_ERI4D1(la, lb)
+	#file_str += instantiateR_ERI4D1(la, lb)
 
 	file_str += 'template void lible::ints::calcRInts_ERI<{}, {}>(const double, const double, const double*, const double*, double*);\n\n'.format(la, lb)
 
 	# ERI2-deriv R-ints kernel instantiationo
-	file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)	
+	#file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)	
 
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		 file.write(file_str)
@@ -254,7 +254,7 @@ def writeKernelGenerate(la, lb):
 	file_str += '}\n\n'		
 
 	# ERI2-deriv R-ints kernel instantiation
-	file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
+	# file_str += 'template void lible::ints::calcRInts_ERI2_deriv1<{}, {}>(const double, const double, const double*, const double*, double*);\n'.format(la, lb)
 
 	file_str += instantiateR_ERI2D1(la, lb)
 
@@ -262,7 +262,7 @@ def writeKernelGenerate(la, lb):
 
 	file_str += instantiateR_ERI3D1(la, lb)
 
-	file_str += instantiateR_ERI4D1(la, lb)
+	#file_str += instantiateR_ERI4D1(la, lb)
 
 	with open('rints_kernel_{}_{}.cpp'.format(la, lb), 'w') as file:
 		file.write(file_str)

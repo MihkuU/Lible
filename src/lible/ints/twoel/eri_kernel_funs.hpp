@@ -37,17 +37,6 @@ namespace lible
         void calcRInts_ERI3D1(const double alpha, const double fac, const double *fnx,
                               const double *xyz_pc, double *rints);
 
-        template <int lab, int lcd>
-        void calcRInts_ERI4D1(const double alpha, const double fac, const double *fnx,
-                              const double *xyz_pq, const int n_rints, const int ofs_row,
-                              const int ofs_col, const int n_cols, const int n_rows,
-                              double *rints);
-
-        // // Forward decls.
-        // struct ERI4Kernel;
-        // struct ERI3Kernel;
-        // struct ERI2Kernel;
-
         template <int la, int lb, int lc, int ld>
         vec4d eri4KernelFun(const int ipair_ab, const int ipair_cd,
                             const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,

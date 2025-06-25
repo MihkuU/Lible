@@ -307,65 +307,6 @@ namespace lible
                     rints_out[idx_lhs] = sign * fac * rints_buff[idx_rhs];
                 }
             }
-        }        
-
-        // TODO: remove
-        template <int la, int lb>
-        void calcRInts_ERI2_deriv1(const double alpha, const double fac, const double *fnx,
-                                   const double *xyz_pq, double *rints_out)
-        {
-            constexpr int lab = la + lb;
-
-            constexpr int buff_size = numHermitesC(lab + 1) + lab + 1;
-            std::array<double, buff_size> rints_buff{};
-            calcRInts<lab + 1>(alpha, fac, fnx, xyz_pq, &rints_buff[0]);
-
-            constexpr int n_hermites_a = numHermitesC(la);
-            constexpr int n_hermites_b = numHermitesC(lb);
-            constexpr int n_hermites_ab = n_hermites_a * n_hermites_b;
-            constexpr int ofs0 = n_hermites_ab * 0;
-            constexpr int ofs1 = n_hermites_ab * 1;
-            constexpr int ofs2 = n_hermites_ab * 2;
-            constexpr int ofs3 = n_hermites_ab * 3;
-            constexpr int ofs4 = n_hermites_ab * 4;
-            constexpr int ofs5 = n_hermites_ab * 5;
-
-            constexpr std::array<std::array<int, 3>, n_hermites_a> idxs_a = generateHermiteIdxs<la>();
-            constexpr std::array<std::array<int, 3>, n_hermites_b> idxs_b = generateHermiteIdxs<lb>();
-            for (int j = 0; j < n_hermites_b; j++)
-            {
-                auto &[t_, u_, v_] = idxs_b[j];
-
-                double sign_A = 1.0;
-                if ((t_ + u_ + v_) % 2 != 0)
-                    sign_A = -1.0;
-
-                double sign_B = sign_A * -1.0;
-
-                for (int i = 0; i < n_hermites_a; i++)
-                {
-                    auto &[t, u, v] = idxs_a[i];
-
-                    int tt_ = t + t_;
-                    int uu_ = u + u_;
-                    int vv_ = v + v_;
-
-                    int idx_lhs = i * n_hermites_b + j;
-                    int idx_rhs0 = indexRRollout(lab + 1, tt_ + 1, uu_, vv_); // TODO: precalc offset
-                    int idx_rhs1 = indexRRollout(lab + 1, tt_, uu_ + 1, vv_); // TODO: precalc offset
-                    int idx_rhs2 = indexRRollout(lab + 1, tt_, uu_, vv_ + 1); // TODO: precalc offset
-
-                    // d/dA
-                    rints_out[ofs0 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs0];
-                    rints_out[ofs1 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs1];
-                    rints_out[ofs2 + idx_lhs] = sign_A * fac * rints_buff[idx_rhs2];
-
-                    // d/dB
-                    rints_out[ofs3 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs0];
-                    rints_out[ofs4 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs1];
-                    rints_out[ofs5 + idx_lhs] = sign_B * fac * rints_buff[idx_rhs2];
-                }
-            }
         }
 
         template <int la, int lb>
@@ -470,79 +411,6 @@ namespace lible
             }
         }
 
-        template <int lab, int lcd>
-        void calcRInts_ERI4D1(const double alpha, const double fac, const double *fnx,
-                              const double *xyz_pq, const int n_rints, const int ofs_row,
-                              const int ofs_col, const int n_cols, const int n_rows,
-                              double *rints)
-        {
-            constexpr int labcd = lab + lcd;
-
-            constexpr int buff_size = numHermitesC(labcd + 1) + (labcd + 1);
-            std::array<double, buff_size> rints_buff{};
-            calcRInts<labcd + 1>(alpha, fac, fnx, xyz_pq, &rints_buff[0]);
-
-            constexpr int n_hermites_ab = numHermitesC(lab);
-            constexpr int n_hermites_cd = numHermitesC(lcd);
-            const int ofs0 = n_rints * 0;
-            const int ofs1 = n_rints * 1;
-            const int ofs2 = n_rints * 2;
-            const int ofs3 = n_rints * 3;
-            const int ofs4 = n_rints * 4;
-            const int ofs5 = n_rints * 5;
-            const int ofs6 = n_rints * 6;
-            const int ofs7 = n_rints * 7;
-
-            constexpr std::array<std::array<int, 3>, n_hermites_ab> idxs_ab = generateHermiteIdxs<lab>();
-            constexpr std::array<std::array<int, 3>, n_hermites_cd> idxs_cd = generateHermiteIdxs<lcd>();
-
-            for (size_t j = 0; j < idxs_cd.size(); j++)
-            {
-                auto [t_, u_, v_] = idxs_cd[j];
-
-                double sign = 1.0;
-                if ((t_ + u_ + v_) % 2 != 0)
-                    sign = -1.0;
-
-                double sign_ = sign * -1.0;
-
-                for (size_t i = 0; i < idxs_ab.size(); i++)
-                {
-                    auto [t, u, v] = idxs_ab[i];
-
-                    int tt_ = t + t_;
-                    int uu_ = u + u_;
-                    int vv_ = v + v_;
-
-                    int irow = ofs_row + i;
-                    int icol = ofs_col + j;
-                    int idx_lhs = irow * n_cols + icol;
-                    int idx_rhs0 = indexRRollout(labcd + 1, tt_ + 1, uu_, vv_);
-                    int idx_rhs1 = indexRRollout(labcd + 1, tt_, uu_ + 1, vv_);
-                    int idx_rhs2 = indexRRollout(labcd + 1, tt_, uu_, vv_ + 1);
-                    int idx_rhs3 = indexRRollout(labcd + 1, tt_, uu_, vv_);
-
-                    // d/dP
-                    rints[ofs0 + idx_lhs] = sign * fac * rints_buff[idx_rhs0];
-                    rints[ofs1 + idx_lhs] = sign * fac * rints_buff[idx_rhs1];
-                    rints[ofs2 + idx_lhs] = sign * fac * rints_buff[idx_rhs2];
-
-                    // d/dR
-                    rints[ofs3 + idx_lhs] = sign * fac * rints_buff[idx_rhs3];
-
-                    int idx_lhs_tsp = icol * n_rows + irow;
-
-                    // d/dQ
-                    rints[ofs4 + idx_lhs_tsp] = sign_ * fac * rints_buff[idx_rhs0];
-                    rints[ofs5 + idx_lhs_tsp] = sign_ * fac * rints_buff[idx_rhs1];
-                    rints[ofs6 + idx_lhs_tsp] = sign_ * fac * rints_buff[idx_rhs2];
-
-                    // d/dS
-                    rints[ofs7 + idx_lhs_tsp] = sign * fac * rints_buff[idx_rhs3];
-                }
-            }
-        }
-
         template <int la, int lb>
         void calcRInts_ERI2D2(const double alpha, const double fac, const double *fnx,
                               const double *xyz_ab, double *rints)
@@ -582,14 +450,13 @@ namespace lible
                     int vv_ = v + v_;
 
                     int idx_lhs = i * n_hermites_b + j;
-                    int idx_rhs0 = indexRRollout(lab + 2, tt_ + 2, uu_, vv_);     // TODO: precalc offset
-                    int idx_rhs1 = indexRRollout(lab + 2, tt_ + 1, uu_ + 1, vv_); // TODO: precalc offset
-                    int idx_rhs2 = indexRRollout(lab + 2, tt_ + 1, uu_, vv_ + 1); // TODO: precalc offset
-                    int idx_rhs3 = indexRRollout(lab + 2, tt_, uu_ + 2, vv_);     // TODO: precalc offset
-                    int idx_rhs4 = indexRRollout(lab + 2, tt_, uu_ + 1, vv_ + 1); // TODO: precalc offset
-                    int idx_rhs5 = indexRRollout(lab + 2, tt_, uu_, vv_ + 2);     // TODO: precalc offset
+                    int idx_rhs0 = indexRRollout(lab + 2, tt_ + 2, uu_, vv_);
+                    int idx_rhs1 = indexRRollout(lab + 2, tt_ + 1, uu_ + 1, vv_);
+                    int idx_rhs2 = indexRRollout(lab + 2, tt_ + 1, uu_, vv_ + 1);
+                    int idx_rhs3 = indexRRollout(lab + 2, tt_, uu_ + 2, vv_);
+                    int idx_rhs4 = indexRRollout(lab + 2, tt_, uu_ + 1, vv_ + 1);
+                    int idx_rhs5 = indexRRollout(lab + 2, tt_, uu_, vv_ + 2);
 
-                    // d/dA
                     rints[ofs0 + idx_lhs] = sign * fac * rints_buff[idx_rhs0];
                     rints[ofs1 + idx_lhs] = sign * fac * rints_buff[idx_rhs1];
                     rints[ofs2 + idx_lhs] = sign * fac * rints_buff[idx_rhs2];
@@ -598,10 +465,28 @@ namespace lible
                     rints[ofs5 + idx_lhs] = sign * fac * rints_buff[idx_rhs5];
                 }
             }
-        }        
-        // template <int la, int lb>
-        // void calcRInts_ERI4_deriv1()
-        // {
-        // }
+        }
+
+        template <int lab, int lc>
+        void calcRInts_ERI3D2(const double alpha, const double fac, const double *fnx,
+                              const double *xyz_pc, double *rints)
+        {
+            constexpr int labc = lab + lc;
+
+            constexpr int buff_size = numHermitesC(labc + 1) + (labc + 1);
+            std::array<double, buff_size> rints_buff{};
+            calcRInts<labc + 1>(alpha, fac, fnx, xyz_pc, &rints_buff[0]);
+
+            constexpr int n_hermites_ab = numHermitesC(lab);
+            constexpr int n_hermites_c = numHermitesC(lc);
+            constexpr int n_rints = n_hermites_ab * n_hermites_c;
+            constexpr int ofs0 = n_rints * 0;
+            constexpr int ofs1 = n_rints * 1;
+            constexpr int ofs2 = n_rints * 2;
+            constexpr int ofs3 = n_rints * 3;
+
+            constexpr std::array<std::array<int, 3>, n_hermites_ab> idxs_ab = generateHermiteIdxs<lab>();
+            constexpr std::array<std::array<int, 3>, n_hermites_c> idxs_c = generateHermiteIdxs<lc>();
+        }
     }
 }

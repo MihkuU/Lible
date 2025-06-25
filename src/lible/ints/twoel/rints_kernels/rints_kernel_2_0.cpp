@@ -96,7 +96,6 @@ void calcRInts_ERI<2, 0>(const double alpha, const double fac, const double *fnx
 }
 }
 
-template void lible::ints::calcRInts_ERI2_deriv1<2, 0>(const double, const double, const double*, const double*, double*);
 template void lible::ints::calcRInts_ERI2D1<2, 0>(const double alpha, const double fac, const double *fnx,
                                                   const double *xyz_ab, double *rints);
 
@@ -105,9 +104,4 @@ template void lible::ints::calcRInts_ERI2D2<2, 0>(const double alpha, const doub
 
 template void lible::ints::calcRInts_ERI3D1<2, 0>(const double alpha, const double fac, const double *fnx,
                                                   const double *xyz_pc, double *rints);
-
-template void lible::ints::calcRInts_ERI4D1<2, 0>(const double alpha, const double fac, const double *fnx,
-                                                  const double *xyz_pq, const int n_rints, const int ofs_row,
-                                                  const int ofs_col, const int n_cols, const int n_rows,
-                                                  double *rints_out);
 
