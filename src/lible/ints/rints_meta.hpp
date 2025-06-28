@@ -267,6 +267,7 @@ namespace lible
             }
         }
 
+        // TODO: rename/remove?
         template <int la, int lb>
         void calcRInts_ERI_new(const double alpha, const double fac, const double *fnx, 
                                const double *xyz_pq, const int n_cols, const int ofs_row, 
@@ -473,9 +474,9 @@ namespace lible
         {
             constexpr int labc = lab + lc;
 
-            constexpr int buff_size = numHermitesC(labc + 1) + (labc + 1);
+            constexpr int buff_size = numHermitesC(labc + 2) + (labc + 2);
             std::array<double, buff_size> rints_buff{};
-            calcRInts<labc + 1>(alpha, fac, fnx, xyz_pc, &rints_buff[0]);
+            calcRInts<labc + 2>(alpha, fac, fnx, xyz_pc, &rints_buff[0]);
 
             constexpr int n_hermites_ab = numHermitesC(lab);
             constexpr int n_hermites_c = numHermitesC(lc);
@@ -484,9 +485,49 @@ namespace lible
             constexpr int ofs1 = n_rints * 1;
             constexpr int ofs2 = n_rints * 2;
             constexpr int ofs3 = n_rints * 3;
+            constexpr int ofs4 = n_rints * 4;
+            constexpr int ofs5 = n_rints * 5;
+            constexpr int ofs6 = n_rints * 6;
+            constexpr int ofs7 = n_rints * 7;            
+            constexpr int ofs8 = n_rints * 8;
+            constexpr int ofs9 = n_rints * 9;                                    
 
             constexpr std::array<std::array<int, 3>, n_hermites_ab> idxs_ab = generateHermiteIdxs<lab>();
             constexpr std::array<std::array<int, 3>, n_hermites_c> idxs_c = generateHermiteIdxs<lc>();
+
+            for (int j = 0; j < n_hermites_ab; j++)
+            {
+                auto [t_, u_, v_] = idxs_ab[j];
+
+                double sign = 1.0;
+                if ((t_ + u_ + v_) % 2 != 0)
+                    sign = -1.0;
+
+                for (int i = 0; i < n_hermites_c; i++)
+                {
+                    auto [t, u, v] = idxs_c[i];
+
+                    // int idx = i * n_hermite_c + j;
+                    int tt_ = t + t_;
+                    int uu_ = u + u_;
+                    int vv_ = v + v_;
+
+                    int idx_lhs = i * n_hermites_c + j;
+
+                    rints[ofs0 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_, uu_, vv_);
+
+                    rints[ofs1 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_ + 1, uu_, vv_);
+                    rints[ofs2 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_, uu_ + 1, vv_);
+                    rints[ofs3 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_, uu_, vv_ + 1);
+
+                    rints[ofs4 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_ + 2, uu_, vv_);
+                    rints[ofs5 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_ + 1, uu_ + 1, vv_);
+                    rints[ofs6 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_ + 1, uu_, vv_ + 1);
+                    rints[ofs7 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_, uu_ + 2, vv_);
+                    rints[ofs8 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_, uu_ + 1, vv_ + 1);
+                    rints[ofs9 + idx_lhs] = sign * fac * indexRRollout(labc + 2, tt_, uu_, vv_ + 2);
+                }
+            }
         }
     }
 }

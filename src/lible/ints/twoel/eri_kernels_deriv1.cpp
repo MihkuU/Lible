@@ -23,15 +23,15 @@ namespace lible::ints
                                          const ERI2D1Kernel *eri2d1_kernel);
 
     template <int la, int lb>
-    std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+    arr2d<vec2d, 6, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
                                                         const ShellData &sh_data_a,
                                                         const ShellData &sh_data_b,
                                                         const ERI2D2Kernel *eri2d2_kernel);
 
-    std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
-                                                        const ShellData &sh_data_a,
-                                                        const ShellData &sh_data_b,
-                                                        const ERI2D2Kernel *eri2d2_kernel);
+    arr2d<vec2d, 6, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                       const ShellData &sh_data_a,
+                                       const ShellData &sh_data_b,
+                                       const ERI2D2Kernel *eri2d2_kernel);
 
     template <int la, int lb, int lc>
     std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
@@ -43,6 +43,17 @@ namespace lible::ints
                                          const ShellPairData &sp_data_ab,
                                          const ShellData &sh_data_c,
                                          const ERI3D1Kernel *eri3d1_kernel);
+
+    template <int la, int lb, int lc>
+    arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+                                       const ShellPairData &sp_data_ab,
+                                       const ShellData &sh_data_c,
+                                       const ERI3D2Kernel *eri3d2_kernel);
+
+    arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+                                       const ShellPairData &sp_data_ab,
+                                       const ShellData &sh_data_c,
+                                       const ERI3D2Kernel *eri3d2_kernel);
 
     template <int la, int lb, int lc, int ld>
     std::array<vec4d, 12> eri4d1KernelFun(const int ipair_ab, const int ipair_cd,
@@ -216,6 +227,9 @@ namespace lible::ints
         {{1, 5, 0}, eri3d1KernelFun<1, 5, 0>},
         {{6, 0, 0}, eri3d1KernelFun<6, 0, 0>},
         {{0, 6, 0}, eri3d1KernelFun<0, 6, 0>}};
+
+    const std::map<std::tuple<int, int, int>, eri3d2_kernelfun_t> eri3d2_kernelfuns{
+    };
 
     const std::map<std::tuple<int, int, int, int>, eri4d1_kernelfun_t> eri4d1_kernelfuns{
         {{0, 0, 0, 0}, eri4d1KernelFun<0, 0, 0, 0>},
@@ -466,6 +480,30 @@ LI::ERI2D1Kernel::ERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_d
     boys_grid = BoysGrid(lab + 1);
 }
 
+LI::ERI2D2Kernel::ERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
+                               const eri2d2_kernelfun_t &eri2d2_kernelfun)
+    : eri2d2_kernelfun(eri2d2_kernelfun)
+{
+    ecoeffs_bra = ecoeffsSHARK(sh_data_a, false);
+    ecoeffs_ket = ecoeffsSHARK(sh_data_b, true);
+
+    int lab = sh_data_a.l + sh_data_b.l;
+    boys_grid = BoysGrid(lab + 2);    
+}
+
+LI::ERI3D2Kernel::ERI3D2Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
+                               const eri3d2_kernelfun_t &eri3d2_kernelfun)
+    : eri3d2_kernelfun(eri3d2_kernelfun)
+{
+    ecoeffs0_bra = ecoeffsSHARK(sp_data_ab, false);
+    ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab, false);
+    ecoeffs2_bra = ecoeffsD2SHARK(sp_data_ab, false);
+    ecoeffs0_ket = ecoeffsSHARK(sh_data_c, true);
+
+    int labc = sp_data_ab.la + sp_data_ab.lb + sh_data_c.l;
+    boys_grid = BoysGrid(labc + 2);
+}
+
 LI::ERI4D1Kernel LI::deployERI4D1Kernel(const ShellPairData &sp_data_ab,
                                         const ShellPairData &sp_data_cd)
 {
@@ -527,6 +565,36 @@ LI::ERI3D1Kernel LI::deployERI3D1Kernel(const ShellPairData &sp_data_ab,
                             });
 }
 
+LI::ERI3D2Kernel LI::deployERI3D2Kernel(const ShellPairData &sp_data_ab,
+                                        const ShellData &sh_data_c)
+{
+    int la = sp_data_ab.la;
+    int lb = sp_data_ab.lb;
+    int lc = sh_data_c.l;
+
+    int labc = la + lb + lc;
+    int l_max = _eri_kernel_max_l_;
+    if (labc > _eri_kernel_max_l_)
+    {
+        string msg = std::format("deployERI3D2Kernel(): lab + lc = {} is larger than the allowed max: {}!\n",
+                                 labc, l_max);
+        throw std::runtime_error(msg);
+    }
+
+    if (labc <= _max_l_rollout_)
+        return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
+    else
+        return ERI3D2Kernel(sp_data_ab, sh_data_c,
+                            [](const int ipair_ab, const int ish_c,
+                               const ShellPairData &sp_data_ab,
+                               const ShellData &sh_data_c,
+                               const ERI3D2Kernel *eri3d2_kernel) -> arr2d<vec3d, 9, 9>
+                            {
+                                return eri3d2KernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
+                                                       eri3d2_kernel);
+                            });
+}
+
 LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b)
 {
     int la = sh_data_a.l;
@@ -576,7 +644,7 @@ LI::ERI2D2Kernel LI::deployERI2D2Kernel(const ShellData &sh_data_a, const ShellD
                             [](const int ish_a, const int ish_b,
                                const ShellData &sh_data_a,
                                const ShellData &sh_data_b,
-                               const ERI2D2Kernel *eri2d2_kernel) -> std::array<std::array<vec2d, 6>, 6>
+                               const ERI2D2Kernel *eri2d2_kernel) -> arr2d<vec2d, 6, 6>
                             {
                                 return eri2d2KernelFun(ish_a, ish_b, sh_data_a, sh_data_b,
                                                        eri2d2_kernel);

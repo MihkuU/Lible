@@ -72,14 +72,16 @@ namespace lible
                           const std::vector<int> &offsets_cart,
                           const std::vector<int> &offsets_ecoeffs,
                           const std::vector<int> &offsets_ecoeffs_deriv1,
+                          const std::vector<int> &offsets_ecoeffs_deriv2,
                           const std::vector<int> &offsets_norms,
                           const std::vector<int> &offsets_sph)
                 : la(la), lb(lb), n_atoms(n_atoms), n_pairs(n_pairs), n_prim_pairs(n_prim_pairs),
                   atomic_coords(atomic_coords), coeffs(coeffs), coords(coords), exps(exps),
                   norms(norms), atomic_idxs(atomic_idxs), atomic_nrs(atomic_nrs), cdepths(cdepths),
                   coffsets(coffsets), offsets_cart(offsets_cart), offsets_ecoeffs(offsets_ecoeffs),
-                  offsets_ecoeffs_deriv1(offsets_ecoeffs_deriv1), offsets_norms(offsets_norms), 
-                  offsets_sph(offsets_sph)
+                  offsets_ecoeffs_deriv1(offsets_ecoeffs_deriv1), 
+                  offsets_ecoeffs_deriv2(offsets_ecoeffs_deriv2), 
+                  offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
             }
 
@@ -102,6 +104,7 @@ namespace lible
             std::vector<int> offsets_cart;           /** Offsets of the atomic orbital (cartesian) positions in the list of all atomic orbitals. */
             std::vector<int> offsets_ecoeffs;        /** Offsets of the spherical Hermite expansion coefficients. */
             std::vector<int> offsets_ecoeffs_deriv1; /** Offsets of the 1st derivative spherical Hermite expansion coefficients. */
+            std::vector<int> offsets_ecoeffs_deriv2; /** Offsets of the 2nd derivative spherical Hermite expansion coefficients. */
             std::vector<int> offsets_norms;          /** Offsets of the shell atomic orbital norms. */
             std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */
         };

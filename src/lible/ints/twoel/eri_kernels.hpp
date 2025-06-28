@@ -13,9 +13,11 @@ namespace lible
         struct ERI4Kernel;
         struct ERI3Kernel;
         struct ERI2Kernel;
+
         struct ERI4D1Kernel;
         struct ERI3D1Kernel;
         struct ERI2D1Kernel;
+
         struct ERI4D2Kernel;
         struct ERI3D2Kernel;
         struct ERI2D2Kernel;
@@ -47,9 +49,13 @@ namespace lible
             const int ishell_a, const int ishell_b, const ShellData &sh_data_a,
             const ShellData &sh_data_b, const ERI2D1Kernel *eri2d1_kernel)>;
 
-        using eri2d2_kernelfun_t = std::function<std::array<std::array<vec2d, 6>, 6>(
+        using eri2d2_kernelfun_t = std::function<arr2d<vec2d, 6, 6>(
             const int ishell_a, const int ishell_b, const ShellData &sh_data_a,
             const ShellData &sh_data_b, const ERI2D2Kernel *eri2d2_kernel)>;
+
+        using eri3d2_kernelfun_t = std::function<arr2d<vec3d, 9, 9>(
+            const int ipair_ab, const int ishell_c, const ShellPairData &sp_data_ab,
+            const ShellData &sh_data_c, const ERI3D2Kernel *eri3d2_kernel)>;
 
         struct ERI4Kernel
         {
@@ -94,7 +100,7 @@ namespace lible
             ERI2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
                        const eri2_kernelfun_t &eri2_kernelfun);
 
-            vec2d operator()(const int ishell_a, const int ishell_b, 
+            vec2d operator()(const int ishell_a, const int ishell_b,
                              const ShellData &sh_data_a,
                              const ShellData &sh_data_b) const
             {
@@ -173,9 +179,9 @@ namespace lible
             ERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
                          const eri2d2_kernelfun_t &eri2d2_kernelfun);
 
-            std::array<std::array<vec2d, 6>, 6> operator()(const int ishell_a, const int ishell_b,
-                                                           const ShellData &sh_data_a,
-                                                           const ShellData &sh_data_b) const
+            arr2d<vec2d, 6, 6> operator()(const int ishell_a, const int ishell_b,
+                                          const ShellData &sh_data_a,
+                                          const ShellData &sh_data_b) const
             {
                 return eri2d2_kernelfun(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
             }
@@ -183,6 +189,27 @@ namespace lible
             std::vector<double> ecoeffs_bra;
             std::vector<double> ecoeffs_ket;
             eri2d2_kernelfun_t eri2d2_kernelfun;
+
+            BoysGrid boys_grid;
+        };
+
+        struct ERI3D2Kernel
+        {
+            ERI3D2Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
+                         const eri3d2_kernelfun_t &eri3d2_kernelfun);
+
+            arr2d<vec3d, 9, 9> operator()(const int ipair_ab, const int ishell_c,
+                                          const ShellPairData &sp_data_ab,
+                                          const ShellData &sh_data_c) const
+            {
+                return eri3d2_kernelfun(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
+            }
+
+            std::vector<double> ecoeffs0_bra;
+            std::vector<double> ecoeffs1_bra;
+            std::vector<double> ecoeffs2_bra;
+            std::vector<double> ecoeffs0_ket;
+            eri3d2_kernelfun_t eri3d2_kernelfun;
 
             BoysGrid boys_grid;
         };
@@ -207,6 +234,9 @@ namespace lible
 
         ERI2D2Kernel deployERI2D2Kernel(const ShellData &sh_data_a,
                                         const ShellData &sh_data_b);
+
+        ERI3D2Kernel deployERI3D2Kernel(const ShellPairData &sp_data_ab,
+                                        const ShellData &sh_data_c);
 
     }
 }

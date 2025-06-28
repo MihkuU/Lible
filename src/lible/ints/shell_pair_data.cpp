@@ -163,10 +163,12 @@ LI::ShellPairData LI::constructShellPairData(const bool use_symm, const int la, 
     vector<int> offsets_cart(2 * n_pairs);
     vector<int> offsets_ecoeffs(n_pairs);
     vector<int> offsets_ecoeffs_deriv1(n_pairs);
+    vector<int> offsets_ecoeffs_deriv2(n_pairs);
     vector<int> offsets_norms(2 * n_pairs);
     vector<int> offsets_sph(2 * n_pairs);
 
-    int pos_coords{0}, pos_coeffs{0}, pos_norms{0}, pos_ecoeffs{0}, pos_ecoeffs_deriv{0};
+    int pos_coords{0}, pos_coeffs{0}, pos_norms{0}, pos_ecoeffs{0}, pos_ecoeffs_deriv1{0};
+    int pos_ecoeffs_deriv2{0};
     for (int ipair = 0; ipair < n_pairs; ipair++)
     {
         auto [ishell, jshell] = shell_pair_idxs[ipair];
@@ -186,9 +188,11 @@ LI::ShellPairData LI::constructShellPairData(const bool use_symm, const int la, 
         int cdepth_b = shell_b.coeffs.size();
 
         offsets_ecoeffs[ipair] += pos_ecoeffs;
-        offsets_ecoeffs_deriv1[ipair] += pos_ecoeffs_deriv;
+        offsets_ecoeffs_deriv1[ipair] += pos_ecoeffs_deriv1;
+        offsets_ecoeffs_deriv2[ipair] += pos_ecoeffs_deriv2;
         pos_ecoeffs += cdepth_a * cdepth_b * n_sph_ecoeffs;
-        pos_ecoeffs_deriv += 3 * cdepth_a * cdepth_b * n_sph_ecoeffs;
+        pos_ecoeffs_deriv1 += 3 * cdepth_a * cdepth_b * n_sph_ecoeffs;
+        pos_ecoeffs_deriv2 += 6 * cdepth_a * cdepth_b * n_sph_ecoeffs;
         n_prim_pairs += cdepth_a * cdepth_b;
 
         coffsets[2 * ipair + 0] = pos_coeffs;
@@ -254,7 +258,8 @@ LI::ShellPairData LI::constructShellPairData(const bool use_symm, const int la, 
 
     ShellPairData sp_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords, coeffs, coords,
                           exps, norms, atomic_idxs, atomic_nrs, cdepths, coffsets, offsets_cart,
-                          offsets_ecoeffs, offsets_ecoeffs_deriv1, offsets_norms, offsets_sph);
+                          offsets_ecoeffs, offsets_ecoeffs_deriv1, offsets_ecoeffs_deriv2,
+                          offsets_norms, offsets_sph);
 
     return sp_data;
 }

@@ -383,10 +383,10 @@ namespace lible
                                              const ERI2D1Kernel *eri2d1_kernel);
 
         template <int la, int lb>
-        std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
-                                                            const ShellData &sh_data_a,
-                                                            const ShellData &sh_data_b,
-                                                            const ERI2D2Kernel *eri2d2_kernel)
+        arr2d<vec2d, 6, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                              const ShellData &sh_data_a,
+                                              const ShellData &sh_data_b,
+                                              const ERI2D2Kernel *eri2d2_kernel)
         {
             // Compile-time data
             constexpr int lab = la + lb;
@@ -425,7 +425,7 @@ namespace lible
             double dx{xyz_ab[0]}, dy{xyz_ab[1]}, dz{xyz_ab[2]};
             double xyz_ab_dot = dx * dx + dy * dy + dz * dz;
 
-            std::array<std::array<vec2d, 6>, 6> eri2_batch;
+            arr2d<vec2d, 6, 6> eri2_batch;
             for (int i = 0; i < 6; i++)
                 for (int j = 0; j < 6; j++)
                     eri2_batch[i][j] = vec2d(Fill(0), n_sph_a, n_sph_b);
@@ -499,10 +499,10 @@ namespace lible
             return eri2_batch;
         }
 
-        std::array<std::array<vec2d, 6>, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
-                                                            const ShellData &sh_data_a,
-                                                            const ShellData &sh_data_b,
-                                                            const ERI2D2Kernel *eri2d2_kernel);
+        arr2d<vec2d, 6, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
+                                              const ShellData &sh_data_a,
+                                              const ShellData &sh_data_b,
+                                              const ERI2D2Kernel *eri2d2_kernel);
 
         template <int la, int lb, int lc>
         std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
@@ -644,6 +644,22 @@ namespace lible
                                              const ShellPairData &sp_data_ab,
                                              const ShellData &sh_data_c,
                                              const ERI3D1Kernel *eri3d1_kernel);
+
+        template <int la, int lb, int lc>
+        arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+                                           const ShellPairData &sp_data_ab,
+                                           const ShellData &sh_data_c,
+                                           const ERI3D2Kernel *eri3d2_kernel)
+        {
+            arr2d<vec3d, 9, 9> eri3_batch;
+
+            return eri3_batch;
+        }
+
+        arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+                                           const ShellPairData &sp_data_ab,
+                                           const ShellData &sh_data_c,
+                                           const ERI3D2Kernel *eri3d2_kernel);
 
         template <int la, int lb, int lc, int ld>
         std::array<vec4d, 12> eri4d1KernelFun(const int ipair_ab, const int ipair_cd,

@@ -10,15 +10,19 @@ namespace lible
     namespace ints
     {
         /** */
+        vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
+
+        /** */
         vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
                                  const double PA, const double PB, const double Kab);
 
         /** */
         vec3d ecoeffsRecurrence2_n1(const double a, const double b, const int la, const int lb,
-                                    const double A, const double B, const vec3d &ecoeffs);
+                                    const double A, const double B, const vec3d &ecoeffs0);
 
         /** */
-        vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
+        vec3d ecoeffsRecurrence2_n2(const double a, const double b, const int la, const int lb,
+                                    const double A, const double B, const vec3d &ecoeffs1);
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
@@ -29,7 +33,13 @@ namespace lible
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
                                                      const double *xyz_b,
-                                                     const std::array<lible::vec3d, 3> &ecoeffs);
+                                                     const std::array<lible::vec3d, 3> &ecoeffs0);
+
+        /** */
+        std::array<vec3d, 3> ecoeffsPrimitivePair_n2(const double a, const double b, const int la,
+                                                     const int lb, const double *xyz_a,
+                                                     const double *xyz_b,
+                                                     const std::array<lible::vec3d, 3> &ecoeffs1);
 
         /** */
         std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
