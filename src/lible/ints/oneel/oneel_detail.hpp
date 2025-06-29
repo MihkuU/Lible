@@ -14,6 +14,9 @@ namespace lible
 {
     namespace ints
     {
+        // TODO: this stuff should prolly be removed, its not well generalizeable and 
+        // doesnt give much benefit.
+
         namespace one // TODO: remove one-namespace
         {
             /** */

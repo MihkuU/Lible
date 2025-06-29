@@ -111,7 +111,7 @@ namespace lible
          */
         std::vector<std::array<vec2d, 3>>
         externalChargesOperatorD1Kernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
-                                        const BoysGrid &boys_grid, const ShellPairData &sp_data); // TODO: rename to externalChargesOperatorD1Kernel
+                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -127,6 +127,16 @@ namespace lible
          */
         std::array<vec2d, 3> dipoleMomentKernel(const int ipair, const std::array<double, 3> &origin,
                                                 const ShellPairData &sp_data);
+
+        /** */
+        vec2d spinOrbitCoupling1El(const Structure &structure);
+
+        /**
+         * TODO: mention that it requires lab + 1 angular momentum boys_grid.
+         */
+        std::array<vec2d, 3>
+        spinOrbitCoupling1ElKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                   const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints

@@ -214,6 +214,21 @@ array<double, 3> LI::Structure::getCoordsAtom(const int iatom) const
     return coords_xyz[iatom];
 }
 
+vector<array<double, 4>> LI::Structure::getZs() const
+{
+    int n_atoms = getNAtoms();
+
+    vector<array<double, 4>> atomic_charges(n_atoms);
+    for (int iatom = 0; iatom < n_atoms; iatom++)
+    {
+        auto [x, y, z] = coords_xyz[iatom];
+        double Z = atomic_nrs[iatom];
+        atomic_charges[iatom] = {x, y, z, Z};
+    }
+
+    return atomic_charges;
+}
+
 vector<LI::Shell> LI::Structure::getShellsL(const int l) const
 {
     return shells.at(l);

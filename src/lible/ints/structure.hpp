@@ -101,6 +101,8 @@ namespace lible
 
             std::array<double, 3> getCoordsAtom(const int iatom) const;
 
+            std::vector<std::array<double, 4>> getZs() const;
+
             std::vector<Shell> getShellsL(const int l) const;
 
             std::vector<Shell> getShellsLAux(const int l) const;
