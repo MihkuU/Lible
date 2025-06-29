@@ -556,25 +556,29 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 // double axby = pp_xy + pr_xy - rr_xy;
                                 // double aybx = pp_xy + pr_yx - rr_xy;
 
-                                ints_cart[0](mu, nu) += fac * (pr_yz - pr_zy);
-                                ints_cart[1](mu, nu) += fac * (pr_zx - pr_xz);
-                                ints_cart[2](mu, nu) += fac * (pr_xy - pr_yz);
+                                // ints_cart[0](mu, nu) += fac * (pr_yz - pr_zy);
+                                // ints_cart[1](mu, nu) += fac * (pr_zx - pr_xz);
+                                // ints_cart[2](mu, nu) += fac * (pr_xy - pr_yz);
+
+                                ints_cart[0](mu, nu) += fac * pr_yz;
+                                ints_cart[1](mu, nu) += fac * pr_zx;
+                                ints_cart[2](mu, nu) += fac * pr_xy;
                             }
         }
 
     array<vec2d, 3> ints_sph;
-    for (int ideriv = 0; ideriv < 3; ideriv++)
-        ints_sph[ideriv] = trafo2Spherical(la, lb, ints_cart[ideriv]);
+    for (int icoord = 0; icoord < 3; icoord++)
+        ints_sph[icoord] = trafo2Spherical(la, lb, ints_cart[icoord]);
 
     int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
     int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
-    for (int ideriv = 0; ideriv < 3; ideriv++)
-        for (size_t mu = 0; mu < ints_sph[ideriv].dim<0>(); mu++)
-            for (size_t nu = 0; nu < ints_sph[ideriv].dim<1>(); nu++)
+    for (int icoord = 0; icoord < 3; icoord++)
+        for (size_t mu = 0; mu < ints_sph[icoord].dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph[icoord].dim<1>(); nu++)
             {
                 double norm_a = sp_data.norms[ofs_norm_a + mu];
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
-                ints_sph[ideriv](mu, nu) *= norm_a * norm_b;
+                ints_sph[icoord](mu, nu) *= norm_a * norm_b;
             }
 
     return ints_sph;
