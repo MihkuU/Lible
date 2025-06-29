@@ -4,8 +4,10 @@
 #include <lible/ints/ecoeffs.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
+#include <lible/ints/oneel/oneel_detail.hpp>
 
 namespace LI = lible::ints;
+namespace LIO = lible::ints::one;
 
 using std::array, std::vector;
 
@@ -391,15 +393,15 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1El(const Structure &structure)
     array<vec2d, 3> ints;
     for (int i = 0; i < 3; i++)
         ints[i] = vec2d(Fill(0), dim_ao, dim_ao);
-        
-    // TODO: use symm        
+
+    // TODO: use symm
     for (int la = 0; la <= l_max; la++)
         for (int lb = 0; lb <= l_max; lb++)
         {
             ShellPairData sp_data = shellPairDataNoSymm(la, lb, structure);
 
             int lab = la + lb;
-            BoysGrid boys_grid(lab + 1);            
+            BoysGrid boys_grid(lab + 1);
 
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
@@ -417,7 +419,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1El(const Structure &structure)
                         int nu = ofs_b + b;
                         ints[0](mu, nu) = ints_batch[0](a, b);
                         ints[1](mu, nu) = ints_batch[1](a, b);
-                        ints[2](mu, nu) = ints_batch[2](a, b);                         
+                        ints[2](mu, nu) = ints_batch[2](a, b);
                     }
             }
         }
@@ -440,7 +442,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
     const int cofs_a = sp_data.coffsets[2 * ipair + 0];
     const int cofs_b = sp_data.coffsets[2 * ipair + 1];
     const int n_cart_a = numCartesians(la);
-    const int n_cart_b = numCartesians(lb);    
+    const int n_cart_b = numCartesians(lb);
 
     const double *cexps_a = &sp_data.exps[cofs_a];
     const double *cexps_b = &sp_data.exps[cofs_b];
@@ -450,11 +452,11 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
     const double *xyz_b = &sp_data.coords[6 * ipair + 3];
 
     const auto &cart_exps_a = cart_exps[la];
-    const auto &cart_exps_b = cart_exps[lb];    
+    const auto &cart_exps_b = cart_exps[lb];
 
     array<vec2d, 3> ints_cart;
     for (int ideriv = 0; ideriv < 3; ideriv++)
-        ints_cart[ideriv] = vec2d(Fill(0), n_cart_a, n_cart_b);    
+        ints_cart[ideriv] = vec2d(Fill(0), n_cart_a, n_cart_b);
 
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -462,7 +464,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
             double a = cexps_a[ia];
             double b = cexps_b[ib];
             double da = ccoeffs_a[ia];
-            double db = ccoeffs_b[ib];        
+            double db = ccoeffs_b[ib];
 
             auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
 
@@ -498,9 +500,9 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                         for (int v = 0; v <= lab + 1; v++)
                             rints_sum(t, u, v) += charge * rints(t, u, v);
             }
-                        
+
             double dadb = da * db;
-            double fac = 2 * (M_PI / p) * dadb * alpha_sqr * (b - a) / p;            
+            double fac = 2 * (M_PI / p) * dadb * alpha_sqr * (b - a) / p;
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                     for (int t = 0; t <= i + i_; t++)
@@ -543,11 +545,11 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 // double rr_yz = fac * Ex(i, i_, t) * E1y(j, j_, u) * E1z(k, k_, v) * r000;
                                 // double rr_zz = fac * Ex(i, i_, t) * Ey(j, j_, u) * E2z(k, k_, v) * r000;
 
-                                // AB                                                                
+                                // AB
                                 // TODO: PP and RR not needed?
                                 // double aybz = pp_yz + pr_yz - rr_yz;
                                 // double azby = pp_yz + pr_zy - rr_yz;
-                                
+
                                 // double azbx = pp_xz + pr_zx - rr_xz;
                                 // double axbz = pp_xz + pr_xz - rr_xz;
 
@@ -557,7 +559,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 ints_cart[0](mu, nu) += fac * (pr_yz - pr_zy);
                                 ints_cart[1](mu, nu) += fac * (pr_zx - pr_xz);
                                 ints_cart[2](mu, nu) += fac * (pr_xy - pr_yz);
-                            }     
+                            }
         }
 
     array<vec2d, 3> ints_sph;
@@ -576,4 +578,39 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
             }
 
     return ints_sph;
+}
+
+template <>
+void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
+                                                  const ShellPairData &sp_data,
+                                                  vec2d &ints_out)
+{
+    vector<array<double, 4>> charges(sp_data.n_atoms);
+    for (int iatom = 0; iatom < sp_data.n_atoms; iatom++)
+    {
+        const auto &coords = sp_data.atomic_coords;
+        array<double, 3> xyz_c{coords[3 * iatom],
+                               coords[3 * iatom + 1],
+                               coords[3 * iatom + 2]};
+
+        double Z = sp_data.atomic_nrs[iatom];
+        charges[iatom] = {xyz_c[0], xyz_c[1], xyz_c[2], Z};
+    }
+
+    int lab = la + lb;
+    BoysGrid boys_grid(lab);
+
+    for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+    {
+        vec2d ints_ipair = externalChargesKernel(ipair, charges, boys_grid, sp_data);
+
+        int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
+        int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
+        for (size_t mu = 0; mu < ints_ipair.dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_ipair.dim<1>(); nu++)
+            {
+                ints_out(ofs_a + mu, ofs_b + nu) = ints_ipair(mu, nu);
+                ints_out(ofs_b + nu, ofs_a + mu) = ints_ipair(mu, nu);
+            }
+    }
 }
