@@ -432,7 +432,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                                       const BoysGrid &boys_grid,
                                                       const ShellPairData &sp_data)
 {
-    constexpr double alpha_sqr = _alpha_ * _alpha_;
+    constexpr double alpha_sqr_2 = _alpha_ * _alpha_ * 0.5;
 
     const int la = sp_data.la;
     const int lb = sp_data.lb;
@@ -471,9 +471,6 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
             auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b,
                                                            {Ex, Ey, Ez});
 
-            // auto [E2x, E2y, E2z] = ecoeffsPrimitivePair_n2(a, b, la, lb, xyz_a, xyz_b,
-            //                                                {E1x, E1y, E1z});
-
             // R integrals
             double p = a + b;
             array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
@@ -502,7 +499,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
             }
 
             double dadb = da * db;
-            double fac = 2 * (M_PI / p) * dadb * alpha_sqr * (b - a) / p;
+            double fac = (M_PI / p) * dadb * alpha_sqr_2 * ((b - a) / p);
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                     for (int t = 0; t <= i + i_; t++)
@@ -527,13 +524,13 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 double e001 = Ex(i, i_, t) * Ey(j, j_, u) * E1z(k, k_, v);
 
                                 // double pr_xx = fac * e100 * r100;
-                                double pr_xy = fac * e010 * r100;
-                                double pr_xz = fac * e001 * r100;
-                                // double pr_yx = fac * e100 * r010;
+                                double pr_xy = fac * r100 * e010;
+                                double pr_xz = fac * r100 * e001;
+                                double pr_yx = fac * r010 * e100;
                                 // double pr_yy = fac * e010 * r010;
-                                double pr_yz = fac * e001 * r010;
-                                double pr_zx = fac * e100 * r001;
-                                double pr_zy = fac * e010 * r001;
+                                double pr_yz = fac * r010 * e001;
+                                double pr_zx = fac * r001 * e100;
+                                double pr_zy = fac * r001 * e010;
                                 // double pr_zz = fac * e001 * r001;
 
                                 // // RR
@@ -556,13 +553,13 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 // double axby = pp_xy + pr_xy - rr_xy;
                                 // double aybx = pp_xy + pr_yx - rr_xy;
 
-                                // ints_cart[0](mu, nu) += fac * (pr_yz - pr_zy);
-                                // ints_cart[1](mu, nu) += fac * (pr_zx - pr_xz);
-                                // ints_cart[2](mu, nu) += fac * (pr_xy - pr_yz);
+                                ints_cart[0](mu, nu) += fac * (pr_yz - pr_zy);
+                                ints_cart[1](mu, nu) += fac * (pr_zx - pr_xz);
+                                ints_cart[2](mu, nu) += fac * (pr_xy - pr_yx);
 
-                                ints_cart[0](mu, nu) += fac * pr_yz;
-                                ints_cart[1](mu, nu) += fac * pr_zx;
-                                ints_cart[2](mu, nu) += fac * pr_xy;
+                                // ints_cart[0](mu, nu) += fac * pr_yz;
+                                // ints_cart[1](mu, nu) += fac * pr_zx;
+                                // ints_cart[2](mu, nu) += fac * pr_xy;
                             }
         }
 

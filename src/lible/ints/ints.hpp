@@ -380,6 +380,12 @@ namespace lible
 
         /**
          * \ingroup ints
+         * TODO: write dox.
+         */
+        double purePrimitiveNorm(const int l, const double exp);
+
+        /**
+         * \ingroup ints
          * Returns the number of Cartesian Gaussians.
          */
         constexpr int numCartesians(const int l);

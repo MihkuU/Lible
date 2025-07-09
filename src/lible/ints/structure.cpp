@@ -280,7 +280,7 @@ void LI::Structure::constructShells(const basis_atoms_t &basis_atoms, int &max_l
             {
                 vector<double> coeffs = coeffs_raw;
                 for (size_t i = 0; i < exps.size(); i++)
-                    coeffs[i] *= calcPurePrimitiveNorm(angmom, exps[i]);
+                    coeffs[i] *= purePrimitiveNorm(angmom, exps[i]);
 
                 vector<double> norms = calcShellNorms(angmom, coeffs, exps);
 
