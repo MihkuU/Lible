@@ -192,8 +192,6 @@ lible::vec2d LI::externalChargesKernelErf(const double omega, const int ipair,
                 //second part of (52) in https://doi.org/10.1039/B605188J
                 double x = p * xyz_pc_dot * omega_squared / (omega_squared + p);
 
-                // std::cout << "T = " << x << ", normally = " << p * xyz_pc_dot << std::endl; //TODO remove 
-
                 vector<double> fnx = calcBoysF(lab, x, boys_grid);
 
                 vec3d rints = calcRInts3DErf(lab, p, omega, &xyz_pc[0], &fnx[0]);
