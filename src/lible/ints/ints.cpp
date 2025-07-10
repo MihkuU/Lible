@@ -23,6 +23,11 @@ lible::vec2d LI::nuclearAttraction(const Structure &structure)
     return LIO::calculate<LIO::Option::nuclear_attraction>(structure);
 }
 
+lible::vec2d LI::nuclearAttractionErf(const Structure &structure, const double omega)
+{
+    return LIO::calculate<LIO::Option::nuclear_attraction_erf>(structure, omega);
+}
+
 std::array<lible::vec2d, 3> LI::dipoleMoment(const std::array<double, 3> &origin,
                                              const Structure &structure)
 {

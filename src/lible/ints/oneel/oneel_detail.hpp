@@ -25,12 +25,18 @@ namespace lible
                 dipole_moment,
                 kinetic_energy,
                 nuclear_attraction,
+                nuclear_attraction_erf,
                 overlap
             };
 
             /** TODO: rename?  */
             template <Option opt>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
+                        vec2d &ints_out); // TODO: remove la, lb
+
+            /** for erf attenuated ints */
+            template <Option opt>
+            void kernel(const double omega, const int la, const int lb, const ShellPairData &sp_data,
                         vec2d &ints_out); // TODO: remove la, lb
 
             /** TODO: rename? */
@@ -59,6 +65,32 @@ namespace lible
                         ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
 
                         kernel<opt>(la, lb, sp_data, ints);
+                    }
+
+                return ints;
+            }
+
+            /** For the erf-attenuated nuclear attraction integrals. */
+            template <Option opt>
+            vec2d calculate(const Structure &structure, const double omega)
+            {
+                int l_max = structure.getMaxL();
+                size_t dim_ao = structure.getDimAO();
+
+                vec2d ints(Fill(0), dim_ao, dim_ao);
+                for (int la = l_max; la >= 0; la--)
+                {
+                    ShellPairData sp_data = shellPairDataSymm(la, la, structure);
+
+                    kernel<opt>(omega, la, la, sp_data, ints);
+                }
+
+                for (int la = l_max; la >= 0; la--)
+                    for (int lb = la - 1; lb >= 0; lb--)
+                    {
+                        ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+
+                        kernel<opt>(omega, la, lb, sp_data, ints);
                     }
 
                 return ints;

@@ -76,6 +76,12 @@ namespace lible
         vec2d nuclearAttraction(const Structure &structure);
 
         /**
+         * \ingroup ints
+         * Calculates the nuclear attraction integral matrix.
+         */
+        vec2d nuclearAttractionErf(const Structure &structure, const double omega);
+
+        /**
          * Calculates the one-electron Coulombic interaction integral matrix for given point
          * charges.
          */
