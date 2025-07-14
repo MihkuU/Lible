@@ -23,7 +23,8 @@ lible::vec2d LI::nuclearAttraction(const Structure &structure)
     return LIO::calculate<LIO::Option::nuclear_attraction>(structure);
 }
 
-lible::vec2d LI::nuclearAttractionErf(const Structure &structure, const double omega)
+lible::vec2d LI::nuclearAttractionErf(const Structure &structure,
+                                      const std::vector<double> &omega)
 {
     return LIO::calculate<LIO::Option::nuclear_attraction_erf>(structure, omega);
 }

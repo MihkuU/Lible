@@ -14,7 +14,7 @@ namespace lible
 {
     namespace ints
     {
-        // TODO: this stuff should prolly be removed, its not well generalizeable and 
+        // TODO: this stuff should prolly be removed, its not well generalizeable and
         // doesnt give much benefit.
 
         namespace one // TODO: remove one-namespace
@@ -36,13 +36,14 @@ namespace lible
 
             /** for erf attenuated ints */
             template <Option opt>
-            void kernel(const double omega, const int la, const int lb, const ShellPairData &sp_data,
+            void kernel(const int la, const int lb, const ShellPairData &sp_data,
+                        const std::vector<double> &omegas,
                         vec2d &ints_out); // TODO: remove la, lb
 
             /** TODO: rename? */
             template <Option opt, typename T>
             void kernel(const int la, const int lb, const ShellPairData &sp_data,
-                        const T& arg, std::array<vec2d, 3> &ints_out); // TODO: remove la, lb
+                        const T &arg, std::array<vec2d, 3> &ints_out); // TODO: remove la, lb
 
             /** For various one-electron integrals. */
             template <Option opt>
@@ -72,7 +73,7 @@ namespace lible
 
             /** For the erf-attenuated nuclear attraction integrals. */
             template <Option opt>
-            vec2d calculate(const Structure &structure, const double omega)
+            vec2d calculate(const Structure &structure, const std::vector<double> &omega)
             {
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();
@@ -82,7 +83,7 @@ namespace lible
                 {
                     ShellPairData sp_data = shellPairDataSymm(la, la, structure);
 
-                    kernel<opt>(omega, la, la, sp_data, ints);
+                    kernel<opt>(la, la, sp_data, omega, ints);
                 }
 
                 for (int la = l_max; la >= 0; la--)
@@ -90,7 +91,7 @@ namespace lible
                     {
                         ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
 
-                        kernel<opt>(omega, la, lb, sp_data, ints);
+                        kernel<opt>(la, lb, sp_data, omega, ints);
                     }
 
                 return ints;
@@ -98,7 +99,7 @@ namespace lible
 
             /** For dipole mom, linear mom and angmom. */
             template <Option opt, typename T>
-            std::array<vec2d, 3> calculate3D(const Structure &structure, const T& arg)
+            std::array<vec2d, 3> calculate3D(const Structure &structure, const T &arg)
             {
                 int l_max = structure.getMaxL();
                 size_t dim_ao = structure.getDimAO();

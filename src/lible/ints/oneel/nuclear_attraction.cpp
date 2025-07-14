@@ -16,12 +16,17 @@ namespace lible::ints
     vec2d externalCharges(const vector<array<double, 4>> &charges,
                           const Structure &structure);
 
+    vec2d externalChargesErf(const vector<array<double, 4>> &charges,
+                             const std::vector<double> &omegas,
+                             const Structure &structure);
+
     vec2d externalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    vec2d externalChargesKernelErf(const double omega, const int ipair, 
+    vec2d externalChargesErfKernel(const int ipair,
                                    const vector<array<double, 4>> &charges,
-                                   const BoysGrid &boys_grid, 
+                                   const vector<double> &omegas,
+                                   const BoysGrid &boys_grid,
                                    const ShellPairData &sp_data);
 
     array<vec2d, 3> spinOrbitCoupling1El(const Structure &structure);
@@ -130,9 +135,10 @@ lible::vec2d LI::externalChargesKernel(const int ipair, const vector<array<doubl
     return ints_sph;
 }
 
-lible::vec2d LI::externalChargesKernelErf(const double omega, const int ipair, 
+lible::vec2d LI::externalChargesErfKernel(const int ipair,
                                           const vector<array<double, 4>> &charges,
-                                          const BoysGrid &boys_grid, 
+                                          const vector<double> &omegas,
+                                          const BoysGrid &boys_grid,
                                           const ShellPairData &sp_data)
 {
     int la = sp_data.la;
@@ -156,8 +162,6 @@ lible::vec2d LI::externalChargesKernelErf(const double omega, const int ipair,
     int n_cart_a = numCartesians(la);
     int n_cart_b = numCartesians(lb);
 
-    double omega_squared = omega * omega;
-
     vec2d ints_cart(Fill(0), n_cart_a, n_cart_b);
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -167,12 +171,10 @@ lible::vec2d LI::externalChargesKernelErf(const double omega, const int ipair,
             double da = ccoeffs_a[ia];
             double db = ccoeffs_b[ib];
 
-            double p = a + b; 
+            double p = a + b;
             double dadb = da * db;
             double fac = 2 * (M_PI / p) * dadb;
 
-            double omega_factor = omega / std::pow(omega_squared + p, 0.5);
-            
             auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
 
             array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
@@ -189,17 +191,22 @@ lible::vec2d LI::externalChargesKernelErf(const double omega, const int ipair,
                 double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
                 double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
 
-                //second part of (52) in https://doi.org/10.1039/B605188J
+                double omega_factor = omegas[icharge] / std::pow(omegas[icharge] * omegas[icharge] + p, 0.5);
+
+                double omega_squared = omegas[icharge] * omegas[icharge];
+
+                // second part of (52) in https://doi.org/10.1039/B605188J
                 double x = p * xyz_pc_dot * omega_squared / (omega_squared + p);
 
                 vector<double> fnx = calcBoysF(lab, x, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab, p, omega, &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3DErf(lab, p, omegas[icharge], &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
                         for (int v = 0; v <= lab; v++)
-                            rints_sum(t, u, v) += charge * rints(t, u, v);
+                            rints_sum(t, u, v) += charge * omega_factor // erf-related factors
+                                                  * rints(t, u, v);
             }
 
             for (const auto &[i, j, k, mu] : cart_exps_a)
@@ -208,7 +215,6 @@ lible::vec2d LI::externalChargesKernelErf(const double omega, const int ipair,
                         for (int u = 0; u <= j + j_; u++)
                             for (int v = 0; v <= k + k_; v++)
                                 ints_cart(mu, nu) += (-1) * fac * // -1 = charge of electron
-                                                     omega_factor * //erf-related factors
                                                      Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) *
                                                      rints_sum(t, u, v);
         }
@@ -486,6 +492,46 @@ lible::vec2d LI::externalCharges(const vector<array<double, 4>> &charges,
     return ints;
 }
 
+lible::vec2d LI::externalChargesErf(const vector<array<double, 4>> &charges,
+                                    const std::vector<double> &omegas,
+                                    const Structure &structure)
+{
+    int l_max = structure.getMaxL();
+    int dim_ao = structure.getDimAO();
+
+    vec2d ints(Fill(0), dim_ao, dim_ao);
+    for (int la = l_max; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--)
+        {
+            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+
+            int lab = la + lb;
+            BoysGrid boys_grid(lab);
+
+            for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+            {
+                vec2d ints_ipair = externalChargesErfKernel(ipair, charges,
+                                                            omegas, boys_grid,
+                                                            sp_data);
+
+                int n_sph_a = 2 * la + 1;
+                int n_sph_b = 2 * lb + 1;
+                int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
+                int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
+                for (int a = 0; a < n_sph_a; a++)
+                    for (int b = 0; b < n_sph_b; b++)
+                    {
+                        int mu = ofs_a + a;
+                        int nu = ofs_b + b;
+                        ints(mu, nu) = ints_ipair(a, b);
+                        ints(nu, mu) = ints_ipair(a, b);
+                    }
+            }
+        }
+
+    return ints;
+}
+
 array<lible::vec2d, 3> LI::spinOrbitCoupling1El(const Structure &structure)
 {
     int l_max = structure.getMaxL();
@@ -723,9 +769,10 @@ void LIO::kernel<LIO::Option::nuclear_attraction>(const int la, const int lb,
 }
 
 template <>
-void LIO::kernel<LIO::Option::nuclear_attraction_erf>(const double omega, const int la,
+void LIO::kernel<LIO::Option::nuclear_attraction_erf>(const int la,
                                                       const int lb,
                                                       const ShellPairData &sp_data,
+                                                      const std::vector<double> &omegas,
                                                       vec2d &ints_out)
 {
     vector<array<double, 4>> charges(sp_data.n_atoms);
@@ -745,7 +792,7 @@ void LIO::kernel<LIO::Option::nuclear_attraction_erf>(const double omega, const 
 
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
-        vec2d ints_ipair = externalChargesKernelErf(omega, ipair, charges, boys_grid, sp_data);
+        vec2d ints_ipair = externalChargesErfKernel(ipair, charges, omegas, boys_grid, sp_data);
 
         int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
         int ofs_b = sp_data.offsets_sph[2 * ipair + 1];

@@ -101,6 +101,7 @@ namespace lible
 
             std::array<double, 3> getCoordsAtom(const int iatom) const;
 
+            /** Returns for every atom {x, y, z, charge} */
             std::vector<std::array<double, 4>> getZs() const;
 
             std::vector<Shell> getShellsL(const int l) const;

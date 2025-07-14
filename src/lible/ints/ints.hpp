@@ -77,9 +77,10 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Calculates the nuclear attraction integral matrix.
+         * Calculates the nuclear attraction integral matrix with the erf-attenuated (screened) Coulomb operator.
          */
-        vec2d nuclearAttractionErf(const Structure &structure, const double omega);
+        vec2d nuclearAttractionErf(const Structure &structure, 
+                                   const std::vector<double> &omegas);
 
         /**
          * Calculates the one-electron Coulombic interaction integral matrix for given point
@@ -89,6 +90,15 @@ namespace lible
                               const Structure &structure);
 
         /**
+         * Calculates the one-electron Coulombic interaction integral matrix for given point
+         * charges using the erf-attenuated (screened) Coulomb operator.
+         * \param omegas vector holding the screening parameters. Has to have the same size as the point_charges
+         */
+        vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges,
+                                 const std::vector<double> &omegas,
+                                 const Structure &structure);
+
+        /**
          * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
          * pair 'ipair'. In spherical basis. The charges should be given as a list
          * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
@@ -96,6 +106,16 @@ namespace lible
          */
         vec2d externalChargesKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+        /**
+         * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
+         * pair 'ipair'. In spherical basis. The charges should be given as a list
+         * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
+         * initialized for lab = la + lb in the given shell pair data.
+         */
+        vec2d externalChargesErfKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+                                       const std::vector<double> &omegas,
+                                       const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * Calculates a batch of normalized Coulombic interaction energy integral derivatives for
