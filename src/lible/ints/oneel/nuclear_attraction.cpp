@@ -432,7 +432,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                                       const BoysGrid &boys_grid,
                                                       const ShellPairData &sp_data)
 {
-    constexpr double alpha_sqr_2 = _alpha_ * _alpha_ * 0.5;
+    constexpr double alpha_sqr_half = _alpha_ * _alpha_ * 0.5; // TODO: remove this and leave it to the caller.
 
     const int la = sp_data.la;
     const int lb = sp_data.lb;
@@ -498,24 +498,17 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                             rints_sum(t, u, v) += charge * rints(t, u, v);
             }
 
+            // (\nabla_A x \nabla_B) integrals
             double dadb = da * db;
-            double fac = (M_PI / p) * dadb * alpha_sqr_2 * ((b - a) / p);
+            double fac = (2 * M_PI / p) * dadb * alpha_sqr_half;
+            double a_p = a / p;
+            double b_p = b / p;
             for (const auto &[i, j, k, mu] : cart_exps_a)
                 for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                     for (int t = 0; t <= i + i_; t++)
                         for (int u = 0; u <= j + j_; u++)
                             for (int v = 0; v <= k + k_; v++)
                             {
-                                // // PP
-                                // double Exyz = Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
-                                // double pp_xx = fac * Exyz * rints_sum(t + 2, u, v);
-                                // double pp_xy = fac * Exyz * rints_sum(t + 1, u + 1, v);
-                                // double pp_xz = fac * Exyz * rints_sum(t + 1, u, v + 1);
-                                // double pp_yy = fac * Exyz * rints_sum(t, u + 2, v);
-                                // double pp_yz = fac * Exyz * rints_sum(t, u + 1, v + 1);
-                                // double pp_zz = fac * Exyz * rints_sum(t, u, v + 2);
-
-                                // PR
                                 double r100 = rints_sum(t + 1, u, v);
                                 double r010 = rints_sum(t, u + 1, v);
                                 double r001 = rints_sum(t, u, v + 1);
@@ -523,43 +516,23 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 double e010 = Ex(i, i_, t) * E1y(j, j_, u) * Ez(k, k_, v);
                                 double e001 = Ex(i, i_, t) * Ey(j, j_, u) * E1z(k, k_, v);
 
-                                // double pr_xx = fac * e100 * r100;
-                                double pr_xy = fac * r100 * e010;
-                                double pr_xz = fac * r100 * e001;
-                                double pr_yx = fac * r010 * e100;
-                                // double pr_yy = fac * e010 * r010;
-                                double pr_yz = fac * r010 * e001;
-                                double pr_zx = fac * r001 * e100;
-                                double pr_zy = fac * r001 * e010;
-                                // double pr_zz = fac * e001 * r001;
+                                double pr_yz = r010 * e001;
+                                double pr_zy = r001 * e010;
+                                double pr_zx = r001 * e100;
+                                double pr_xz = r100 * e001;
+                                double pr_xy = r100 * e010;
+                                double pr_yx = r010 * e100;
 
-                                // // RR
-                                // double r000 = rints_sum(t, u, v);
-                                // double rr_xx = fac * E2x(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * r000;
-                                // double rr_xy = fac * E1x(i, i_, t) * E1y(j, j_, u) * Ez(k, k_, v) * r000;
-                                // double rr_xz = fac * E1x(i, i_, t) * Ey(j, j_, u) * E1z(k, k_, v) * r000;
-                                // double rr_yy = fac * Ex(i, i_, t) * E2y(j, j_, u) * Ez(k, k_, v) * r000;
-                                // double rr_yz = fac * Ex(i, i_, t) * E1y(j, j_, u) * E1z(k, k_, v) * r000;
-                                // double rr_zz = fac * Ex(i, i_, t) * Ey(j, j_, u) * E2z(k, k_, v) * r000;
+                                double ab_yz = -a_p * pr_yz + b_p * pr_zy;
+                                double ab_zy = -a_p * pr_zy + b_p * pr_yz;
+                                double ab_zx = -a_p * pr_zx + b_p * pr_xz;
+                                double ab_xz = -a_p * pr_xz + b_p * pr_zx;
+                                double ab_xy = -a_p * pr_xy + b_p * pr_yx;
+                                double ab_yx = -a_p * pr_yx + b_p * pr_xy;
 
-                                // AB
-                                // TODO: PP and RR not needed?
-                                // double aybz = pp_yz + pr_yz - rr_yz;
-                                // double azby = pp_yz + pr_zy - rr_yz;
-
-                                // double azbx = pp_xz + pr_zx - rr_xz;
-                                // double axbz = pp_xz + pr_xz - rr_xz;
-
-                                // double axby = pp_xy + pr_xy - rr_xy;
-                                // double aybx = pp_xy + pr_yx - rr_xy;
-
-                                ints_cart[0](mu, nu) += fac * (pr_yz - pr_zy);
-                                ints_cart[1](mu, nu) += fac * (pr_zx - pr_xz);
-                                ints_cart[2](mu, nu) += fac * (pr_xy - pr_yx);
-
-                                // ints_cart[0](mu, nu) += fac * pr_yz;
-                                // ints_cart[1](mu, nu) += fac * pr_zx;
-                                // ints_cart[2](mu, nu) += fac * pr_xy;
+                                ints_cart[0](mu, nu) += fac * (ab_yz - ab_zy);
+                                ints_cart[1](mu, nu) += fac * (ab_zx - ab_xz);
+                                ints_cart[2](mu, nu) += fac * (ab_xy - ab_yx);
                             }
         }
 

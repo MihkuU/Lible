@@ -101,7 +101,7 @@ vector<double> LI::calcRInts_ERI2D1(const int l, const double alpha, const doubl
     const int n_rints = n_hermite_a * n_hermite_b;
     const int ofs0 = n_rints * 0;
     const int ofs1 = n_rints * 1;
-    const int ofs2 = n_rints * 2;  
+    const int ofs2 = n_rints * 2;
 
     vector<double> rints(3 * n_rints);
     for (int j = 0; j < n_hermite_b; j++)
@@ -115,7 +115,7 @@ vector<double> LI::calcRInts_ERI2D1(const int l, const double alpha, const doubl
         for (int i = 0; i < n_hermite_a; i++)
         {
             auto [t, u, v] = hermite_idxs_a[i];
-            
+
             int idx = i * n_hermite_b + j;
 
             // d/dA
@@ -150,7 +150,7 @@ vector<double> LI::calcRInts_ERI3D1(const int l, const double alpha, const doubl
 
         double sign = 1.0;
         if ((t_ + u_ + v_) % 2 != 0)
-            sign = -1.0;        
+            sign = -1.0;
 
         for (int i = 0; i < n_hermite_ab; i++)
         {
@@ -200,7 +200,7 @@ vector<double> LI::calcRInts_ERI2D2(const int l, const double alpha, const doubl
         for (int i = 0; i < n_hermite_a; i++)
         {
             auto [t, u, v] = hermite_idxs_a[i];
-            
+
             int idx = i * n_hermite_b + j;
 
             rints[ofs0 + idx] = sign * fac * rints_3d(t + t_ + 2, u + u_, v + v_);
@@ -252,7 +252,7 @@ vector<double> LI::calcRInts_ERI3D2(const int l, const double alpha, const doubl
             int idx = i * n_hermite_ket + j;
 
             rints[ofs0 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
-            
+
             rints[ofs1 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
             rints[ofs2 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
             rints[ofs3 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
@@ -266,5 +266,43 @@ vector<double> LI::calcRInts_ERI3D2(const int l, const double alpha, const doubl
         }
     }
 
-    return rints;    
+    return rints;
+}
+
+vector<double> LI::calcRInts_ERISOC(const int l, const double fac, const double alpha,
+                                    const double *xyz_pq, const double *fnx,
+                                    const vector<array<int, 3>> &hermite_idxs_bra,
+                                    const vector<array<int, 3>> &hermite_idxs_ket)
+{
+    vec3d rints_3d = calcRInts3D(l + 1, alpha, xyz_pq, fnx);
+
+    const int n_hermite_bra = hermite_idxs_bra.size();
+    const int n_hermite_ket = hermite_idxs_ket.size();
+    const int n_rints = n_hermite_bra * n_hermite_ket;
+    const int ofs0 = n_rints * 0;
+    const int ofs1 = n_rints * 1;
+    const int ofs2 = n_rints * 2;
+
+    vector<double> rints(4 * n_rints);
+    for (int j = 0; j < n_hermite_ket; j++)
+    {
+        auto &[t_, u_, v_] = hermite_idxs_ket[j];
+
+        double sign = 1.0;
+        if ((t_ + u_ + v_) % 2 != 0)
+            sign = -1.0;
+
+        for (int i = 0; i < n_hermite_bra; i++)
+        {
+            auto &[t, u, v] = hermite_idxs_bra[i];
+
+            int idx = i * n_hermite_ket + j;
+
+            rints[ofs0 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
+            rints[ofs1 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
+            rints[ofs2 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
+        }
+    }
+
+    return rints;
 }
