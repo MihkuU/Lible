@@ -394,7 +394,6 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1El(const Structure &structure)
     for (int i = 0; i < 3; i++)
         ints[i] = vec2d(Fill(0), dim_ao, dim_ao);
 
-    // TODO: use symm
     for (int la = 0; la <= l_max; la++)
         for (int lb = 0; lb <= l_max; lb++)
         {
@@ -432,8 +431,6 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                                       const BoysGrid &boys_grid,
                                                       const ShellPairData &sp_data)
 {
-    constexpr double alpha_sqr_half = _alpha_ * _alpha_ * 0.5; // TODO: remove this and leave it to the caller.
-
     const int la = sp_data.la;
     const int lb = sp_data.lb;
     const int lab = la + lb;
@@ -500,7 +497,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
 
             // (\nabla_A x \nabla_B) integrals
             double dadb = da * db;
-            double fac = (2 * M_PI / p) * dadb * alpha_sqr_half;
+            double fac = (2 * M_PI / p) * dadb;
             double a_p = a / p;
             double b_p = b / p;
             for (const auto &[i, j, k, mu] : cart_exps_a)

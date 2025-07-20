@@ -1108,6 +1108,9 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
 
             int m = n_sph_ab, n = n_sph_cd, k = n_hermite_ab;
             int ofs_e1_ab = 3 * iab * n_ecoeffs_ab;
+            int ofs_e1_0 = ofs_e1_ab + 0 * n_ecoeffs_ab;
+            int ofs_e1_1 = ofs_e1_ab + 1 * n_ecoeffs_ab;
+            int ofs_e1_2 = ofs_e1_ab + 2 * n_ecoeffs_ab;
 
             // P & R
             vector<double> PR_yz(n_sph_abcd, 0);
@@ -1116,10 +1119,6 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
             vector<double> PR_xz(n_sph_abcd, 0);
             vector<double> PR_xy(n_sph_abcd, 0);
             vector<double> PR_yx(n_sph_abcd, 0);
-
-            int ofs_e1_0 = ofs_e1_ab + 0 * n_ecoeffs_ab;
-            int ofs_e1_1 = ofs_e1_ab + 1 * n_ecoeffs_ab;
-            int ofs_e1_2 = ofs_e1_ab + 2 * n_ecoeffs_ab;
 
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_yz[0]);
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_zy[0]);
@@ -1252,6 +1251,9 @@ array<lible::vec3d, 3> LI::eri3socKernelFun(const int ipair_ab, const int ishell
 
             int m = n_sph_ab, n = n_sph_c, k = n_hermite_ab;
             int ofs_e1_ab = 3 * iab * n_ecoeffs_ab;
+            int ofs_e1_0 = ofs_e1_ab + 0 * n_ecoeffs_ab;
+            int ofs_e1_1 = ofs_e1_ab + 1 * n_ecoeffs_ab;
+            int ofs_e1_2 = ofs_e1_ab + 2 * n_ecoeffs_ab;            
 
             // P & R
             vector<double> PR_yz(n_sph_abc, 0);
@@ -1260,10 +1262,6 @@ array<lible::vec3d, 3> LI::eri3socKernelFun(const int ipair_ab, const int ishell
             vector<double> PR_xz(n_sph_abc, 0);
             vector<double> PR_xy(n_sph_abc, 0);
             vector<double> PR_yx(n_sph_abc, 0);
-
-            int ofs_e1_0 = ofs_e1_ab + 0 * n_ecoeffs_ab;
-            int ofs_e1_1 = ofs_e1_ab + 1 * n_ecoeffs_ab;
-            int ofs_e1_2 = ofs_e1_ab + 2 * n_ecoeffs_ab;
 
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_yz[0]);
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_zy[0]);
