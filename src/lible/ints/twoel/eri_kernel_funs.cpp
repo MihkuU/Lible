@@ -1068,7 +1068,7 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
             double b = exps_b[ib];
             double p = a + b;
 
-            std::vector<double> R_x_E(3 * n_R_x_E, 0);
+            vector<double> R_x_E(3 * n_R_x_E, 0);
             for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
                 for (int id = 0; id < cdepth_d; id++, icd++)
                 {
@@ -1078,32 +1078,32 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
                     double q = c + d;
                     double alpha = p * q / (p + q);
 
-                    std::array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                    array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
                                                 (a * xyz_a[1] + b * xyz_b[1]) / p,
                                                 (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-                    std::array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
+                    array<double, 3> xyz_q{(c * xyz_c[0] + d * xyz_d[0]) / q,
                                                 (c * xyz_c[1] + d * xyz_d[1]) / q,
                                                 (c * xyz_c[2] + d * xyz_d[2]) / q};
 
-                    std::array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0],
-                                                 xyz_p[1] - xyz_q[1],
-                                                 xyz_p[2] - xyz_q[2]};
+                    array<double, 3> xyz_pq{xyz_p[0] - xyz_q[0],
+                                            xyz_p[1] - xyz_q[1],
+                                            xyz_p[2] - xyz_q[2]};
 
                     double xx{xyz_pq[0]}, xy{xyz_pq[1]}, xz{xyz_pq[2]};
                     double x = alpha * (xx * xx + xy * xy + xz * xz);
                     vector<double> fnx = calcBoysF(labcd + 1, x, eri4soc_kernel->boys_grid);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
-                    vector<double> rints = calcRInts_ERISOC(labcd, alpha, fac, &fnx[0], &xyz_pq[0],
+                    vector<double> rints = calcRInts_ERISOC(labcd, fac, alpha, &xyz_pq[0], &fnx[0],
                                                             hermite_idxs_bra, hermite_idxs_ket);
 
                     int m = n_hermite_ab, n = n_sph_cd, k = n_hermite_cd;
-                    int ofs_e1_cd = icd * n_ecoeffs_cd;
+                    int ofs_e0_cd = icd * n_ecoeffs_cd;
 
-                    shark_mm_ket(m, n, k, &rints[0 * n_rints], &ecoeffs0_cd[ofs_e1_cd], &R_x_E[0 * n_R_x_E]);
-                    shark_mm_ket(m, n, k, &rints[1 * n_rints], &ecoeffs0_cd[ofs_e1_cd], &R_x_E[1 * n_R_x_E]);
-                    shark_mm_ket(m, n, k, &rints[2 * n_rints], &ecoeffs0_cd[ofs_e1_cd], &R_x_E[2 * n_R_x_E]);
+                    shark_mm_ket(m, n, k, &rints[0 * n_rints], &ecoeffs0_cd[ofs_e0_cd], &R_x_E[0 * n_R_x_E]);
+                    shark_mm_ket(m, n, k, &rints[1 * n_rints], &ecoeffs0_cd[ofs_e0_cd], &R_x_E[1 * n_R_x_E]);
+                    shark_mm_ket(m, n, k, &rints[2 * n_rints], &ecoeffs0_cd[ofs_e0_cd], &R_x_E[2 * n_R_x_E]);
                 }
 
             int m = n_sph_ab, n = n_sph_cd, k = n_hermite_ab;
@@ -1120,12 +1120,12 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
             vector<double> PR_xy(n_sph_abcd, 0);
             vector<double> PR_yx(n_sph_abcd, 0);
 
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_yz[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_zy[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_zx[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_xz[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_xy[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_yz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_yz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_zy[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_zx[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_xz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_xy[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yx[0]);
 
             // A & B
             vector<double> AB_yz(n_sph_abcd, 0);
@@ -1153,9 +1153,9 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
             cblas_daxpy(n_sph_abcd, 1.0, &AB_zx[0], 1, &eri4_batch[1][0], 1);
             cblas_daxpy(n_sph_abcd, 1.0, &AB_xy[0], 1, &eri4_batch[2][0], 1);
 
-            cblas_daxpy(n_sph_abcd, -1.0, &PR_zy[0], 1, &eri4_batch[0][0], 1);
-            cblas_daxpy(n_sph_abcd, -1.0, &PR_xz[0], 1, &eri4_batch[1][0], 1);
-            cblas_daxpy(n_sph_abcd, -1.0, &PR_yx[0], 1, &eri4_batch[2][0], 1);
+            cblas_daxpy(n_sph_abcd, -1.0, &AB_zy[0], 1, &eri4_batch[0][0], 1);
+            cblas_daxpy(n_sph_abcd, -1.0, &AB_xz[0], 1, &eri4_batch[1][0], 1);
+            cblas_daxpy(n_sph_abcd, -1.0, &AB_yx[0], 1, &eri4_batch[2][0], 1);
         }
 
     return eri4_batch;
@@ -1238,7 +1238,7 @@ array<lible::vec3d, 3> LI::eri3socKernelFun(const int ipair_ab, const int ishell
                 vector<double> fnx = calcBoysF(labc + 1, x, eri3soc_kernel->boys_grid);
 
                 double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
-                vector<double> rints = calcRInts_ERISOC(labc, alpha, fac, &fnx[0], &xyz_pc[0],
+                vector<double> rints = calcRInts_ERISOC(labc, fac, alpha, &xyz_pc[0], &fnx[0], 
                                                         hermite_idxs_bra, hermite_idxs_ket);
 
                 int m = n_hermite_ab, n = n_sph_c, k = n_hermite_c;
@@ -1263,12 +1263,12 @@ array<lible::vec3d, 3> LI::eri3socKernelFun(const int ipair_ab, const int ishell
             vector<double> PR_xy(n_sph_abc, 0);
             vector<double> PR_yx(n_sph_abc, 0);
 
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_yz[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_zy[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_zx[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_xz[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_xy[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_yz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_yz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_zy[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_zx[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_xz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_xy[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yz[0]);
 
             // A & B
             vector<double> AB_yz(n_sph_abc, 0);
@@ -1296,9 +1296,9 @@ array<lible::vec3d, 3> LI::eri3socKernelFun(const int ipair_ab, const int ishell
             cblas_daxpy(n_sph_abc, 1.0, &AB_zx[0], 1, &eri3_batch[1][0], 1);
             cblas_daxpy(n_sph_abc, 1.0, &AB_xy[0], 1, &eri3_batch[2][0], 1);
 
-            cblas_daxpy(n_sph_abc, -1.0, &PR_zy[0], 1, &eri3_batch[0][0], 1);
-            cblas_daxpy(n_sph_abc, -1.0, &PR_xz[0], 1, &eri3_batch[1][0], 1);
-            cblas_daxpy(n_sph_abc, -1.0, &PR_yx[0], 1, &eri3_batch[2][0], 1);
+            cblas_daxpy(n_sph_abc, -1.0, &AB_zy[0], 1, &eri3_batch[0][0], 1);
+            cblas_daxpy(n_sph_abc, -1.0, &AB_xz[0], 1, &eri3_batch[1][0], 1);
+            cblas_daxpy(n_sph_abc, -1.0, &AB_yx[0], 1, &eri3_batch[2][0], 1);
         }
 
     return eri3_batch;

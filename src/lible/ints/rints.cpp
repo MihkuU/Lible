@@ -283,7 +283,7 @@ vector<double> LI::calcRInts_ERISOC(const int l, const double fac, const double 
     const int ofs1 = n_rints * 1;
     const int ofs2 = n_rints * 2;
 
-    vector<double> rints(4 * n_rints);
+    vector<double> rints(3 * n_rints);
     for (int j = 0; j < n_hermite_ket; j++)
     {
         auto &[t_, u_, v_] = hermite_idxs_ket[j];

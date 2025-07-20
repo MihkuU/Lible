@@ -964,12 +964,12 @@ namespace lible
                     int ofs_e1_1 = ofs_e1_ab + 1 * n_ecoeffs_ab;
                     int ofs_e1_2 = ofs_e1_ab + 2 * n_ecoeffs_ab;
 
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_yz[0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_zy[0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_zx[0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_xz[0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_xy[0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_yz[0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_yz[0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_zy[0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_zx[0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_xz[0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_xy[0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yx[0]);
 
                     // A & B
                     std::array<double, n_sph_abcd> AB_yz{};
@@ -997,9 +997,9 @@ namespace lible
                     cblas_daxpy(n_sph_abcd, 1.0, &AB_zx[0], 1, &eri4_batch[1][0], 1);
                     cblas_daxpy(n_sph_abcd, 1.0, &AB_xy[0], 1, &eri4_batch[2][0], 1);
 
-                    cblas_daxpy(n_sph_abcd, -1.0, &PR_zy[0], 1, &eri4_batch[0][0], 1);
-                    cblas_daxpy(n_sph_abcd, -1.0, &PR_xz[0], 1, &eri4_batch[1][0], 1);
-                    cblas_daxpy(n_sph_abcd, -1.0, &PR_yx[0], 1, &eri4_batch[2][0], 1);
+                    cblas_daxpy(n_sph_abcd, -1.0, &AB_zy[0], 1, &eri4_batch[0][0], 1);
+                    cblas_daxpy(n_sph_abcd, -1.0, &AB_xz[0], 1, &eri4_batch[1][0], 1);
+                    cblas_daxpy(n_sph_abcd, -1.0, &AB_yx[0], 1, &eri4_batch[2][0], 1);
                 }
 
             return eri4_batch;
@@ -1103,12 +1103,12 @@ namespace lible
                     int ofs_e1_1 = ofs_e1_ab + 1 * n_ecoeffs_ab;
                     int ofs_e1_2 = ofs_e1_ab + 2 * n_ecoeffs_ab;
 
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_yz[0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_zy[0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_zx[0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_xz[0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_xy[0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_yz[0]);
+                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[1 * n_R_x_E], &PR_yz[0]);
+                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[2 * n_R_x_E], &PR_zy[0]);
+                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_zx[0]);
+                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_xz[0]);
+                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_xy[0]);
+                    shark_mm_bra2<la, lb, lc>(&ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yx[0]);
 
                     // A & B
                     std::array<double, n_sph_abc> AB_yz{};
@@ -1136,9 +1136,9 @@ namespace lible
                     cblas_daxpy(n_sph_abc, 1.0, &AB_zx[0], 1, &eri3_batch[1][0], 1);
                     cblas_daxpy(n_sph_abc, 1.0, &AB_xy[0], 1, &eri3_batch[2][0], 1);
 
-                    cblas_daxpy(n_sph_abc, -1.0, &PR_zy[0], 1, &eri3_batch[0][0], 1);
-                    cblas_daxpy(n_sph_abc, -1.0, &PR_xz[0], 1, &eri3_batch[1][0], 1);
-                    cblas_daxpy(n_sph_abc, -1.0, &PR_yx[0], 1, &eri3_batch[2][0], 1);
+                    cblas_daxpy(n_sph_abc, -1.0, &AB_zy[0], 1, &eri3_batch[0][0], 1);
+                    cblas_daxpy(n_sph_abc, -1.0, &AB_xz[0], 1, &eri3_batch[1][0], 1);
+                    cblas_daxpy(n_sph_abc, -1.0, &AB_yx[0], 1, &eri3_batch[2][0], 1);
                 }
 
             return eri3_batch;
