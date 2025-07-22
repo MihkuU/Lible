@@ -13,41 +13,32 @@ namespace lible::ints
 {
 	std::ostream &operator<<(std::ostream &os, const LI::Shell &obj)
 	{
-		os << "Shell Information:\n";
-		os << "  Angular Momentum (l): " << obj.l << "\n";
-		os << "  Atomic Number (z): " << obj.z << "\n";
-		os << "  Atom Index: " << obj.atom_idx << "\n";
-		// os << "  Dimension (Cartesian): " << obj.dim_cart << "\n";
-		// os << "  Dimension (Spherical): " << obj.dim_sph << "\n";
-		// os << "  Position: " << obj.pos << "\n";
-		// os << "  Position (Cartesian): " << obj.pos_cart << "\n";
-		// os << "  Coordinates (x, y, z): (" 
-		//    << obj.xyz_coords[0] << ", " 
-		//    << obj.xyz_coords[1] << ", " 
-		//    << obj.xyz_coords[2] << ")\n";
-		// os << "  Coefficients: ";
-		// for (const auto &coeff : obj.coeffs) 
-		// {
-		//     os << coeff << " ";
-		// }
-		// os << "\n";
-		// os << "  Raw Coefficients: ";
-		// for (const auto &coeff_raw : obj.coeffs_raw) 
-		// {
-		//     os << coeff_raw << " ";
-		// }
-		// os << "\n";
-		// os << "  Exponents: ";
-		// for (const auto &exp : obj.exps) 
-		// {
-		//     os << exp << " ";
-		// }
-		// os << "\n";
-		// os << "  Norms: ";
-		// for (const auto &norm : obj.norms) 
-		// {
-		//     os << norm << " ";
-		// }
+		os << "  l        : " << obj.l << "\n";
+		os << "  z        : " << obj.z << "\n";
+		os << "  atm index: " << obj.atom_idx << "\n";
+		os << "  dim_cart : " << obj.dim_cart << "\n";
+		os << "  dim_sph  : " << obj.dim_sph << "\n";
+		os << "  position : " << obj.pos << "\n";
+		   << obj.xyz_coords[0] << ", " 
+		   << obj.xyz_coords[1] << ", " 
+		   << obj.xyz_coords[2] << ")\n";
+		os << "  coeffs   :";
+		for (const auto &coeff : obj.coeffs) 
+		{
+		    os << coeff << " ";
+		}
+		os << "\n";
+		os << "  exps     : ";
+		for (const auto &exp : obj.exps) 
+		{
+		    os << exp << " ";
+		}
+		os << "\n";
+		os << "  norms    : ";
+		for (const auto &norm : obj.norms) 
+		{
+		    os << norm << " ";
+		}
 		os << "\n";
 		return os;
 	}
