@@ -3,6 +3,7 @@
 #include <array>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace lible
 {
@@ -36,6 +37,9 @@ namespace lible
                   coeffs_raw(coeffs_raw), exps(exps), norms(norms)
             {
             }
+
+						/** printing to output  */ 
+						friend std::ostream &operator<<(std::ostream &os, const Shell &obj);
 
             int l; /** Angular momentum. */
             int z; /** Atomic number. */
