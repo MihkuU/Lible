@@ -19,10 +19,10 @@ namespace lible::ints
 		os << "  dim_cart : " << obj.dim_cart << "\n";
 		os << "  dim_sph  : " << obj.dim_sph << "\n";
 		os << "  position : " << obj.pos << "\n";
-		   << obj.xyz_coords[0] << ", " 
-		   << obj.xyz_coords[1] << ", " 
-		   << obj.xyz_coords[2] << ")\n";
-		os << "  coeffs   :";
+		os << "  origin   : " << obj.xyz_coords[0] << " " 
+		   << obj.xyz_coords[1] << " " 
+		   << obj.xyz_coords[2] << "\n";
+		os << "  coeffs   : ";
 		for (const auto &coeff : obj.coeffs) 
 		{
 		    os << coeff << " ";
