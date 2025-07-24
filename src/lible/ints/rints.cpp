@@ -4,6 +4,61 @@ namespace LI = lible::ints;
 
 using std::array, std::vector;
 
+lible::vec3d LI::calcRInts3DErf(const int l, const double p, const double omega,
+                                const double *xyz_ab, const double *fnx)
+{
+    vec4d rints_buff(Fill(0), l + 1);
+
+    rints_buff(0, 0, 0, 0) = fnx[0];
+
+    double x = -2 * p * omega * omega / (p + omega * omega);
+    double y = x;
+    for (int n = 1; n <= l; n++)
+    {
+        rints_buff(n, 0, 0, 0) = fnx[n] * y;
+        y *= x;
+    }
+
+    // This clever loop is taken from HUMMR:
+    for (int n = l - 1; n >= 0; n--)
+    {
+        int n_ = l - n;
+        for (int t = 0; t <= n_; t++)
+            for (int u = 0; u <= n_ - t; u++)
+                for (int v = 0; v <= n_ - t - u; v++)
+                {
+                    if (t > 0)
+                    {
+                        rints_buff(n, t, u, v) = xyz_ab[0] * rints_buff(n + 1, t - 1, u, v);
+                        if (t > 1)
+                            rints_buff(n, t, u, v) += (t - 1) * rints_buff(n + 1, t - 2, u, v);
+                    }
+                    else
+                    {
+                        if (u > 0)
+                        {
+                            rints_buff(n, t, u, v) = xyz_ab[1] * rints_buff(n + 1, t, u - 1, v);
+                            if (u > 1)
+                                rints_buff(n, t, u, v) += (u - 1) * rints_buff(n + 1, t, u - 2, v);
+                        }
+                        else if (v > 0)
+                        {
+                            rints_buff(n, t, u, v) = xyz_ab[2] * rints_buff(n + 1, t, u, v - 1);
+                            if (v > 1)
+                                rints_buff(n, t, u, v) += (v - 1) * rints_buff(n + 1, t, u, v - 2);
+                        }
+                    }
+                }
+    }
+
+    vec3d rints(Fill(0), l + 1);
+    for (int t = 0; t <= l; t++)
+        for (int u = 0; u <= l - t; u++)
+            for (int v = 0; v <= l - t - u; v++)
+                rints(t, u, v) = rints_buff(0, t, u, v);
+
+    return rints;
+}
 lible::vec3d LI::calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx)
 {
     vec4d rints_buff(Fill(0), l + 1);
