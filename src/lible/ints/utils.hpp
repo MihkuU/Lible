@@ -16,7 +16,7 @@ namespace lible
         /**
          *
          */
-        double calcPurePrimitiveNorm(const int l, const double exp);
+        double purePrimitiveNorm(const int l, const double exp);
 
         /** Implements eq. (6.5.10) from DOI:10.1002/9781119019572 without the odd negative values. */
         double doubleFactorial(const int n);

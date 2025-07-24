@@ -4,7 +4,7 @@ namespace LI = lible::ints;
 
 using std::array, std::map, std::pair, std::vector;
 
-double LI::calcPurePrimitiveNorm(const int l, const double exp)
+double LI::purePrimitiveNorm(const int l, const double exp)
 {
     double norm = std::sqrt(std::pow(2 * exp / M_PI, 1.5) * std::pow(4 * exp, l) /
                                     doubleFactorial(2 * l - 1));

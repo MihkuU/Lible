@@ -43,5 +43,10 @@ namespace lible
                                              const double *fnx, const double *xyz_pc,
                                              const std::vector<std::array<int, 3>> &hermite_idxs_bra,
                                              const std::vector<std::array<int, 3>> &hermite_idxs_ket);
+
+        std::vector<double> calcRInts_ERISOC(const int l, const double fac, const double alpha,
+                                             const double *xyz_pq, const double *fnx,
+                                             const std::vector<std::array<int, 3>> &hermite_idxs_bra,
+                                             const std::vector<std::array<int, 3>> &hermite_idxs_ket);
     }
 }

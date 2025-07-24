@@ -154,8 +154,8 @@ namespace lible
         std::array<vec2d, 3> dipoleMomentKernel(const int ipair, const std::array<double, 3> &origin,
                                                 const ShellPairData &sp_data);
 
-        /** */
-        vec2d spinOrbitCoupling1El(const Structure &structure);
+        /**  TODO: dox. */
+        std::array<vec2d, 3> spinOrbitCoupling1El(const Structure &structure);
 
         /**
          * TODO: mention that it requires lab + 1 angular momentum boys_grid.
@@ -280,6 +280,14 @@ namespace lible
         ERI2D1Kernel deployERI2D1Kernel(const ShellData &sp_data_a,
                                         const ShellData &sp_data_b);
 
+        /** */
+        ERI4SOCKernel deployERI4SOCKernel(const ShellPairData &sp_data_ab,
+                                          const ShellPairData &sp_data_cd);
+
+        /** */
+        ERI3SOCKernel deployERI3SOCKernel(const ShellPairData &sp_data_ab,
+                                          const ShellData &sh_data_c);
+
         /**
          * \ingroup ints
          * Constructs the shell data corresponding to the auxilary basis set.
@@ -403,6 +411,12 @@ namespace lible
 
         /** TODO: */
         vec3d calcRInts3D(const int l, const double p, const double *xyz_ab, const double *fnx);
+
+        /**
+         * \ingroup ints
+         * TODO: write dox.
+         */
+        double purePrimitiveNorm(const int l, const double exp);
 
         /**
          * \ingroup ints

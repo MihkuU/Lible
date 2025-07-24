@@ -55,12 +55,30 @@ def instantiateERI3D1(la, lb, lc):
 
 	return file_str
 
+def instantiateERI3SOC(la, lb, lc):
+
+	file_str = 'template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<{}, {}, {}>(const int ipair_ab, const int ishell_c,\n'.format(la, lb, lc)
+	file_str += '                                                                            const ShellPairData &sh_data_ab,\n'
+	file_str += '                                                                            const ShellData &sh_data_c,\n'
+	file_str += '                                                                            const ERI3SOCKernel *eri3soc_kernel);\n\n'
+
+	return file_str
+
 def instantiateERI4D1(la, lb, lc, ld):
 
 	file_str = 'template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
 	file_str += '                                                                               const ShellPairData &sh_data_ab,\n'
 	file_str += '                                                                               const ShellPairData &sp_data_cd,\n'
 	file_str += '                                                                               const ERI4D1Kernel *eri4d1_kernel);\n\n'
+
+	return file_str
+
+def instantiateERI4SOC(la, lb, lc, ld):
+
+	file_str = 'template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
+	file_str += '                                                                                const ShellPairData &sh_data_ab,\n'
+	file_str += '                                                                                const ShellPairData &sp_data_cd,\n'
+	file_str += '                                                                                const ERI4SOCKernel *eri4soc_kernel);\n\n'
 
 	return file_str
 
@@ -223,19 +241,25 @@ def writeKernelInstantiate(lbra, lket):
 				if lbra + lket <= 6:
 					file_str += instantiateERI4(la, lb, lc, ld)
 					file_str += instantiateERI4D1(la, lb, lc, ld)
+					file_str += instantiateERI4SOC(la, lb, lc, ld)
 					if la != lb and lc == ld:
-						file_str += instantiateERI4D1(lb, la, lc, ld)
 						file_str += instantiateERI4(lb, la, lc, ld)
-					elif lc != ld and la == lb:
-						file_str += instantiateERI4D1(la, lb, ld, lc)
-						file_str += instantiateERI4(la, lb, ld, lc)
-					elif la != lb and lc != ld:
-						file_str += instantiateERI4D1(lb, la, ld, lc)
 						file_str += instantiateERI4D1(lb, la, lc, ld)
+						file_str += instantiateERI4SOC(lb, la, lc, ld)
+					elif lc != ld and la == lb:
+						file_str += instantiateERI4(la, lb, ld, lc)
 						file_str += instantiateERI4D1(la, lb, ld, lc)
+						file_str += instantiateERI4SOC(la, lb, ld, lc)
+					elif la != lb and lc != ld:
 						file_str += instantiateERI4(lb, la, ld, lc)
 						file_str += instantiateERI4(lb, la, lc, ld)
 						file_str += instantiateERI4(la, lb, ld, lc)
+						file_str += instantiateERI4D1(lb, la, ld, lc)
+						file_str += instantiateERI4D1(lb, la, lc, ld)
+						file_str += instantiateERI4D1(la, lb, ld, lc)
+						file_str += instantiateERI4SOC(lb, la, ld, lc)
+						file_str += instantiateERI4SOC(lb, la, lc, ld)
+						file_str += instantiateERI4SOC(la, lb, ld, lc)
 			
 
 				# file_str += 'template lible::vec4d lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
@@ -250,9 +274,11 @@ def writeKernelInstantiate(lbra, lket):
 			if (lbra + lket) <= 6:
 				file_str += instantiateERI3(la, lb, lket)
 				file_str += instantiateERI3D1(la, lb, lket)
+				file_str += instantiateERI3SOC(la, lb, lket)
 				if la != lb:
-					file_str += instantiateERI3D1(lb, la, lket)
 					file_str += instantiateERI3(lb, la, lket)
+					file_str += instantiateERI3D1(lb, la, lket)
+					file_str += instantiateERI3SOC(lb, la, lket)
 
 			# file_str += 'template lible::vec3d lible::ints::two::eri3Kernel<{}, {}, {}>(const int ipair_ab, const int ishell_c,\n'.format(la, lb, lket)
 			# file_str += '                                                             const std::vector<double> &ecoeffs_ab,\n'
@@ -303,19 +329,25 @@ def writeKernelGenerate(lbra, lket):
 			# file_str += specializeERI4(la, lb, lc, ld)
 			file_str += instantiateERI4(la, lb, lc, ld)			
 			file_str += instantiateERI4D1(la, lb, lc, ld)
+			file_str += instantiateERI4SOC(la, lb, lc, ld)
 			if la != lb and lc == ld:
-				file_str += instantiateERI4D1(lb, la, lc, ld)
 				file_str += instantiateERI4(lb, la, lc, ld)			
-			elif lc != ld and la == lb:
-				file_str += instantiateERI4D1(la, lb, ld, lc)
-				file_str += instantiateERI4(la, lb, ld, lc)			
-			elif la != lb and lc != ld:
-				file_str += instantiateERI4D1(lb, la, ld, lc)
 				file_str += instantiateERI4D1(lb, la, lc, ld)
+				file_str += instantiateERI4SOC(lb, la, lc, ld)
+			elif lc != ld and la == lb:
+				file_str += instantiateERI4(la, lb, ld, lc)			
 				file_str += instantiateERI4D1(la, lb, ld, lc)
+				file_str += instantiateERI4SOC(la, lb, ld, lc)
+			elif la != lb and lc != ld:
 				file_str += instantiateERI4(lb, la, ld, lc)
 				file_str += instantiateERI4(lb, la, lc, ld)
 				file_str += instantiateERI4(la, lb, ld, lc)
+				file_str += instantiateERI4D1(lb, la, ld, lc)
+				file_str += instantiateERI4D1(lb, la, lc, ld)
+				file_str += instantiateERI4D1(la, lb, ld, lc)
+				file_str += instantiateERI4SOC(lb, la, ld, lc)
+				file_str += instantiateERI4SOC(lb, la, lc, ld)
+				file_str += instantiateERI4SOC(la, lb, ld, lc)
 			
 			# file_str += 'template<> lible::vec4d\n'
 			# file_str += 'lible::ints::two::eri4Kernel<{}, {}, {}, {}>(const int ipair_ab, const int ipair_cd,\n'.format(la, lb, lc, ld)
@@ -444,9 +476,11 @@ def writeKernelGenerate(lbra, lket):
 		if (lbra + lket) <= 6:
 			file_str += instantiateERI3(la, lb, lket)
 			file_str += instantiateERI3D1(la, lb, lket)
+			file_str += instantiateERI3SOC(la, lb, lket)
 			if la != lb:
-				file_str += instantiateERI3D1(lb, la, lket)
 				file_str += instantiateERI3(lb, la, lket)
+				file_str += instantiateERI3D1(lb, la, lket)
+				file_str += instantiateERI3SOC(lb, la, lket)
 
 		# file_str += 'template<> lible::vec3d\n'
 		# file_str += 'lible::ints::two::eri3Kernel<{}, {}, {}>(const int ipair_ab, const int ishell_c,\n'.format(la, lb, lket)
