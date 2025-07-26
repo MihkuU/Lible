@@ -403,7 +403,7 @@ namespace lible
                     double b = exps_b[ib];
                     double p = a + b;
 
-                    std::array<double, 13 * n_R_x_E> R_x_E{};
+                    std::array<double, 7 * n_R_x_E> R_x_E{};
                     for (int ic = 0, icd = 0; ic < cdepth_c; ic++)
                         for (int id = 0; id < cdepth_d; id++, icd++)
                         {
@@ -432,29 +432,22 @@ namespace lible
                             double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
                             calcRInts_ERI3D1<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
-                            std::array<double, 3 * n_R_x_E> I1{};
-                            std::array<double, 3 * n_R_x_E> I2{};
+                            std::array<double, 3 * n_R_x_E> I{};
 
                             int ofs_ecoeffs0_cd = icd * n_ecoeffs_cd;
                             int ofs_ecoeffs1_cd = 3 * icd * n_ecoeffs_cd;
-                            shark_mm_ket2<lab, lc, ld>(&rints[0 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &I1[0 * n_R_x_E]);
-                            shark_mm_ket2<lab, lc, ld>(&rints[1 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &I1[1 * n_R_x_E]);
-                            shark_mm_ket2<lab, lc, ld>(&rints[2 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &I1[2 * n_R_x_E]);
+                            shark_mm_ket2<lab, lc, ld>(&rints[0 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &I[0 * n_R_x_E]);
+                            shark_mm_ket2<lab, lc, ld>(&rints[1 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &I[1 * n_R_x_E]);
+                            shark_mm_ket2<lab, lc, ld>(&rints[2 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &I[2 * n_R_x_E]);
 
                             shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs0_cd[ofs_ecoeffs0_cd], &R_x_E[3 * n_R_x_E]);
 
-                            shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs1_cd[ofs_ecoeffs1_cd + 0 * n_ecoeffs_cd], &I2[0 * n_R_x_E]);
-                            shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs1_cd[ofs_ecoeffs1_cd + 1 * n_ecoeffs_cd], &I2[1 * n_R_x_E]);
-                            shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs1_cd[ofs_ecoeffs1_cd + 2 * n_ecoeffs_cd], &I2[2 * n_R_x_E]);
+                            shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs1_cd[ofs_ecoeffs1_cd + 0 * n_ecoeffs_cd], &R_x_E[4 * n_R_x_E]);
+                            shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs1_cd[ofs_ecoeffs1_cd + 1 * n_ecoeffs_cd], &R_x_E[5 * n_R_x_E]);
+                            shark_mm_ket2<lab, lc, ld>(&rints[3 * n_rints], &ecoeffs1_cd[ofs_ecoeffs1_cd + 2 * n_ecoeffs_cd], &R_x_E[6 * n_R_x_E]);
 
-                            cblas_daxpy(3 * n_R_x_E, 1.0, &I1[0], 1, &R_x_E[0 * n_R_x_E], 1);
-                            cblas_daxpy(3 * n_R_x_E, -1.0, &I1[0], 1, &R_x_E[4 * n_R_x_E], 1);
-
-                            cblas_daxpy(3 * n_R_x_E, -(c / q), &I1[0], 1, &R_x_E[7 * n_R_x_E], 1);
-                            cblas_daxpy(3 * n_R_x_E, -(d / q), &I1[0], 1, &R_x_E[10 * n_R_x_E], 1);
-
-                            cblas_daxpy(3 * n_R_x_E, 1.0, &I2[0], 1, &R_x_E[7 * n_R_x_E], 1);
-                            cblas_daxpy(3 * n_R_x_E, -1.0, &I2[0], 1, &R_x_E[10 * n_R_x_E], 1);
+                            cblas_daxpy(3 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);
+                            cblas_daxpy(3 * n_R_x_E, -(c / q), &I[0], 1, &R_x_E[4 * n_R_x_E], 1);
                         }
 
                     int ofs_ecoeffs0_ab = iab * n_ecoeffs_ab;
@@ -490,15 +483,15 @@ namespace lible
                     cblas_daxpy(n_sph_abcd, -1.0, &R[1 * n_sph_abcd], 1, &eri4_batch[4][0], 1);
                     cblas_daxpy(n_sph_abcd, -1.0, &R[2 * n_sph_abcd], 1, &eri4_batch[5][0], 1);
 
-                    // C & D
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[7 * n_R_x_E], &eri4_batch[6][0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[8 * n_R_x_E], &eri4_batch[7][0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[9 * n_R_x_E], &eri4_batch[8][0]);
-
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[10 * n_R_x_E], &eri4_batch[9][0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[11 * n_R_x_E], &eri4_batch[10][0]);
-                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[12 * n_R_x_E], &eri4_batch[11][0]);
+                    // C
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[4 * n_R_x_E], &eri4_batch[6][0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[5 * n_R_x_E], &eri4_batch[7][0]);
+                    shark_mm_bra2<la, lb, lc, ld>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[6 * n_R_x_E], &eri4_batch[8][0]);
                 }
+
+            // D
+            for (int ideriv = 9; ideriv < 12; ideriv++)
+                eri4_batch[ideriv] = -1 * (eri4_batch[ideriv - 9] + eri4_batch[ideriv - 6] + eri4_batch[ideriv - 3]);
 
             return eri4_batch;
         }
@@ -562,7 +555,7 @@ namespace lible
                     double b = exps_b[ib];
                     double p = a + b;
 
-                    std::array<double, 7 * n_R_x_E> R_x_E{};
+                    std::array<double, 4 * n_R_x_E> R_x_E{};
                     for (int ic = 0; ic < cdepth_c; ic++)
                     {
                         double c = exps_c[ic];
@@ -584,17 +577,12 @@ namespace lible
                         double fac = (2.0 * std::pow(M_PI, 2.5) / (p * c * std::sqrt(p + c)));
                         calcRInts_ERI3D1<lab, lc>(alpha, fac, &fnx[0], &xyz_pc[0], &rints[0]);
 
-                        std::array<double, 3 * n_R_x_E> I{};
-
                         int ofs_ecoeffs_c = ic * n_ecoeffs_c;
-                        shark_mm_ket1<lab, lc>(&rints[0 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &I[0 * n_R_x_E]);
-                        shark_mm_ket1<lab, lc>(&rints[1 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &I[1 * n_R_x_E]);
-                        shark_mm_ket1<lab, lc>(&rints[2 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &I[2 * n_R_x_E]);
+                        shark_mm_ket1<lab, lc>(&rints[0 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &R_x_E[0 * n_R_x_E]);
+                        shark_mm_ket1<lab, lc>(&rints[1 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &R_x_E[1 * n_R_x_E]);
+                        shark_mm_ket1<lab, lc>(&rints[2 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &R_x_E[2 * n_R_x_E]);                        
 
                         shark_mm_ket1<lab, lc>(&rints[3 * n_rints], &ecoeffs0_c[ofs_ecoeffs_c], &R_x_E[3 * n_R_x_E]);
-
-                        cblas_daxpy(3 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);
-                        cblas_daxpy(3 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[4 * n_R_x_E], 1);
                     }
 
                     int ofs_ecoeffs0_ab = iab * n_ecoeffs_ab;
@@ -621,20 +609,15 @@ namespace lible
                     cblas_daxpy(n_sph_abc, 1.0, &R[1 * n_sph_abc], 1, &eri3_batch[1][0], 1);
                     cblas_daxpy(n_sph_abc, 1.0, &R[2 * n_sph_abc], 1, &eri3_batch[2][0], 1);
 
-                    // B
-                    cblas_daxpy(n_sph_abc, (b / p), &P[0 * n_sph_abc], 1, &eri3_batch[3][0], 1);
-                    cblas_daxpy(n_sph_abc, (b / p), &P[1 * n_sph_abc], 1, &eri3_batch[4][0], 1);
-                    cblas_daxpy(n_sph_abc, (b / p), &P[2 * n_sph_abc], 1, &eri3_batch[5][0], 1);
-
-                    cblas_daxpy(n_sph_abc, -1.0, &R[0 * n_sph_abc], 1, &eri3_batch[3][0], 1);
-                    cblas_daxpy(n_sph_abc, -1.0, &R[1 * n_sph_abc], 1, &eri3_batch[4][0], 1);
-                    cblas_daxpy(n_sph_abc, -1.0, &R[2 * n_sph_abc], 1, &eri3_batch[5][0], 1);
-
                     // C
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[4 * n_R_x_E], &eri3_batch[6][0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[5 * n_R_x_E], &eri3_batch[7][0]);
-                    shark_mm_bra2<la, lb, lc>(&ecoeffs0_ab[ofs_ecoeffs0_ab], &R_x_E[6 * n_R_x_E], &eri3_batch[8][0]);
+                    cblas_daxpy(n_sph_abc, -1.0, &P[0 * n_sph_abc], 1, &eri3_batch[6][0], 1);
+                    cblas_daxpy(n_sph_abc, -1.0, &P[1 * n_sph_abc], 1, &eri3_batch[7][0], 1);
+                    cblas_daxpy(n_sph_abc, -1.0, &P[2 * n_sph_abc], 1, &eri3_batch[8][0], 1);
                 }
+
+            // B
+            for (int ideriv = 3; ideriv < 6; ideriv++)
+                eri3_batch[ideriv] = -1 * (eri3_batch[ideriv - 3] + eri3_batch[ideriv + 3]);
 
             return eri3_batch;
         }
@@ -688,8 +671,8 @@ namespace lible
 
             std::array<double, 3 * n_rints> rints{};
             for (int ia = 0; ia < cdepth_a; ia++)
-            {
-                std::array<double, 6 * n_R_x_E> R_x_E{};
+            {                
+                std::array<double, 3 * n_R_x_E> R_x_E{};                
                 for (int ib = 0; ib < cdepth_b; ib++)
                 {
                     double a = exps_a[ia];
@@ -700,26 +683,25 @@ namespace lible
                     boys_f.calcFnx(x, &fnx[0]);
 
                     double fac = (2.0 * std::pow(M_PI, 2.5) / (a * b * std::sqrt(a + b)));
-                    calcRInts_ERI2D1<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);
-
-                    std::array<double, 3 * n_R_x_E> I{};
+                    calcRInts_ERI2D1<la, lb>(alpha, fac, &fnx[0], &xyz_ab[0], &rints[0]);             
 
                     int ofs_ecoeffs_b = ib * n_ecoeffs_b;
-                    shark_mm_ket1<la, lb>(&rints[0 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[0 * n_R_x_E]);
-                    shark_mm_ket1<la, lb>(&rints[1 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[1 * n_R_x_E]);
-                    shark_mm_ket1<la, lb>(&rints[2 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &I[2 * n_R_x_E]);
+                    shark_mm_ket1<la, lb>(&rints[0 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &R_x_E[0 * n_R_x_E]);
+                    shark_mm_ket1<la, lb>(&rints[1 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &R_x_E[1 * n_R_x_E]);
+                    shark_mm_ket1<la, lb>(&rints[2 * n_rints], &ecoeffs_b[ofs_ecoeffs_b], &R_x_E[2 * n_R_x_E]);
 
-                    cblas_daxpy(3 * n_R_x_E, 1.0, &I[0], 1, &R_x_E[0 * n_R_x_E], 1);
-                    cblas_daxpy(3 * n_R_x_E, -1.0, &I[0], 1, &R_x_E[3 * n_R_x_E], 1);
                 }
+
+                // A
                 int ofs_ecoeffs_a = ia * n_ecoeffs_a;
                 shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[0 * n_R_x_E], &eri2_batch[0][0]);
                 shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[1 * n_R_x_E], &eri2_batch[1][0]);
                 shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[2 * n_R_x_E], &eri2_batch[2][0]);
-                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[3 * n_R_x_E], &eri2_batch[3][0]);
-                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[4 * n_R_x_E], &eri2_batch[4][0]);
-                shark_mm_bra1<la, lb>(&ecoeffs_a[ofs_ecoeffs_a], &R_x_E[5 * n_R_x_E], &eri2_batch[5][0]);
             }
+
+            // B
+            for (int ideriv = 3; ideriv < 6; ideriv++)
+                eri2_batch[ideriv] = -1 * eri2_batch[ideriv - 3];
 
             return eri2_batch;
         }
