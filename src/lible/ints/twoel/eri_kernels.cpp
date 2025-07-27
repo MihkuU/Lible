@@ -442,6 +442,17 @@ namespace lible::ints
                                           const ERI4D1Kernel *eri4d1_kernel);
 
     template <int la, int lb, int lc, int ld>
+    arr2d<vec4d, 12, 12> eri4d2KernelFun(const int ipair_ab, const int ipair_cd,
+                                         const ShellPairData &sp_data_ab,
+                                         const ShellPairData &sp_data_cd,
+                                         const ERI4D2Kernel *eri4d2_kernel);
+
+    arr2d<vec4d, 12, 12> eri4d2KernelFun(const int ipair_ab, const int ipair_cd,
+                                         const ShellPairData &sp_data_ab,
+                                         const ShellPairData &sp_data_cd,
+                                         const ERI4D2Kernel *eri4d2_kernel);
+
+    template <int la, int lb, int lc, int ld>
     std::array<vec4d, 3> eri4socKernelFun(const int ipair_ab, const int ipair_cd,
                                           const ShellPairData &sp_data_ab,
                                           const ShellPairData &sp_data_cd,
@@ -598,7 +609,91 @@ namespace lible::ints
         {{6, 0, 0}, eri3d1KernelFun<6, 0, 0>},
         {{0, 6, 0}, eri3d1KernelFun<0, 6, 0>}};
 
-    const std::map<std::tuple<int, int, int>, eri3d2_kernelfun_t> eri3d2_kernelfuns{};
+    const std::map<std::tuple<int, int, int>, eri3d2_kernelfun_t> eri3d2_kernelfuns{
+        {{0, 0, 0}, eri3d2KernelFun<0, 0, 0>},
+        {{0, 0, 1}, eri3d2KernelFun<0, 0, 1>},
+        {{0, 0, 2}, eri3d2KernelFun<0, 0, 2>},
+        {{0, 0, 3}, eri3d2KernelFun<0, 0, 3>},
+        {{0, 0, 4}, eri3d2KernelFun<0, 0, 4>},
+        {{0, 0, 5}, eri3d2KernelFun<0, 0, 5>},
+        {{0, 0, 6}, eri3d2KernelFun<0, 0, 6>},
+        {{1, 0, 0}, eri3d2KernelFun<1, 0, 0>},
+        {{0, 1, 0}, eri3d2KernelFun<0, 1, 0>},
+        {{1, 0, 1}, eri3d2KernelFun<1, 0, 1>},
+        {{0, 1, 1}, eri3d2KernelFun<0, 1, 1>},
+        {{1, 0, 2}, eri3d2KernelFun<1, 0, 2>},
+        {{0, 1, 2}, eri3d2KernelFun<0, 1, 2>},
+        {{1, 0, 3}, eri3d2KernelFun<1, 0, 3>},
+        {{0, 1, 3}, eri3d2KernelFun<0, 1, 3>},
+        {{1, 0, 4}, eri3d2KernelFun<1, 0, 4>},
+        {{0, 1, 4}, eri3d2KernelFun<0, 1, 4>},
+        {{1, 0, 5}, eri3d2KernelFun<1, 0, 5>},
+        {{0, 1, 5}, eri3d2KernelFun<0, 1, 5>},
+        {{1, 1, 0}, eri3d2KernelFun<1, 1, 0>},
+        {{1, 1, 1}, eri3d2KernelFun<1, 1, 1>},
+        {{1, 1, 2}, eri3d2KernelFun<1, 1, 2>},
+        {{1, 1, 3}, eri3d2KernelFun<1, 1, 3>},
+        {{1, 1, 4}, eri3d2KernelFun<1, 1, 4>},
+        {{2, 0, 0}, eri3d2KernelFun<2, 0, 0>},
+        {{0, 2, 0}, eri3d2KernelFun<0, 2, 0>},
+        {{2, 0, 1}, eri3d2KernelFun<2, 0, 1>},
+        {{0, 2, 1}, eri3d2KernelFun<0, 2, 1>},
+        {{2, 0, 2}, eri3d2KernelFun<2, 0, 2>},
+        {{0, 2, 2}, eri3d2KernelFun<0, 2, 2>},
+        {{2, 0, 3}, eri3d2KernelFun<2, 0, 3>},
+        {{0, 2, 3}, eri3d2KernelFun<0, 2, 3>},
+        {{2, 0, 4}, eri3d2KernelFun<2, 0, 4>},
+        {{0, 2, 4}, eri3d2KernelFun<0, 2, 4>},
+        {{2, 1, 0}, eri3d2KernelFun<2, 1, 0>},
+        {{1, 2, 0}, eri3d2KernelFun<1, 2, 0>},
+        {{2, 1, 1}, eri3d2KernelFun<2, 1, 1>},
+        {{1, 2, 1}, eri3d2KernelFun<1, 2, 1>},
+        {{2, 1, 2}, eri3d2KernelFun<2, 1, 2>},
+        {{1, 2, 2}, eri3d2KernelFun<1, 2, 2>},
+        {{2, 1, 3}, eri3d2KernelFun<2, 1, 3>},
+        {{1, 2, 3}, eri3d2KernelFun<1, 2, 3>},
+        {{2, 2, 0}, eri3d2KernelFun<2, 2, 0>},
+        {{2, 2, 1}, eri3d2KernelFun<2, 2, 1>},
+        {{2, 2, 2}, eri3d2KernelFun<2, 2, 2>},
+        {{3, 0, 0}, eri3d2KernelFun<3, 0, 0>},
+        {{0, 3, 0}, eri3d2KernelFun<0, 3, 0>},
+        {{3, 0, 1}, eri3d2KernelFun<3, 0, 1>},
+        {{0, 3, 1}, eri3d2KernelFun<0, 3, 1>},
+        {{3, 0, 2}, eri3d2KernelFun<3, 0, 2>},
+        {{0, 3, 2}, eri3d2KernelFun<0, 3, 2>},
+        {{3, 0, 3}, eri3d2KernelFun<3, 0, 3>},
+        {{0, 3, 3}, eri3d2KernelFun<0, 3, 3>},
+        {{3, 1, 0}, eri3d2KernelFun<3, 1, 0>},
+        {{1, 3, 0}, eri3d2KernelFun<1, 3, 0>},
+        {{3, 1, 1}, eri3d2KernelFun<3, 1, 1>},
+        {{1, 3, 1}, eri3d2KernelFun<1, 3, 1>},
+        {{3, 1, 2}, eri3d2KernelFun<3, 1, 2>},
+        {{1, 3, 2}, eri3d2KernelFun<1, 3, 2>},
+        {{3, 2, 0}, eri3d2KernelFun<3, 2, 0>},
+        {{2, 3, 0}, eri3d2KernelFun<2, 3, 0>},
+        {{3, 2, 1}, eri3d2KernelFun<3, 2, 1>},
+        {{2, 3, 1}, eri3d2KernelFun<2, 3, 1>},
+        {{3, 3, 0}, eri3d2KernelFun<3, 3, 0>},
+        {{4, 0, 0}, eri3d2KernelFun<4, 0, 0>},
+        {{0, 4, 0}, eri3d2KernelFun<0, 4, 0>},
+        {{4, 0, 1}, eri3d2KernelFun<4, 0, 1>},
+        {{0, 4, 1}, eri3d2KernelFun<0, 4, 1>},
+        {{4, 0, 2}, eri3d2KernelFun<4, 0, 2>},
+        {{0, 4, 2}, eri3d2KernelFun<0, 4, 2>},
+        {{4, 1, 0}, eri3d2KernelFun<4, 1, 0>},
+        {{1, 4, 0}, eri3d2KernelFun<1, 4, 0>},
+        {{4, 1, 1}, eri3d2KernelFun<4, 1, 1>},
+        {{1, 4, 1}, eri3d2KernelFun<1, 4, 1>},
+        {{4, 2, 0}, eri3d2KernelFun<4, 2, 0>},
+        {{2, 4, 0}, eri3d2KernelFun<2, 4, 0>},
+        {{5, 0, 0}, eri3d2KernelFun<5, 0, 0>},
+        {{0, 5, 0}, eri3d2KernelFun<0, 5, 0>},
+        {{5, 0, 1}, eri3d2KernelFun<5, 0, 1>},
+        {{0, 5, 1}, eri3d2KernelFun<0, 5, 1>},
+        {{5, 1, 0}, eri3d2KernelFun<5, 1, 0>},
+        {{1, 5, 0}, eri3d2KernelFun<1, 5, 0>},
+        {{6, 0, 0}, eri3d2KernelFun<6, 0, 0>},
+        {{0, 6, 0}, eri3d2KernelFun<0, 6, 0>}};
 
     const std::map<std::tuple<int, int, int, int>, eri4d1_kernelfun_t> eri4d1_kernelfuns{
         {{0, 0, 0, 0}, eri4d1KernelFun<0, 0, 0, 0>},
@@ -1181,6 +1276,21 @@ LI::ERI2D1Kernel::ERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_d
     boys_grid = BoysGrid(lab + 1);
 }
 
+LI::ERI4D2Kernel::ERI4D2Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
+                               const eri4d2_kernelfun_t &eri4d2_kernelfun)
+    : eri4d2_kernelfun(eri4d2_kernelfun)
+{
+    ecoeffs0_bra = ecoeffsSHARK(sp_data_ab, false);
+    ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab, false);
+    ecoeffs2_bra = ecoeffsD2SHARK(sp_data_ab, false);
+    ecoeffs0_ket = ecoeffsSHARK(sp_data_cd, true);
+    ecoeffs1_ket = ecoeffsD1SHARK(sp_data_cd, true);
+    ecoeffs2_ket = ecoeffsD2SHARK(sp_data_cd, true);
+
+    int labcd = sp_data_ab.la + sp_data_ab.lb + sp_data_cd.la + sp_data_cd.lb;
+    boys_grid = BoysGrid(labcd + 2);
+}
+
 LI::ERI3D2Kernel::ERI3D2Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
                                const eri3d2_kernelfun_t &eri3d2_kernelfun)
     : eri3d2_kernelfun(eri3d2_kernelfun)
@@ -1357,6 +1467,29 @@ LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a, const ShellD
                             });
 }
 
+LI::ERI4D2Kernel LI::deployERI4D2Kernel(const ShellPairData &sp_data_ab,
+                                        const ShellPairData &sp_data_cd)
+{
+    int la = sp_data_ab.la;
+    int lb = sp_data_ab.lb;
+    int lc = sp_data_cd.la;
+    int ld = sp_data_cd.lb;
+
+    // int labc = la + lb + lc;
+    // if (labc <= _max_l_rollout_)
+    //     return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
+    // else
+    return ERI4D2Kernel(sp_data_ab, sp_data_cd,
+                        [](const int ipair_ab, const int ipair_cd,
+                           const ShellPairData &sp_data_ab,
+                           const ShellPairData &sp_data_cd,
+                           const ERI4D2Kernel *eri4d2_kernel) -> arr2d<vec4d, 12, 12>
+                        {
+                            return eri4d2KernelFun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+                                                   eri4d2_kernel);
+                        });
+}
+
 LI::ERI3D2Kernel LI::deployERI3D2Kernel(const ShellPairData &sp_data_ab,
                                         const ShellData &sh_data_c)
 {
@@ -1364,19 +1497,19 @@ LI::ERI3D2Kernel LI::deployERI3D2Kernel(const ShellPairData &sp_data_ab,
     int lb = sp_data_ab.lb;
     int lc = sh_data_c.l;
 
-    int labc = la + lb + lc;
-    if (labc <= _max_l_rollout_)
-        return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
-    else
-        return ERI3D2Kernel(sp_data_ab, sh_data_c,
-                            [](const int ipair_ab, const int ish_c,
-                               const ShellPairData &sp_data_ab,
-                               const ShellData &sh_data_c,
-                               const ERI3D2Kernel *eri3d2_kernel) -> arr2d<vec3d, 9, 9>
-                            {
-                                return eri3d2KernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
-                                                       eri3d2_kernel);
-                            });
+    // int labc = la + lb + lc;
+    // if (labc <= _max_l_rollout_)
+    //     return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
+    // else
+    return ERI3D2Kernel(sp_data_ab, sh_data_c,
+                        [](const int ipair_ab, const int ish_c,
+                           const ShellPairData &sp_data_ab,
+                           const ShellData &sh_data_c,
+                           const ERI3D2Kernel *eri3d2_kernel) -> arr2d<vec3d, 9, 9>
+                        {
+                            return eri3d2KernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
+                                                   eri3d2_kernel);
+                        });
 }
 
 LI::ERI2D2Kernel LI::deployERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b)

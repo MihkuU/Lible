@@ -49,7 +49,7 @@ namespace lible
          * Calculates a batch of normalized overlap integral derivatives for the shell pair
          * 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz). In spherical basis.
          */
-        std::array<vec2d, 6> overlapD1Kernel(const int ipair, const ShellPairData &sp_data); // TODO: rename to overlapD1Kernel
+        std::array<vec2d, 6> overlapD1Kernel(const int ipair, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -67,7 +67,7 @@ namespace lible
          * Calculates a batch of normalized kinetic energy integral derivatives for the shell pair
          * 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz). In spherical basis.
          */
-        std::array<vec2d, 6> kineticEnergyD1Kernel(const int ipair, const ShellPairData &sp_data); // TODO: rename to kineticEnergyD1Kernel
+        std::array<vec2d, 6> kineticEnergyD1Kernel(const int ipair, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
@@ -77,7 +77,8 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Calculates the nuclear attraction integral matrix with the erf-attenuated (screened) Coulomb operator.
+         * Calculates the nuclear attraction integral matrix with the erf-attenuated (screened) 
+         * Coulomb operator.
          */
         vec2d nuclearAttractionErf(const Structure &structure, 
                                    const std::vector<double> &omegas);
@@ -92,7 +93,8 @@ namespace lible
         /**
          * Calculates the one-electron Coulombic interaction integral matrix for given point
          * charges using the erf-attenuated (screened) Coulomb operator.
-         * \param omegas vector holding the screening parameters. Has to have the same size as the point_charges
+         * \param omegas vector holding the screening parameters. Has to have the same size as the 
+         * point_charges.
          */
         vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges,
                                  const std::vector<double> &omegas,
@@ -126,7 +128,7 @@ namespace lible
          */
         std::array<vec2d, 6>
         externalChargesD1Kernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
-                                const BoysGrid &boys_grid, const ShellPairData &sp_data); // TODO: rename to externalChargesD1Kernel
+                                const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * Calculates a batch of normalized Coulombic operator derivative integrals for the shell
@@ -275,6 +277,14 @@ namespace lible
         /** */
         ERI3D1Kernel deployERI3D1Kernel(const ShellPairData &sp_data_ab,
                                         const ShellData &sp_data_b);
+
+        /** */
+        ERI3D2Kernel deployERI3D2Kernel(const ShellPairData &sp_data_ab,
+                                        const ShellData &sp_data_b);
+
+        /** */
+        ERI2D2Kernel deployERI2D2Kernel(const ShellData &sh_data_a,
+                                        const ShellData &sh_data_b);
 
         /** */
         ERI2D1Kernel deployERI2D1Kernel(const ShellData &sp_data_a,
