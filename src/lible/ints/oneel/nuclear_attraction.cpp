@@ -36,6 +36,11 @@ namespace lible::ints
                                                const BoysGrid &boys_grid,
                                                const ShellPairData &sp_data);
 
+    array<vec2d, 3> spinOrbitCoupling1ElKernelDebug(const int ipair,
+                                                    const vector<array<double, 4>> &charges,
+                                                    const BoysGrid &boys_grid,
+                                                    const ShellPairData &sp_data);
+
     array<vec2d, 6> externalChargesD1Kernel(const int ipair,
                                             const vector<array<double, 4>> &charges,
                                             const BoysGrid &boys_grid,
@@ -49,13 +54,13 @@ namespace lible::ints
 lible::vec2d LI::externalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
                                        const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
-    int la = sp_data.la;
-    int lb = sp_data.lb;
-    int lab = la + lb;
-    int cdepth_a = sp_data.cdepths[2 * ipair + 0];
-    int cdepth_b = sp_data.cdepths[2 * ipair + 1];
-    int cofs_a = sp_data.coffsets[2 * ipair + 0];
-    int cofs_b = sp_data.coffsets[2 * ipair + 1];
+    const int la = sp_data.la;
+    const int lb = sp_data.lb;
+    const int lab = la + lb;
+    const int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    const int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    const int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    const int cofs_b = sp_data.coffsets[2 * ipair + 1];
 
     const double *cexps_a = &sp_data.exps[cofs_a];
     const double *cexps_b = &sp_data.exps[cofs_b];
@@ -676,9 +681,10 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 double ab_xy = -a_p * pr_xy + b_p * pr_yx;
                                 double ab_yx = -a_p * pr_yx + b_p * pr_xy;
 
-                                ints_cart[0](mu, nu) += fac * (ab_yz - ab_zy);
-                                ints_cart[1](mu, nu) += fac * (ab_zx - ab_xz);
-                                ints_cart[2](mu, nu) += fac * (ab_xy - ab_yx);
+                                // -1 = charge of electron
+                                ints_cart[0](mu, nu) += -1 * fac * (ab_yz - ab_zy);
+                                ints_cart[1](mu, nu) += -1 * fac * (ab_zx - ab_xz);
+                                ints_cart[2](mu, nu) += -1 * fac * (ab_xy - ab_yx);
                             }
         }
 
@@ -696,6 +702,159 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
                 ints_sph[icoord](mu, nu) *= norm_a * norm_b;
             }
+
+    return ints_sph;
+}
+
+array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernelDebug(const int ipair,
+                                                           const vector<array<double, 4>> &charges,
+                                                           const BoysGrid &boys_grid,
+                                                           const ShellPairData &sp_data)
+{
+    const double delta = 1e-5; // Finite differences with a fixed value.
+
+    const int la = sp_data.la;
+    const int lb = sp_data.lb;
+    const int lab = la + lb;
+    const int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    const int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    const int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    const int cofs_b = sp_data.coffsets[2 * ipair + 1];
+    const int n_cart_a = numCartesians(la);
+    const int n_cart_b = numCartesians(lb);
+    const int n_sph_a = numSphericals(la);
+    const int n_sph_b = numSphericals(lb);
+
+    const double *cexps_a = &sp_data.exps[cofs_a];
+    const double *cexps_b = &sp_data.exps[cofs_b];
+    const double *ccoeffs_a = &sp_data.coeffs[cofs_a];
+    const double *ccoeffs_b = &sp_data.coeffs[cofs_b];
+    const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+    const double *xyz_b = &sp_data.coords[6 * ipair + 3];
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    auto kernel_fun = [&](const array<double, 6> &coords) -> vec2d
+    {
+        array<double, 3> xyz_a{coords[0], coords[1], coords[2]};
+        array<double, 3> xyz_b{coords[4], coords[5], coords[6]};
+
+        vec2d ints_cart(Fill(0), n_cart_a, n_cart_b);
+        for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+            for (int ib = 0; ib < cdepth_b; ib++, iab++)
+            {
+                double a = cexps_a[ia];
+                double b = cexps_b[ib];
+                double da = ccoeffs_a[ia];
+                double db = ccoeffs_b[ib];
+
+                double p = a + b;
+                double dadb = da * db;
+                double fac = 2 * (M_PI / p) * dadb;
+
+                auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, &xyz_a[0], &xyz_b[0]);
+
+                array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                       (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                       (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+                vec3d rints_sum(Fill(0), lab + 1);
+                for (size_t icharge = 0; icharge < charges.size(); icharge++)
+                {
+                    auto [xc, yc, zc, charge] = charges[icharge];
+
+                    array<double, 3> xyz_pc{xyz_p[0] - xc, xyz_p[1] - yc, xyz_p[2] - zc};
+
+                    double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
+                    double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
+                    double x = p * xyz_pc_dot;
+
+                    vector<double> fnx = calcBoysF(lab, x, boys_grid);
+
+                    vec3d rints = calcRInts3D(lab, p, &xyz_pc[0], &fnx[0]);
+
+                    for (int t = 0; t <= lab; t++)
+                        for (int u = 0; u <= lab; u++)
+                            for (int v = 0; v <= lab; v++)
+                                rints_sum(t, u, v) += charge * rints(t, u, v);
+                }
+
+                for (const auto &[i, j, k, mu] : cart_exps_a)
+                    for (const auto &[i_, j_, k_, nu] : cart_exps_b)
+                        for (int t = 0; t <= i + i_; t++)
+                            for (int u = 0; u <= j + j_; u++)
+                                for (int v = 0; v <= k + k_; v++)
+                                    ints_cart(mu, nu) += (-1) * fac * // -1 = charge of electron
+                                                         Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) *
+                                                         rints_sum(t, u, v);
+            }
+
+        vec2d ints_sph = trafo2Spherical(la, lb, ints_cart);
+
+        int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
+        int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+        for (size_t mu = 0; mu < ints_sph.dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph.dim<1>(); nu++)
+            {
+                double norm_a = sp_data.norms[ofs_norm_a + mu];
+                double norm_b = sp_data.norms[ofs_norm_b + nu];
+                ints_sph(mu, nu) *= norm_a * norm_b;
+            }
+
+        return ints_sph;
+    };
+
+    array<vec2d, 3> ints_sph;
+    for (int icart = 0; icart < 3; icart++)
+        ints_sph[icart] = vec2d(Fill(0), n_sph_a, n_sph_b);
+
+    array<double, 6> coords{xyz_a[0], xyz_a[1], xyz_a[2],
+                            xyz_b[0], xyz_b[1], xyz_b[2]};
+
+    array<std::pair<int, int>, 6> idxs{{
+        {1, 5},
+        {2, 4},
+        {2, 3},
+        {0, 5},
+        {1, 3},
+        {0, 4}}};
+
+    array<vec2d, 6> terms;
+    for (int iterm = 0; iterm < 6; iterm++)
+    {
+        auto [di, dj] = idxs[iterm];
+
+        array<double, 6> coords_upup = coords;
+        coords_upup[di] += delta;
+        coords_upup[dj] += delta;
+
+        array<double, 6> coords_dnup = coords;
+        coords_dnup[di] -= delta;
+        coords_dnup[dj] += delta;
+
+        array<double, 6> coords_updn = coords;
+        coords_updn[di] += delta;
+        coords_updn[dj] -= delta;
+
+        array<double, 6> coords_dndn = coords;
+        coords_dndn[di] -= delta;
+        coords_dndn[dj] -= delta;
+
+        vec2d batch_upup = kernel_fun(coords_upup);
+        vec2d batch_dnup = kernel_fun(coords_dnup);
+        vec2d batch_updn = kernel_fun(coords_updn);
+        vec2d batch_dndn = kernel_fun(coords_dndn);
+
+        double denom = 4 * delta * delta;
+
+        terms[iterm] = (1.0 / denom) * (batch_upup - batch_dnup -
+                                        batch_updn + batch_dndn);
+    }
+
+    ints_sph[0] = terms[0] - terms[1];
+    // ints_sph[1] = terms[2] - terms[3];
+    // ints_sph[2] = terms[4] - terms[5];    
 
     return ints_sph;
 }

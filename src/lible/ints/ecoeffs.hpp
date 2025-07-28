@@ -20,7 +20,7 @@ namespace lible
         vec3d ecoeffsRecurrence2_n1(const double a, const double b, const int la, const int lb,
                                     const double A, const double B, const vec3d &ecoeffs0);
 
-        /** */ // TODO: this function should be the same as n1, that is, have only one for all n.
+        /** */ // TODO: have only one for all n.
         vec3d ecoeffsRecurrence2_n2(const double a, const double b, const int la, const int lb,
                                     const double A, const double B, const vec3d &ecoeffs1);
 
@@ -35,7 +35,7 @@ namespace lible
                                                      const double *xyz_b,
                                                      const std::array<lible::vec3d, 3> &ecoeffs0);
 
-        /** */
+        /** */ // TODO: have only one for all n.
         std::array<vec3d, 3> ecoeffsPrimitivePair_n2(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
                                                      const double *xyz_b,

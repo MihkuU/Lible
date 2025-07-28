@@ -101,7 +101,7 @@ lible::vec3d LI::ecoeffsRecurrence2_n2(const double a, const double b, const int
     double one_o_2p = 1.0 / (2 * p);
     double R = A - B;
 
-    ecoeffs2(0, 0, 0) = -2 * (a * b) * R * ecoeffs1(0, 0, 0) / p;
+    ecoeffs2(0, 0, 0) = -2 * (a * b) * R * ecoeffs1(0, 0, 0) / p; // TODO: inappropriate starting value
 
     for (int i = 1; i <= la; i++)
     {
@@ -110,7 +110,7 @@ lible::vec3d LI::ecoeffsRecurrence2_n2(const double a, const double b, const int
 
         for (int t = 1; t < i; t++)
             ecoeffs2(i, 0, t) = one_o_2p * ecoeffs2(i - 1, 0, t - 1) -
-                                (b / p) * (R * ecoeffs2(i - 1, 0, t) + ecoeffs1(i - 1, 0, t)) +
+                                (b / p) * (R * ecoeffs2(i - 1, 0, t) + ecoeffs1(i - 1, 0, t)) + // TODO: add 2 * n or make generic ecoeffsRecurrence_N
                                 (t + 1) * ecoeffs2(i - 1, 0, t + 1);
 
         ecoeffs2(i, 0, i) = one_o_2p * ecoeffs2(i - 1, 0, i - 1) -
@@ -125,7 +125,7 @@ lible::vec3d LI::ecoeffsRecurrence2_n2(const double a, const double b, const int
 
             for (int t = 1; t < i + j; t++)
                 ecoeffs2(i, j, t) = one_o_2p * ecoeffs2(i, j - 1, t - 1) +
-                                    (a / p) * (R * ecoeffs2(i, j - 1, t) + ecoeffs1(i, j - 1, t)) +
+                                    (a / p) * (R * ecoeffs2(i, j - 1, t) + ecoeffs1(i, j - 1, t)) + // TODO: add 2 * n or make generic ecoeffsRecurrence_N
                                     (t + 1) * ecoeffs2(i, j - 1, t + 1);
 
             ecoeffs2(i, j, i + j) = one_o_2p * ecoeffs2(i, j - 1, i + j - 1) +

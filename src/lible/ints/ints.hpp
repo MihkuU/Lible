@@ -167,6 +167,13 @@ namespace lible
                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
+         */
+        std::array<vec2d, 3>
+        spinOrbitCoupling1ElKernelDebug(const int ipair,
+                                        const std::vector<std::array<double, 4>> &charges,
+                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+        /**
          * \ingroup ints
          * Calculates the two-center ERI matrix over the auxiliary basis functions, \f$(P|Q)\f$.
          */
@@ -297,6 +304,14 @@ namespace lible
         /** */
         ERI3SOCKernel deployERI3SOCKernel(const ShellPairData &sp_data_ab,
                                           const ShellData &sh_data_c);
+
+        /** */
+        ERI3D2KernelDebug deployERI3D2KernelDebug(const ShellPairData &sp_data_ab,
+                                                  const ShellData &sp_data_b);
+
+        /** */
+        ERI2D2KernelDebug deployERI2D2KernelDebug(const ShellData &sh_data_a,
+                                                  const ShellData &sh_data_b);
 
         /**
          * \ingroup ints
