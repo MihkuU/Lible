@@ -1201,34 +1201,13 @@ array<lible::vec4d, 3> LI::eri4socKernelFun(const int ipair_ab, const int ipair_
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yx[0]);
 
             // A & B
-            vector<double> AB_yz(n_sph_abcd, 0);
-            vector<double> AB_zy(n_sph_abcd, 0);
-            vector<double> AB_zx(n_sph_abcd, 0);
-            vector<double> AB_xz(n_sph_abcd, 0);
-            vector<double> AB_xy(n_sph_abcd, 0);
-            vector<double> AB_yx(n_sph_abcd, 0);
+            cblas_daxpy(n_sph_abcd, 1.0, &PR_zy[0], 1, &eri4_batch[0][0], 1);
+            cblas_daxpy(n_sph_abcd, 1.0, &PR_xz[0], 1, &eri4_batch[1][0], 1);
+            cblas_daxpy(n_sph_abcd, 1.0, &PR_yx[0], 1, &eri4_batch[2][0], 1);
 
-            cblas_daxpy(n_sph_abcd, -(a / p), &PR_yz[0], 1, &AB_yz[0], 1);
-            cblas_daxpy(n_sph_abcd, -(a / p), &PR_zy[0], 1, &AB_zy[0], 1);
-            cblas_daxpy(n_sph_abcd, -(a / p), &PR_zx[0], 1, &AB_zx[0], 1);
-            cblas_daxpy(n_sph_abcd, -(a / p), &PR_xz[0], 1, &AB_xz[0], 1);
-            cblas_daxpy(n_sph_abcd, -(a / p), &PR_xy[0], 1, &AB_xy[0], 1);
-            cblas_daxpy(n_sph_abcd, -(a / p), &PR_yx[0], 1, &AB_yx[0], 1);
-
-            cblas_daxpy(n_sph_abcd, (b / p), &PR_yz[0], 1, &AB_yz[0], 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &PR_zy[0], 1, &AB_zy[0], 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &PR_zx[0], 1, &AB_zx[0], 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &PR_xz[0], 1, &AB_xz[0], 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &PR_xy[0], 1, &AB_xy[0], 1);
-            cblas_daxpy(n_sph_abcd, (b / p), &PR_yx[0], 1, &AB_yx[0], 1);
-
-            cblas_daxpy(n_sph_abcd, 1.0, &AB_yz[0], 1, &eri4_batch[0][0], 1);
-            cblas_daxpy(n_sph_abcd, 1.0, &AB_zx[0], 1, &eri4_batch[1][0], 1);
-            cblas_daxpy(n_sph_abcd, 1.0, &AB_xy[0], 1, &eri4_batch[2][0], 1);
-
-            cblas_daxpy(n_sph_abcd, -1.0, &AB_zy[0], 1, &eri4_batch[0][0], 1);
-            cblas_daxpy(n_sph_abcd, -1.0, &AB_xz[0], 1, &eri4_batch[1][0], 1);
-            cblas_daxpy(n_sph_abcd, -1.0, &AB_yx[0], 1, &eri4_batch[2][0], 1);
+            cblas_daxpy(n_sph_abcd, -1.0, &PR_yz[0], 1, &eri4_batch[0][0], 1);
+            cblas_daxpy(n_sph_abcd, -1.0, &PR_zx[0], 1, &eri4_batch[1][0], 1);
+            cblas_daxpy(n_sph_abcd, -1.0, &PR_xy[0], 1, &eri4_batch[2][0], 1);         
         }
 
     return eri4_batch;
@@ -1341,37 +1320,16 @@ array<lible::vec3d, 3> LI::eri3socKernelFun(const int ipair_ab, const int ishell
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[2 * n_R_x_E], &PR_zx[0]);
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_2], &R_x_E[0 * n_R_x_E], &PR_xz[0]);
             shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_1], &R_x_E[0 * n_R_x_E], &PR_xy[0]);
-            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yz[0]);
+            shark_mm_bra(m, n, k, &ecoeffs1_ab[ofs_e1_0], &R_x_E[1 * n_R_x_E], &PR_yx[0]);
 
             // A & B
-            vector<double> AB_yz(n_sph_abc, 0);
-            vector<double> AB_zy(n_sph_abc, 0);
-            vector<double> AB_zx(n_sph_abc, 0);
-            vector<double> AB_xz(n_sph_abc, 0);
-            vector<double> AB_xy(n_sph_abc, 0);
-            vector<double> AB_yx(n_sph_abc, 0);
+            cblas_daxpy(n_sph_abc, 1.0, &PR_zy[0], 1, &eri3_batch[0][0], 1);
+            cblas_daxpy(n_sph_abc, 1.0, &PR_xz[0], 1, &eri3_batch[1][0], 1);
+            cblas_daxpy(n_sph_abc, 1.0, &PR_yx[0], 1, &eri3_batch[2][0], 1);
 
-            cblas_daxpy(n_sph_abc, -(a / p), &PR_yz[0], 1, &AB_yz[0], 1);
-            cblas_daxpy(n_sph_abc, -(a / p), &PR_zy[0], 1, &AB_zy[0], 1);
-            cblas_daxpy(n_sph_abc, -(a / p), &PR_zx[0], 1, &AB_zx[0], 1);
-            cblas_daxpy(n_sph_abc, -(a / p), &PR_xz[0], 1, &AB_xz[0], 1);
-            cblas_daxpy(n_sph_abc, -(a / p), &PR_xy[0], 1, &AB_xy[0], 1);
-            cblas_daxpy(n_sph_abc, -(a / p), &PR_yx[0], 1, &AB_yx[0], 1);
-
-            cblas_daxpy(n_sph_abc, (b / p), &PR_yz[0], 1, &AB_yz[0], 1);
-            cblas_daxpy(n_sph_abc, (b / p), &PR_zy[0], 1, &AB_zy[0], 1);
-            cblas_daxpy(n_sph_abc, (b / p), &PR_zx[0], 1, &AB_zx[0], 1);
-            cblas_daxpy(n_sph_abc, (b / p), &PR_xz[0], 1, &AB_xz[0], 1);
-            cblas_daxpy(n_sph_abc, (b / p), &PR_xy[0], 1, &AB_xy[0], 1);
-            cblas_daxpy(n_sph_abc, (b / p), &PR_yx[0], 1, &AB_yx[0], 1);
-
-            cblas_daxpy(n_sph_abc, 1.0, &AB_yz[0], 1, &eri3_batch[0][0], 1);
-            cblas_daxpy(n_sph_abc, 1.0, &AB_zx[0], 1, &eri3_batch[1][0], 1);
-            cblas_daxpy(n_sph_abc, 1.0, &AB_xy[0], 1, &eri3_batch[2][0], 1);
-
-            cblas_daxpy(n_sph_abc, -1.0, &AB_zy[0], 1, &eri3_batch[0][0], 1);
-            cblas_daxpy(n_sph_abc, -1.0, &AB_xz[0], 1, &eri3_batch[1][0], 1);
-            cblas_daxpy(n_sph_abc, -1.0, &AB_yx[0], 1, &eri3_batch[2][0], 1);
+            cblas_daxpy(n_sph_abc, -1.0, &PR_yz[0], 1, &eri3_batch[0][0], 1);
+            cblas_daxpy(n_sph_abc, -1.0, &PR_zx[0], 1, &eri3_batch[1][0], 1);
+            cblas_daxpy(n_sph_abc, -1.0, &PR_xy[0], 1, &eri3_batch[2][0], 1);
         }
 
     return eri3_batch;
@@ -1570,6 +1528,8 @@ LI::eri3d2KernelFunDebug(const int ipair_ab, const int ishell_c,
         return eri3_batch;
     };
 
+    // Finite differences
+
     double delta = eri3d2_kernel_debug->delta;
 
     array<double, 9> coords{coords_a[0], coords_a[1], coords_a[2],
@@ -1610,5 +1570,5 @@ LI::eri3d2KernelFunDebug(const int ipair_ab, const int ishell_c,
                                                    eri3_batch_updn + eri3_batch_dndn);
         }
 
-    return eri3_batch;    
+    return eri3_batch;
 }

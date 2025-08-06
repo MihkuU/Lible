@@ -9,7 +9,7 @@
 namespace LI = lible::ints;
 namespace LIO = lible::ints::one;
 
-using std::array, std::vector;
+using std::array, std::pair, std::vector;
 
 namespace lible::ints
 {
@@ -674,17 +674,10 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernel(const int ipair,
                                 double pr_xy = r100 * e010;
                                 double pr_yx = r010 * e100;
 
-                                double ab_yz = -a_p * pr_yz + b_p * pr_zy;
-                                double ab_zy = -a_p * pr_zy + b_p * pr_yz;
-                                double ab_zx = -a_p * pr_zx + b_p * pr_xz;
-                                double ab_xz = -a_p * pr_xz + b_p * pr_zx;
-                                double ab_xy = -a_p * pr_xy + b_p * pr_yx;
-                                double ab_yx = -a_p * pr_yx + b_p * pr_xy;
-
                                 // -1 = charge of electron
-                                ints_cart[0](mu, nu) += -1 * fac * (ab_yz - ab_zy);
-                                ints_cart[1](mu, nu) += -1 * fac * (ab_zx - ab_xz);
-                                ints_cart[2](mu, nu) += -1 * fac * (ab_xy - ab_yx);
+                                ints_cart[0](mu, nu) += -1.0 * fac * (pr_zy - pr_yz);
+                                ints_cart[1](mu, nu) += -1.0 * fac * (pr_xz - pr_zx);
+                                ints_cart[2](mu, nu) += -1.0 * fac * (pr_yx - pr_xy);
                             }
         }
 
@@ -738,7 +731,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernelDebug(const int ipair,
     auto kernel_fun = [&](const array<double, 6> &coords) -> vec2d
     {
         array<double, 3> xyz_a{coords[0], coords[1], coords[2]};
-        array<double, 3> xyz_b{coords[4], coords[5], coords[6]};
+        array<double, 3> xyz_b{coords[3], coords[4], coords[5]};
 
         vec2d ints_cart(Fill(0), n_cart_a, n_cart_b);
         for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
@@ -817,8 +810,8 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernelDebug(const int ipair,
         {2, 4},
         {2, 3},
         {0, 5},
-        {1, 3},
-        {0, 4}}};
+        {0, 4},
+        {1, 3}}};
 
     array<vec2d, 6> terms;
     for (int iterm = 0; iterm < 6; iterm++)
@@ -853,8 +846,8 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1ElKernelDebug(const int ipair,
     }
 
     ints_sph[0] = terms[0] - terms[1];
-    // ints_sph[1] = terms[2] - terms[3];
-    // ints_sph[2] = terms[4] - terms[5];    
+    ints_sph[1] = terms[2] - terms[3];
+    ints_sph[2] = terms[4] - terms[5];
 
     return ints_sph;
 }

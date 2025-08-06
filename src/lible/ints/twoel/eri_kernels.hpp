@@ -311,7 +311,6 @@ namespace lible
             }
 
             double delta = 5e-5;
-            // double delta = 1e-3;
 
             std::vector<double> ecoeffs0_bra;
             std::vector<double> ecoeffs0_ket;

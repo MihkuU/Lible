@@ -25,6 +25,10 @@ namespace lible
                                     const double A, const double B, const vec3d &ecoeffs1);
 
         /** */
+        std::pair<vec3d, vec3d> fcoeffsRecurrence_n1(const double a, const double b, const int la,
+                                                     const int lb, const vec3d &ecoeffs);
+
+        /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
                                                   const int lb, const double *xyz_a,
                                                   const double *xyz_b);
@@ -40,6 +44,12 @@ namespace lible
                                                      const int lb, const double *xyz_a,
                                                      const double *xyz_b,
                                                      const std::array<lible::vec3d, 3> &ecoeffs1);
+
+        /** */
+        std::array<std::pair<vec3d, vec3d>, 3>
+        fcoeffsPrimitivePair_n1(const double a, const double b, const int la,
+                                const int lb, const double *xyz_a, const double *xyz_b,
+                                const std::array<lible::vec3d, 3> &ecoeffs);
 
         /** */
         std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
