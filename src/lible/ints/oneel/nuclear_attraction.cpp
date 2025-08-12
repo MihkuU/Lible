@@ -469,11 +469,10 @@ LI::externalChargesOperatorD1Kernel(const int ipair, const vector<array<double, 
     return ints_sph;
 }
 
-
 std::vector<lible::vec2d>
-LI::potentialAtExternalChargesKernel(const int ipair, 
+LI::potentialAtExternalChargesKernel(const int ipair,
                                      const std::vector<std::array<double, 4>> &charges,
-                                     const BoysGrid &boys_grid, 
+                                     const BoysGrid &boys_grid,
                                      const ShellPairData &sp_data)
 {
     const int la = sp_data.la;
@@ -539,15 +538,15 @@ LI::potentialAtExternalChargesKernel(const int ipair,
                     for (int u = 0; u <= lab; u++)
                         for (int v = 0; v <= lab; v++)
                             rints_sum[icharge](t, u, v) += charge * rints(t, u, v);
-            
+
                 for (const auto &[i, j, k, mu] : cart_exps_a)
                     for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                         for (int t = 0; t <= i + i_; t++)
                             for (int u = 0; u <= j + j_; u++)
                                 for (int v = 0; v <= k + k_; v++)
                                     ints_cart[icharge](mu, nu) += (-1) * fac * // -1 = charge of electron
-                                                        Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) *
-                                                        rints_sum[icharge](t, u, v);
+                                                                  Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) *
+                                                                  rints_sum[icharge](t, u, v);
             }
         }
 
@@ -557,7 +556,7 @@ LI::potentialAtExternalChargesKernel(const int ipair,
 
     int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
     int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
-    
+
     for (size_t icharge = 0; icharge < charges.size(); icharge++)
     {
         ints_sph[icharge] = trafo2Spherical(la, lb, ints_cart[icharge]);

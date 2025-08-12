@@ -142,7 +142,7 @@ namespace lible
                                         const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
-         * Calculates a batch of normalized Coulombic operator integrals for the shell pair 'ipair'. 
+         * Calculates a batch of normalized Coulombic operator integrals for the shell pair 'ipair'.
          * For every charge a batch of integrals is calculated.
          * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
          * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
@@ -150,10 +150,10 @@ namespace lible
          */
         std::vector<vec2d>
         potentialAtExternalChargesKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
-                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
+                                         const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
-         * Calculates a batch of normalizederf-attenuated  Coulombic operator integrals for the shell pair 'ipair'. 
+         * Calculates a batch of normalizederf-attenuated  Coulombic operator integrals for the shell pair 'ipair'.
          * For every charge a batch of integrals is calculated.
          * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
          * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
@@ -161,8 +161,8 @@ namespace lible
          */
         std::vector<vec2d>
         potentialAtExternalChargesErfKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
-																				const std::vector<double> &omegas,
-                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
+                                            const std::vector<double> &omegas,
+                                            const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
          * \ingroup ints
