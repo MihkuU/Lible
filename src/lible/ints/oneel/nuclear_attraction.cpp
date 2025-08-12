@@ -558,23 +558,22 @@ LI::potentialAtExternalChargesKernel(const int ipair,
         ints_sph[icharge] = trafo2Spherical(la, lb, ints_cart[icharge]);
 
         for (size_t mu = 0; mu < ints_sph[icharge].dim<0>(); mu++)
-        {
             for (size_t nu = 0; nu < ints_sph[icharge].dim<1>(); nu++)
             {
                 double norm_a = sp_data.norms[ofs_norm_a + mu];
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
                 ints_sph[icharge](mu, nu) *= norm_a * norm_b;
             }
-        }
     }
 
     return ints_sph;
 }
+
 std::vector<lible::vec2d>
-LI::potentialAtExternalChargesErfKernel(const int ipair, 
+LI::potentialAtExternalChargesErfKernel(const int ipair,
                                         const std::vector<std::array<double, 4>> &charges,
-																				const vector<double> &omegas,
-                                        const BoysGrid &boys_grid, 
+                                        const vector<double> &omegas,
+                                        const BoysGrid &boys_grid,
                                         const ShellPairData &sp_data)
 {
     int la = sp_data.la;
@@ -598,10 +597,10 @@ LI::potentialAtExternalChargesErfKernel(const int ipair,
     int n_cart_a = numCartesians(la);
     int n_cart_b = numCartesians(lb);
 
-		int n_ext_points = charges.size();
-		
-    vector<vec2d> 
-			ints_cart(n_ext_points, vec2d(Fill(0), n_cart_a, n_cart_b));
+    int n_ext_points = charges.size();
+
+    vector<vec2d>
+        ints_cart(n_ext_points, vec2d(Fill(0), n_cart_a, n_cart_b));
 
     for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
         for (int ib = 0; ib < cdepth_b; ib++, iab++)
@@ -621,8 +620,8 @@ LI::potentialAtExternalChargesErfKernel(const int ipair,
                                    (a * xyz_a[1] + b * xyz_b[1]) / p,
                                    (a * xyz_a[2] + b * xyz_b[2]) / p};
 
-            vector<vec3d> 
-							rints_sum(n_ext_points, vec3d(Fill(0), lab + 1));
+            vector<vec3d>
+                rints_sum(n_ext_points, vec3d(Fill(0), lab + 1));
 
             for (size_t icharge = 0; icharge < charges.size(); icharge++)
             {
@@ -647,40 +646,37 @@ LI::potentialAtExternalChargesErfKernel(const int ipair,
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
                         for (int v = 0; v <= lab; v++)
-                            rints_sum[icharge](t, u, v) 
-															+= charge * omega_factor // erf-related factors
-                                                  * rints(t, u, v);
+                            rints_sum[icharge](t, u, v) += charge * omega_factor // erf-related factor
+                                                           * rints(t, u, v);
                 for (const auto &[i, j, k, mu] : cart_exps_a)
                     for (const auto &[i_, j_, k_, nu] : cart_exps_b)
                         for (int t = 0; t <= i + i_; t++)
                             for (int u = 0; u <= j + j_; u++)
                                 for (int v = 0; v <= k + k_; v++)
                                     ints_cart[icharge](mu, nu) += (-1) * fac * // -1 = charge of electron
-                                                         Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) *
-                                                         rints_sum[icharge](t, u, v);
-						}
+                                                                  Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) *
+                                                                  rints_sum[icharge](t, u, v);
+            }
         }
 
-		int n_sph_a = numSphericals(la);
+    int n_sph_a = numSphericals(la);
     int n_sph_b = numSphericals(lb);
     vector<vec2d> ints_sph(n_ext_points, vec2d(Fill(0), n_sph_a, n_sph_b));
 
     int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
     int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
-    
+
     for (size_t icharge = 0; icharge < charges.size(); icharge++)
     {
         ints_sph[icharge] = trafo2Spherical(la, lb, ints_cart[icharge]);
 
         for (size_t mu = 0; mu < ints_sph[icharge].dim<0>(); mu++)
-        {
             for (size_t nu = 0; nu < ints_sph[icharge].dim<1>(); nu++)
             {
                 double norm_a = sp_data.norms[ofs_norm_a + mu];
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
                 ints_sph[icharge](mu, nu) *= norm_a * norm_b;
             }
-        }
     }
 
     return ints_sph;
