@@ -231,7 +231,7 @@ vector<double> LI::calcRInts_ERI2D2(const int l, const double alpha, const doubl
                                     const vector<array<int, 3>> &hermite_idxs_a,
                                     const vector<array<int, 3>> &hermite_idxs_b)
 {
-    vec3d rints_3d = calcRInts3D(l + 2, alpha, xyz_ab, fnx);
+    const vec3d rints_3d = calcRInts3D(l + 2, alpha, xyz_ab, fnx);
 
     const int n_hermite_a = hermite_idxs_a.size();
     const int n_hermite_b = hermite_idxs_b.size();
@@ -275,7 +275,7 @@ vector<double> LI::calcRInts_ERI3D2(const int l, const double alpha, const doubl
                                     const vector<array<int, 3>> &hermite_idxs_bra,
                                     const vector<array<int, 3>> &hermite_idxs_ket)
 {
-    vec3d rints_3d = calcRInts3D(l + 2, alpha, xyz_pc, fnx);
+    const vec3d rints_3d = calcRInts3D(l + 2, alpha, xyz_pc, fnx);
 
     const int n_hermite_bra = hermite_idxs_bra.size();
     const int n_hermite_ket = hermite_idxs_ket.size();
@@ -292,17 +292,17 @@ vector<double> LI::calcRInts_ERI3D2(const int l, const double alpha, const doubl
     const int ofs9 = n_rints * 9;
 
     vector<double> rints(10 * n_rints);
-    for (int j = 0; j < n_hermite_bra; j++)
+    for (int j = 0; j < n_hermite_ket; j++)
     {
-        auto [t_, u_, v_] = hermite_idxs_bra[j];
+        auto [t_, u_, v_] = hermite_idxs_ket[j];
 
         double sign = 1.0;
         if ((t_ + u_ + v_) % 2 != 0)
             sign = -1.0;
 
-        for (int i = 0; i < n_hermite_ket; i++)
+        for (int i = 0; i < n_hermite_bra; i++)
         {
-            auto [t, u, v] = hermite_idxs_ket[i];
+            auto [t, u, v] = hermite_idxs_bra[i];
 
             int idx = i * n_hermite_ket + j;
 
@@ -312,8 +312,8 @@ vector<double> LI::calcRInts_ERI3D2(const int l, const double alpha, const doubl
             rints[ofs2 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
             rints[ofs3 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
 
-            rints[ofs4 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_ + 1);
-            rints[ofs5 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 2);
+            rints[ofs4 + idx] = sign * fac * rints_3d(t + t_ + 2, u + u_, v + v_);
+            rints[ofs5 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_ + 1, v + v_);
             rints[ofs6 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_ + 1);
             rints[ofs7 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 2, v + v_);
             rints[ofs8 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_ + 1);

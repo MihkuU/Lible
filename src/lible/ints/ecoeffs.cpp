@@ -101,7 +101,7 @@ lible::vec3d LI::ecoeffsRecurrence2_n2(const double a, const double b, const int
     double one_o_2p = 1.0 / (2 * p);
     double R = A - B;
 
-    ecoeffs2(0, 0, 0) = -2 * (a * b) * R * ecoeffs1(0, 0, 0) / p;
+    ecoeffs2(0, 0, 0) = -2 * (a * b) * R * ecoeffs1(0, 0, 0) / p; // TODO: inappropriate starting value
 
     for (int i = 1; i <= la; i++)
     {
@@ -110,7 +110,7 @@ lible::vec3d LI::ecoeffsRecurrence2_n2(const double a, const double b, const int
 
         for (int t = 1; t < i; t++)
             ecoeffs2(i, 0, t) = one_o_2p * ecoeffs2(i - 1, 0, t - 1) -
-                                (b / p) * (R * ecoeffs2(i - 1, 0, t) + ecoeffs1(i - 1, 0, t)) +
+                                (b / p) * (R * ecoeffs2(i - 1, 0, t) + ecoeffs1(i - 1, 0, t)) + // TODO: add 2 * n or make generic ecoeffsRecurrence_N
                                 (t + 1) * ecoeffs2(i - 1, 0, t + 1);
 
         ecoeffs2(i, 0, i) = one_o_2p * ecoeffs2(i - 1, 0, i - 1) -
@@ -125,7 +125,7 @@ lible::vec3d LI::ecoeffsRecurrence2_n2(const double a, const double b, const int
 
             for (int t = 1; t < i + j; t++)
                 ecoeffs2(i, j, t) = one_o_2p * ecoeffs2(i, j - 1, t - 1) +
-                                    (a / p) * (R * ecoeffs2(i, j - 1, t) + ecoeffs1(i, j - 1, t)) +
+                                    (a / p) * (R * ecoeffs2(i, j - 1, t) + ecoeffs1(i, j - 1, t)) + // TODO: add 2 * n or make generic ecoeffsRecurrence_N
                                     (t + 1) * ecoeffs2(i, j - 1, t + 1);
 
             ecoeffs2(i, j, i + j) = one_o_2p * ecoeffs2(i, j - 1, i + j - 1) +
@@ -156,6 +156,30 @@ lible::vec2d LI::ecoeffsRecurrence1(const double one_o_2a, const int l)
     }
 
     return ecoeffs;
+}
+
+std::pair<lible::vec3d, lible::vec3d> LI::fcoeffsRecurrence_n1(const double a, const double b,
+                                                               const int la, const int lb,
+                                                               const vec3d &ecoeffs)
+{
+    vec3d fcoeffs_a(Fill(0), la + 1, lb + 1, la + lb + 2);
+    vec3d fcoeffs_b(Fill(0), la + 1, lb + 1, la + lb + 2);
+
+    for (int i = 0; i <= la; i++)
+        for (int j = 0; j <= lb; j++)
+            for (int t = 0; t <= i + j + 1; t++)
+            {
+                fcoeffs_a(i, j, t) = 2 * a * ecoeffs(i + i, j, t);
+                fcoeffs_b(i, j, t) = 2 * b * ecoeffs(i, j + 1, t);
+
+                if (i > 0)
+                    fcoeffs_a(i, j, t) -= i * ecoeffs(i - i, j, t);
+
+                if (j > 0)
+                    fcoeffs_b(i, j, t) -= j * ecoeffs(i, j - 1, t);
+            }
+
+    return {fcoeffs_a, fcoeffs_b};
 }
 
 array<lible::vec3d, 3> LI::ecoeffsPrimitivePair(const double a, const double b, const int la,
@@ -210,6 +234,18 @@ array<lible::vec3d, 3> LI::ecoeffsPrimitivePair_n2(const double a, const double 
     vec3d ecoeffs2_z = ecoeffsRecurrence2_n2(a, b, la, lb, xyz_a[2], xyz_b[2], ecoeffs1[2]);
 
     return {ecoeffs2_x, ecoeffs2_y, ecoeffs2_z};
+}
+
+std::array<std::pair<lible::vec3d, lible::vec3d>, 3>
+LI::fcoeffsPrimitivePair_n1(const double a, const double b, const int la,
+                            const int lb, const double *xyz_a, const double *xyz_b,
+                            const array<vec3d, 3> &ecoeffs)
+{
+    auto [fcoeffs_x_a, fcoeffs_x_b] = fcoeffsRecurrence_n1(a, b, la, lb, ecoeffs[0]);
+    auto [fcoeffs_y_a, fcoeffs_y_b] = fcoeffsRecurrence_n1(a, b, la, lb, ecoeffs[1]);
+    auto [fcoeffs_z_a, fcoeffs_z_b] = fcoeffsRecurrence_n1(a, b, la, lb, ecoeffs[2]);
+
+    return {{{fcoeffs_x_a, fcoeffs_x_b}, {fcoeffs_y_a, fcoeffs_y_b}, {fcoeffs_z_a, fcoeffs_z_b}}};
 }
 
 array<lible::vec2d, 3> LI::ecoeffsPrimitive(const double a, const int l)
