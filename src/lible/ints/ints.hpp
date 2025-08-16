@@ -212,15 +212,15 @@ namespace lible
          */
         vec4d eri4(const Structure &structure);
 
-        /**
-         * \ingroup ints
-         * Runs a benchmark of calculating the four-center ERIs for all shell quartets,
-         * \f$(l_a l_b|l_c l_d)\f$ with \f$l_a \geq l_b\f$ and \f$(l_a l_b) \geq (l_c l_d)\f$.
-         */
-        void eri4Benchmark(const Structure &structure);
+        // /**
+        //  * \ingroup ints
+        //  * Runs a benchmark of calculating the four-center ERIs for all shell quartets,
+        //  * \f$(l_a l_b|l_c l_d)\f$ with \f$l_a \geq l_b\f$ and \f$(l_a l_b) \geq (l_c l_d)\f$.
+        //  */
+        // void eri4Benchmark(const Structure &structure);
 
         /** */
-        void eri4BenchmarkTest(const Structure &structure);
+        void eri4Benchmark(const Structure &structure);
 
         /**
          * \ingroup ints

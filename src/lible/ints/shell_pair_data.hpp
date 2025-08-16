@@ -24,11 +24,11 @@ namespace lible
             ShellData(const int l, const int n_shells, const int n_primitives,
                       const std::vector<double> &coeffs, const std::vector<double> &coords,
                       const std::vector<double> &exps, const std::vector<double> &norms,
-                      const std::vector<int> atomic_idxs, const std::vector<int> &cdepths, 
-                      const std::vector<int> &coffsets, const std::vector<int> &offsets_ecoeffs, 
+                      const std::vector<int> atomic_idxs, const std::vector<int> &cdepths,
+                      const std::vector<int> &coffsets, const std::vector<int> &offsets_ecoeffs,
                       const std::vector<int> &offsets_norms, const std::vector<int> &offsets_sph)
                 : l(l), n_shells(n_shells), n_primitives(n_primitives), coeffs(coeffs),
-                  coords(coords), exps(exps), norms(norms),  atomic_idxs(atomic_idxs),
+                  coords(coords), exps(exps), norms(norms), atomic_idxs(atomic_idxs),
                   cdepths(cdepths), coffsets(coffsets), offsets_ecoeffs(offsets_ecoeffs),
                   offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
@@ -79,8 +79,8 @@ namespace lible
                   atomic_coords(atomic_coords), coeffs(coeffs), coords(coords), exps(exps),
                   norms(norms), atomic_idxs(atomic_idxs), atomic_nrs(atomic_nrs), cdepths(cdepths),
                   coffsets(coffsets), offsets_cart(offsets_cart), offsets_ecoeffs(offsets_ecoeffs),
-                  offsets_ecoeffs_deriv1(offsets_ecoeffs_deriv1), 
-                  offsets_ecoeffs_deriv2(offsets_ecoeffs_deriv2), 
+                  offsets_ecoeffs_deriv1(offsets_ecoeffs_deriv1),
+                  offsets_ecoeffs_deriv2(offsets_ecoeffs_deriv2),
                   offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
             }
@@ -146,31 +146,35 @@ namespace lible
                                              const Structure &structure);
 
         /**
-         * \ingroup spdata
-         *
-         * Constructs the shell datas for the auxiliary basis set, up to l_max.
+         * 
+         * Constructs the shell datas for the auxiliary basis set, up to max L.
          */
-        std::vector<ShellData>
-        shellDatasAux(const int l_max, const Structure &structure);
+        std::vector<ShellData> shellDatasAux(const Structure &structure);
 
         /**
-         * \ingroup spdata
          *
-         * Constructs the shell pair datas for the given l-pairs. The shell pair datas for each
-         * (la, lb)-pair assume symmetries.
          */
-        std::vector<ShellPairData>
-        shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                           const Structure &structure);
+        std::vector<ShellPairData> shellPairDatas(const Structure &structure,
+                                                  const bool use_symm = true);
 
-        /**
-         * \ingroup spdata
-         *
-         * Constructs the shell pair datas for the given l-pairs. The shell pair datas for each
-         * (la, lb)-pair assume symmetries.
-         */
-        std::vector<ShellPairData>
-        shellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                                      const Structure &structure);
+        // /**
+        //  * \ingroup spdata
+        //  *
+        //  * Constructs the shell pair datas for the given l-pairs. The shell pair datas for each
+        //  * (la, lb)-pair assume symmetries.
+        //  */
+        // std::vector<ShellPairData>
+        // shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
+        //                    const Structure &structure);
+
+        // /**
+        //  * \ingroup spdata
+        //  *
+        //  * Constructs the shell pair datas for the given l-pairs. The shell pair datas for each
+        //  * (la, lb)-pair assume symmetries.
+        //  */
+        // std::vector<ShellPairData>
+        // shellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
+        //                      const Structure &structure);
     }
 }

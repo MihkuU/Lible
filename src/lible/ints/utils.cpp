@@ -51,7 +51,6 @@ vector<pair<int, int>> LI::getLPairsSymm(const int l_max)
 {
     int n_pairs = (l_max + 1) * (l_max + 2) / 2;
     vector<pair<int, int>> l_pairs(n_pairs);
-
     for (int la = 0, idx = 0; la <= l_max; la++)
         for (int lb = 0; lb <= la; lb++, idx++)
             l_pairs[idx] = std::make_pair(la, lb);
@@ -63,7 +62,6 @@ vector<pair<int, int>> LI::getLPairsNoSymm(const int l_max)
 {
     int n_pairs = (l_max + 1) * (l_max + 1);
     vector<pair<int, int>> l_pairs(n_pairs);
-
     for (int la = 0, idx = 0; la <= l_max; la++)
         for (int lb = 0; lb <= l_max; lb++, idx++)
             l_pairs[idx] = {la, lb};

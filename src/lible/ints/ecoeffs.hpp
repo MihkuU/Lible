@@ -52,16 +52,8 @@ namespace lible
         ecoeffsSphericalSPData_Bra(const ShellPairData &sp_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::vector<double>
-        ecoeffsSphericalSPData_Bra_Deriv1(const ShellPairData &sp_data);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::pair<std::vector<double>, std::vector<double>>
         ecoeffsSphericalSPData_BraKet(const ShellPairData &sp_data);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::pair<std::vector<double>, std::vector<double>>
-        ecoeffsSphericalSPData_BraKet_Deriv1(const ShellPairData &sp_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<double>
