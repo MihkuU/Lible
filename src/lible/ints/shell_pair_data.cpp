@@ -257,10 +257,10 @@ vector<LI::ShellData> LI::shellDatasAux(const Structure &structure)
     if (structure.getUseRI() == false)
         throw std::runtime_error("shellDatasAux(): RI approximation is not enabled!");
 
-    int l_max = structure.getMaxL();
+    int l_max_aux = structure.getMaxLAux();
 
     vector<ShellData> sh_datas;
-    for (int l = 0; l <= l_max; l++)
+    for (int l = 0; l <= l_max_aux; l++)
         sh_datas.emplace_back(shellDataAux(l, structure));
 
     return sh_datas;
