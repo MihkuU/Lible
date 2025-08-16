@@ -77,11 +77,10 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Calculates the nuclear attraction integral matrix with the erf-attenuated (screened) 
+         * Calculates the nuclear attraction integral matrix with the erf-attenuated (screened)
          * Coulomb operator.
          */
-        vec2d nuclearAttractionErf(const Structure &structure, 
-                                   const std::vector<double> &omegas);
+        vec2d nuclearAttractionErf(const Structure &structure, const std::vector<double> &omegas);
 
         /**
          * Calculates the one-electron Coulombic interaction integral matrix for given point
