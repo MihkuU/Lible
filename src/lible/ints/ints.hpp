@@ -219,7 +219,9 @@ namespace lible
         //  */
         // void eri4Benchmark(const Structure &structure);
 
-        /** */
+        /**
+         * 
+         */
         void eri4Benchmark(const Structure &structure);
 
         /**
@@ -323,35 +325,21 @@ namespace lible
         ShellData shellDataAux(const int l, const Structure &structure);
 
         /**
-         * \ingroup ints
-         * Constructs the shell pair data corresponding to the main basis set.
-         */
-        ShellPairData shellPairDataSymm(const int la, const int lb, const Structure &structure);
-
-        /**
-         * \ingroup ints
          *
          */
-        ShellPairData shellPairDataNoSymm(const int la, const int lb, const Structure &structure);
+        ShellPairData shellPairData(const bool use_symm, const int la, const int lb,
+                                    const Structure &structure);
 
         /**
          * \ingroup ints
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
          */
-        std::vector<ShellData> shellDatasAux(const int l_max, const Structure &structure);
+        std::vector<ShellData> shellDatasAux(const Structure &structure);
 
         /**
-         * \ingroup ints
-         * Constructs the shell pair datas for the given l-pairs.
+         *
          */
-        std::vector<ShellPairData>
-        shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                           const Structure &structure);
-
-        /** */
-        std::vector<ShellPairData>
-        shellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
-                             const Structure &structure);
+        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure);
 
         /** */
         vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,

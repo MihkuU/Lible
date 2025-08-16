@@ -79,20 +79,8 @@ LI::ShellData LI::shellDataAux(const int l, const Structure &structure)
     return sh_data;
 }
 
-LI::ShellPairData LI::shellPairDataSymm(const int la, const int lb,
-                                        const Structure &structure)
-{
-    return constructShellPairData(true, la, lb, structure);
-}
-
-LI::ShellPairData LI::shellPairDataNoSymm(const int la, const int lb,
-                                          const Structure &structure)
-{
-    return constructShellPairData(false, la, lb, structure);
-}
-
-LI::ShellPairData LI::constructShellPairData(const bool use_symm, const int la, const int lb,
-                                             const Structure &structure)
+LI::ShellPairData LI::shellPairData(const bool use_symm, const int la, const int lb,
+                                    const Structure &structure)
 {
     const auto &shells_a = structure.getShellsL(la);
     const auto &shells_b = structure.getShellsL(lb);
@@ -278,17 +266,7 @@ vector<LI::ShellData> LI::shellDatasAux(const Structure &structure)
     return sh_datas;
 }
 
-// vector<LI::ShellData> LI::shellDatasAux(const int l_max, const Structure &structure)
-// {
-//     vector<ShellData> sh_datas;
-//     for (int l = 0; l <= l_max; l++)
-//         sh_datas.emplace_back(shellDataAux(l, structure));
-
-//     return sh_datas;
-// }
-
-
-vector<LI::ShellPairData> LI::shellPairDatas(const Structure &structure, const bool use_symm)
+vector<LI::ShellPairData> LI::shellPairDatas(const bool use_symm, const Structure &structure)
 {
     vector<pair<int, int>> l_pairs;
     if (use_symm == true)
@@ -298,33 +276,7 @@ vector<LI::ShellPairData> LI::shellPairDatas(const Structure &structure, const b
         
     vector<ShellPairData> sp_datas;
     for (const auto &[la, lb] : l_pairs)
-        sp_datas.emplace_back(constructShellPairData(use_symm, la, lb, structure));
+        sp_datas.emplace_back(shellPairData(use_symm, la, lb, structure));
 
     return sp_datas;
 }
-
-// vector<LI::ShellPairData> LI::shellPairDatasSymm(const vector<pair<int, int>> &l_pairs,
-//                                                  const Structure &structure)
-// {
-//     vector<ShellPairData> sp_datas;
-//     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-//     {
-//         auto [la, lb] = l_pairs[ipair];
-//         sp_datas.emplace_back(shellPairDataSymm(la, lb, structure));
-//     }
-
-//     return sp_datas;
-// }
-
-// vector<LI::ShellPairData> LI::shellPairDatasNoSymm(const vector<pair<int, int>> &l_pairs,
-//                                                    const Structure &structure)
-// {
-//     vector<ShellPairData> sp_datas;
-//     for (size_t ipair = 0; ipair < l_pairs.size(); ipair++)
-//     {
-//         auto [la, lb] = l_pairs[ipair];
-//         sp_datas.emplace_back(shellPairDataNoSymm(la, lb, structure));
-//     }
-
-//     return sp_datas;
-// }

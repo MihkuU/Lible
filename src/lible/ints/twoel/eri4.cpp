@@ -36,7 +36,7 @@ namespace lible::ints
 
                 int mu = ofs_a + a;
                 int nu = ofs_b + b;
-                
+
                 eri4_diagonal(mu, nu) = integral;
                 eri4_diagonal(nu, mu) = integral;
             }
@@ -45,7 +45,7 @@ namespace lible::ints
 
 lible::vec4d LI::eri4(const Structure &structure)
 {
-    vector<ShellPairData> sp_datas = shellPairDatas(structure, true);
+    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
 
     int dim_ao = structure.getDimAO();
     vec4d eri4(Fill(0), dim_ao);
@@ -64,7 +64,7 @@ lible::vec4d LI::eri4(const Structure &structure)
 
             for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
             {
-                int bound_cd = (ispdata_ab == isp_data_cd) ? ipair_ab + 1 :  sp_data_cd.n_pairs;
+                int bound_cd = (ispdata_ab == isp_data_cd) ? ipair_ab + 1 : sp_data_cd.n_pairs;
                 for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
                     vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd);
@@ -107,7 +107,7 @@ void LI::eri4Benchmark(const Structure &structure)
 
     auto start{std::chrono::steady_clock::now()};
 
-    vector<ShellPairData> sp_datas = shellPairDatas(structure, true);
+    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
 
     double sum_eri4 = 0;
     for (size_t ispdata_ab = 0; ispdata_ab < sp_datas.size(); ispdata_ab++)
@@ -158,7 +158,7 @@ void LI::eri4Benchmark(const Structure &structure)
 
 lible::vec2d LI::eri4Diagonal(const Structure &structure)
 {
-    vector<ShellPairData> sp_datas = shellPairDatas(structure, true);
+    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
 
     int dim_ao = structure.getDimAO();
     vec2d eri4_diagonal(Fill(0), dim_ao, dim_ao);

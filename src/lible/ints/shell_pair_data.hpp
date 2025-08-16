@@ -119,34 +119,15 @@ namespace lible
         /**
          * \ingroup spdata
          *
-         * Constructs the shell pair data corresponding to the main basis set. It is assumed
-         * that the integrals involving shells A and B are symmetric w.r.t. interchanging A and B.
-         * If la != lb, shell pair data is created for pairs (ishellA, ishellB). When la == lb,
-         * the data is create for (ishellA, ishellA') pairs such that ishellA >= ishellA'.
-         */
-        ShellPairData shellPairDataSymm(const int la, const int lb, const Structure &structure);
-
-        /**
-         * \ingroup spdata
-         *
-         * Constructs the shell pair data corresponding to the main basis set. No symmetries are
-         * being used in this version.
-         */
-        ShellPairData shellPairDataNoSymm(const int la, const int lb, const Structure &structure);
-
-        /**
-         * \ingroup spdata
-         *
          * Constructs the shell pair data corresponding to the main basis set. If symmetry is
          * enabled the data is created for (ishellA, ishellA') pairs such that ishellA >= ishellA'
          * when la == lb. If la != lb, shell pair data is created for pairs (ishellA, ishellB)
          * irrespective of whether symmetry is used or not.
          */
-        ShellPairData constructShellPairData(const bool use_symm, const int la, const int lb,
-                                             const Structure &structure);
+        ShellPairData shellPairData(const bool use_symm, const int la, const int lb,
+                                    const Structure &structure);
 
-        /**
-         * 
+        /**         
          * Constructs the shell datas for the auxiliary basis set, up to max L.
          */
         std::vector<ShellData> shellDatasAux(const Structure &structure);
@@ -154,27 +135,6 @@ namespace lible
         /**
          *
          */
-        std::vector<ShellPairData> shellPairDatas(const Structure &structure,
-                                                  const bool use_symm = true);
-
-        // /**
-        //  * \ingroup spdata
-        //  *
-        //  * Constructs the shell pair datas for the given l-pairs. The shell pair datas for each
-        //  * (la, lb)-pair assume symmetries.
-        //  */
-        // std::vector<ShellPairData>
-        // shellPairDatasSymm(const std::vector<std::pair<int, int>> &l_pairs,
-        //                    const Structure &structure);
-
-        // /**
-        //  * \ingroup spdata
-        //  *
-        //  * Constructs the shell pair datas for the given l-pairs. The shell pair datas for each
-        //  * (la, lb)-pair assume symmetries.
-        //  */
-        // std::vector<ShellPairData>
-        // shellPairDatasNoSymm(const std::vector<std::pair<int, int>> &l_pairs,
-        //                      const Structure &structure);
+        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure);
     }
 }

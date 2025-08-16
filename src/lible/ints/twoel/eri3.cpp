@@ -18,7 +18,7 @@ lible::vec3d LI::eri3(const Structure &structure)
         throw std::runtime_error("RI approximation is not enabled!");
 
     vector<ShellData> sh_datas = shellDatasAux(structure);
-    vector<ShellPairData> sp_datas = shellPairDatas(structure, true);
+    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
 
     int dim_ao = structure.getDimAO();
     int dim_ao_aux = structure.getDimAOAux();

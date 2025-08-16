@@ -259,7 +259,7 @@ lible::vec2d LI::overlap(const Structure &structure)
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 vec2d ints_ipair = overlapKernel(ipair, sp_data);
@@ -457,7 +457,7 @@ lible::vec2d LI::kineticEnergy(const Structure &structure)
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 vec2d ints_ipair = kineticEnergyKernel(ipair, sp_data);
@@ -590,7 +590,7 @@ array<lible::vec2d, 3> LI::dipoleMoment(const array<double, 3> &origin,
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 array<vec2d, 3> ints_ipair = dipoleMomentKernel(ipair, origin, sp_data);
@@ -1249,7 +1249,7 @@ lible::vec2d LI::externalCharges(const vector<array<double, 4>> &charges,
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
 
             int lab = la + lb;
             BoysGrid boys_grid(lab);
@@ -1287,7 +1287,7 @@ lible::vec2d LI::externalChargesErf(const vector<array<double, 4>> &charges,
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
 
             int lab = la + lb;
             BoysGrid boys_grid(lab);
@@ -1330,7 +1330,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1El(const Structure &structure)
     for (int la = 0; la <= l_max; la++)
         for (int lb = 0; lb <= l_max; lb++)
         {
-            ShellPairData sp_data = shellPairDataNoSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(false, la, lb, structure);
 
             int lab = la + lb;
             BoysGrid boys_grid(lab + 1);
@@ -1495,14 +1495,13 @@ lible::vec2d LI::nuclearAttraction(const Structure &structure)
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
 
             int lab = la + lb;
             BoysGrid boys_grid(lab);
 
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
-                // vec2d ints_ipair = kineticEnergyKernel(ipair, sp_data);
                 vec2d ints_ipair = externalChargesKernel(ipair, charges, boys_grid, sp_data);
 
                 int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
@@ -1538,7 +1537,7 @@ lible::vec2d LI::nuclearAttractionErf(const Structure &structure, const vector<d
     for (int la = l_max; la >= 0; la--)
         for (int lb = la; lb >= 0; lb--)
         {
-            ShellPairData sp_data = shellPairDataSymm(la, lb, structure);
+            ShellPairData sp_data = shellPairData(true, la, lb, structure);
             
             int lab = la + lb;
             BoysGrid boys_grid(lab);
