@@ -1467,51 +1467,6 @@ LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a, const ShellD
                             });
 }
 
-// LI::ERI4D2Kernel LI::deployERI4D2Kernel(const ShellPairData &sp_data_ab,
-//                                         const ShellPairData &sp_data_cd)
-// {
-//     int la = sp_data_ab.la;
-//     int lb = sp_data_ab.lb;
-//     int lc = sp_data_cd.la;
-//     int ld = sp_data_cd.lb;
-
-//     int labc = la + lb + lc;
-//     if (labc <= _max_l_rollout_)
-//         return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
-//     else
-//         return ERI4D2Kernel(sp_data_ab, sp_data_cd,
-//                             [](const int ipair_ab, const int ipair_cd,
-//                                const ShellPairData &sp_data_ab,
-//                                const ShellPairData &sp_data_cd,
-//                                const ERI4D2Kernel *eri4d2_kernel) -> arr2d<vec4d, 12, 12>
-//                             {
-//                                 return eri4d2KernelFun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-//                                                        eri4d2_kernel);
-//                             });    
-// }
-
-// LI::ERI3D2Kernel LI::deployERI3D2Kernel(const ShellPairData &sp_data_ab,
-//                                         const ShellData &sh_data_c)
-// {
-//     int la = sp_data_ab.la;
-//     int lb = sp_data_ab.lb;
-//     int lc = sh_data_c.l;
-
-//     int labc = la + lb + lc;
-//     if (labc <= _max_l_rollout_)
-//         return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
-//     else
-//         return ERI3D2Kernel(sp_data_ab, sh_data_c,
-//                             [](const int ipair_ab, const int ish_c,
-//                                const ShellPairData &sp_data_ab,
-//                                const ShellData &sh_data_c,
-//                                const ERI3D2Kernel *eri3d2_kernel) -> arr2d<vec3d, 9, 9>
-//                             {
-//                                 return eri3d2KernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
-//                                                        eri3d2_kernel);
-//                             });    
-// }
-
 LI::ERI2D2Kernel LI::deployERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b)
 {
     int la = sh_data_a.l;

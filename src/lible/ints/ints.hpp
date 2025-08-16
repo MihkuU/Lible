@@ -369,30 +369,6 @@ namespace lible
         /** */
         std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);
 
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::vector<double>
-        ecoeffsSphericalSPData_Bra(const ShellPairData &sp_data);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::pair<std::vector<double>, std::vector<double>>
-        ecoeffsSphericalSPData_BraKet(const ShellPairData &sp_data);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::vector<double>
-        ecoeffsSphericalShellData_Bra(const ShellData &sh_data);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::pair<std::vector<double>, std::vector<double>>
-        ecoeffsSphericalShellData_BraKet(const ShellData &sh_data);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::vector<std::vector<double>>
-        ecoeffsSphericalSPDatas_Bra(const std::vector<ShellPairData> &sp_datas);
-
-        /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
-        std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
-        ecoeffsSphericalSPDatas_BraKet(const std::vector<ShellPairData> &sp_datas);
-
         /** TODO: */
         class BoysGrid;
 
