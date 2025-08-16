@@ -395,11 +395,6 @@ namespace lible::ints
                                        const ShellData &sh_data_b,
                                        const ERI2D2Kernel *eri2d2_kernel);
 
-    arr2d<vec2d, 6, 6> eri2d2KernelFunDebug(const int ishell_a, const int ishell_b,
-                                            const ShellData &sh_data_a,
-                                            const ShellData &sh_data_b,
-                                            const ERI2D2KernelDebug *eri2d2_kernel_debug);
-
     // 3-center
     template <int la, int lb, int lc>
     std::array<vec3d, 9> eri3d1KernelFun(const int ipair_ab, const int ishell_c,
@@ -433,11 +428,6 @@ namespace lible::ints
                                           const ShellPairData &sp_data_ab,
                                           const ShellData &sh_data_c,
                                           const ERI3SOCKernel *eri3soc_kernel);
-
-    arr2d<vec3d, 9, 9> eri3d2KernelFunDebug(const int ipair_ab, const int ishell_c,
-                                            const ShellPairData &sp_data_ab,
-                                            const ShellData &sh_data_c,
-                                            const ERI3D2KernelDebug *eri3d2_kernel_debug);
 
     // 4-center
     template <int la, int lb, int lc, int ld>
@@ -1347,29 +1337,6 @@ LI::ERI3SOCKernel::ERI3SOCKernel(const ShellPairData &sp_data_ab, const ShellDat
     boys_grid = BoysGrid(labc + 1);
 }
 
-LI::ERI3D2KernelDebug::ERI3D2KernelDebug(const ShellPairData &sp_data_ab,
-                                         const ShellData &sh_data_c,
-                                         const eri3d2_kernelfun_debug_t &eri3d2_kernelfun_debug)
-    : eri3d2_kernelfun_debug(eri3d2_kernelfun_debug)
-{
-    ecoeffs0_bra = ecoeffsSHARK(sp_data_ab, false);
-    ecoeffs0_ket = ecoeffsSHARK(sh_data_c, true);
-
-    int labc = sp_data_ab.la + sp_data_ab.lb + sh_data_c.l;
-    boys_grid = BoysGrid(labc);
-}
-
-LI::ERI2D2KernelDebug::ERI2D2KernelDebug(const ShellData &sh_data_a, const ShellData &sh_data_b,
-                                         const eri2d2_kernelfun_debug_t &eri2d2_kernelfun_debug)
-    : eri2d2_kernelfun_debug(eri2d2_kernelfun_debug)
-{
-    ecoeffs_bra = ecoeffsSHARK(sh_data_a, false);
-    ecoeffs_ket = ecoeffsSHARK(sh_data_b, true);
-
-    int lab = sh_data_a.l + sh_data_b.l;
-    boys_grid = BoysGrid(lab);
-}
-
 LI::ERI4Kernel LI::deployERI4Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd)
 {
     int la = sp_data_ab.la;
@@ -1500,50 +1467,50 @@ LI::ERI2D1Kernel LI::deployERI2D1Kernel(const ShellData &sh_data_a, const ShellD
                             });
 }
 
-LI::ERI4D2Kernel LI::deployERI4D2Kernel(const ShellPairData &sp_data_ab,
-                                        const ShellPairData &sp_data_cd)
-{
-    int la = sp_data_ab.la;
-    int lb = sp_data_ab.lb;
-    int lc = sp_data_cd.la;
-    int ld = sp_data_cd.lb;
+// LI::ERI4D2Kernel LI::deployERI4D2Kernel(const ShellPairData &sp_data_ab,
+//                                         const ShellPairData &sp_data_cd)
+// {
+//     int la = sp_data_ab.la;
+//     int lb = sp_data_ab.lb;
+//     int lc = sp_data_cd.la;
+//     int ld = sp_data_cd.lb;
 
-    // int labc = la + lb + lc;
-    // if (labc <= _max_l_rollout_)
-    //     return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
-    // else
-    return ERI4D2Kernel(sp_data_ab, sp_data_cd,
-                        [](const int ipair_ab, const int ipair_cd,
-                           const ShellPairData &sp_data_ab,
-                           const ShellPairData &sp_data_cd,
-                           const ERI4D2Kernel *eri4d2_kernel) -> arr2d<vec4d, 12, 12>
-                        {
-                            return eri4d2KernelFun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
-                                                   eri4d2_kernel);
-                        });
-}
+//     int labc = la + lb + lc;
+//     if (labc <= _max_l_rollout_)
+//         return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
+//     else
+//         return ERI4D2Kernel(sp_data_ab, sp_data_cd,
+//                             [](const int ipair_ab, const int ipair_cd,
+//                                const ShellPairData &sp_data_ab,
+//                                const ShellPairData &sp_data_cd,
+//                                const ERI4D2Kernel *eri4d2_kernel) -> arr2d<vec4d, 12, 12>
+//                             {
+//                                 return eri4d2KernelFun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd,
+//                                                        eri4d2_kernel);
+//                             });    
+// }
 
-LI::ERI3D2Kernel LI::deployERI3D2Kernel(const ShellPairData &sp_data_ab,
-                                        const ShellData &sh_data_c)
-{
-    int la = sp_data_ab.la;
-    int lb = sp_data_ab.lb;
-    int lc = sh_data_c.l;
+// LI::ERI3D2Kernel LI::deployERI3D2Kernel(const ShellPairData &sp_data_ab,
+//                                         const ShellData &sh_data_c)
+// {
+//     int la = sp_data_ab.la;
+//     int lb = sp_data_ab.lb;
+//     int lc = sh_data_c.l;
 
-    // int labc = la + lb + lc;
-    // if (labc <= _max_l_rollout_)
-    //     return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
-    // else
-    return ERI3D2Kernel(sp_data_ab, sh_data_c,
-                        [](const int ipair_ab, const int ish_c,
-                           const ShellPairData &sp_data_ab,
-                           const ShellData &sh_data_c,
-                           const ERI3D2Kernel *eri3d2_kernel) -> arr2d<vec3d, 9, 9>
-                        {
-                            return eri3d2KernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
-                                                   eri3d2_kernel);
-                        });
-}
+//     int labc = la + lb + lc;
+//     if (labc <= _max_l_rollout_)
+//         return ERI3D2Kernel(sp_data_ab, sh_data_c, eri3d2_kernelfuns.at({la, lb, lc}));
+//     else
+//         return ERI3D2Kernel(sp_data_ab, sh_data_c,
+//                             [](const int ipair_ab, const int ish_c,
+//                                const ShellPairData &sp_data_ab,
+//                                const ShellData &sh_data_c,
+//                                const ERI3D2Kernel *eri3d2_kernel) -> arr2d<vec3d, 9, 9>
+//                             {
+//                                 return eri3d2KernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
+//                                                        eri3d2_kernel);
+//                             });    
+// }
 
 LI::ERI2D2Kernel LI::deployERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b)
 {
@@ -1607,33 +1574,5 @@ LI::ERI3SOCKernel LI::deployERI3SOCKernel(const ShellPairData &sp_data_ab,
                              {
                                  return eri3socKernelFun(ipair_ab, ish_c, sp_data_ab, sh_data_c,
                                                          eri3soc_kernel);
-                             });
-}
-
-LI::ERI3D2KernelDebug LI::deployERI3D2KernelDebug(const ShellPairData &sp_data_ab,
-                                                  const ShellData &sh_data_c)
-{
-    return ERI3D2KernelDebug(sp_data_ab, sh_data_c,
-                             [](const int ipair_ab, const int ish_c,
-                                const ShellPairData &sp_data_ab,
-                                const ShellData &sh_data_c,
-                                const ERI3D2KernelDebug *eri3d2_kernel_debug) -> arr2d<vec3d, 9, 9>
-                             {
-                                 return eri3d2KernelFunDebug(ipair_ab, ish_c, sp_data_ab, sh_data_c,
-                                                             eri3d2_kernel_debug);
-                             });
-}
-
-LI::ERI2D2KernelDebug LI::deployERI2D2KernelDebug(const ShellData &sh_data_a,
-                                                  const ShellData &sh_data_b)
-{
-    return ERI2D2KernelDebug(sh_data_a, sh_data_b,
-                             [](const int ish_a, const int ish_b,
-                                const ShellData &sh_data_a,
-                                const ShellData &sh_data_b,
-                                const ERI2D2KernelDebug *eri2d2_kernel_debug) -> arr2d<vec2d, 6, 6>
-                             {
-                                 return eri2d2KernelFunDebug(ish_a, ish_b, sh_data_a, sh_data_b,
-                                                             eri2d2_kernel_debug);
                              });
 }

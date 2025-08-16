@@ -23,48 +23,12 @@ option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" OFF)
 option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
-option(LIBLE_BUILD_GPUINTS  "Build and install the GPU molecular integrals module" OFF)
 
 ### Options
 option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-if(LIBLE_BUILD_GPUINTS)
-    # Based on the boilerplate that I found from AMDs HIP course
-    if(NOT CMAKE_GPU_RUNTIME)
-        set(GPU_RUNTIME "ROCM" CACHE STRING "Switches between ROCM and CUDA")
-    else()
-        set(GPU_RUNTIME "${CMAKE_GPU_RUNTIME}" CACHE STRING "Switches between ROCM and CUDA")
-    endif()
-
-    # Should only be ROCM or CUDA, but allowing HIP because it is the currently built-in option
-    # Select with e.g., -DGPU_RUNTIME=ROCM
-    set(GPU_RUNTIMES "ROCM" "CUDA" "HIP")
-    if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-        set(ERROR_MESSAGE
-            "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP, ROCM, or CUDA.")
-        message(FATAL_ERROR ${ERROR_MESSAGE})
-    endif()
-
-    # GPU_RUNTIME should really be ROCM for AMD GPUs, so manually resetting to HIP if ROCM is selected
-    if(${GPU_RUNTIME} MATCHES "ROCM")
-        set(GPU_RUNTIME "HIP")
-    endif()
-    set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
-    enable_language(${GPU_RUNTIME})
-    set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-    set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
-
-    set(ROCMCC_FLAGS "${ROCMCC_FLAGS} ")
-    set(CUDACC_FLAGS "${CUDACC_FLAGS} ")
-    if(${GPU_RUNTIME} MATCHES "HIP")
-        set(HIPCC_FLAGS "${ROCMCC_FLAGS}")
-    else()
-        set(HIPCC_FLAGS "${CUDACC_FLAGS}")
-    endif()
-endif()
 
 ### the main target
 add_library(lible SHARED)
@@ -82,11 +46,6 @@ if(LIBLE_USE_MPI)
 	find_package(MPI REQUIRED)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_MPI_)
 	target_link_libraries(lible PRIVATE MPI::MPI_CXX)
-endif()
-
-if(LIBLE_BUILD_GPUINTS)
-	target_compile_definitions(lible PRIVATE _LIBLE_USE_HIP_)
-	target_link_libraries(lible PRIVATE lible_gpuints)
 endif()
 
 # OMP

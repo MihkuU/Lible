@@ -95,16 +95,6 @@ namespace lible
                                               const ShellData &sh_data_c,
                                               const ERI3SOCKernel *eri3soc_kernel);
 
-        arr2d<vec2d, 6, 6> eri2d2KernelFunDebug(const int ishell_a, const int ishell_b,
-                                                const ShellData &sh_data_a,
-                                                const ShellData &sh_data_b,
-                                                const ERI2D2KernelDebug *eri2d2_kernel_debug);
-
-        arr2d<vec3d, 9, 9> eri3d2KernelFunDebug(const int ipair_ab, const int ishell_c,
-                                                const ShellPairData &sp_data_ab,
-                                                const ShellData &sh_data_c,
-                                                const ERI3D2KernelDebug *eri3d2_kernel_debug);
-
         // Templated ERI kernels for limited L
 
         template <int la, int lb, int lc, int ld>

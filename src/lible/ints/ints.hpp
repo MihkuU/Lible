@@ -190,13 +190,6 @@ namespace lible
                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
-         */
-        std::array<vec2d, 3>
-        spinOrbitCoupling1ElKernelDebug(const int ipair,
-                                        const std::vector<std::array<double, 4>> &charges,
-                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
-
-        /**
          * \ingroup ints
          * Calculates the two-center ERI matrix over the auxiliary basis functions, \f$(P|Q)\f$.
          */
@@ -309,10 +302,6 @@ namespace lible
                                         const ShellData &sp_data_b);
 
         /** */
-        ERI3D2Kernel deployERI3D2Kernel(const ShellPairData &sp_data_ab,
-                                        const ShellData &sp_data_b);
-
-        /** */
         ERI2D2Kernel deployERI2D2Kernel(const ShellData &sh_data_a,
                                         const ShellData &sh_data_b);
 
@@ -327,14 +316,6 @@ namespace lible
         /** */
         ERI3SOCKernel deployERI3SOCKernel(const ShellPairData &sp_data_ab,
                                           const ShellData &sh_data_c);
-
-        /** */
-        ERI3D2KernelDebug deployERI3D2KernelDebug(const ShellPairData &sp_data_ab,
-                                                  const ShellData &sp_data_b);
-
-        /** */
-        ERI2D2KernelDebug deployERI2D2KernelDebug(const ShellData &sh_data_a,
-                                                  const ShellData &sh_data_b);
 
         /**
          * \ingroup ints
@@ -503,20 +484,5 @@ namespace lible
          * Returns a list of angular momentum pairs: {(0, 0), (1, 0), (0, 1), ..., (l_max, l_max)}.
          */
         std::vector<std::pair<int, int>> getLPairsNoSymm(const int l_max);
-
-#ifdef _LIBLE_USE_HIP_
-        namespace gpu
-        {
-            /**
-             *
-             */
-            vec2d overlap0(const Structure &structure);
-
-            /**
-             *
-             */
-            vec2d overlap(const Structure &structure);
-        }
-#endif
     }
 }

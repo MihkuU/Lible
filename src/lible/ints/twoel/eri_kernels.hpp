@@ -25,9 +25,6 @@ namespace lible
         struct ERI4SOCKernel;
         struct ERI3SOCKernel;
 
-        struct ERI3D2KernelDebug;
-        struct ERI2D2KernelDebug;
-
         using eri4_kernelfun_t = std::function<vec4d(
             const int ipair_ab, const int ipair_cd, const ShellPairData &sp_data_ab,
             const ShellPairData &sp_data_cd, const ERI4Kernel *eri4_kernel)>;
@@ -71,14 +68,6 @@ namespace lible
         using eri3soc_kernelfun_t = std::function<std::array<vec3d, 3>(
             const int ipair_ab, const int ishell_c, const ShellPairData &sp_data_ab,
             const ShellData &sh_data_c, const ERI3SOCKernel *eri3soc_kernel)>;
-
-        using eri3d2_kernelfun_debug_t = std::function<arr2d<vec3d, 9, 9>(
-            const int ipair_ab, const int ishell_c, const ShellPairData &sp_data_ab,
-            const ShellData &sh_data_c, const ERI3D2KernelDebug *eri3d2_kernel_debug)>;
-
-        using eri2d2_kernelfun_debug_t = std::function<arr2d<vec2d, 6, 6>(
-            const int ishell_a, const int ishell_b, const ShellData &sh_data_a,
-            const ShellData &sh_data_b, const ERI2D2KernelDebug *eri2d2_kernel_debug)>;
 
         struct ERI4Kernel
         {
@@ -298,48 +287,6 @@ namespace lible
             BoysGrid boys_grid;
         };
 
-        struct ERI3D2KernelDebug
-        {
-            ERI3D2KernelDebug(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
-                              const eri3d2_kernelfun_debug_t &eri3d2_kernelfun_debug);
-
-            arr2d<vec3d, 9, 9> operator()(const int ipair_ab, const int ishell_c,
-                                          const ShellPairData &sp_data_ab,
-                                          const ShellData &sh_data_c) const
-            {
-                return eri3d2_kernelfun_debug(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
-            }
-
-            double delta = 5e-5;
-
-            std::vector<double> ecoeffs0_bra;
-            std::vector<double> ecoeffs0_ket;
-            eri3d2_kernelfun_debug_t eri3d2_kernelfun_debug;
-
-            BoysGrid boys_grid;
-        };
-
-        struct ERI2D2KernelDebug
-        {
-            ERI2D2KernelDebug(const ShellData &sh_data_a, const ShellData &sh_data_b,
-                              const eri2d2_kernelfun_debug_t &eri2d2_kernelfun_debug);
-
-            arr2d<vec2d, 6, 6> operator()(const int ishell_a, const int ishell_b,
-                                          const ShellData &sh_data_a,
-                                          const ShellData &sh_data_b) const
-            {
-                return eri2d2_kernelfun_debug(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
-            }
-            
-            double delta = 5e-5;
-
-            std::vector<double> ecoeffs_bra;
-            std::vector<double> ecoeffs_ket;
-            eri2d2_kernelfun_debug_t eri2d2_kernelfun_debug;
-
-            BoysGrid boys_grid;
-        };
-
         ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
                                     const ShellPairData &sp_data_cd);
 
@@ -372,11 +319,5 @@ namespace lible
 
         ERI3SOCKernel deployERI3SOCKernel(const ShellPairData &sp_data_ab,
                                           const ShellData &sh_data_c);
-
-        ERI3D2KernelDebug deployERI3D2KernelDebug(const ShellPairData &sp_data_ab,
-                                                  const ShellData &sh_data_c);
-
-        ERI2D2KernelDebug deployERI2D2KernelDebug(const ShellData &sh_data_a,
-                                                  const ShellData &sh_data_b);
     }
 }

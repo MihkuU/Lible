@@ -4,7 +4,7 @@ def writeKernelInstantiate(la, lb):
 
 	file_str = ''
 
-	file_str += '#include <lible/ints/rints_meta.hpp>\n\n'
+	file_str += '#include <lible/ints/rints.hpp>\n\n'
 
 	file_str += instantiateR_ERI2D1(la, lb)
 
@@ -64,8 +64,7 @@ def writeKernelGenerate(la, lb):
 
 	file_str = ''
 
-	#file_str += '#include <lible/ints/utils.hpp>\n\n'
-	file_str += '#include <lible/ints/rints_meta.hpp>\n\n'
+	file_str += '#include <lible/ints/rints.hpp>\n\n'
 
 	#file_str += specializeR0(la, lb)
 
