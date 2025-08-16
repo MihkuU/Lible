@@ -379,33 +379,7 @@ namespace lible
         std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
 
         /** */
-        std::vector<lible::vec3d>
-        ecoeffsShellPair_Eij0(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                              const double *exps_a, const double *exps_b, const double *xyz_a,
-                              const double *xyz_b);
-
-        /** */
-        std::vector<lible::vec4d>
-        ecoeffsShellPair_Eijt(const int la, const int lb, const int cdepth_a, const int cdepth_b,
-                              const double *exps_a, const double *exps_b, const double *xyz_a,
-                              const double *xyz_b);
-
-        /** */
         std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);
-
-        /**
-         * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
-         * pair of Gaussian primitives in each shell pair.
-         */
-        std::vector<std::vector<vec3d>>
-        ecoeffsSPData_Eij0(const ShellPairData &sp_data);
-
-        /**
-         * Calculates the Hermite expansion coefficients { E(r, i, j, 0) | r = x,y,z } for each
-         * pair of Gaussian primitives in each shell pair.
-         */
-        std::vector<std::vector<vec4d>>
-        ecoeffsSPData_Eijt(const ShellPairData &sp_data);
 
         /** TODO: mention that c-coeffs are inside the e-coeffs!!!! */
         std::vector<double>
