@@ -92,7 +92,7 @@ namespace lible
         /**
          * Calculates the one-electron Coulombic interaction integral matrix for given point
          * charges using the erf-attenuated (screened) Coulomb operator.
-         * \param omegas vector holding the screening parameters. Has to have the same size as the 
+         * \param omegas vector holding the screening parameters. Has to have the same size as the
          * point_charges.
          */
         vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges,
@@ -212,15 +212,8 @@ namespace lible
          */
         vec4d eri4(const Structure &structure);
 
-        // /**
-        //  * \ingroup ints
-        //  * Runs a benchmark of calculating the four-center ERIs for all shell quartets,
-        //  * \f$(l_a l_b|l_c l_d)\f$ with \f$l_a \geq l_b\f$ and \f$(l_a l_b) \geq (l_c l_d)\f$.
-        //  */
-        // void eri4Benchmark(const Structure &structure);
-
         /**
-         * 
+         *
          */
         void eri4Benchmark(const Structure &structure);
 
@@ -342,6 +335,9 @@ namespace lible
         std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure);
 
         /** */
+        vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
+
+        /** */
         vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
                                  const double PA, const double PB, const double Kab);
 
@@ -350,7 +346,7 @@ namespace lible
                                     const double A, const double B, const vec3d &ecoeffs);
 
         /** */
-        vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
+        std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
@@ -362,9 +358,6 @@ namespace lible
                                                      const int lb, const double *xyz_a,
                                                      const double *xyz_b,
                                                      const std::array<lible::vec3d, 3> &ecoeffs);
-
-        /** */
-        std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
 
         /** */
         std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);

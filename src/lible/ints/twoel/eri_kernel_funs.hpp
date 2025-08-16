@@ -70,15 +70,15 @@ namespace lible
                                              const ShellData &sh_data_b,
                                              const ERI2D1Kernel *eri2d1_kernel);
 
-        arr2d<vec4d, 12, 12> eri4d2KernelFun(const int ipair_ab, const int ipair_cd,
-                                             const ShellPairData &sp_data_ab,
-                                             const ShellPairData &sp_data_cd,
-                                             const ERI4D2Kernel *eri4d2_kernel);
+        // arr2d<vec4d, 12, 12> eri4d2KernelFun(const int ipair_ab, const int ipair_cd,
+        //                                      const ShellPairData &sp_data_ab,
+        //                                      const ShellPairData &sp_data_cd,
+        //                                      const ERI4D2Kernel *eri4d2_kernel);
 
-        arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
-                                           const ShellPairData &sp_data_ab,
-                                           const ShellData &sh_data_c,
-                                           const ERI3D2Kernel *eri3d2_kernel);
+        // arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+        //                                    const ShellPairData &sp_data_ab,
+        //                                    const ShellData &sh_data_c,
+        //                                    const ERI3D2Kernel *eri3d2_kernel);
 
         arr2d<vec2d, 6, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,
                                            const ShellData &sh_data_a,
@@ -711,16 +711,16 @@ namespace lible
             return eri2_batch;
         }
 
-        template <int la, int lb, int lc>
-        arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
-                                              const ShellPairData &sp_data_ab,
-                                              const ShellData &sh_data_c,
-                                              const ERI3D2Kernel *eri3d2_kernel)
-        {
-            arr2d<vec3d, 9, 9> eri3_batch;
+        // template <int la, int lb, int lc>
+        // arr2d<vec3d, 9, 9> eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+        //                                       const ShellPairData &sp_data_ab,
+        //                                       const ShellData &sh_data_c,
+        //                                       const ERI3D2Kernel *eri3d2_kernel)
+        // {
+        //     arr2d<vec3d, 9, 9> eri3_batch;
 
-            return eri3_batch;
-        }
+        //     return eri3_batch;
+        // }
 
         template <int la, int lb>
         arr2d<vec2d, 6, 6> eri2d2KernelFun(const int ishell_a, const int ishell_b,

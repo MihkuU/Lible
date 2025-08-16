@@ -572,11 +572,11 @@ array<lible::vec3d, 9> LI::eri3d1KernelFun(const int ipair_ab, const int ishell_
     return eri3_batch;
 }
 
-lible::arr2d<lible::vec4d, 12, 12> LI::eri4d2KernelFun(const int ipair_ab, const int ipair_cd,
-                                                       const ShellPairData &sp_data_ab,
-                                                       const ShellPairData &sp_data_cd,
-                                                       const ERI4D2Kernel *eri4d2_kernel)
-{
+// lible::arr2d<lible::vec4d, 12, 12> LI::eri4d2KernelFun(const int ipair_ab, const int ipair_cd,
+//                                                        const ShellPairData &sp_data_ab,
+//                                                        const ShellPairData &sp_data_cd,
+//                                                        const ERI4D2Kernel *eri4d2_kernel)
+// {
     // const int la = sp_data_ab.la;
     // const int lb = sp_data_ab.lb;
     // const int lc = sp_data_cd.la;
@@ -680,14 +680,14 @@ lible::arr2d<lible::vec4d, 12, 12> LI::eri4d2KernelFun(const int ipair_ab, const
 
     // return eri4_batch;
 
-    return {};
-}
+//     return {};
+// }
 
-lible::arr2d<lible::vec3d, 9, 9> LI::eri3d2KernelFun(const int ipair_ab, const int ishell_c,
-                                                     const ShellPairData &sp_data_ab,
-                                                     const ShellData &sh_data_c,
-                                                     const ERI3D2Kernel *eri3d2_kernel)
-{
+// lible::arr2d<lible::vec3d, 9, 9> LI::eri3d2KernelFun(const int ipair_ab, const int ishell_c,
+//                                                      const ShellPairData &sp_data_ab,
+//                                                      const ShellData &sh_data_c,
+//                                                      const ERI3D2Kernel *eri3d2_kernel)
+// {
     // const int la = sp_data_ab.la;
     // const int lb = sp_data_ab.lb;
     // const int lc = sh_data_c.l;
@@ -910,8 +910,8 @@ lible::arr2d<lible::vec3d, 9, 9> LI::eri3d2KernelFun(const int ipair_ab, const i
 
     // return eri3_batch;
 
-    return {};
-}
+//     return {};
+// }
 
 array<lible::vec4d, 12> LI::eri4d1KernelFun(const int ipair_ab, const int ipair_cd,
                                             const ShellPairData &sp_data_ab,

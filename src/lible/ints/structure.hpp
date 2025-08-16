@@ -113,9 +113,7 @@ namespace lible
             std::map<int, std::vector<Shell>> getShellsAux() const;
 
         private:
-            bool use_ri{false};                    /** Flag for using the RI-approximation. */
-            bool prescreen_built{false};           // TODO: remove
-            bool prescreen_built_ri{false}; /** */ // TODO: remove
+            bool use_ri{false}; /** Flag for using the RI-approximation. */
 
             int max_l{};     /** Highest angular momentum among the shells of atomic orbitals. */
             int max_l_aux{}; /** Highest angular momentum among the shells of auxiliary atomic orbitals. */

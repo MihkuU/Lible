@@ -55,12 +55,6 @@ template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<0, 0, 2>(const
                                                                            const ShellData &sh_data_c,
                                                                            const ERI3D1Kernel *eri3d1_kernel);
 
-template lible::arr2d<lible::vec3d, 9, 9>
-lible::ints::eri3d2KernelFun<0, 0, 2>(const int ipair_ab, const int ishell_c,
-                                      const ShellPairData &sh_data_ab,
-                                      const ShellData &sh_data_c,
-                                      const ERI3D2Kernel *eri3d2_kernel);
-
 template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<0, 0, 2>(const int ipair_ab, const int ishell_c,
                                                                             const ShellPairData &sh_data_ab,
                                                                             const ShellData &sh_data_c,

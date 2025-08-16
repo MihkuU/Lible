@@ -20,45 +20,44 @@ namespace lible
         vec3d ecoeffsRecurrence2_n1(const double a, const double b, const int la, const int lb,
                                     const double A, const double B, const vec3d &ecoeffs0);
 
-        /** */ // TODO: have only one for all n.
-        vec3d ecoeffsRecurrence2_n2(const double a, const double b, const int la, const int lb,
-                                    const double A, const double B, const vec3d &ecoeffs1);
+        /** */
+        std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
                                                   const int lb, const double *xyz_a,
                                                   const double *xyz_b);
 
-        /** */ // TODO: have only one for all n.
+        /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
                                                      const double *xyz_b,
                                                      const std::array<lible::vec3d, 3> &ecoeffs0);
-
-        /** */ // TODO: have only one for all n.
-        std::array<vec3d, 3> ecoeffsPrimitivePair_n2(const double a, const double b, const int la,
-                                                     const int lb, const double *xyz_a, 
-                                                     const double *xyz_b,
-                                                     const std::array<lible::vec3d, 3> &ecoeffs1);
+        /** */
+        std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);
 
         /** */
-        std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
+        std::vector<double> ecoeffsSHARK(const ShellPairData &sp_data, const bool transpose = false);
 
         /** */
-        std::vector<std::vector<double>> ecoeffsShell(const int l, const std::vector<double> &exps);    
+        std::vector<double> ecoeffsSHARK(const ShellData &sh_data, const bool transpose = false);
+
+        /** */
+        std::vector<double> ecoeffsD1SHARK(const ShellPairData &sp_data, const bool transpose = false);
 
         // SHARK E-coeffs contain norms and contraction coeffs TODO: mention that.
 
-        std::vector<double>
-        ecoeffsSHARK(const ShellPairData &sp_data, const bool transpose = false);
+        // /** */
+        // vec3d ecoeffsRecurrence2_n2(const double a, const double b, const int la, const int lb,
+        //                             const double A, const double B, const vec3d &ecoeffs1);
+                
+        /** */
+        // std::array<vec3d, 3> ecoeffsPrimitivePair_n2(const double a, const double b, const int la,
+        //                                              const int lb, const double *xyz_a,
+        //                                              const double *xyz_b,
+        //                                              const std::array<lible::vec3d, 3> &ecoeffs1);
 
-        std::vector<double>
-        ecoeffsSHARK(const ShellData &sh_data, const bool transpose = false);
-
-        std::vector<double>
-        ecoeffsD1SHARK(const ShellPairData &sp_data, const bool transpose = false);     
-
-        std::vector<double> 
-        ecoeffsD2SHARK(const ShellPairData &sp_data, const bool transpose = false);
+        // /** */
+        // std::vector<double> ecoeffsD2SHARK(const ShellPairData &sp_data, const bool transpose = false);
     }
 }
