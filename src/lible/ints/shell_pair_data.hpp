@@ -8,7 +8,7 @@ namespace lible
     {
         /** \defgroup spdata */
 
-        // TODO: make variables private, add getters!
+        // TODO: make variables private, add getters?
 
         /**
          * \ingroup spdata
@@ -63,13 +63,13 @@ namespace lible
         struct ShellPairData
         {
             /** The constructor. */
-            ShellPairData(const int la, const int lb, const int n_atoms, const int n_pairs,
-                          const int n_prim_pairs, const std::vector<double> &atomic_coords,
-                          const std::vector<double> &coeffs, const std::vector<double> &coords,
-                          const std::vector<double> &exps, const std::vector<double> &norms,
-                          const std::vector<int> &atomic_idxs, const std::vector<int> &atomic_nrs,
-                          const std::vector<int> &cdepths, const std::vector<int> &coffsets,
-                          const std::vector<int> &offsets_cart,
+            ShellPairData(const bool uses_symm, const int la, const int lb, const int n_atoms,
+                          const int n_pairs, const int n_prim_pairs,
+                          const std::vector<double> &atomic_coords, const std::vector<double> &coeffs,
+                          const std::vector<double> &coords, const std::vector<double> &exps,
+                          const std::vector<double> &norms, const std::vector<int> &atomic_idxs,
+                          const std::vector<int> &atomic_nrs, const std::vector<int> &cdepths,
+                          const std::vector<int> &coffsets, const std::vector<int> &offsets_cart,
                           const std::vector<int> &offsets_ecoeffs,
                           const std::vector<int> &offsets_ecoeffs_deriv1,
                           const std::vector<int> &offsets_ecoeffs_deriv2,
@@ -84,6 +84,8 @@ namespace lible
                   offsets_norms(offsets_norms), offsets_sph(offsets_sph)
             {
             }
+
+            bool uses_symm; /** Flag indicating whether symmetry is used or not. */
 
             int la;           /** Angular momentum of the left shell. */
             int lb;           /** Angular momentum of the right shell. */
@@ -107,6 +109,12 @@ namespace lible
             std::vector<int> offsets_ecoeffs_deriv2; /** Offsets of the 2nd derivative spherical Hermite expansion coefficients. */
             std::vector<int> offsets_norms;          /** Offsets of the shell atomic orbital norms. */
             std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */
+
+            /** Returns the angular momentum pair. */
+            std::pair<int, int> getLPair() const
+            {
+                return {la, lb};
+            }
         };
 
         /**

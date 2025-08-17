@@ -244,10 +244,10 @@ LI::ShellPairData LI::shellPairData(const bool use_symm, const int la, const int
         atomic_nrs[iatom] = structure.getZ(iatom);
     }
 
-    ShellPairData sp_data(la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords, coeffs, coords,
-                          exps, norms, atomic_idxs, atomic_nrs, cdepths, coffsets, offsets_cart,
-                          offsets_ecoeffs, offsets_ecoeffs_deriv1, offsets_ecoeffs_deriv2,
-                          offsets_norms, offsets_sph);
+    ShellPairData sp_data(use_symm, la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords, coeffs,
+                          coords, exps, norms, atomic_idxs, atomic_nrs, cdepths, coffsets,
+                          offsets_cart, offsets_ecoeffs, offsets_ecoeffs_deriv1,
+                          offsets_ecoeffs_deriv2, offsets_norms, offsets_sph);
 
     return sp_data;
 }
