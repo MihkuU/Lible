@@ -28,6 +28,8 @@ namespace lible
          * the integrals. Note that to use the RI approximation, the Structure object has to be
          * initialized by providing an auxiliary basis set name. By default, RI is disabled.
          */
+        // TODO: add a flattened list of shells
+        // TODO: replace the 'coords_angstrom' with 'coords_bohr'        
         struct Structure
         {
             /** Constructur for initializing a structure object. */
@@ -132,8 +134,8 @@ namespace lible
             std::vector<std::array<double, 3>> coords_xyz; /** Coordinates of the atoms. */
             std::vector<std::string> elements;             /** Symbols of the atoms. */
 
-            std::map<int, std::vector<Shell>> shells;     /** Shells corresponding to the main basis set for each atomic number. */
-            std::map<int, std::vector<Shell>> shells_aux; /** Shells corresponding to the auxiliary basis set for each atomic number. */
+            std::map<int, std::vector<Shell>> shells;     /** Shells corresponding to the main basis set for each angular momentum. */
+            std::map<int, std::vector<Shell>> shells_aux; /** Shells corresponding to the auxiliary basis set for each angular momentum. */
 
             /**
              * Constructs the shells for the given basis. Used for both the main and auxiliary

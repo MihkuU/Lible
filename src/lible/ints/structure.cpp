@@ -261,6 +261,7 @@ void LI::Structure::constructShells(const basis_atoms_t &basis_atoms, int &max_l
 
         array<double, 3> coords_xyz{coords[3 * iatom], coords[3 * iatom + 1],
                                     coords[3 * iatom + 2]};
+                                    
         for (const auto &[angmom, shell_exps_coeffs] : basis_atom)
         {
             if (angmom > max_angmom)

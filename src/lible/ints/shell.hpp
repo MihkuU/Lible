@@ -23,7 +23,8 @@ namespace lible
          * Structure for representing a shell of atomic orbitals. Groups together various
          * data that defines a shell: angular momentum, contraction coefficients, contraction
          * exponents etc.
-         */
+         */        
+        // TODO: add a variable to indicate position in the list of shells?
         struct Shell
         {
             /** The constructor. */
@@ -33,13 +34,13 @@ namespace lible
                   const std::vector<double> &coeffs_raw, const std::vector<double> &exps,
                   const std::vector<double> &norms)
                 : l(l), z(z), atom_idx(atom_idx), dim_cart(dim_cart), dim_sph(dim_sph), pos(pos),
-                  pos_cart(pos_cart), xyz_coords(xyz_coords), coeffs(coeffs), 
+                  pos_cart(pos_cart), xyz_coords(xyz_coords), coeffs(coeffs),
                   coeffs_raw(coeffs_raw), exps(exps), norms(norms)
             {
             }
 
-						/** printing to output  */ 
-						friend std::ostream &operator<<(std::ostream &os, const Shell &obj);
+            /** printing to output */
+            friend std::ostream &operator<<(std::ostream &os, const Shell &obj); // TODO: remove?
 
             int l; /** Angular momentum. */
             int z; /** Atomic number. */
@@ -47,8 +48,8 @@ namespace lible
             int atom_idx; /** Index of the shell atom in the list of all atoms. */
             int dim_cart; /** Number of atomic orbitals in Cartesian basis. */
             int dim_sph;  /** Number of atomic orbitals in spherical basis. */
-            int pos;      /** Starting position in the list of atomic orbitals. */
-            int pos_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */            
+            int pos;      /** Starting position in the list of atomic orbitals. */ // TODO: rename to pos_sph
+            int pos_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */
 
             std::array<double, 3> xyz_coords; /** Coordinates of the atom corresponding to the shell. */
 

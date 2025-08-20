@@ -8,8 +8,6 @@ namespace lible
     {
         /** \defgroup spdata */
 
-        // TODO: make variables private, add getters?
-
         /**
          * \ingroup spdata
          *
@@ -60,6 +58,7 @@ namespace lible
          * \f$i \geq j\f$ where \f$i, j\f$ refer to the shell indices. Contains a few additional
          * gadgets that might be useful.
          */
+        // TODO: add a vector for shell indices
         struct ShellPairData
         {
             /** The constructor. */
@@ -108,7 +107,7 @@ namespace lible
             std::vector<int> offsets_ecoeffs_deriv1; /** Offsets of the 1st derivative spherical Hermite expansion coefficients. */
             std::vector<int> offsets_ecoeffs_deriv2; /** Offsets of the 2nd derivative spherical Hermite expansion coefficients. */
             std::vector<int> offsets_norms;          /** Offsets of the shell atomic orbital norms. */
-            std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */
+            std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */            
 
             /** Returns the angular momentum pair. */
             std::pair<int, int> getLPair() const
@@ -138,11 +137,11 @@ namespace lible
         /**         
          * Constructs the shell datas for the auxiliary basis set, up to max L.
          */
-        std::vector<ShellData> shellDatasAux(const Structure &structure);
+        std::vector<ShellData> shellDatasAux(const Structure &structure); // TODO: rename to shellDataAux
 
         /**
          *
          */
-        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure);
+        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure); // TODO: rename to shellPairData
     }
 }
