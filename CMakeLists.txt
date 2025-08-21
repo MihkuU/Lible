@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(lible
 	VERSION      0.0.0 
-	#LANGUAGES    CXX
+	LANGUAGES    CXX
 	DESCRIPTION  "A C++ quantum chemistry library with various usable gadgets."
 	HOMEPAGE_URL "https://github.com/MihkuU/Lible")
 

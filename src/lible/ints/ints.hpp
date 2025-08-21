@@ -28,13 +28,6 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Calculates the diagonal of the two-center ERI matrix over auxiliary basis functions,
-         * \f$(P|P)\f$.
-         */
-        std::vector<double> eri2Diagonal(const Structure &structure);
-
-        /**
-         * \ingroup ints
          * Calculates the overlap integral matrix.
          */
         vec2d overlap(const Structure &structure);
@@ -84,7 +77,7 @@ namespace lible
 
         /**
          * Calculates the one-electron Coulombic interaction integral matrix for given point
-         * charges.
+         * charges. The point charges should be given as {x, y, z, q} with coordinates in Bohr.
          */
         vec2d externalCharges(const std::vector<std::array<double, 4>> &point_charges,
                               const Structure &structure);
@@ -187,6 +180,13 @@ namespace lible
         std::array<vec2d, 3>
         spinOrbitCoupling1ElKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+        /**
+         * \ingroup ints
+         * Calculates the diagonal of the two-center ERI matrix over auxiliary basis functions,
+         * \f$(P|P)\f$.
+         */
+        std::vector<double> eri2Diagonal(const Structure &structure);
 
         /**
          * \ingroup ints

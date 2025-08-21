@@ -707,6 +707,9 @@ lible::vec2d LI::externalChargesErfKernel(const int ipair,
                                           const BoysGrid &boys_grid,
                                           const ShellPairData &sp_data)
 {
+    if (omegas.size() != charges.size())    
+        throw std::runtime_error("Number of omega values must match number of charges.");        
+
     int la = sp_data.la;
     int lb = sp_data.lb;
     int lab = la + lb;
@@ -1127,11 +1130,14 @@ LI::potentialAtExternalChargesKernel(const int ipair,
 
 std::vector<lible::vec2d>
 LI::potentialAtExternalChargesErfKernel(const int ipair,
-                                        const std::vector<std::array<double, 4>> &charges,
+                                        const vector<array<double, 4>> &charges,
                                         const vector<double> &omegas,
                                         const BoysGrid &boys_grid,
                                         const ShellPairData &sp_data)
 {
+    if (charges.size() != omegas.size())
+        throw std::runtime_error("Number of omega values must match number of charges.");
+
     int la = sp_data.la;
     int lb = sp_data.lb;
     int lab = la + lb;
@@ -1277,9 +1283,12 @@ lible::vec2d LI::externalCharges(const vector<array<double, 4>> &charges,
 }
 
 lible::vec2d LI::externalChargesErf(const vector<array<double, 4>> &charges,
-                                    const std::vector<double> &omegas,
+                                    const vector<double> &omegas,
                                     const Structure &structure)
 {
+    if (charges.size() != omegas.size())
+        throw std::runtime_error("Number of charges and omegas must match.");
+
     int l_max = structure.getMaxL();
     int dim_ao = structure.getDimAO();
 
@@ -1520,6 +1529,9 @@ lible::vec2d LI::nuclearAttraction(const Structure &structure)
 
 lible::vec2d LI::nuclearAttractionErf(const Structure &structure, const vector<double> &omegas)
 {
+    if (omegas.size() != (size_t)structure.getNAtoms())    
+        throw std::runtime_error("Number of omega values must match number of atoms.");    
+
     int l_max = structure.getMaxL();
     int dim_ao = structure.getDimAO();
 
