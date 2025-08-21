@@ -26,7 +26,14 @@ set(Tests
 	externalChargesOperatorD1Kernel
 	potentialAtExternalChargesKernel
 	potentialAtExternalChargesErfKernel
-	ERI2Diagonal)	
+	ERI2Diagonal
+	availableBasisSets
+	availableBasisSetsAux
+	purePrimitiveNorm
+	numHermites
+	cartExps
+	getLPairsSymm
+	getLPairsNoSymm)
 
 foreach(item ${Tests})
 	add_test(NAME "lible::ints::${item}" COMMAND ${CMAKE_BINARY_DIR}/testlible ${item})

@@ -23,8 +23,9 @@ namespace lible
          * Structure for representing a shell of atomic orbitals. Groups together various
          * data that defines a shell: angular momentum, contraction coefficients, contraction
          * exponents etc.
-         */        
+         */
         // TODO: add a variable to indicate position in the list of shells?
+        // TODO: remove the replace coeffs_raw with coeffs, add primitive norms.
         struct Shell
         {
             /** The constructor. */

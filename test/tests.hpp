@@ -41,5 +41,19 @@ namespace lible
 		bool potentialAtExternalChargesKernel();
 
 		bool potentialAtExternalChargesErfKernel();
+
+		bool availableBasisSets();
+
+		bool availableBasisSetsAux();
+
+		bool purePrimitiveNorm();
+
+		bool numHermites();
+
+		bool cartExps();
+
+		bool getLPairsSymm();
+
+		bool getLPairsNoSymm();
 	}
 }

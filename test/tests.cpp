@@ -1,4 +1,5 @@
 #include <tests.hpp>
+#include <available_basis_sets.hpp>
 
 #include <lible/ints/ints.hpp>
 
@@ -501,4 +502,147 @@ bool ltests::potentialAtExternalChargesErfKernel()
         return true;
     else
         return false;
+}
+
+bool ltests::availableBasisSets()
+{
+    std::set<std::string> available_basis_sets = lints::availableBasisSets();
+    
+    for (const std::string &basis_set : available_basis_sets)
+        if (basis_sets_table.contains(basis_set) == false)
+            return false;
+        
+    return true;
+}
+
+bool ltests::availableBasisSetsAux()
+{
+    std::set<std::string> available_basis_sets_aux = lints::availableBasisSetsAux();
+
+    for (const std::string &basis_set : available_basis_sets_aux)
+        if (auxbasis_sets_table.contains(basis_set) == false)
+            return false;
+        
+    return true;
+}
+
+bool ltests::purePrimitiveNorm()
+{
+    const double correct_answer = 8.063341937228;    
+
+    double exp = 1.70325241;
+    int l = 4;
+    double norm = lints::purePrimitiveNorm(exp, l);
+    
+    if (std::fabs(norm - correct_answer) < tol)
+        return true;
+    else
+        return false;    
+}
+
+bool ltests::numHermites()
+{
+    const int correct_answer = 35;
+
+    int l = 4;
+    int num_hermites = lints::numHermites(l);
+
+    return (num_hermites == correct_answer);
+}
+
+bool ltests::cartExps()
+{
+    const std::vector<std::array<int, 3>> correct_answer{
+        {5, 0, 0},
+        {4, 1, 0},
+        {4, 0, 1},
+        {3, 2, 0},
+        {3, 1, 1},
+        {3, 0, 2},
+        {2, 3, 0},
+        {2, 2, 1},
+        {2, 1, 2},
+        {2, 0, 3},
+        {1, 4, 0},
+        {1, 3, 1},
+        {1, 2, 2},
+        {1, 1, 3},
+        {1, 0, 4},
+        {0, 5, 0},
+        {0, 4, 1},
+        {0, 3, 2},
+        {0, 2, 3},
+        {0, 1, 4},
+        {0, 0, 5}};
+
+    int l = 5;
+    std::vector<std::array<int, 3>> cart_exps = lints::cartExps(l);
+    
+    return (cart_exps == correct_answer);
+}
+
+bool ltests::getLPairsSymm()
+{
+    const std::vector<std::pair<int, int>> correct_answer{
+        {0, 0},
+        {1, 0},
+        {1, 1},
+        {2, 0},
+        {2, 1},
+        {2, 2},
+        {3, 0},
+        {3, 1},
+        {3, 2},
+        {3, 3},
+        {4, 0},
+        {4, 1},
+        {4, 2},
+        {4, 3},
+        {4, 4},
+        {5, 0},
+        {5, 1},
+        {5, 2},
+        {5, 3},
+        {5, 4},
+        {5, 5}};
+
+    int l_max = 5;
+    std::vector<std::pair<int, int>> l_pairs = lints::getLPairsSymm(l_max);
+
+    return (l_pairs == correct_answer);
+}
+
+bool ltests::getLPairsNoSymm()
+{
+    const std::vector<std::pair<int, int>> correct_answer{
+        {0, 0},
+        {0, 1},
+        {0, 2},
+        {0, 3},
+        {0, 4},
+        {1, 0},
+        {1, 1},
+        {1, 2},
+        {1, 3},
+        {1, 4},
+        {2, 0},
+        {2, 1},
+        {2, 2},
+        {2, 3},
+        {2, 4},
+        {3, 0},
+        {3, 1},
+        {3, 2},
+        {3, 3},
+        {3, 4},
+        {4, 0},
+        {4, 1},
+        {4, 2},
+        {4, 3},
+        {4, 4}};
+
+    int l_max = 4;
+    std::vector<std::pair<int, int>> l_pairs = lints::getLPairsNoSymm(l_max);
+
+    return (l_pairs == correct_answer);
 }

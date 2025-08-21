@@ -59,6 +59,7 @@ namespace lible
          * gadgets that might be useful.
          */
         // TODO: add a vector for shell indices
+        // TODO: add ctors for Structure and shells.
         struct ShellPairData
         {
             /** The constructor. */
@@ -121,7 +122,7 @@ namespace lible
          *
          * Constructs the shell data corresponding to the auxilary basis set.
          */
-        ShellData shellDataAux(const int l, const Structure &structure);
+        ShellData shellDataAux(const int l, const Structure &structure); // TODO: remove
 
         /**
          * \ingroup spdata
@@ -132,16 +133,16 @@ namespace lible
          * irrespective of whether symmetry is used or not.
          */
         ShellPairData shellPairData(const bool use_symm, const int la, const int lb,
-                                    const Structure &structure);
+                                    const Structure &structure); // TODO: remove
 
         /**         
          * Constructs the shell datas for the auxiliary basis set, up to max L.
          */
-        std::vector<ShellData> shellDatasAux(const Structure &structure); // TODO: rename to shellDataAux
+        std::vector<ShellData> shellDatasAux(const Structure &structure); // TODO: rename to shellDataAux // TODO: remove
 
         /**
          *
          */
-        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure); // TODO: rename to shellPairData
+        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure); // TODO: rename to shellPairData // TODO: remove
     }
 }
