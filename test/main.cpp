@@ -51,8 +51,6 @@ int main(int argc, char **argv)
         success = lible::tests::potentialAtExternalChargesKernel();
     else if (test_name == "potentialAtExternalChargesErfKernel")
         success = lible::tests::potentialAtExternalChargesErfKernel();
-    else if (test_name == "ERI2Diagonal")
-        success = lible::tests::eri2Diagonal();
     else if (test_name == "availableBasisSets")
         success = lible::tests::availableBasisSets();
     else if (test_name == "availableBasisSetsAux")
@@ -67,6 +65,70 @@ int main(int argc, char **argv)
         success = lible::tests::getLPairsSymm();
     else if (test_name == "getLPairsNoSymm")
         success = lible::tests::getLPairsNoSymm();
+    else if (test_name == "dipoleMoment")
+        success = lible::tests::dipoleMoment();
+    else if (test_name == "dipoleMomentKernel")
+        success = lible::tests::dipoleMomentKernel();
+    else if (test_name == "spinOrbitCoupling1El")
+        success = lible::tests::spinOrbitCoupling1El();
+    else if (test_name == "spinOrbitCoupling1ElKernel")
+        success = lible::tests::spinOrbitCoupling1ElKernel();
+    else if (test_name == "eri2Diagonal")
+        success = lible::tests::eri2Diagonal();
+    else if (test_name == "eri2")
+        success = lible::tests::eri2();
+    else if (test_name == "eri4Diagonal")
+        success = lible::tests::eri4Diagonal();
+    else if (test_name == "eri3")
+        success = lible::tests::eri3();
+    else if (test_name == "eri4")
+        success = lible::tests::eri4();
+    else if (test_name == "basisForAtom")
+        success = lible::tests::basisForAtom();
+    else if (test_name == "basisForAtomAux")
+        success = lible::tests::basisForAtomAux();
+    else if (test_name == "basisForAtoms")
+        success = lible::tests::basisForAtoms();
+    else if (test_name == "basisForAtomsAux")
+        success = lible::tests::basisForAtomsAux();
+    else if (test_name == "sphericalTrafo")
+        success = lible::tests::sphericalTrafo();
+    else if (test_name == "deployERI4Kernel")
+        success = lible::tests::deployERI4Kernel();
+    else if (test_name == "deployERI3Kernel")
+        success = lible::tests::deployERI3Kernel();
+    else if (test_name == "deployERI2Kernel")
+        success = lible::tests::deployERI2Kernel();
+    else if (test_name == "deployERI4D1Kernel")
+        success = lible::tests::deployERI4D1Kernel();
+    else if (test_name == "deployERI3D1Kernel")
+        success = lible::tests::deployERI3D1Kernel();
+    else if (test_name == "deployERI2D1Kernel")
+        success = lible::tests::deployERI2D1Kernel();
+    else if (test_name == "deployERI2D2Kernel")
+        success = lible::tests::deployERI2D2Kernel();
+    else if (test_name == "deployERI4SOCKernel")
+        success = lible::tests::deployERI4SOCKernel();
+    else if (test_name == "deployERI3SOCKernel")
+        success = lible::tests::deployERI3SOCKernel();
+    else if (test_name == "ecoeffsRecurrence1")
+        success = lible::tests::ecoeffsRecurrence1();
+    else if (test_name == "ecoeffsRecurrence2")
+        success = lible::tests::ecoeffsRecurrence2();
+    else if (test_name == "ecoeffsRecurrence2_n1")  
+        success = lible::tests::ecoeffsRecurrence2_n1();
+    else if (test_name == "ecoeffsPrimitive")
+        success = lible::tests::ecoeffsPrimitive();
+    else if (test_name == "ecoeffsPrimitivePair")
+        success = lible::tests::ecoeffsPrimitivePair();
+    else if (test_name == "ecoeffsPrimitivePair_n1")
+        success = lible::tests::ecoeffsPrimitivePair_n1();
+    else if (test_name == "ecoeffsShell")
+        success = lible::tests::ecoeffsShell();
+    else if (test_name == "calcBoysF")
+        success = lible::tests::calcBoysF();
+    else if (test_name == "calcRInts3D")
+        success = lible::tests::calcRInts3D();
     else
         throw std::runtime_error(std::format("Invalid test name specified: {}", test_name));
 

@@ -2,58 +2,120 @@
 
 namespace lible
 {
-	namespace tests
-	{
-		bool numCartesians();	
+    namespace tests
+    {
+        bool overlap();
 
-		bool numSphericals();
+        bool overlapKernel();
 
-		bool eri2Diagonal();
+        bool overlapD1Kernel();
 
-		bool overlap();
+        bool kineticEnergy();
 
-		bool overlapKernel();
+        bool kineticEnergyKernel();
 
-		bool overlapD1Kernel(); 
+        bool kineticEnergyD1Kernel();
 
-		bool kineticEnergy();
+        bool nuclearAttraction();
 
-		bool kineticEnergyKernel();
+        bool nuclearAttractionErf();
 
-		bool kineticEnergyD1Kernel();
+        bool externalCharges();
 
-		bool nuclearAttraction();
+        bool externalChargesErf();
 
-		bool nuclearAttractionErf();
+        bool externalChargesKernel();
 
-		bool externalCharges();
+        bool externalChargesErfKernel();
 
-		bool externalChargesErf();
+        bool externalChargesD1Kernel();
 
-		bool externalChargesKernel();
+        bool externalChargesOperatorD1Kernel();
 
-		bool externalChargesErfKernel();
+        bool potentialAtExternalChargesKernel();
 
-		bool externalChargesD1Kernel();
+        bool potentialAtExternalChargesErfKernel();
 
-		bool externalChargesOperatorD1Kernel();
+        bool dipoleMoment();
 
-		bool potentialAtExternalChargesKernel();
+        bool dipoleMomentKernel();
 
-		bool potentialAtExternalChargesErfKernel();
+        bool spinOrbitCoupling1El();
 
-		bool availableBasisSets();
+        bool spinOrbitCoupling1ElKernel();
 
-		bool availableBasisSetsAux();
+        bool eri2Diagonal();
 
-		bool purePrimitiveNorm();
+        bool eri2();
 
-		bool numHermites();
+        bool eri4Diagonal();
 
-		bool cartExps();
+        bool eri3();
+        
+        bool eri4();
 
-		bool getLPairsSymm();
+        bool basisForAtom();
 
-		bool getLPairsNoSymm();
-	}
+        bool basisForAtomAux();
+
+        bool basisForAtoms();
+
+        bool basisForAtomsAux();
+        
+        bool availableBasisSets();
+
+        bool availableBasisSetsAux();
+
+        bool sphericalTrafo();
+
+        bool deployERI4Kernel();
+
+        bool deployERI3Kernel();
+
+        bool deployERI2Kernel();
+
+        bool deployERI4D1Kernel();
+
+        bool deployERI3D1Kernel();
+
+        bool deployERI2D1Kernel();
+
+        bool deployERI2D2Kernel();
+
+        bool deployERI4SOCKernel();        
+
+        bool deployERI3SOCKernel();
+
+        bool ecoeffsRecurrence1();
+
+        bool ecoeffsRecurrence2();
+
+        bool ecoeffsRecurrence2_n1();
+
+        bool ecoeffsPrimitive();
+
+        bool ecoeffsPrimitivePair();
+
+        bool ecoeffsPrimitivePair_n1();
+
+        bool ecoeffsShell();
+
+        bool calcBoysF();
+
+        bool calcRInts3D();
+
+        bool purePrimitiveNorm();
+
+        bool numCartesians();
+
+        bool numSphericals();
+
+        bool numHermites();
+
+        bool cartExps();
+
+        bool getLPairsSymm();
+
+        bool getLPairsNoSymm();
+    }
 }

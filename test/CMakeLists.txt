@@ -26,9 +26,40 @@ set(Tests
 	externalChargesOperatorD1Kernel
 	potentialAtExternalChargesKernel
 	potentialAtExternalChargesErfKernel
-	ERI2Diagonal
+	dipoleMoment
+	dipoleMomentKernel
+	spinOrbitCoupling1El
+	spinOrbitCoupling1ElKernel
+	eri2Diagonal
+	eri2
+	eri4Diagonal
+	eri3
+	eri4
 	availableBasisSets
 	availableBasisSetsAux
+	basisForAtom
+	basisForAtomAux
+	basisForAtoms
+	basisForAtomsAux
+	deployERI4Kernel
+	deployERI3Kernel
+	deployERI2Kernel
+	deployERI4D1Kernel
+	deployERI3D1Kernel
+	deployERI2D1Kernel
+	deployERI2D2Kernel
+	deployERI4SOCKernel
+	deployERI3SOCKernel
+	ecoeffsRecurrence1
+	ecoeffsRecurrence2
+	ecoeffsRecurrence2_n1
+	ecoeffsPrimitive
+	ecoeffsPrimitivePair
+	ecoeffsPrimitivePair_n1
+	ecoeffsShell
+	calcBoysF
+	calcRInts3D
+	sphericalTrafo
 	purePrimitiveNorm
 	numHermites
 	cartExps

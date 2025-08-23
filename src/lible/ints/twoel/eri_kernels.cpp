@@ -1276,34 +1276,6 @@ LI::ERI2D1Kernel::ERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_d
     boys_grid = BoysGrid(lab + 1);
 }
 
-// LI::ERI4D2Kernel::ERI4D2Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
-//                                const eri4d2_kernelfun_t &eri4d2_kernelfun)
-//     : eri4d2_kernelfun(eri4d2_kernelfun)
-// {
-//     ecoeffs0_bra = ecoeffsSHARK(sp_data_ab, false);
-//     ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab, false);
-//     ecoeffs2_bra = ecoeffsD2SHARK(sp_data_ab, false);
-//     ecoeffs0_ket = ecoeffsSHARK(sp_data_cd, true);
-//     ecoeffs1_ket = ecoeffsD1SHARK(sp_data_cd, true);
-//     ecoeffs2_ket = ecoeffsD2SHARK(sp_data_cd, true);
-
-//     int labcd = sp_data_ab.la + sp_data_ab.lb + sp_data_cd.la + sp_data_cd.lb;
-//     boys_grid = BoysGrid(labcd + 2);
-// }
-
-// LI::ERI3D2Kernel::ERI3D2Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
-//                                const eri3d2_kernelfun_t &eri3d2_kernelfun)
-//     : eri3d2_kernelfun(eri3d2_kernelfun)
-// {
-//     ecoeffs0_bra = ecoeffsSHARK(sp_data_ab, false);
-//     ecoeffs1_bra = ecoeffsD1SHARK(sp_data_ab, false);
-//     ecoeffs2_bra = ecoeffsD2SHARK(sp_data_ab, false);
-//     ecoeffs0_ket = ecoeffsSHARK(sh_data_c, true);
-
-//     int labc = sp_data_ab.la + sp_data_ab.lb + sh_data_c.l;
-//     boys_grid = BoysGrid(labc + 2);
-// }
-
 LI::ERI2D2Kernel::ERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
                                const eri2d2_kernelfun_t &eri2d2_kernelfun)
     : eri2d2_kernelfun(eri2d2_kernelfun)

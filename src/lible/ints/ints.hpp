@@ -295,13 +295,14 @@ namespace lible
         ERI3D1Kernel deployERI3D1Kernel(const ShellPairData &sp_data_ab,
                                         const ShellData &sp_data_b);
 
-        /** */
-        ERI2D2Kernel deployERI2D2Kernel(const ShellData &sh_data_a,
-                                        const ShellData &sh_data_b);
 
         /** */
         ERI2D1Kernel deployERI2D1Kernel(const ShellData &sp_data_a,
                                         const ShellData &sp_data_b);
+
+        /** */
+        ERI2D2Kernel deployERI2D2Kernel(const ShellData &sh_data_a,
+                                        const ShellData &sh_data_b);
 
         /** */
         ERI4SOCKernel deployERI4SOCKernel(const ShellPairData &sp_data_ab,
@@ -315,24 +316,24 @@ namespace lible
          * \ingroup ints
          * Constructs the shell data corresponding to the auxilary basis set.
          */
-        ShellData shellDataAux(const int l, const Structure &structure);
+        ShellData shellDataAux(const int l, const Structure &structure); // TODO:....
 
         /**
          *
          */
         ShellPairData shellPairData(const bool use_symm, const int la, const int lb,
-                                    const Structure &structure);
+                                    const Structure &structure); // TODO:....
 
         /**
          * \ingroup ints
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
          */
-        std::vector<ShellData> shellDatasAux(const Structure &structure);
+        std::vector<ShellData> shellDatasAux(const Structure &structure); // TODO:....
 
         /**
          *
          */
-        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure);
+        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure); // TODO:....
 
         /** */
         vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
@@ -352,7 +353,7 @@ namespace lible
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,
                                                   const int lb, const double *xyz_a,
                                                   const double *xyz_b);
-
+ 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair_n1(const double a, const double b, const int la,
                                                      const int lb, const double *xyz_a,
