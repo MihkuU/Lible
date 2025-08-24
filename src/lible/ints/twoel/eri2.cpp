@@ -49,6 +49,7 @@ lible::vec2d LI::eri2(const Structure &structure)
 
             ERI2Kernel eri2_kernel = deployERI2Kernel(sh_data_a, sh_data_b);
 
+#pragma omp parallel for
             for (int ishell_a = 0; ishell_a < sh_data_a.n_shells; ishell_a++)
             {
                 int bound_b = (la == lb) ? ishell_a + 1 : sh_data_b.n_shells;
@@ -89,6 +90,7 @@ vector<double> LI::eri2Diagonal(const Structure &structure)
 
         ERI2Kernel eri2_kernel = deployERI2Kernel(sh_data_a, sh_data_a);
 
+#pragma omp parallel for        
         for (int ishell = 0; ishell < sh_data_a.n_shells; ishell++)
         {
             vec2d eri2_batch = eri2_kernel(ishell, ishell, sh_data_a, sh_data_a);

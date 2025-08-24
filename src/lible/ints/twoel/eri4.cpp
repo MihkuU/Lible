@@ -62,6 +62,7 @@ lible::vec4d LI::eri4(const Structure &structure)
 
             ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
 
+#pragma omp parallel for            
             for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
             {
                 int bound_cd = (ispdata_ab == isp_data_cd) ? ipair_ab + 1 : sp_data_cd.n_pairs;
@@ -168,6 +169,7 @@ lible::vec2d LI::eri4Diagonal(const Structure &structure)
 
         ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_ab);
 
+#pragma omp parallel for        
         for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
         {
             vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_ab, sp_data_ab, sp_data_ab);

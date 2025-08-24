@@ -148,8 +148,6 @@ lints::ShellPairData::ShellPairData(const bool use_symm, const int la, const int
         const int cdepth_b = shell_b.coeffs.size();
         const int cdepth_ab = cdepth_a * cdepth_b;
 
-        // printf("ipair = %d, cdepth_a = %d, cdepth_b = %d\n", ipair, cdepth_a, cdepth_b);
-
         atomic_idxs[2 * ipair + 0] = shell_a.atom_idx;
         atomic_idxs[2 * ipair + 1] = shell_b.atom_idx;
         cdepths[2 * ipair + 0] = cdepth_a;

@@ -31,6 +31,7 @@ lible::vec3d LI::eri3(const Structure &structure)
 
             ERI3Kernel eri3_kernel = deployERI3Kernel(sp_data_ab, sh_data_c);
 
+#pragma omp parallel for            
             for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
                 for (int ishell_c = 0; ishell_c < sh_data_c.n_shells; ishell_c++)
                 {

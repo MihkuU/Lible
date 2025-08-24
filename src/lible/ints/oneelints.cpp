@@ -261,33 +261,7 @@ lible::vec2d LI::overlap(const Structure &structure)
         {
             ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
 
-            ////////////////////////////////////
-            double sum_coeffs = 0;
-            double sum_coords = 0;
-            double sum_exps = 0;
-            double sum_norms = 0;
-            for (double c : sp_data.coeffs)
-                sum_coeffs += std::fabs(c);
-            for (double c : sp_data.coords)
-                sum_coords += std::fabs(c);
-            for (double c : sp_data.exps)
-                sum_exps += std::fabs(c);
-            for (double c : sp_data.norms)
-                sum_norms += std::fabs(c);
-
-            printf("n_coeffs = %d\n", sp_data.coeffs.size());
-            printf("n_coords = %d\n", sp_data.coords.size());
-            printf("n_exps = %d\n", sp_data.exps.size());
-            printf("n_norms = %d\n", sp_data.norms.size());
-            
-            printf("sp_data.n_pairs = %d, sp_data.n_prim_pairs = %d, la = %d, lb = %d\n",
-                   sp_data.n_pairs, sp_data.n_prim_pairs, la, lb);
-            printf("sum_coeffs = %16.12lf\n", sum_coeffs);
-            printf("sum_coords = %16.12lf\n", sum_coords);
-            printf("sum_exps = %16.12lf\n", sum_exps);
-            printf("sum_norms = %16.12lf\n", sum_norms);
-            ////////////////////////////////////
-
+#pragma omp parallel for
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 vec2d ints_ipair = overlapKernel(ipair, sp_data);
@@ -486,6 +460,8 @@ lible::vec2d LI::kineticEnergy(const Structure &structure)
         for (int lb = la; lb >= 0; lb--)
         {
             ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
+
+#pragma omp parallel for            
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 vec2d ints_ipair = kineticEnergyKernel(ipair, sp_data);
@@ -619,6 +595,8 @@ array<lible::vec2d, 3> LI::dipoleMoment(const array<double, 3> &origin,
         for (int lb = la; lb >= 0; lb--)
         {
             ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
+
+#pragma omp parallel for            
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 array<vec2d, 3> ints_ipair = dipoleMomentKernel(ipair, origin, sp_data);
@@ -1372,6 +1350,7 @@ array<lible::vec2d, 3> LI::spinOrbitCoupling1El(const Structure &structure)
             int lab = la + lb;
             BoysGrid boys_grid(lab + 1);
 
+#pragma omp parallel for            
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 array<vec2d, 3> ints_batch = spinOrbitCoupling1ElKernel(ipair, charges, boys_grid,
@@ -1537,6 +1516,7 @@ lible::vec2d LI::nuclearAttraction(const Structure &structure)
             int lab = la + lb;
             BoysGrid boys_grid(lab);
 
+#pragma omp parallel for            
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 vec2d ints_ipair = externalChargesKernel(ipair, charges, boys_grid, sp_data);
@@ -1582,6 +1562,7 @@ lible::vec2d LI::nuclearAttractionErf(const Structure &structure, const vector<d
             int lab = la + lb;
             BoysGrid boys_grid(lab);
 
+#pragma omp parallel for            
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
             {
                 vec2d ints_ipair = externalChargesErfKernel(ipair, charges, omegas, boys_grid, sp_data);

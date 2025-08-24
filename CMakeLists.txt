@@ -50,8 +50,7 @@ endif()
 
 # OMP
 find_package(OpenMP REQUIRED)
-target_compile_options(lible PRIVATE ${OpenMP_CXX_FLAGS})
-target_link_libraries(lible PRIVATE ${OpenMP_CXX_FLAGS})
+target_link_libraries(lible PRIVATE OpenMP::OpenMP_CXX)
 
 # BLAS/LAPACK
 find_package(MKL QUIET)

@@ -210,13 +210,14 @@ vector<double> LI::ecoeffsSHARK(const ShellData &sh_data, const bool transpose)
     const int n_sph = numSphericals(l);
     const int n_hermite = numHermites(l);
     const int n_ecoeffs_pp = n_sph * n_hermite;
-    const int n_ecoeffs = sh_data.n_primitives * n_ecoeffs_pp;    
+    const int n_ecoeffs = sh_data.n_primitives * n_ecoeffs_pp;
 
     const auto &cart_exps = cartExps(l);
     const vec3i tuv_poss = getHermiteGaussianPositions(l);
     const vector<tuple<int, int, double>> sph_trafo = sphericalTrafo(l);
 
     vector<double> ecoeffs(n_ecoeffs, 0);
+#pragma omp parallel for
     for (int ishell = 0; ishell < sh_data.n_shells; ishell++)
     {
         int cdepth = sh_data.cdepths[ishell];
@@ -232,7 +233,7 @@ vector<double> LI::ecoeffsSHARK(const ShellData &sh_data, const bool transpose)
             double a = sh_data.exps[cofs + ia];
             double d = sh_data.coeffs[cofs + ia];
 
-            auto [Ex, Ey, Ez] = ecoeffsPrimitive(a, l);            
+            auto [Ex, Ey, Ez] = ecoeffsPrimitive(a, l);
 
             int ofs = offset_ecoeffs + ia * n_sph * n_hermite;
             for (auto &[a, a_, val] : sph_trafo)
@@ -249,7 +250,7 @@ vector<double> LI::ecoeffsSHARK(const ShellData &sh_data, const bool transpose)
                             int idx;
                             if (transpose)
                                 idx = ofs + tuv * n_sph + a;
-                            else 
+                            else
                                 idx = ofs + a * n_hermite + tuv;
 
                             ecoeffs[idx] += ecoeff;
@@ -276,10 +277,11 @@ vector<double> LI::ecoeffsSHARK(const ShellPairData &sp_data, const bool transpo
     const vector<tuple<int, int, double>> sph_trafo_a = sphericalTrafo(la);
     const vector<tuple<int, int, double>> sph_trafo_b = sphericalTrafo(lb);
     const auto &cart_exps_a = cartExps(la);
-    const auto &cart_exps_b = cartExps(lb);        
+    const auto &cart_exps_b = cartExps(lb);
     const vec3i tuv_poss = getHermiteGaussianPositions(lab);
 
     vector<double> ecoeffs(n_ecoeffs * sp_data.n_prim_pairs, 0);
+#pragma omp parallel for
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
         int cdepth_a = sp_data.cdepths[2 * ipair + 0];
@@ -331,12 +333,12 @@ vector<double> LI::ecoeffsSHARK(const ShellPairData &sp_data, const bool transpo
                     for (int a = 0; a < n_sph_a; a++)
                         for (int tuv = 0; tuv < n_hermite; tuv++)
                         {
-                            int ab = a * n_sph_b + b;                            
+                            int ab = a * n_sph_b + b;
 
                             int idx;
                             if (transpose)
                                 idx = ofs + tuv * n_sph_ab + ab;
-                            else 
+                            else
                                 idx = ofs + ab * n_hermite + tuv;
 
                             ecoeffs[idx] += norms_a[a] * norms_b[b] * dadb * val *
@@ -368,6 +370,7 @@ vector<double> LI::ecoeffsD1SHARK(const ShellPairData &sp_data, const bool trans
     const auto &cart_exps_b = cartExps(lb);
 
     vector<double> ecoeffs_100_010_001(n_ecoeffs_prims, 0);
+#pragma omp parallel for
     for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
     {
         int cdepth_a = sp_data.cdepths[2 * ipair + 0];
@@ -381,7 +384,7 @@ vector<double> LI::ecoeffsD1SHARK(const ShellPairData &sp_data, const bool trans
         int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
         int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
         const double *norms_a = &sp_data.norms[ofs_norm_a];
-        const double *norms_b = &sp_data.norms[ofs_norm_b];        
+        const double *norms_b = &sp_data.norms[ofs_norm_b];
 
         int offset_ecoeffs = sp_data.offsets_ecoeffs_deriv1[ipair];
 
@@ -431,7 +434,7 @@ vector<double> LI::ecoeffsD1SHARK(const ShellPairData &sp_data, const bool trans
                         for (int tuv = 0; tuv < n_hermite_ab; tuv++)
                         {
                             int ab = a * n_sph_b + b;
-                            
+
                             int idx_100, idx_010, idx_001;
                             if (transpose)
                             {
@@ -444,7 +447,7 @@ vector<double> LI::ecoeffsD1SHARK(const ShellPairData &sp_data, const bool trans
                                 idx_100 = ofs_100 + ab * n_hermite_ab + tuv;
                                 idx_010 = ofs_010 + ab * n_hermite_ab + tuv;
                                 idx_001 = ofs_001 + ab * n_hermite_ab + tuv;
-                            } 
+                            }
 
                             double NaNb = norms_a[a] * norms_b[b];
 
