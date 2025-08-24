@@ -14,52 +14,57 @@ namespace lible::tests
 
     // CO2-
     std::vector<int> atomic_nrs_co2{6, 8, 8};
-    std::vector<double> coords_co2{0.00000, 0.00000, 0.32942,
-                                   0.00000, 1.15362, -0.12353,
-                                   0.00000, -1.15362, -0.12353};
+    std::vector<std::array<double, 3>> coords_co2{
+        {0.00000, 0.00000, 0.32942},
+        {0.00000, 1.15362, -0.12353},
+        {0.00000, -1.15362, -0.12353}};
 
     // Ethane
     std::vector<int> atomic_nrs_c2h6{1, 6, 1, 1, 6, 1, 1, 1};
-    std::vector<double> coords_c2h6{
-        1.1851, -0.0039, 0.9875,
-        0.7516, -0.0225, -0.0209,
-        1.1669, 0.8330, -0.5693,
-        1.1155, -0.9329, -0.5145,
-        -0.7516, 0.0225, 0.0209,
-        -1.1669, -0.8334, 0.5687,
-        -1.1157, 0.9326, 0.5151,
-        -1.1850, 0.0044, -0.9875};
+    std::vector<std::array<double, 3>> coords_c2h6{
+        {1.1851, -0.0039, 0.9875},
+        {0.7516, -0.0225, -0.0209},
+        {1.1669, 0.8330, -0.5693},
+        {1.1155, -0.9329, -0.5145},
+        {-0.7516, 0.0225, 0.0209},
+        {-1.1669, -0.8334, 0.5687},
+        {-1.1157, 0.9326, 0.5151},
+        {-1.1850, 0.0044, -0.9875}};
 
     // FeH6
-    std::vector<int> atomic_nrs_feh{26, 1};
-    std::vector<double> coords_feh{-0.00000000700783, -0.00000000961045, -0.00000001699045,
-                                   -1.90000000000000, -0.06531984963340, 0.06531987277077,
-                                   1.90000000000000, 0.06531978816537, -0.06531984034895,
-                                   -0.06531980735085, -1.69016064020970, 0.06531920821976,
-                                   0.06531974281206, 1.69016062544695, -0.06531916850398,
-                                   0.06531985909338, 0.06531923539693, -1.69016066429686,
-                                   -0.06531977461945, -0.06531914955570, 1.69016060914971};
+    std::vector<int> atomic_nrs_feh6{26, 1, 1, 1, 1, 1, 1};
+    std::vector<std::array<double, 3>> coords_feh6{
+        {-0.00000000700783, -0.00000000961045, -0.00000001699045},
+        {-1.90000000000000, -0.06531984963340, 0.06531987277077},
+        {1.90000000000000, 0.06531978816537, -0.06531984034895},
+        {-0.06531980735085, -1.69016064020970, 0.06531920821976},
+        {0.06531974281206, 1.69016062544695, -0.06531916850398},
+        {0.06531985909338, 0.06531923539693, -1.69016066429686},
+        {-0.06531977461945, -0.06531914955570, 1.69016060914971}};
 
     // Ethylene
     std::vector<int> atomic_nrs_c2h4{6, 6, 1, 1, 1, 1};
-    std::vector<double> coords_c2h4{3.402, 0.773, -9.252,
-                                    4.697, 0.791, -8.909,
-                                    2.933, -0.150, -9.521,
-                                    2.837, 1.682, -9.258,
-                                    5.262, -0.118, -8.904,
-                                    5.167, 1.714, -8.641};
+    std::vector<std::array<double, 3>> coords_c2h4{
+        {3.402, 0.773, -9.252},
+        {4.697, 0.791, -8.909},
+        {2.933, -0.150, -9.521},
+        {2.837, 1.682, -9.258},
+        {5.262, -0.118, -8.904},
+        {5.167, 1.714, -8.641}};
 
     // H2O
     std::vector<int> atomic_nrs_h2o{8, 1, 1};
-    std::vector<double> coords_h2o{0.0, 0.0, 0.0,
-                                   0.757, 0.586, 0.0,
-                                   -0.757, 0.586, 0.0};
+    std::vector<std::array<double, 3>> coords_h2o{
+        {0.0, 0.0, 0.0},
+        {0.757, 0.586, 0.0},
+        {-0.757, 0.586, 0.0}};
 
     // Ozone
     std::vector<int> atomic_nrs_o3{8, 8, 8};
-    std::vector<double> coords_o3{0, 0, 0,
-                                  0, 1, 1,
-                                  0, 0, 2};
+    std::vector<std::array<double, 3>> coords_o3{
+        {0, 0, 0},
+        {0, 1, 1},
+        {0, 0, 2}};
 }
 
 bool ltests::numCartesians()
@@ -129,7 +134,7 @@ bool ltests::overlapKernel()
     const double correct_answer = 137.049592196795;
 
     lints::Structure structure("cc-pvdz", atomic_nrs_c2h4, coords_c2h4);
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     double sum_sints = 0;
     for (const auto &sp_data : shell_pair_datas)
@@ -153,7 +158,7 @@ bool ltests::overlapD1Kernel()
     const double correct_answer = 712.697494155785;
 
     lints::Structure structure("cc-pvdz", atomic_nrs_c2h4, coords_c2h4);
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     double sum_sints = 0;
     for (const auto &sp_data : shell_pair_datas)
@@ -196,7 +201,7 @@ bool ltests::kineticEnergyKernel()
     const double correct_answer = 252.755644635020;
 
     lints::Structure structure("cc-pvdz", atomic_nrs_c2h4, coords_c2h4);
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     double sum_tints = 0;
     for (const auto &sp_data : shell_pair_datas)
@@ -220,7 +225,7 @@ bool ltests::kineticEnergyD1Kernel()
     const double correct_answer = 1153.592041307788;
 
     lints::Structure structure("cc-pvdz", atomic_nrs_c2h4, coords_c2h4);
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     double sum_tints = 0;
     for (const auto &sp_data : shell_pair_datas)
@@ -324,7 +329,7 @@ bool ltests::externalChargesKernel()
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     std::vector<std::array<double, 4>> charges = structure.getZs();
 
@@ -357,7 +362,7 @@ bool ltests::externalChargesErfKernel()
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     std::vector<std::array<double, 4>> charges = structure.getZs();
     std::vector<double> omegas = {1.2, -10.5, 0.031};
@@ -392,7 +397,7 @@ bool ltests::externalChargesD1Kernel()
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     std::vector<std::array<double, 4>> charges = structure.getZs();
 
@@ -427,7 +432,7 @@ bool ltests::externalChargesOperatorD1Kernel()
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     std::vector<std::array<double, 4>> charges = structure.getZs();
 
@@ -463,7 +468,7 @@ bool ltests::potentialAtExternalChargesKernel()
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     std::vector<std::array<double, 4>> charges = structure.getZs();
 
@@ -479,10 +484,10 @@ bool ltests::potentialAtExternalChargesKernel()
             std::vector<lible::vec2d> ecints =
                 lints::potentialAtExternalChargesKernel(ipair, charges, boys_grid, sp_data);
 
-            for (const auto &ecints_at_charge : ecints)            
+            for (const auto &ecints_at_charge : ecints)
                 for (size_t a = 0; a < ecints_at_charge.dim<0>(); a++)
                     for (size_t b = 0; b < ecints_at_charge.dim<1>(); b++)
-                        sum_ecints += std::fabs(ecints_at_charge(a, b));            
+                        sum_ecints += std::fabs(ecints_at_charge(a, b));
         }
     }
 
@@ -498,7 +503,7 @@ bool ltests::potentialAtExternalChargesErfKernel()
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     std::vector<std::array<double, 4>> charges{{0.0, -0.025, 0.05, 1.0},
                                                {1.0, -0.025, 0.05, -1.0},
@@ -557,20 +562,19 @@ bool ltests::dipoleMomentKernel()
 
     lints::Structure structure("cc-pvdz", atomic_nrs_c2h6, coords_c2h6);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     double sum_dipole_moment = 0;
-    for (const lints::ShellPairData &sp_data : shell_pair_datas)    
+    for (const lints::ShellPairData &sp_data : shell_pair_datas)
         for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
         {
             std::array<lible::vec2d, 3> dipole_moment_ints =
                 lints::dipoleMomentKernel(ipair, {0, 0, 0}, sp_data);
-            
+
             for (int icart = 0; icart < 3; icart++)
                 for (size_t i = 0; i < dipole_moment_ints[icart].size(); i++)
-                    sum_dipole_moment += std::fabs(dipole_moment_ints[icart][i]);        
-
-    }
+                    sum_dipole_moment += std::fabs(dipole_moment_ints[icart][i]);
+        }
 
     if (std::fabs(sum_dipole_moment - correct_answer) < tol)
         return true;
@@ -580,9 +584,9 @@ bool ltests::dipoleMomentKernel()
 
 bool ltests::spinOrbitCoupling1El()
 {
-    const double correct_answer = 85960.900198188145;
+    const double correct_answer = 86318.844650089319;
 
-    lints::Structure structure("ahlrichs-vdz", atomic_nrs_feh, coords_feh);
+    lints::Structure structure("ahlrichs-vdz", atomic_nrs_feh6, coords_feh6);
 
     std::array<lible::vec2d, 3> soc_ints = lints::spinOrbitCoupling1El(structure);
 
@@ -599,17 +603,17 @@ bool ltests::spinOrbitCoupling1El()
 
 bool ltests::spinOrbitCoupling1ElKernel()
 {
-    const double correct_answer = 85960.900198188072;
+    const double correct_answer = 86318.844650089552;
 
-    lints::Structure structure("ahlrichs-vdz", atomic_nrs_feh, coords_feh);
+    lints::Structure structure("ahlrichs-vdz", atomic_nrs_feh6, coords_feh6);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     std::vector<std::array<double, 4>> charges = structure.getZs();
 
     double sum_soc_ints = 0;
-    for (const lints::ShellPairData &sp_data : shell_pair_datas)   
-    { 
+    for (const lints::ShellPairData &sp_data : shell_pair_datas)
+    {
         auto [la, lb] = sp_data.getLPair();
         lints::BoysGrid boys_grid(la + lb + 1);
 
@@ -620,15 +624,14 @@ bool ltests::spinOrbitCoupling1ElKernel()
 
             for (int icart = 0; icart < 3; icart++)
                 for (size_t i = 0; i < soc_ints[icart].size(); i++)
-                    sum_soc_ints += std::fabs(soc_ints[icart][i]);        
+                    sum_soc_ints += std::fabs(soc_ints[icart][i]);
         }
-
     }
 
     if (std::fabs(sum_soc_ints - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::eri2()
@@ -646,7 +649,7 @@ bool ltests::eri2()
     if (std::fabs(eri2_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::eri4Diagonal()
@@ -677,12 +680,12 @@ bool ltests::eri3()
 
     double eri3_sum = 0;
     for (size_t i = 0; i < eri3.size(); i++)
-        eri3_sum += std::fabs(eri3[i]);    
+        eri3_sum += std::fabs(eri3[i]);
 
     if (std::fabs(eri3_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::eri4()
@@ -700,7 +703,7 @@ bool ltests::eri4()
     if (std::fabs(eri4_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::basisForAtom()
@@ -828,7 +831,7 @@ bool ltests::deployERI4Kernel()
 
     lints::Structure structure("def2-svp", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     double eri4_sum = 0;
     for (const lints::ShellPairData &sp_data_ab : shell_pair_datas)
@@ -848,7 +851,7 @@ bool ltests::deployERI4Kernel()
     if (std::fabs(eri4_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::deployERI3Kernel()
@@ -857,8 +860,8 @@ bool ltests::deployERI3Kernel()
 
     lints::Structure structure("def2-svp", "def2-universal-jkfit", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
-    std::vector<lints::ShellData> shell_datas = lints::shellDatasAux(structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
+    std::vector<lints::ShellData> shell_datas = lints::shellDataAux(structure);
 
     double eri3_sum = 0;
     for (const lints::ShellPairData &sp_data_ab : shell_pair_datas)
@@ -878,7 +881,7 @@ bool ltests::deployERI3Kernel()
     if (std::fabs(eri3_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::deployERI2Kernel()
@@ -887,8 +890,8 @@ bool ltests::deployERI2Kernel()
 
     lints::Structure structure("def2-svp", "def2-universal-jkfit", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellData> shell_datas = lints::shellDatasAux(structure);
-    
+    std::vector<lints::ShellData> shell_datas = lints::shellDataAux(structure);
+
     double eri2_sum = 0;
     for (const lints::ShellData &sh_data_a : shell_datas)
         for (const lints::ShellData &sh_data_b : shell_datas)
@@ -907,7 +910,7 @@ bool ltests::deployERI2Kernel()
     if (std::fabs(eri2_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::deployERI4D1Kernel()
@@ -916,7 +919,7 @@ bool ltests::deployERI4D1Kernel()
 
     lints::Structure structure("def2-svp", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(true, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(true, structure);
 
     double eri4_sum = 0;
     for (const lints::ShellPairData &sp_data_ab : shell_pair_datas)
@@ -930,15 +933,15 @@ bool ltests::deployERI4D1Kernel()
                         eri4d1_kernel(ipair1, ipair2, sp_data_ab, sp_data_cd);
 
                     for (int icart = 0; icart < 12; icart++)
-                    for (size_t i = 0; i < eri4_batch[icart].size(); i++)
-                        eri4_sum += std::fabs(eri4_batch[icart][i]);
+                        for (size_t i = 0; i < eri4_batch[icart].size(); i++)
+                            eri4_sum += std::fabs(eri4_batch[icart][i]);
                 }
         }
 
     if (std::fabs(eri4_sum - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::deployERI3D1Kernel()
@@ -947,8 +950,8 @@ bool ltests::deployERI3D1Kernel()
 
     lints::Structure structure("def2-svp", "def2-universal-jkfit", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
-    std::vector<lints::ShellData> shell_datas = lints::shellDatasAux(structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
+    std::vector<lints::ShellData> shell_datas = lints::shellDataAux(structure);
 
     double eri3_sum = 0;
     for (const lints::ShellPairData &sp_data_ab : shell_pair_datas)
@@ -970,7 +973,7 @@ bool ltests::deployERI3D1Kernel()
     if (std::fabs(eri3_sum - correct_answer) < tol)
         return true;
     else
-        return false;   
+        return false;
 }
 
 bool ltests::deployERI2D1Kernel()
@@ -979,8 +982,8 @@ bool ltests::deployERI2D1Kernel()
 
     lints::Structure structure("def2-svp", "def2-universal-jkfit", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellData> shell_datas = lints::shellDatasAux(structure);
-    
+    std::vector<lints::ShellData> shell_datas = lints::shellDataAux(structure);
+
     double eri2_sum = 0;
     for (const lints::ShellData &sh_data_a : shell_datas)
         for (const lints::ShellData &sh_data_b : shell_datas)
@@ -1001,7 +1004,7 @@ bool ltests::deployERI2D1Kernel()
     if (std::fabs(eri2_sum - correct_answer) < tol)
         return true;
     else
-        return false; 
+        return false;
 }
 
 bool ltests::deployERI2D2Kernel()
@@ -1010,7 +1013,7 @@ bool ltests::deployERI2D2Kernel()
 
     lints::Structure structure("def2-svp", "def2-universal-jkfit", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellData> shell_datas = lints::shellDatasAux(structure);
+    std::vector<lints::ShellData> shell_datas = lints::shellDataAux(structure);
 
     double eri2_sum = 0;
     for (const lints::ShellData &sh_data_a : shell_datas)
@@ -1025,8 +1028,8 @@ bool ltests::deployERI2D2Kernel()
 
                     for (int icart = 0; icart < 6; icart++)
                         for (int jcart = 0; jcart < 6; jcart++)
-                        for (size_t i = 0; i < eri2_batch[icart][jcart].size(); i++)
-                            eri2_sum += std::fabs(eri2_batch[icart][jcart][i]);
+                            for (size_t i = 0; i < eri2_batch[icart][jcart].size(); i++)
+                                eri2_sum += std::fabs(eri2_batch[icart][jcart][i]);
                 }
         }
 
@@ -1042,7 +1045,7 @@ bool ltests::deployERI4SOCKernel()
 
     lints::Structure structure("def2-svp", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
 
     double eri4_sum = 0;
     for (const lints::ShellPairData &sp_data_ab : shell_pair_datas)
@@ -1052,7 +1055,7 @@ bool ltests::deployERI4SOCKernel()
             for (int ipair1 = 0; ipair1 < sp_data_ab.n_pairs; ipair1++)
                 for (int ipair2 = 0; ipair2 < sp_data_cd.n_pairs; ipair2++)
                 {
-                    std::array<lible::vec4d, 3> eri4_batch = 
+                    std::array<lible::vec4d, 3> eri4_batch =
                         eri4soc_kernel(ipair1, ipair2, sp_data_ab, sp_data_cd);
 
                     for (int icart = 0; icart < 3; icart++)
@@ -1073,8 +1076,8 @@ bool ltests::deployERI3SOCKernel()
 
     lints::Structure structure("def2-svp", "def2-universal-jkfit", atomic_nrs_o3, coords_o3);
 
-    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairDatas(false, structure);
-    std::vector<lints::ShellData> shell_datas = lints::shellDatasAux(structure);
+    std::vector<lints::ShellPairData> shell_pair_datas = lints::shellPairData(false, structure);
+    std::vector<lints::ShellData> shell_datas = lints::shellDataAux(structure);
 
     double eri3_sum = 0;
     for (const lints::ShellPairData &sp_data_ab : shell_pair_datas)
@@ -1146,12 +1149,12 @@ bool ltests::ecoeffsRecurrence2_n1()
     double A = -0.571235891;
     double B = 1.612357121;
 
-    vec3d ecoeffs = lints::ecoeffsRecurrence2(a, b, la, lb, PA, PB, Kab);    
+    vec3d ecoeffs = lints::ecoeffsRecurrence2(a, b, la, lb, PA, PB, Kab);
     vec3d ecoeffs1 = lints::ecoeffsRecurrence2_n1(a, b, la, lb, A, B, ecoeffs);
 
     double sum_ecoeffs = 0;
     for (size_t i = 0; i < ecoeffs1.size(); i++)
-        sum_ecoeffs += std::fabs(ecoeffs1[i]);  
+        sum_ecoeffs += std::fabs(ecoeffs1[i]);
 
     if (std::fabs(sum_ecoeffs - correct_answer) < tol)
         return true;
@@ -1189,7 +1192,7 @@ bool ltests::ecoeffsPrimitivePair()
     double sum_ecoeffs = 0;
     for (int icart = 0; icart < 3; icart++)
         for (size_t i = 0; i < ecoeffs[icart].size(); i++)
-            sum_ecoeffs += std::fabs(ecoeffs[icart][i]);    
+            sum_ecoeffs += std::fabs(ecoeffs[icart][i]);
 
     if (std::fabs(sum_ecoeffs - correct_answer) < tol)
         return true;
@@ -1211,9 +1214,9 @@ bool ltests::ecoeffsPrimitivePair_n1()
     double A[3] = {0.571235891, 1.612357121, -0.234512341};
     double B[3] = {1.2345123, -0.5113241, 0.003451234};
 
-    std::array<lible::vec3d, 3> ecoeffs0 = 
+    std::array<lible::vec3d, 3> ecoeffs0 =
         lints::ecoeffsPrimitivePair(a, b, la, lb, xyz_a.data(), xyz_b.data());
-    std::array<lible::vec3d, 3> ecoeffs1 = 
+    std::array<lible::vec3d, 3> ecoeffs1 =
         lints::ecoeffsPrimitivePair_n1(a, b, la, lb, A, B, ecoeffs0);
 
     double sum_ecoeffs = 0;
@@ -1224,7 +1227,7 @@ bool ltests::ecoeffsPrimitivePair_n1()
     if (std::fabs(sum_ecoeffs - correct_answer) < tol)
         return true;
     else
-        return false;       
+        return false;
 }
 
 bool ltests::ecoeffsShell()
@@ -1289,11 +1292,11 @@ bool ltests::calcRInts3D()
 bool ltests::availableBasisSets()
 {
     std::set<std::string> available_basis_sets = lints::availableBasisSets();
-    
+
     for (const std::string &basis_set : available_basis_sets)
         if (basis_sets_table.contains(basis_set) == false)
             return false;
-        
+
     return true;
 }
 
@@ -1304,22 +1307,22 @@ bool ltests::availableBasisSetsAux()
     for (const std::string &basis_set : available_basis_sets_aux)
         if (auxbasis_sets_table.contains(basis_set) == false)
             return false;
-        
+
     return true;
 }
 
 bool ltests::purePrimitiveNorm()
 {
-    const double correct_answer = 8.063341937228;    
+    const double correct_answer = 8.063341937228;
 
     double exp = 1.70325241;
     int l = 4;
     double norm = lints::purePrimitiveNorm(exp, l);
-    
+
     if (std::fabs(norm - correct_answer) < tol)
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool ltests::numHermites()
@@ -1359,7 +1362,7 @@ bool ltests::cartExps()
 
     int l = 5;
     std::vector<std::array<int, 3>> cart_exps = lints::cartExps(l);
-    
+
     return (cart_exps == correct_answer);
 }
 

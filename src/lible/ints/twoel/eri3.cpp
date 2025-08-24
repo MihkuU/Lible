@@ -17,16 +17,16 @@ lible::vec3d LI::eri3(const Structure &structure)
     if (structure.getUseRI() == false)
         throw std::runtime_error("RI approximation is not enabled!");
 
-    vector<ShellData> sh_datas = shellDatasAux(structure);
-    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
+    vector<ShellData> sh_datas = shellDataAux(structure);
+    vector<ShellPairData> sp_data = shellPairData(true, structure);
 
     int dim_ao = structure.getDimAO();
     int dim_ao_aux = structure.getDimAOAux();
     vec3d eri3(Fill(0), dim_ao, dim_ao, dim_ao_aux);
-    for (size_t ispdata_ab = 0; ispdata_ab < sp_datas.size(); ispdata_ab++)
+    for (size_t ispdata_ab = 0; ispdata_ab < sp_data.size(); ispdata_ab++)
         for (size_t ishdata_c = 0; ishdata_c < sh_datas.size(); ishdata_c++)
         {
-            const auto &sp_data_ab = sp_datas[ispdata_ab];
+            const auto &sp_data_ab = sp_data[ispdata_ab];
             const auto &sh_data_c = sh_datas[ishdata_c];
 
             ERI3Kernel eri3_kernel = deployERI3Kernel(sp_data_ab, sh_data_c);

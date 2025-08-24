@@ -45,15 +45,15 @@ namespace lible::ints
 
 lible::vec4d LI::eri4(const Structure &structure)
 {
-    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
+    vector<ShellPairData> sp_data = shellPairData(true, structure);
 
     int dim_ao = structure.getDimAO();
     vec4d eri4(Fill(0), dim_ao);
-    for (size_t ispdata_ab = 0; ispdata_ab < sp_datas.size(); ispdata_ab++)
+    for (size_t ispdata_ab = 0; ispdata_ab < sp_data.size(); ispdata_ab++)
         for (size_t isp_data_cd = 0; isp_data_cd <= ispdata_ab; isp_data_cd++)
         {
-            const ShellPairData &sp_data_ab = sp_datas[ispdata_ab];
-            const ShellPairData &sp_data_cd = sp_datas[isp_data_cd];
+            const ShellPairData &sp_data_ab = sp_data[ispdata_ab];
+            const ShellPairData &sp_data_cd = sp_data[isp_data_cd];
 
             int n_sph_a = numSphericals(sp_data_ab.la);
             int n_sph_b = numSphericals(sp_data_ab.lb);
@@ -107,16 +107,16 @@ void LI::eri4Benchmark(const Structure &structure)
 
     auto start{std::chrono::steady_clock::now()};
 
-    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
+    vector<ShellPairData> sp_data = shellPairData(true, structure);
 
     double sum_eri4 = 0;
-    for (size_t ispdata_ab = 0; ispdata_ab < sp_datas.size(); ispdata_ab++)
+    for (size_t ispdata_ab = 0; ispdata_ab < sp_data.size(); ispdata_ab++)
         for (size_t ispdata_cd = 0; ispdata_cd <= ispdata_ab; ispdata_cd++)
         {
             auto start{std::chrono::steady_clock::now()};
 
-            const auto &sp_data_ab = sp_datas[ispdata_ab];
-            const auto &sp_data_cd = sp_datas[ispdata_cd];
+            const auto &sp_data_ab = sp_data[ispdata_ab];
+            const auto &sp_data_cd = sp_data[ispdata_cd];
 
             int n_pairs_ab = sp_data_ab.n_pairs;
             int n_pairs_cd = sp_data_cd.n_pairs;
@@ -158,13 +158,13 @@ void LI::eri4Benchmark(const Structure &structure)
 
 lible::vec2d LI::eri4Diagonal(const Structure &structure)
 {
-    vector<ShellPairData> sp_datas = shellPairDatas(true, structure);
+    vector<ShellPairData> sp_data = shellPairData(true, structure);
 
     int dim_ao = structure.getDimAO();
     vec2d eri4_diagonal(Fill(0), dim_ao, dim_ao);
-    for (size_t ispdata = 0; ispdata < sp_datas.size(); ispdata++)
+    for (size_t ispdata = 0; ispdata < sp_data.size(); ispdata++)
     {
-        const auto &sp_data_ab = sp_datas[ispdata];
+        const auto &sp_data_ab = sp_data[ispdata];
 
         ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_ab);
 

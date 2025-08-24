@@ -1,9 +1,9 @@
 #pragma once
 
 #include <array>
+#include <map>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 namespace lible
 {
@@ -24,24 +24,19 @@ namespace lible
          * data that defines a shell: angular momentum, contraction coefficients, contraction
          * exponents etc.
          */
-        // TODO: add a variable to indicate position in the list of shells?
-        // TODO: remove the replace coeffs_raw with coeffs, add primitive norms.
         struct Shell
         {
             /** The constructor. */
             Shell(const int l, const int z, const int atom_idx, const int dim_cart,
-                  const int dim_sph, const int pos, const int pos_cart,
-                  const std::array<double, 3> &xyz_coords, const std::vector<double> &coeffs,
-                  const std::vector<double> &coeffs_raw, const std::vector<double> &exps,
-                  const std::vector<double> &norms)
-                : l(l), z(z), atom_idx(atom_idx), dim_cart(dim_cart), dim_sph(dim_sph), pos(pos),
-                  pos_cart(pos_cart), xyz_coords(xyz_coords), coeffs(coeffs),
-                  coeffs_raw(coeffs_raw), exps(exps), norms(norms)
+                  const int dim_sph, const int ofs_cart, const int ofs_sph, const int idx,
+                  const std::array<double, 3> &xyz_coords, const std::vector<double> &exps,
+                  const std::vector<double> &coeffs, const std::vector<double> &norms,
+                  const std::vector<double> &norms_prim)
+                : l(l), z(z), atom_idx(atom_idx), dim_cart(dim_cart), dim_sph(dim_sph),
+                  ofs_cart(ofs_cart), ofs_sph(ofs_sph), idx(idx), xyz_coords(xyz_coords),
+                  exps(exps), coeffs(coeffs), norms(norms), norms_prim(norms_prim)
             {
             }
-
-            /** printing to output */
-            friend std::ostream &operator<<(std::ostream &os, const Shell &obj); // TODO: remove?
 
             int l; /** Angular momentum. */
             int z; /** Atomic number. */
@@ -49,16 +44,22 @@ namespace lible
             int atom_idx; /** Index of the shell atom in the list of all atoms. */
             int dim_cart; /** Number of atomic orbitals in Cartesian basis. */
             int dim_sph;  /** Number of atomic orbitals in spherical basis. */
-            int pos;      /** Starting position in the list of atomic orbitals. */ // TODO: rename to pos_sph
-            int pos_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */
+            int ofs_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */
+            int ofs_sph;  /** Starting position in the list of atomic orbitals. */            
+
+            int idx; /** Index of the shell in the list of all shells. */
 
             std::array<double, 3> xyz_coords; /** Coordinates of the atom corresponding to the shell. */
 
-            std::vector<double> coeffs;     /** Contraction coefficients with primitive norms multiplied into. */
-            std::vector<double> coeffs_raw; /** Contraction coefficients without primitive norms. */
             std::vector<double> exps;       /** Exponents of the Gaussian primitives. */
+            std::vector<double> coeffs;     /** Contraction coefficients of the Gaussian primitives. */            
             std::vector<double> norms;      /** Normalization constants of the atomic orbitals in spherical basis. */
+            std::vector<double> norms_prim; /** Normalization constants of the Gaussian primitives. */
         };
+
+        using shell_exps_coeffs_t = std::pair<std::vector<double>, std::vector<double>>;
+        using basis_atom_t = std::map<int, std::vector<shell_exps_coeffs_t>>;
+        using basis_atoms_t = std::map<int, basis_atom_t>;
 
         /**
          * \ingroup shell
@@ -67,5 +68,10 @@ namespace lible
          */
         std::vector<double> calcShellNorms(const int l, const std::vector<double> &coeffs,
                                            const std::vector<double> &exps);
+
+        /** */
+        std::vector<Shell> constructShells(const basis_atoms_t &basis_atoms,
+                                           const std::vector<int> &atomic_nrs,
+                                           const std::vector<std::array<double, 3>> &coords_atoms);
     }
 }

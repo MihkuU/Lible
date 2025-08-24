@@ -32,7 +32,7 @@ lible::vec2d LI::eri2(const Structure &structure)
     if (!structure.getUseRI())
         throw std::runtime_error("RI approximation is not enabled!");
 
-    vector<ShellData> sh_datas = shellDatasAux(structure);
+    vector<ShellData> sh_datas = shellDataAux(structure);
 
     int dim_ao_aux = structure.getDimAOAux();
     vec2d eri2(Fill(0), dim_ao_aux, dim_ao_aux);
@@ -79,13 +79,13 @@ vector<double> LI::eri2Diagonal(const Structure &structure)
     if (structure.getUseRI() == false)
         throw std::runtime_error("RI approximation is not enabled!");
     
-    vector<ShellData> sh_datas = shellDatasAux(structure);
+    vector<ShellData> sh_datas = shellDataAux(structure);
 
     int dim_ao_aux = structure.getDimAOAux();
     vector<double> eri2_diagonal(dim_ao_aux, 0);
     for (size_t ishdata = 0; ishdata < sh_datas.size(); ishdata++)
     {
-        const auto &sh_data_a = sh_datas[ishdata];        
+        const auto &sh_data_a = sh_datas[ishdata];
 
         ERI2Kernel eri2_kernel = deployERI2Kernel(sh_data_a, sh_data_a);
 

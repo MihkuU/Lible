@@ -28,8 +28,6 @@ namespace lible
          * the integrals. Note that to use the RI approximation, the Structure object has to be
          * initialized by providing an auxiliary basis set name. By default, RI is disabled.
          */
-        // TODO: add a flattened list of shells
-        // TODO: replace the 'coords_angstrom' with 'coords_bohr'        
         struct Structure
         {
             /** Constructur for initializing a structure object. */
@@ -37,49 +35,24 @@ namespace lible
 
             /** Constructor for initializing a Structure object. */
             Structure(const std::string &basis_set, const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
-
-            /** Constructor for initializing a Structure object. RI approximation is disabled. */
-            Structure(const std::string &basis_set, const std::vector<std::string> &elements,
-                      const std::vector<double> &coords_angstrom);
+                      const std::vector<std::array<double, 3>> &coords_angstrom);
 
             /** Constructor for initializing a Structure object with enabling the RI approximation. */
             Structure(const std::string &basis_set, const std::string &basis_set_aux,
                       const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
-
-            /** Constructor for initializing a Structure object with enabling the RI approximation. */
-            Structure(const std::string &basis_set, const std::string &basis_set_aux,
-                      const std::vector<std::string> &elements,
-                      const std::vector<double> &coords_angstrom);
+                      const std::vector<std::array<double, 3>> &coords_angstrom);
 
             /** Constructor for initializing a structure object with a given custom basis set. */
-            Structure(const basis_atoms_t &basis_set_custom, const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
-
-            /**
-             * Constructor for initializing a structure object with a given main basis set
-             * and custom auxiliary basis set.
-             */
-            Structure(const std::string &basis_set, const basis_atoms_t &basis_set_custom_aux,
-                      const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
-
-            /**
-             * Constructor for initializing a structure object with a custom main basis set
-             * and a given auxiliary basis set.
-             */
-            Structure(const basis_atoms_t &basis_set_custom, const std::string &basis_set_aux,
-                      const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
+            Structure(const basis_atoms_t &basis_set, const std::vector<int> &atomic_nrs,
+                      const std::vector<std::array<double, 3>> &coords_angstrom);
 
             /**
              * Constructor for initializing a structure object with custom main and auxiliary
              * basis sets.
              */
-            Structure(const basis_atoms_t &basis_set_custom, const basis_atoms_t &basis_set_custom_aux,
+            Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_aux,
                       const std::vector<int> &atomic_nrs,
-                      const std::vector<double> &coords_angstrom);
+                      const std::vector<std::array<double, 3>> &coords_angstrom);
 
             // Some getters
 
@@ -106,13 +79,17 @@ namespace lible
             /** Returns for every atom {x, y, z, charge} */
             std::vector<std::array<double, 4>> getZs() const;
 
+            std::vector<Shell> getShells() const;
+
+            std::vector<Shell> getShellsAux() const;
+
             std::vector<Shell> getShellsL(const int l) const;
 
             std::vector<Shell> getShellsLAux(const int l) const;
 
-            std::map<int, std::vector<Shell>> getShells() const;
+            std::map<int, std::vector<Shell>> getShellsMap() const;
 
-            std::map<int, std::vector<Shell>> getShellsAux() const;
+            std::map<int, std::vector<Shell>> getShellsMapAux() const;
 
         private:
             bool use_ri{false}; /** Flag for using the RI-approximation. */
@@ -129,20 +106,14 @@ namespace lible
             std::string basis_set;     /** Name of the main basis set. */
             std::string basis_set_aux; /** Name of the auxiliary basis set. */
 
-            std::vector<double> coords;                    /** Rolled out coordinates of atoms.*/
-            std::vector<int> atomic_nrs;                   /** Atomic numbers. */
-            std::vector<std::array<double, 3>> coords_xyz; /** Coordinates of the atoms. */
-            std::vector<std::string> elements;             /** Symbols of the atoms. */
+            std::vector<std::array<double, 3>> coords; /** Coordinates of the atoms in Bohr (a.u.). */
+            std::vector<int> atomic_nrs;               /** Atomic numbers. */
 
-            std::map<int, std::vector<Shell>> shells;     /** Shells corresponding to the main basis set for each angular momentum. */
-            std::map<int, std::vector<Shell>> shells_aux; /** Shells corresponding to the auxiliary basis set for each angular momentum. */
+            std::vector<Shell> shells;     /** All of the shells corresponding to the main basis set. */
+            std::vector<Shell> shells_aux; /** All of the shells corresponding to the auxiliary basis set. */
 
-            /**
-             * Constructs the shells for the given basis. Used for both the main and auxiliary
-             * basis.
-             */
-            void constructShells(const basis_atoms_t &basis_atoms, int &max_l, int &dim_ao,
-                                 int &dim_ao_cart, std::map<int, std::vector<Shell>> &shells);
+            std::map<int, std::vector<Shell>> shells_map;     /** Shells corresponding to the main basis set for each angular momentum. */
+            std::map<int, std::vector<Shell>> shells_map_aux; /** Shells corresponding to the auxiliary basis set for each angular momentum. */
         };
     }
 }

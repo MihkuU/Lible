@@ -1,94 +1,81 @@
 #include <lible/ints/shell_pair_data.hpp>
 #include <lible/ints/utils.hpp>
 
-namespace LI = lible::ints;
+namespace lints = lible::ints;
 
 using std::pair, std::vector;
 
-LI::ShellData LI::shellDataAux(const int l, const Structure &structure)
+lints::ShellData::ShellData(const int l, const std::vector<Shell> &shells)
+    : l(l)
 {
-    if (!structure.getUseRI())
-        throw std::runtime_error("RI approximation is not enabled!");
+    n_shells = shells.size();
+    n_primitives = 0;
+    for (const Shell &shell : shells)
+        n_primitives += shell.coeffs.size();
 
-    const auto &shells = structure.getShellsLAux(l);
-    int n_shells = shells.size();
+    const int n_coords = 3 * n_shells;
+    const int n_sph = numSphericals(l);
+    const int n_herm = numHermites(l);
+    const int n_sph_ecoeffs = n_sph * n_herm;
+    const int n_norms = n_sph * n_shells;
 
-    int n_primitives = 0;
-    for (int ishell = 0; ishell < n_shells; ishell++)
-        n_primitives += shells[ishell].coeffs.size();
+    atomic_idxs.resize(n_shells);
+    cdepths.resize(n_shells);
+    coffsets.resize(n_shells);
+    offsets_ecoeffs.resize(n_shells);
+    offsets_norms.resize(n_shells);
+    offsets_sph.resize(n_shells);
+    shell_idxs.resize(n_shells);
 
-    int dim_sph = numSphericals(l);
-    int dim_herm_gauss = numHermites(l);
-    int n_sph_ecoeffs = dim_sph * dim_herm_gauss;
+    coeffs.resize(n_primitives);
+    exps.resize(n_primitives);
+    coords.resize(n_coords);
+    norms.resize(n_norms);
 
-    int n_coords = 3 * n_shells;
-    int n_norms = dim_sph * n_shells;
-
-    vector<double> coeffs(n_primitives);
-    vector<double> coords(n_coords);
-    vector<double> exps(n_primitives);
-    vector<double> norms(n_norms);
-
-    vector<int> atomic_idxs(n_shells);
-    vector<int> cdepths(n_shells);
-    vector<int> coffsets(n_shells);
-
-    vector<int> offsets_ecoeffs(n_shells);
-    vector<int> offsets_norms(n_shells);
-    vector<int> offsets_sph(n_shells);
-
-    int pos_coeffs{0}, pos_ecoeffs{0}, pos_norms{0};
-    for (int ishell = 0; ishell < n_shells; ishell++)
+    int ofs_coeffs{0}, ofs_ecoeffs{0}, ofs_norms{0};
+    for (size_t ishell = 0; ishell < shells.size(); ishell++)
     {
-        const auto &shell = shells[ishell];
+        const Shell &shell = shells[ishell];
+        if (shell.l != l)
+            throw std::runtime_error("ShellData::ShellData(): given angular momentum and shell "
+                                     "angular momentum don't match");
+
+        int cdepth = shell.coeffs.size();
+        for (int i = 0; i < cdepth; i++)
+        {
+            coeffs[ofs_coeffs + i] = shell.coeffs[i] * shell.norms_prim[i]; // include primitive norms
+            exps[ofs_coeffs + i] = shell.exps[i];
+        }
 
         coords[3 * ishell + 0] = shell.xyz_coords[0];
         coords[3 * ishell + 1] = shell.xyz_coords[1];
         coords[3 * ishell + 2] = shell.xyz_coords[2];
 
-        int cdepth = shell.coeffs.size();
-
-        coffsets[ishell] = pos_coeffs;
-        for (int i = 0; i < cdepth; i++)
-        {
-            coeffs[pos_coeffs] = shell.coeffs[i];
-            exps[pos_coeffs] = shell.exps[i];
-            pos_coeffs++;
-        }
-
-        cdepths[ishell] = cdepth;
-
-        offsets_sph[ishell] = shell.pos;
-
-        offsets_ecoeffs[ishell] = pos_ecoeffs;
-        pos_ecoeffs += cdepth * n_sph_ecoeffs;
-
-        offsets_norms[ishell] = pos_norms;
-        for (int i = 0; i < dim_sph; i++)
-        {
-            norms[pos_norms] = shell.norms[i];
-            pos_norms++;
-        }
+        for (int i = 0; i < n_sph; i++)
+            norms[ofs_norms + i] = shell.norms[i];
 
         atomic_idxs[ishell] = shell.atom_idx;
+        cdepths[ishell] = cdepth;
+        coffsets[ishell] = ofs_coeffs;
+        offsets_ecoeffs[ishell] = ofs_ecoeffs;
+        offsets_norms[ishell] = ofs_norms;
+        offsets_sph[ishell] = shell.ofs_sph;
+        shell_idxs[ishell] = shell.idx;
+
+        ofs_coeffs += cdepth;
+        ofs_ecoeffs += cdepth * n_sph_ecoeffs;
+        ofs_norms += n_sph;
     }
-
-    ShellData sh_data(l, n_shells, n_primitives, coeffs, coords, exps, norms, atomic_idxs, cdepths,
-                      coffsets, offsets_ecoeffs, offsets_norms, offsets_sph);
-
-    return sh_data;
 }
 
-LI::ShellPairData LI::shellPairData(const bool use_symm, const int la, const int lb,
-                                    const Structure &structure)
+lints::ShellPairData::ShellPairData(const bool use_symm, const int la, const int lb,
+                                    const vector<Shell> &shells_a, const vector<Shell> &shells_b)
+    : uses_symm(use_symm), la(la), lb(lb)
 {
-    const auto &shells_a = structure.getShellsL(la);
-    const auto &shells_b = structure.getShellsL(lb);
-    int n_shells_a = shells_a.size();
-    int n_shells_b = shells_b.size();
+    const int n_shells_a = shells_a.size();
+    const int n_shells_b = shells_b.size();
 
-    int n_pairs;
-    if (use_symm)
+    if (uses_symm == true)
     {
         if (la == lb)
             n_pairs = n_shells_a * (n_shells_a + 1) / 2;
@@ -99,184 +86,149 @@ LI::ShellPairData LI::shellPairData(const bool use_symm, const int la, const int
         n_pairs = n_shells_a * n_shells_b;
 
     vector<pair<int, int>> shell_pair_idxs(n_pairs);
-    if (use_symm)
+    for (int ishell = 0, ipair = 0; ishell < n_shells_a; ishell++)
     {
-        if (la == lb)
-        {
-            for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
-                for (int jshell = 0; jshell <= ishell; jshell++, idx++)
-                    shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
-        }
+        int bound_shell_b;
+        if ((uses_symm == true) && (la == lb))
+            bound_shell_b = ishell + 1;
         else
-        {
-            for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
-                for (int jshell = 0; jshell < n_shells_b; jshell++, idx++)
-                    shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
-        }
+            bound_shell_b = n_shells_b;
+
+        for (int jshell = 0; jshell < bound_shell_b; jshell++, ipair++)
+            shell_pair_idxs[ipair] = {ishell, jshell};
     }
-    else
+
+    n_prim_pairs = 0;
+    int n_coeffs = 0;
+    for (const auto &[ishell, jshell] : shell_pair_idxs)
     {
-        for (int ishell = 0, idx = 0; ishell < n_shells_a; ishell++)
-            for (int jshell = 0; jshell < n_shells_b; jshell++, idx++)
-                shell_pair_idxs[idx] = std::make_pair(ishell, jshell);
+        n_prim_pairs += shells_a[ishell].coeffs.size() * shells_b[jshell].coeffs.size();
+        n_coeffs += shells_a[ishell].coeffs.size() + shells_b[jshell].coeffs.size();
     }
 
-    int dim_sph_a = numSphericals(la);
-    int dim_sph_b = numSphericals(lb);
-    int dim_herm_gauss = numHermites(la + lb);
-    int n_sph_ecoeffs = dim_sph_a * dim_sph_b * dim_herm_gauss;
+    const int n_shells_ab = n_pairs * 2;
+    const int n_sph_a = numSphericals(la);
+    const int n_sph_b = numSphericals(lb);
+    const int n_herm = numHermites(la + lb);
+    const int n_sph_ecoeffs = n_sph_a * n_sph_b * n_herm;
+    const int n_norms = (n_sph_a + n_sph_b) * n_pairs;
 
-    int n_coords = 6 * n_pairs;
-    int n_norms = (dim_sph_a + dim_sph_b) * n_pairs;
+    coeffs.resize(n_coeffs);
+    coords.resize(3 * n_shells_ab);
+    exps.resize(n_coeffs);
+    norms.resize(n_norms);
 
-    int n_coeffs{0};
-    for (auto &[ishell, jshell] : shell_pair_idxs)
-    {
-        int cdepth_a = shells_a[ishell].coeffs.size();
-        int cdepth_b = shells_b[jshell].coeffs.size();
-        n_coeffs += cdepth_a + cdepth_b;
-    }
+    atomic_idxs.resize(n_shells_ab);
+    cdepths.resize(n_shells_ab);
+    coffsets.resize(n_shells_ab);
+    offsets_cart.resize(n_shells_ab);
+    offsets_ecoeffs.resize(n_pairs);
+    offsets_ecoeffs_deriv1.resize(n_pairs);
+    offsets_ecoeffs_deriv2.resize(n_pairs);
+    offsets_norms.resize(n_shells_ab);
+    offsets_sph.resize(n_shells_ab);
+    shell_idxs.resize(n_shells_ab);
 
-    int n_prim_pairs{0};
-
-    vector<double> coeffs(n_coeffs);
-    vector<double> coords(n_coords);
-    vector<double> exps(n_coeffs);
-    vector<double> norms(n_norms);
-
-    vector<int> atomic_idxs(2 * n_pairs);
-    vector<int> cdepths(2 * n_pairs);
-    vector<int> coffsets(2 * n_pairs);
-
-    vector<int> offsets_cart(2 * n_pairs);
-    vector<int> offsets_ecoeffs(n_pairs);
-    vector<int> offsets_ecoeffs_deriv1(n_pairs);
-    vector<int> offsets_ecoeffs_deriv2(n_pairs);
-    vector<int> offsets_norms(2 * n_pairs);
-    vector<int> offsets_sph(2 * n_pairs);
-
-    int pos_coords{0}, pos_coeffs{0}, pos_norms{0}, pos_ecoeffs{0}, pos_ecoeffs_deriv1{0};
-    int pos_ecoeffs_deriv2{0};
+    int ofs_coeffs{0}, ofs_norms{0}, ofs_ecoeffs{0}, ofs_ecoeffs_d1{0}, ofs_ecoeffs_d2{0};
     for (int ipair = 0; ipair < n_pairs; ipair++)
     {
-        auto [ishell, jshell] = shell_pair_idxs[ipair];
+        const auto &[ishell, jshell] = shell_pair_idxs[ipair];
 
-        const auto &shell_a = shells_a[ishell];
-        const auto &shell_b = shells_b[jshell];
+        const Shell &shell_a = shells_a[ishell];
+        const Shell &shell_b = shells_b[jshell];
 
-        coords[pos_coords + 0] = shell_a.xyz_coords[0];
-        coords[pos_coords + 1] = shell_a.xyz_coords[1];
-        coords[pos_coords + 2] = shell_a.xyz_coords[2];
-        coords[pos_coords + 3] = shell_b.xyz_coords[0];
-        coords[pos_coords + 4] = shell_b.xyz_coords[1];
-        coords[pos_coords + 5] = shell_b.xyz_coords[2];
-        pos_coords += 6;
+        if (shell_a.l != la)
+            throw std::runtime_error("ShellPairData::ShellPairData(): given la and shell_a angular "
+                                     "momentum don't match");
+        if (shell_b.l != lb)
+            throw std::runtime_error("ShellPairData::ShellPairData(): given lb and shell_b angular "
+                                     "momentum don't match");
 
-        int cdepth_a = shell_a.coeffs.size();
-        int cdepth_b = shell_b.coeffs.size();
+        const int cdepth_a = shell_a.coeffs.size();
+        const int cdepth_b = shell_b.coeffs.size();
+        const int cdepth_ab = cdepth_a * cdepth_b;
 
-        offsets_ecoeffs[ipair] += pos_ecoeffs;
-        offsets_ecoeffs_deriv1[ipair] += pos_ecoeffs_deriv1;
-        offsets_ecoeffs_deriv2[ipair] += pos_ecoeffs_deriv2;
-        pos_ecoeffs += cdepth_a * cdepth_b * n_sph_ecoeffs;
-        pos_ecoeffs_deriv1 += 3 * cdepth_a * cdepth_b * n_sph_ecoeffs;
-        pos_ecoeffs_deriv2 += 6 * cdepth_a * cdepth_b * n_sph_ecoeffs;
-        n_prim_pairs += cdepth_a * cdepth_b;
-
-        coffsets[2 * ipair + 0] = pos_coeffs;
-
-        for (int ia = 0; ia < cdepth_a; ia++)
-        {
-            coeffs[pos_coeffs] = shell_a.coeffs[ia];
-            exps[pos_coeffs] = shell_a.exps[ia];
-            pos_coeffs++;
-        }
-
-        coffsets[2 * ipair + 1] = pos_coeffs;
-
-        for (int ib = 0; ib < cdepth_b; ib++)
-        {
-            coeffs[pos_coeffs] = shell_b.coeffs[ib];
-            exps[pos_coeffs] = shell_b.exps[ib];
-            pos_coeffs++;
-        }
-
-        cdepths[2 * ipair + 0] = cdepth_a;
-        cdepths[2 * ipair + 1] = cdepth_b;
-
-        offsets_cart[2 * ipair + 0] = shell_a.pos_cart;
-        offsets_cart[2 * ipair + 1] = shell_b.pos_cart;
-        offsets_sph[2 * ipair + 0] = shell_a.pos;
-        offsets_sph[2 * ipair + 1] = shell_b.pos;
-
-        const auto &norms_a = shell_a.norms;
-        const auto &norms_b = shell_b.norms;
-
-        offsets_norms[2 * ipair + 0] = pos_norms;
-
-        for (int mu = 0; mu < dim_sph_a; mu++)
-        {
-            norms[pos_norms] = norms_a[mu];
-            pos_norms++;
-        }
-
-        offsets_norms[2 * ipair + 1] = pos_norms;
-
-        for (int mu = 0; mu < dim_sph_b; mu++)
-        {
-            norms[pos_norms] = norms_b[mu];
-            pos_norms++;
-        }
+        // printf("ipair = %d, cdepth_a = %d, cdepth_b = %d\n", ipair, cdepth_a, cdepth_b);
 
         atomic_idxs[2 * ipair + 0] = shell_a.atom_idx;
         atomic_idxs[2 * ipair + 1] = shell_b.atom_idx;
+        cdepths[2 * ipair + 0] = cdepth_a;
+        cdepths[2 * ipair + 1] = cdepth_b;
+
+        coords[6 * ipair + 0] = shell_a.xyz_coords[0];
+        coords[6 * ipair + 1] = shell_a.xyz_coords[1];
+        coords[6 * ipair + 2] = shell_a.xyz_coords[2];
+        coords[6 * ipair + 3] = shell_b.xyz_coords[0];
+        coords[6 * ipair + 4] = shell_b.xyz_coords[1];
+        coords[6 * ipair + 5] = shell_b.xyz_coords[2];
+
+        coffsets[2 * ipair + 0] = ofs_coeffs;
+        for (int a = 0; a < cdepth_a; a++, ofs_coeffs++)
+        {
+            coeffs[ofs_coeffs] = shell_a.coeffs[a] * shell_a.norms_prim[a]; // include primitive norms
+            exps[ofs_coeffs] = shell_a.exps[a];
+        }
+
+        coffsets[2 * ipair + 1] = ofs_coeffs;
+        for (int b = 0; b < cdepth_b; b++, ofs_coeffs++)
+        {
+            coeffs[ofs_coeffs] = shell_b.coeffs[b] * shell_b.norms_prim[b]; // include primitive norms
+            exps[ofs_coeffs] = shell_b.exps[b];
+        }
+
+        offsets_cart[2 * ipair + 0] = shell_a.ofs_cart;
+        offsets_cart[2 * ipair + 1] = shell_b.ofs_cart;
+        offsets_sph[2 * ipair + 0] = shell_a.ofs_sph;
+        offsets_sph[2 * ipair + 1] = shell_b.ofs_sph;
+        offsets_ecoeffs[ipair] = ofs_ecoeffs;
+        offsets_ecoeffs_deriv1[ipair] = ofs_ecoeffs_d1;
+        offsets_ecoeffs_deriv2[ipair] = ofs_ecoeffs_d2;
+
+        offsets_norms[2 * ipair + 0] = ofs_norms;
+        for (int a = 0; a < n_sph_a; a++, ofs_norms++)
+            norms[ofs_norms] = shell_a.norms[a];
+
+        offsets_norms[2 * ipair + 1] = ofs_norms;
+        for (int b = 0; b < n_sph_b; b++, ofs_norms++)
+            norms[ofs_norms] = shell_b.norms[b];
+
+        offsets_sph[2 * ipair + 0] = shell_a.ofs_sph;
+        offsets_sph[2 * ipair + 1] = shell_b.ofs_sph;
+        shell_idxs[2 * ipair + 0] = shell_a.idx;
+        shell_idxs[2 * ipair + 1] = shell_b.idx;
+
+        ofs_ecoeffs += cdepth_ab * n_sph_ecoeffs;
+        ofs_ecoeffs_d1 += 3 * cdepth_ab * n_sph_ecoeffs;
+        ofs_ecoeffs_d2 += 6 * cdepth_ab * n_sph_ecoeffs;
     }
-
-    int n_atoms = structure.getNAtoms();
-    vector<double> atomic_coords(3 * n_atoms);
-    vector<int> atomic_nrs(n_atoms);
-    for (int iatom = 0; iatom < n_atoms; iatom++)
-    {
-        auto [x, y, z] = structure.getCoordsAtom(iatom);
-        atomic_coords[3 * iatom] = x;
-        atomic_coords[3 * iatom + 1] = y;
-        atomic_coords[3 * iatom + 2] = z;
-        atomic_nrs[iatom] = structure.getZ(iatom);
-    }
-
-    ShellPairData sp_data(use_symm, la, lb, n_atoms, n_pairs, n_prim_pairs, atomic_coords, coeffs,
-                          coords, exps, norms, atomic_idxs, atomic_nrs, cdepths, coffsets,
-                          offsets_cart, offsets_ecoeffs, offsets_ecoeffs_deriv1,
-                          offsets_ecoeffs_deriv2, offsets_norms, offsets_sph);
-
-    return sp_data;
 }
 
-vector<LI::ShellData> LI::shellDatasAux(const Structure &structure)
+vector<lints::ShellData> lints::shellDataAux(const Structure &structure)
 {
     if (structure.getUseRI() == false)
-        throw std::runtime_error("shellDatasAux(): RI approximation is not enabled!");
+        throw std::runtime_error("shellDataAux(): RI approximation is not enabled!");
 
     int l_max_aux = structure.getMaxLAux();
 
-    vector<ShellData> sh_datas;
+    vector<ShellData> sh_data;
     for (int l = 0; l <= l_max_aux; l++)
-        sh_datas.emplace_back(shellDataAux(l, structure));
+        sh_data.emplace_back(ShellData(l, structure.getShellsLAux(l)));
 
-    return sh_datas;
+    return sh_data;
 }
 
-vector<LI::ShellPairData> LI::shellPairDatas(const bool use_symm, const Structure &structure)
+vector<lints::ShellPairData> lints::shellPairData(const bool use_symm, const Structure &structure)
 {
     vector<pair<int, int>> l_pairs;
     if (use_symm == true)
         l_pairs = getLPairsSymm(structure.getMaxL());
     else
         l_pairs = getLPairsNoSymm(structure.getMaxL());
-        
-    vector<ShellPairData> sp_datas;
-    for (const auto &[la, lb] : l_pairs)
-        sp_datas.emplace_back(shellPairData(use_symm, la, lb, structure));
 
-    return sp_datas;
+    vector<ShellPairData> sp_data;
+    for (const auto &[la, lb] : l_pairs)
+        sp_data.emplace_back(ShellPairData(use_symm, la, lb, structure.getShellsL(la),
+                                           structure.getShellsL(lb)));
+
+    return sp_data;
 }

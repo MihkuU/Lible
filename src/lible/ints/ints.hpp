@@ -312,28 +312,35 @@ namespace lible
         ERI3SOCKernel deployERI3SOCKernel(const ShellPairData &sp_data_ab,
                                           const ShellData &sh_data_c);
 
-        /**
-         * \ingroup ints
-         * Constructs the shell data corresponding to the auxilary basis set.
-         */
-        ShellData shellDataAux(const int l, const Structure &structure); // TODO:....
+        // /**
+        //  * \ingroup ints
+        //  * Constructs the shell data corresponding to the auxilary basis set.
+        //  */
+        // ShellData shellDataAux(const int l, const Structure &structure); // TODO:....
+
+        // /**
+        //  *
+        //  */
+        // ShellPairData shellPairData(const bool use_symm, const int la, const int lb,
+        //                             const Structure &structure); // TODO:....
 
         /**
          *
          */
-        ShellPairData shellPairData(const bool use_symm, const int la, const int lb,
-                                    const Structure &structure); // TODO:....
+        std::vector<Shell> constructShells(const basis_atoms_t &basis_atoms,
+                                           const std::vector<int> &atomic_nrs,
+                                           const std::vector<std::array<double, 3>> &coords_atoms);
 
         /**
          * \ingroup ints
          * Constructs the shell datas for the auxiliary basis set, up to l_max.
          */
-        std::vector<ShellData> shellDatasAux(const Structure &structure); // TODO:....
+        std::vector<ShellData> shellDataAux(const Structure &structure);
 
         /**
          *
          */
-        std::vector<ShellPairData> shellPairDatas(const bool use_symm, const Structure &structure); // TODO:....
+        std::vector<ShellPairData> shellPairData(const bool use_symm, const Structure &structure);
 
         /** */
         vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
