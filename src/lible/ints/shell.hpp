@@ -67,7 +67,8 @@ namespace lible
          * Calculates the norms of the shell atomic orbitals in spherical basis.
          */
         std::vector<double> calcShellNorms(const int l, const std::vector<double> &coeffs,
-                                           const std::vector<double> &exps);
+                                           const std::vector<double> &exps,
+                                           const std::vector<double> &primitive_norms);
 
         /** */
         std::vector<Shell> constructShells(const basis_atoms_t &basis_atoms,

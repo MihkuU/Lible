@@ -9,8 +9,9 @@ namespace lints = lible::ints;
 
 using std::array, std::vector;
 
-vector<double> lints::calcShellNorms(const int l, const vector<double> &coeffs,
-                                     const vector<double> &exps)
+vector<double> lints::calcShellNorms(const int l, const vector<double> &coeffs, 
+                                     const vector<double> &exps, 
+                                     const vector<double> &primitive_norms)
 {
     size_t k = exps.size();
     vector<vector<double>> e_coeffs = ecoeffsShell(l, exps);
@@ -25,8 +26,8 @@ vector<double> lints::calcShellNorms(const int l, const vector<double> &coeffs,
             double da = coeffs[ia];
             double db = coeffs[ib];
 
-            double na = purePrimitiveNorm(l, a);
-            double nb = purePrimitiveNorm(l, b);
+            double na = primitive_norms[ia];
+            double nb = primitive_norms[ib];
             da *= na;
             db *= nb;
 
@@ -82,7 +83,7 @@ vector<lints::Shell> lints::constructShells(const basis_atoms_t &basis_atoms,
                 for (size_t i = 0; i < cdepth; i++)
                     primitive_norms[i] = purePrimitiveNorm(l, exps[i]);
 
-                vector<double> norms = calcShellNorms(l, coeffs, exps);
+                vector<double> norms = calcShellNorms(l, coeffs, exps, primitive_norms);
 
                 Shell shell(l, atomic_nr, iatom, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
                             coords_iatom, exps, coeffs, norms, primitive_norms);

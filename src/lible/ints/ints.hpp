@@ -323,7 +323,8 @@ namespace lible
          *
          */
         std::vector<double> calcShellNorms(const int l, const std::vector<double> &coeffs,
-                                           const std::vector<double> &exps);
+                                           const std::vector<double> &exps,
+                                           const std::vector<double> &primitive_norms);
 
         /**
          * \ingroup ints
