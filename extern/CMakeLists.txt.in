@@ -20,21 +20,3 @@ ExternalProject_Add(arma
 	BUILD_ALWAYS	  		   OFF
 	DOWNLOAD_EXTRACT_TIMESTAMP FALSE
 )
-
-# mpl library
-if(@LIBLE_USE_MPI@)
-	set(mpl_dir "@CMAKE_CURRENT_BINARY_DIR@/mpl")
-	ExternalProject_Add(mpl
-		URL	                       "@CMAKE_CURRENT_SOURCE_DIR@/mpl-master.zip"
-    	SOURCE_DIR                 "${mpl_dir}"
-	    CONFIGURE_COMMAND          
-			${CMAKE_COMMAND} -S "${mpl_dir}" -B "${mpl_dir}/build" -DCMAKE_INSTALL_PREFIX:PATH=${mpl_dir}/build
-			-DCMAKE_POLICY_VERSION_MINIMUM=3.5
-	    BUILD_COMMAND              "" 
-	    INSTALL_COMMAND            
-			${CMAKE_COMMAND} --install "${mpl_dir}/build"
-	    TEST_COMMAND               ""
-		BUILD_ALWAYS			   OFF
-	    DOWNLOAD_EXTRACT_TIMESTAMP FALSE
-	)
-endif()

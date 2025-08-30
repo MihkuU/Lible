@@ -22,7 +22,6 @@ option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
 
 ### Options
-option(LIBLE_USE_MPI      "Enables compiling with the MPI wrapper" OFF)
 option(LIBLE_BUILD_STATIC "Enables building the static Lible library" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -44,12 +43,6 @@ set_target_properties(lible PROPERTIES PREFIX "")
 set(src_dir ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory("${src_dir}/extern")
 add_subdirectory("${src_dir}/src")
-
-if(LIBLE_USE_MPI)
-	find_package(MPI REQUIRED)
-	target_compile_definitions(lible PRIVATE _LIBLE_USE_MPI_)
-	target_link_libraries(lible PRIVATE MPI::MPI_CXX)
-endif()
 
 # OMP
 find_package(OpenMP REQUIRED)

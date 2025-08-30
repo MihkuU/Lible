@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 # Setting up some external libraries
 # List of libraries:
 #   - armadillo, https://arma.sourceforge.net/
-#   - fmt, https://github.com/fmtlib/fmt
-#   - mpl, https://github.com/rabauke/mpl
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY)
 execute_process(COMMAND "${CMAKE_COMMAND}" . WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/)
@@ -21,13 +19,4 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_definitions(lible PRIVATE ARMA_NO_DEBUG)
-endif()
-
-# fmt
-target_compile_definitions(lible PRIVATE FMT_HEADER_ONLY)
-target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fmt/include)
-
-# mpl
-if(LIBLE_USE_MPI)
-	target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/mpl/build/include)
 endif()
