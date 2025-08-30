@@ -12,32 +12,6 @@ target_include_directories(lible PUBLIC
 	$<BUILD_INTERFACE:${src_dir}/>
 	$<INSTALL_INTERFACE:include>)
 
-if(LIBLE_BUILD_GEOMOPT)
-	file(GLOB geomopt_sources CONFIGURE_DEPENDS
-		"geomopt/*.cpp"
-		"geomopt/*.hpp")
-
-	target_sources(lible PRIVATE ${geomopt_sources})
-
-	target_include_directories(lible PUBLIC 
-		$<BUILD_INTERFACE:${src_dir}>
-		$<INSTALL_INTERFACE:include>)
-endif()
-
-if(LIBLE_BUILD_GCI)
-	file(GLOB gugaci_sources CONFIGURE_DEPENDS 
-		"${src_dir}/lible/gugaci/*.cpp"
-		"${src_dir}/lible/gugaci/*.hpp"
-		"${src_dir}/lible/davidson/*.cpp"
-		"${src_dir}/lible/davidson/*.hpp")
-
-	target_sources(lible PRIVATE ${gugaci_sources})
-
-	target_include_directories(lible PUBLIC 
-		$<BUILD_INTERFACE:${src_dir}>
-		$<INSTALL_INTERFACE:include>)
-endif()
-
 if(LIBLE_BUILD_INTS)
 	target_compile_options(lible PRIVATE -fconstexpr-ops-limit=2147483647)
 	file(GLOB ints_sources CONFIGURE_DEPENDS

@@ -18,20 +18,23 @@ else()
 endif()
 
 # Modules
-option(LIBLE_BUILD_DAVIDSON "Build and install the Davidson module" OFF)
 option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
-option(LIBLE_BUILD_GEOMOPT  "Build and install the Geometry optimization module" OFF)
-option(LIBLE_BUILD_GCI      "Build and install the GUGA-SCI module" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
 
 ### Options
-option(LIBLE_USE_MPI    "Enables compiling with the MPI wrapper" OFF)
+option(LIBLE_USE_MPI      "Enables compiling with the MPI wrapper" OFF)
+option(LIBLE_BUILD_STATIC "Enables building the static Lible library" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 ### the main target
-add_library(lible SHARED)
+if(LIBLE_BUILD_STATIC)
+	add_library(lible STATIC)
+else()
+	add_library(lible SHARED)
+endif()
+
 add_library(lible::lible ALIAS lible)
 target_compile_options(lible PRIVATE -Wall -Wno-unused-local-typedefs)
 
@@ -82,15 +85,6 @@ if(lible_is_top_level)
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/types.hpp")
 	list(APPEND lible_basic_headers "${src_dir}/src/lible/vectormd.hpp") 
 
-	if(LIBLE_BUILD_DAVIDSON)
-	endif()
-
-	if(LIBLE_BUILD_GCI)
-		list(APPEND lible_gci_headers "${src_dir}/src/lible/gugaci/gci.hpp")
-		list(APPEND lible_gci_headers "${src_dir}/src/lible/gugaci/gci_settings.hpp")
-		list(APPEND lible_gci_headers "${src_dir}/src/lible/davidson/davidson_settings.hpp")
-	endif()
-
 	if(LIBLE_BUILD_INTS)
 		file(GLOB lible_ints_headers1 "${src_dir}/src/lible/ints/*.hpp")
 		file(GLOB lible_ints_headers2 "${src_dir}/src/lible/ints/oneel/*.hpp")
@@ -111,11 +105,6 @@ if(lible_is_top_level)
 		install(FILES ${lible_ints_headers3} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/twoel)
 	endif()
 
-	if(LIBLE_BUILD_GCI)
-		install(FILES ${lible_gci_headers}
-				DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/gci)
-	endif()
-
 	install(EXPORT libleTargets
 		FILE libleTargets.cmake
 		NAMESPACE lible::
@@ -132,3 +121,10 @@ add_executable(testlible)
 
 add_subdirectory("${src_dir}/test")
 
+### Static library
+#if(LIBLE_BUILD_STATIC)
+#	add_library(lible_static STATIC)
+#
+#	get_target_property(lible_sources lible SOURCES)
+#	target_sources(lible_static PRIVATE ${lible_sources})
+#endif()
