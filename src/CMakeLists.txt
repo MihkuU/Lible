@@ -13,7 +13,6 @@ target_include_directories(lible PUBLIC
 	$<INSTALL_INTERFACE:include>)
 
 if(LIBLE_BUILD_INTS)
-	target_compile_options(lible PRIVATE -fconstexpr-ops-limit=2147483647)
 	file(GLOB ints_sources CONFIGURE_DEPENDS
 		"${src_dir}/lible/ints/*.cpp"
 		"${src_dir}/lible/ints/*.hpp"

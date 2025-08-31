@@ -10,19 +10,14 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace FS = std::filesystem;
-namespace LI = lible::ints;
+namespace fs = std::filesystem;
+namespace lints = lible::ints;
 
 using std::pair, std::string, std::vector;
 
-#ifdef BASIS_DIR
-#define path_to_basis_sets BASIS_DIR
-#define path_to_aux_basis_sets AUX_BASIS_DIR
-#endif
-
 namespace lible::ints
 {
-    static std::map<int, vector<LI::shell_exps_coeffs_t>>
+    static std::map<int, vector<shell_exps_coeffs_t>>
     basisForAtomImpl(const int atomic_nr, const string &basis_set, const string &basis_path)
     {
         std::ifstream basis_file(basis_path, std::ios::in);
@@ -87,22 +82,22 @@ namespace lible::ints
     }
 }
 
-std::map<int, vector<LI::shell_exps_coeffs_t>>
-LI::basisForAtom(const int atomic_nr, const string &basis_set)
+std::map<int, vector<lints::shell_exps_coeffs_t>>
+lints::basisForAtom(const int atomic_nr, const string &basis_set)
 {
     string basis_path = returnBasisPath(basis_set);
     return basisForAtomImpl(atomic_nr, basis_set, basis_path);
 }
 
-std::map<int, vector<LI::shell_exps_coeffs_t>>
-LI::basisForAtomAux(const int atomic_nr, const string &basis_set)
+std::map<int, vector<lints::shell_exps_coeffs_t>>
+lints::basisForAtomAux(const int atomic_nr, const string &basis_set)
 {
     string aux_basis_path = returnAuxBasisPath(basis_set);
     return basisForAtomImpl(atomic_nr, basis_set, aux_basis_path);
 }
 
-std::map<int, std::map<int, vector<LI::shell_exps_coeffs_t>>>
-LI::basisForAtoms(const std::set<int> &atomic_nrs, const string &basis_set)
+std::map<int, std::map<int, vector<lints::shell_exps_coeffs_t>>>
+lints::basisForAtoms(const std::set<int> &atomic_nrs, const string &basis_set)
 {
     std::map<int, std::map<int, vector<shell_exps_coeffs_t>>> basis_atoms;
     for (const int atomic_nr : atomic_nrs)
@@ -114,10 +109,10 @@ LI::basisForAtoms(const std::set<int> &atomic_nrs, const string &basis_set)
     return basis_atoms;
 }
 
-std::map<int, std::map<int, vector<LI::shell_exps_coeffs_t>>>
-LI::basisForAtomsAux(const std::set<int> &atomic_nrs, const string &aux_basis_set)
+std::map<int, std::map<int, vector<lints::shell_exps_coeffs_t>>>
+lints::basisForAtomsAux(const std::set<int> &atomic_nrs, const string &aux_basis_set)
 {
-    std::map<int, std::map<int, vector<shell_exps_coeffs_t>>> aux_basis_atoms;
+    std::map<int, std::map<int, vector<lints::shell_exps_coeffs_t>>> aux_basis_atoms;
     for (const int atomic_nr : atomic_nrs)
     {
         auto basis_atom = basisForAtomAux(atomic_nr, aux_basis_set);
@@ -127,17 +122,17 @@ LI::basisForAtomsAux(const std::set<int> &atomic_nrs, const string &aux_basis_se
     return aux_basis_atoms;
 }
 
-string LI::returnAuxBasisPath(const string &aux_basis_set)
+string lints::returnAuxBasisPath(const string &aux_basis_set)
 {
     string bs = aux_basis_set;
     std::transform(bs.begin(), bs.end(), bs.begin(), [](unsigned char c)
                    { return std::tolower(c); });
 
     string basis_family_str = returnAuxBasisFamilyString(aux_basis_set);
-    string basis_prefix = string(path_to_aux_basis_sets) + "/" + basis_family_str;
+    string basis_prefix = BasisPaths::getAuxBasisSetsPath() + "/" + basis_family_str;
 
     string basis_path;
-    for (const auto &entry : FS::directory_iterator(basis_prefix))
+    for (const auto &entry : fs::directory_iterator(basis_prefix))
     {
         basis_path = entry.path();
         string basis_name = entry.path().filename();
@@ -150,17 +145,17 @@ string LI::returnAuxBasisPath(const string &aux_basis_set)
     throw std::runtime_error(message);
 }
 
-string LI::returnBasisPath(const string &basis_set)
+string lints::returnBasisPath(const string &basis_set)
 {
     string bs = basis_set;
     std::transform(bs.begin(), bs.end(), bs.begin(), [](unsigned char c)
                    { return std::tolower(c); });
 
     string basis_family_str = returnBasisFamilyString(basis_set);
-    string basis_prefix = string(path_to_basis_sets) + "/" + basis_family_str;
+    string basis_prefix = BasisPaths::getMainBasisSetsPath() + "/" + basis_family_str;
 
     string basis_path;
-    for (const auto &entry : FS::directory_iterator(basis_prefix))
+    for (const auto &entry : fs::directory_iterator(basis_prefix))
     {
         basis_path = entry.path();
         string basis_name = entry.path().filename();

@@ -62,9 +62,19 @@ else()
 	target_link_libraries(lible PRIVATE BLAS::BLAS)
 endif()
 
-# miscellaneous # TODO: manage this
-target_compile_definitions(lible PRIVATE BASIS_DIR="${src_dir}/src/lible/ints/basis")
-target_compile_definitions(lible PRIVATE AUX_BASIS_DIR="${src_dir}/src/lible/ints/aux_basis")
+# miscellaneous
+set(lible_main_basis_srcdir "${src_dir}/src/lible/ints/basis")
+set(lible_aux_basis_srcdir "${src_dir}/src/lible/ints/aux_basis")
+
+if(NOT DEFINED LIBLE_MAIN_BASIS_DIR)
+	target_compile_definitions(lible PRIVATE LIBLE_MAIN_BASIS_DIR="${CMAKE_BINARY_DIR}/basis")
+	file(COPY ${lible_main_basis_srcdir} DESTINATION ${CMAKE_BINARY_DIR}/)
+endif()
+
+if(NOT DEFINED LIBLE_AUX_BASIS_DIR)
+	target_compile_definitions(lible PRIVATE LIBLE_AUX_BASIS_DIR="${CMAKE_BINARY_DIR}/aux_basis")
+	file(COPY ${lible_aux_basis_srcdir} DESTINATION ${CMAKE_BINARY_DIR}/)
+endif()
 
 ### Documentation
 if(lible_is_top_level AND LIBLE_BUILD_DOCS)
@@ -92,7 +102,7 @@ if(lible_is_top_level)
 	install(FILES ${lible_basic_headers}
 			DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible)	
 
-	if(LIBLE_BUILD_INTS)
+	if(LIBLE_BUILD_INTS)	
 		install(FILES ${lible_ints_headers1} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints)
 		install(FILES ${lible_ints_headers2} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/oneel)
 		install(FILES ${lible_ints_headers3} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/twoel)
@@ -113,11 +123,3 @@ enable_testing()
 add_executable(testlible)
 
 add_subdirectory("${src_dir}/test")
-
-### Static library
-#if(LIBLE_BUILD_STATIC)
-#	add_library(lible_static STATIC)
-#
-#	get_target_property(lible_sources lible SOURCES)
-#	target_sources(lible_static PRIVATE ${lible_sources})
-#endif()
