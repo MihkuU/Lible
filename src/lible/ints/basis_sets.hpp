@@ -32,6 +32,7 @@ namespace lible
             sto,
         };
 
+        /** TODO: this class prolly needs to go to the main header. */
         class BasisPaths
         {
         public:

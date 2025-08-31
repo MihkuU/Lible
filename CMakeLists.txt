@@ -62,7 +62,9 @@ else()
 	target_link_libraries(lible PRIVATE BLAS::BLAS)
 endif()
 
-# miscellaneous
+# miscellaneous # TODO: rename this section to basis sets?
+# TODO: make this section conditional on whether ints are built?
+# TODO: figure out how to make this stuff work with installation?!?!?!
 set(lible_main_basis_srcdir "${src_dir}/src/lible/ints/basis")
 set(lible_aux_basis_srcdir "${src_dir}/src/lible/ints/aux_basis")
 
