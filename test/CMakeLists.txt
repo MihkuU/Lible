@@ -7,7 +7,8 @@ target_link_libraries(testlible PRIVATE lible)
 target_include_directories(testlible PRIVATE ${tests_dir})
 target_include_directories(testlible PRIVATE ${src_dir}/src/)
 
-set(Tests 
+if(LIBLE_BUILD_INTS)
+set(IntsTests
 	numCartesians 
 	numSphericals 
 	overlap 
@@ -66,6 +67,7 @@ set(Tests
 	getLPairsSymm
 	getLPairsNoSymm)
 
-foreach(item ${Tests})
+foreach(item ${IntsTests})
 	add_test(NAME "lible::ints::${item}" COMMAND ${CMAKE_BINARY_DIR}/testlible ${item})
 endforeach()
+endif()

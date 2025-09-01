@@ -18,6 +18,14 @@
 #include <utility>
 #include <vector>
 
+#ifdef LIBLE_MAIN_BASIS_DIR
+#define path_to_basis_sets LIBLE_MAIN_BASIS_DIR
+#endif 
+
+#ifdef LIBLE_AUX_BASIS_DIR
+#define path_to_aux_basis_sets LIBLE_AUX_BASIS_DIR
+#endif
+
 namespace lible
 {
     namespace ints
@@ -219,18 +227,6 @@ namespace lible
 
         /**
          * \ingroup ints
-         * Returns the names of all available basis sets in lower case.
-         */
-        std::set<std::string> availableBasisSets();
-
-        /**
-         * \ingroup ints
-         * Returns the names of all available auxiliary basis sets in lower case.
-         */
-        std::set<std::string> availableBasisSetsAux();
-
-        /**
-         * \ingroup ints
          * Typedef for bundling Gaussian primitive exponents and contraction coefficients
          * of a shell.
          */
@@ -417,5 +413,49 @@ namespace lible
          * Returns a list of angular momentum pairs: {(0, 0), (1, 0), (0, 1), ..., (l_max, l_max)}.
          */
         std::vector<std::pair<int, int>> getLPairsNoSymm(const int l_max);
+
+        /**
+         * \ingroup ints
+         * Returns the names of all available basis sets in lower case.
+         */
+        std::set<std::string> availableBasisSets();
+
+        /**
+         * \ingroup ints
+         * Returns the names of all available auxiliary basis sets in lower case.
+         */
+        std::set<std::string> availableBasisSetsAux();
+
+        /** TODO: */
+        class BasisPaths
+        {
+        public:
+            static std::string getMainBasisSetsPath()
+            {
+                return main_basis_sets_path;
+            }
+
+            static std::string getAuxBasisSetsPath()
+            {
+                return aux_basis_sets_path;
+            }
+
+            static void setMainBasisSetsPath(const std::string &path)
+            {
+                main_basis_sets_path = path;
+            }
+
+            static void setAuxBasisSetsPath(const std::string &path)
+            {
+                aux_basis_sets_path = path;
+            }
+
+        private:
+            /** Absolute path to the main basis sets. */
+            static inline std::string main_basis_sets_path{path_to_basis_sets};
+
+            /** Absolute path to the auxiliary basis sets. */
+            static inline std::string aux_basis_sets_path{path_to_aux_basis_sets};
+        };
     }
 }

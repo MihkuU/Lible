@@ -62,19 +62,16 @@ else()
 	target_link_libraries(lible PRIVATE BLAS::BLAS)
 endif()
 
-# miscellaneous # TODO: rename this section to basis sets?
-# TODO: make this section conditional on whether ints are built?
-# TODO: figure out how to make this stuff work with installation?!?!?!
-set(lible_main_basis_srcdir "${src_dir}/src/lible/ints/basis")
-set(lible_aux_basis_srcdir "${src_dir}/src/lible/ints/aux_basis")
+# Basis sets
+## TODO: figure out how to make this stuff work with installation?
 
-if(NOT DEFINED LIBLE_MAIN_BASIS_DIR)
-	target_compile_definitions(lible PRIVATE LIBLE_MAIN_BASIS_DIR="${CMAKE_BINARY_DIR}/basis")
+if(LIBLE_BUILD_INTS)
+	set(lible_main_basis_srcdir "${src_dir}/src/lible/ints/lible_basis")
+	target_compile_definitions(lible PUBLIC LIBLE_MAIN_BASIS_DIR="${CMAKE_BINARY_DIR}/lible_basis")
 	file(COPY ${lible_main_basis_srcdir} DESTINATION ${CMAKE_BINARY_DIR}/)
-endif()
 
-if(NOT DEFINED LIBLE_AUX_BASIS_DIR)
-	target_compile_definitions(lible PRIVATE LIBLE_AUX_BASIS_DIR="${CMAKE_BINARY_DIR}/aux_basis")
+	set(lible_aux_basis_srcdir "${src_dir}/src/lible/ints/lible_aux_basis")
+	target_compile_definitions(lible PUBLIC LIBLE_AUX_BASIS_DIR="${CMAKE_BINARY_DIR}/lible_aux_basis")
 	file(COPY ${lible_aux_basis_srcdir} DESTINATION ${CMAKE_BINARY_DIR}/)
 endif()
 
@@ -120,8 +117,10 @@ if(lible_is_top_level)
 endif()
 
 ### Testing
-include(CTest)
-enable_testing()
-add_executable(testlible)
+if(lible_is_top_level)
+	include(CTest)
+	enable_testing()
+	add_executable(testlible)
 
-add_subdirectory("${src_dir}/test")
+	add_subdirectory("${src_dir}/test")
+endif()

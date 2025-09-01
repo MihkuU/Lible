@@ -6,14 +6,6 @@
 #include <vector>
 #include <unordered_map>
 
-#ifdef LIBLE_MAIN_BASIS_DIR
-#define path_to_basis_sets LIBLE_MAIN_BASIS_DIR
-#endif 
-
-#ifdef LIBLE_AUX_BASIS_DIR
-#define path_to_aux_basis_sets LIBLE_AUX_BASIS_DIR
-#endif
-
 namespace lible
 {
     namespace ints
@@ -30,38 +22,6 @@ namespace lible
             dunning,
             pople,
             sto,
-        };
-
-        /** TODO: this class prolly needs to go to the main header. */
-        class BasisPaths
-        {
-        public:
-            static std::string getMainBasisSetsPath()
-            {
-                return main_basis_sets_path;
-            }
-
-            static std::string getAuxBasisSetsPath()
-            {
-                return aux_basis_sets_path;
-            }
-
-            static void setMainBasisSetsPath(const std::string &path)
-            {
-                main_basis_sets_path = path;
-            }
-
-            static void setAuxBasisSetsPath(const std::string &path)
-            {
-                aux_basis_sets_path = path;
-            }
-
-        private:
-            /** Absolute path to the main basis sets. */
-            static inline std::string main_basis_sets_path{path_to_basis_sets};
-
-            /** Absolute path to the auxiliary basis sets. */
-            static inline std::string aux_basis_sets_path{path_to_aux_basis_sets};
         };
 
         /** */
