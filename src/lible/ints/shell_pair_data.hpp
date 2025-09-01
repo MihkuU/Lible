@@ -73,7 +73,7 @@ namespace lible
             std::vector<int> offsets_ecoeffs_deriv1; /** Offsets of the 1st derivative spherical Hermite expansion coefficients. */
             std::vector<int> offsets_ecoeffs_deriv2; /** Offsets of the 2nd derivative spherical Hermite expansion coefficients. */
             std::vector<int> offsets_norms;          /** Offsets of the shell atomic orbital norms. */
-            std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */            
+            std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */
             std::vector<int> shell_idxs;             /** Indices of the involved shells in the list of all shells. */
 
             /** Returns the angular momentum pair. */
@@ -83,7 +83,7 @@ namespace lible
             }
         };
 
-        /**         
+        /**
          * Constructs the shell datas for the auxiliary basis set, up to max L.
          */
         std::vector<ShellData> shellDataAux(const Structure &structure);
