@@ -21,9 +21,9 @@ namespace lible
             /** */
             ShellData(const int l, const std::vector<Shell> &shells);
 
-            int l;            /** Angular momentum. */
-            int n_shells;     /** Number of shells. */
-            int n_primitives; /** Total number of Gaussian primitives. */
+            int l{};            /** Angular momentum. */
+            int n_shells{};     /** Number of shells. */
+            int n_primitives{}; /** Total number of Gaussian primitives. */
 
             std::vector<double> coeffs; /** Contraction coefficients with the primitive norms multiplied into. */
             std::vector<double> coords; /** Coordinates of atoms corresponding to shells. */

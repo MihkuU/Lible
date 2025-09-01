@@ -26,6 +26,9 @@ namespace lible
          */
         struct Shell
         {
+            /** Default constructor. */
+            Shell() = default;
+
             /** The constructor. */
             Shell(const int l, const int z, const int atom_idx, const int dim_cart,
                   const int dim_sph, const int ofs_cart, const int ofs_sph, const int idx,
@@ -38,21 +41,21 @@ namespace lible
             {
             }
 
-            int l; /** Angular momentum. */
-            int z; /** Atomic number. */
+            int l{}; /** Angular momentum. */
+            int z{}; /** Atomic number. */
 
-            int atom_idx; /** Index of the shell atom in the list of all atoms. */
-            int dim_cart; /** Number of atomic orbitals in Cartesian basis. */
-            int dim_sph;  /** Number of atomic orbitals in spherical basis. */
-            int ofs_cart; /** Starting position in the list of atomic orbitals in Cartesian basis. */
-            int ofs_sph;  /** Starting position in the list of atomic orbitals. */            
+            int atom_idx{}; /** Index of the shell atom in the list of all atoms. */
+            int dim_cart{}; /** Number of atomic orbitals in Cartesian basis. */
+            int dim_sph{};  /** Number of atomic orbitals in spherical basis. */
+            int ofs_cart{}; /** Starting position in the list of atomic orbitals in Cartesian basis. */
+            int ofs_sph{};  /** Starting position in the list of atomic orbitals. */
 
-            int idx; /** Index of the shell in the list of all shells. */
+            int idx{}; /** Index of the shell in the list of all shells. */
 
             std::array<double, 3> xyz_coords; /** Coordinates of the atom corresponding to the shell. */
 
             std::vector<double> exps;       /** Exponents of the Gaussian primitives. */
-            std::vector<double> coeffs;     /** Contraction coefficients of the Gaussian primitives. */            
+            std::vector<double> coeffs;     /** Contraction coefficients of the Gaussian primitives. */
             std::vector<double> norms;      /** Normalization constants of the atomic orbitals in spherical basis. */
             std::vector<double> norms_prim; /** Normalization constants of the Gaussian primitives. */
         };
