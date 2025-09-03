@@ -13,7 +13,6 @@ vector<double> lints::calcShellNorms(const int l, const vector<double> &coeffs,
                                      const vector<double> &exps, 
                                      const vector<double> &primitive_norms)
 {
-    // TODO: error handling
     size_t k = exps.size();
     vector<vector<double>> e_coeffs = ecoeffsShell(l, exps);
 
@@ -56,7 +55,10 @@ vector<lints::Shell> lints::constructShells(const basis_atoms_t &basis_atoms,
                                             const vector<int> &atomic_nrs,
                                             const vector<array<double, 3>> &coords_atoms)
 {
-    // TODO: error handling
+    if (atomic_nrs.size() != coords_atoms.size())
+        throw std::runtime_error("lints::constructShells(): number of atomic numbers and coordinates "
+                                 "doesn't match");
+
     int idx_shell = 0;
     int ofs_sph = 0;
     int ofs_cart = 0;
