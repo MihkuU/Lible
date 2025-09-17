@@ -1,17 +1,9 @@
-.. _ints:
 
 Integrals
 =========
 
-Todo...
-
 .. toctree::
-   :hidden:
-   :caption: Integrals
-
-   ints/definitions
-   ints/ints
-   ints/shell
-   ints/spdata
-   ints/structure
-   ints/tutorials
+   :maxdepth: 2
+   
+   integrals_introduction
+   integrals_tutorial

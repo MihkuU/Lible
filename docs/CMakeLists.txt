@@ -60,12 +60,8 @@ add_custom_command(OUTPUT ${sphinx_index_file}
 	DEPENDS
 		${CMAKE_CURRENT_SOURCE_DIR}/index.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints/definitions.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints/ints.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints/shell.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints/spdata.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints/structure.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/ints/tutorials.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/integrals_introduction.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/integrals_tutorial.rst
 		${doxygen_index_file}
 	MAIN_DEPENDENCY   ${sphinx_source}/conf.py
 	COMMENT           "Generating documentation with Sphinx")

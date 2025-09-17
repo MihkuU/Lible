@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Lible overview
-==============
+=====
+Lible
+=====
 
 `Lible <https://github.com/MihkuU/Lible/>`_ is a modern C++ library that aims to enhance the 
 development of quantum chemical methods. Its primary goal is to provide thin-grained utilities
@@ -30,23 +31,6 @@ not enough here. Thus, the overall documentation is split into three parts:
 
 .. toctree::
    :hidden:
-   :maxdepth: 2
-   :caption: Introduction
+   :maxdepth: 1
 
-   installation
-   basic_usage
-   modules
-
-.. toctree::
-   :hidden:
-   :maxdepth: 3
-   :caption: User guide
-
-   integrals 
-
-.. toctree::
-   :hidden:
-   :maxdepth: 2
-   :caption: Programming interface
-
-   utilities
+   integrals
