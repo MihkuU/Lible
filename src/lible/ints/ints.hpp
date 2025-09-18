@@ -106,7 +106,7 @@ namespace lible
          * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
          * initialized for lab = la + lb in the given shell pair data.
          */
-        vec2d externalChargesKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+        vec2d externalChargesKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
@@ -115,7 +115,7 @@ namespace lible
          * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
          * initialized for lab = la + lb in the given shell pair data.
          */
-        vec2d externalChargesErfKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+        vec2d externalChargesErfKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                        const std::vector<double> &omegas,
                                        const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
@@ -127,7 +127,7 @@ namespace lible
          * in the given shell pair data.
          */
         std::array<vec2d, 6>
-        externalChargesD1Kernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+        externalChargesD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
@@ -138,7 +138,7 @@ namespace lible
          * pair data.
          */
         std::vector<std::array<vec2d, 3>>
-        externalChargesOperatorD1Kernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+        externalChargesOperatorD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                         const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
@@ -149,7 +149,7 @@ namespace lible
          * pair data.
          */
         std::vector<vec2d>
-        potentialAtExternalChargesKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+        potentialAtExternalChargesKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                          const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
         /**
@@ -160,7 +160,7 @@ namespace lible
          * pair data. The screening factor omega should be given as a std::vector<double>
          */
         std::vector<vec2d>
-        potentialAtExternalChargesErfKernel(const int ipair, const std::vector<std::array<double, 4>> &charges,
+        potentialAtExternalChargesErfKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                             const std::vector<double> &omegas,
                                             const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
@@ -238,7 +238,7 @@ namespace lible
          * are listed for every angular momentum.
          */
         std::map<int, std::vector<shell_exps_coeffs_t>>
-        basisForAtom(const int atomic_nr, const std::string &basis_set);
+        basisForAtom(int atomic_nr, const std::string &basis_set);
 
         /**
          * \ingroup ints
@@ -246,7 +246,7 @@ namespace lible
          * coefficients are listed for every angular momentum.
          */
         std::map<int, std::vector<shell_exps_coeffs_t>>
-        basisForAtomAux(const int atomic_nr, const std::string &aux_basis_set);
+        basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
 
         /**
          * \ingroup ints
@@ -269,7 +269,7 @@ namespace lible
          * Returns the Cartesial to spherical basis transformation,
          * \f$\{(\text{i_spherical}, \text{i_cartesian}, \text{val})\}\f$.
          */
-        std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
+        std::vector<std::tuple<int, int, double>> sphericalTrafo(int l);
 
         /** */
         ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
@@ -318,7 +318,7 @@ namespace lible
         /**
          *
          */
-        std::vector<double> calcShellNorms(const int l, const std::vector<double> &coeffs,
+        std::vector<double> calcShellNorms(int l, const std::vector<double> &coeffs,
                                            const std::vector<double> &exps,
                                            const std::vector<double> &primitive_norms);
 
@@ -331,10 +331,16 @@ namespace lible
         /**
          *
          */
-        std::vector<ShellPairData> shellPairData(const bool use_symm, const Structure &structure);
+        std::vector<ShellPairData> shellPairData(bool use_symm, const Structure &structure);
+
+        /**
+         *
+         */
+        std::vector<ShellPairData> shellPairData(const std::vector<Shell> &shells_a,
+                                                 const std::vector<Shell> &shells_b);
 
         /** */
-        vec2d ecoeffsRecurrence1(const double one_o_2a, const int l);
+        vec2d ecoeffsRecurrence1(double one_o_2a, int l);
 
         /** */
         vec3d ecoeffsRecurrence2(const double a, const double b, const int la, const int lb,
@@ -345,7 +351,7 @@ namespace lible
                                     const double A, const double B, const vec3d &ecoeffs);
 
         /** */
-        std::array<lible::vec2d, 3> ecoeffsPrimitive(const double a, const int l);
+        std::array<vec2d, 3> ecoeffsPrimitive(const double a, const int l);
 
         /** */
         std::array<vec3d, 3> ecoeffsPrimitivePair(const double a, const double b, const int la,

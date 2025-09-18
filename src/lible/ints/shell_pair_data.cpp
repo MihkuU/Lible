@@ -3,7 +3,7 @@
 
 namespace lints = lible::ints;
 
-using std::pair, std::vector;
+using std::map, std::pair, std::vector;
 
 lints::ShellData::ShellData(const int l, const std::vector<Shell> &shells)
     : l(l)
@@ -227,6 +227,25 @@ vector<lints::ShellPairData> lints::shellPairData(const bool use_symm, const Str
     for (const auto &[la, lb] : l_pairs)
         sp_data.emplace_back(ShellPairData(use_symm, la, lb, structure.getShellsL(la),
                                            structure.getShellsL(lb)));
+
+    return sp_data;
+}
+
+vector<lints::ShellPairData> lints::shellPairData(const vector<Shell> &shells_a,
+                                                  const vector<Shell> &shells_b)
+{
+    map<int, vector<Shell>> shells_a_map;
+    for (const Shell &shell : shells_a)
+        shells_a_map[shell.l].push_back(shell);
+
+    map<int, vector<Shell>> shells_b_map;
+    for (const Shell &shell : shells_b)
+        shells_b_map[shell.l].push_back(shell);
+
+    vector<ShellPairData> sp_data;
+    for (const auto &[la, shells_la] : shells_a_map)
+        for (const auto &[lb, shells_lb] : shells_b_map)
+            sp_data.emplace_back(ShellPairData(false, la, lb, shells_la, shells_lb));
 
     return sp_data;
 }

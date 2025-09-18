@@ -91,6 +91,9 @@ namespace lible
         /**
          *
          */
-        std::vector<ShellPairData> shellPairData(const bool use_symm, const Structure &structure);
+        std::vector<ShellPairData> shellPairData(bool use_symm, const Structure &structure);
+
+        std::vector<ShellPairData> shellPairData(const std::vector<Shell> &shells_a,
+                                                 const std::vector<Shell> &shells_b);
     }
 }
