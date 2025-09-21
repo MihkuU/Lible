@@ -3,7 +3,7 @@ Integrals
 =========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    integrals_introduction
    integrals_main_interface.rst

@@ -3,6 +3,9 @@
 Introduction
 ============
 
+Atomic orbitals
+---------------
+
 Lible provides utilities to calculate molecular integrals over contracted Gaussian type atomic 
 orbitals (GTAOs). A contracted GTAO can be written as 
 
@@ -46,3 +49,11 @@ The contents of the above expression warrant an explanation:
 
 6. :math:`\mathbf{r}_A = (x - A_x, y - A_y, z - A_z)`
 
+Angular momentum
+----------------
+
+Available kernels
+-----------------
+
+Calculation scheme
+------------------
