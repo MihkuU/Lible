@@ -17,11 +17,9 @@ else()
 	set(lible_is_top_level FALSE)
 endif()
 
-# Modules
+### Options
 option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
-
-### Options
 option(LIBLE_BUILD_STATIC "Enables building the static Lible library" OFF)
 
 set(CMAKE_CXX_STANDARD 20)

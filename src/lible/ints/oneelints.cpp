@@ -74,7 +74,7 @@ namespace lible::ints
 
     vec2d nuclearAttraction(const Structure &structure);
 
-    vec2d nuclearAttractionErf(const Structure &structure, const vector<double> &omega);
+    vec2d nuclearAttractionErf(const Structure &structure, const vector<double> &omegas);
 
     // A helper function for 'kineticEnergyD1Kernel'.
     auto kinEDeriv1Helper = [](const double b, const double b2, const double fac,
@@ -1537,7 +1537,7 @@ lible::vec2d LI::nuclearAttraction(const Structure &structure)
 
 lible::vec2d LI::nuclearAttractionErf(const Structure &structure, const vector<double> &omegas)
 {
-    if (omegas.size() != (size_t)structure.getNAtoms())    
+    if (omegas.size() != static_cast<size_t>(structure.getNAtoms()))
         throw std::runtime_error("Number of omega values must match number of atoms.");    
 
     int l_max = structure.getMaxL();

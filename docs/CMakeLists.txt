@@ -1,13 +1,13 @@
 #[=[ 
-	Based on:
-	1) https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
-	2) https://coderefinery.github.io/documentation/
+Based on:
+1) https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
+2) https://coderefinery.github.io/documentation/
 
-    Some other examples:
-	1) http://ceres-solver.org/index.html
-    2) https://rabauke.github.io/mpl/html/
-    3) https://xtb-docs.readthedocs.io/en/latest/
-	4) https://github.com/roman-ellerbrock/QuTree
+Some other examples:
+1) http://ceres-solver.org/index.html
+2) https://rabauke.github.io/mpl/html/
+3) https://xtb-docs.readthedocs.io/en/latest/
+4) https://github.com/roman-ellerbrock/QuTree
 #]=]
 
 set(lible_header_dir "${PROJECT_SOURCE_DIR}/src/lible/ints")
@@ -60,6 +60,8 @@ add_custom_command(OUTPUT ${sphinx_index_file}
 	DEPENDS
 		${CMAKE_CURRENT_SOURCE_DIR}/index.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/integrals_api.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/integrals_main_interface.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_introduction.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_tutorial.rst
 		${doxygen_index_file}

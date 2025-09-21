@@ -1,6 +1,6 @@
 
-Tutorial
-========
+Tutorials
+=========
 
 Shell & shell-pair data
 -----------------------
