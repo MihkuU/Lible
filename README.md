@@ -1,8 +1,17 @@
 # Lible
 
-** Prerequisites **
-  - A C++17-capable compiler
-  - A form of BLAS/LAPACK is probably required. IntelMKL is preferable, otherwise get OpenBLAS.
+## Set up 
+
+### Preqrequisites
+- A compiler that enables C++20 features such as `std::format` or `consteval`. For example, GNU-13 or newer.
+You can see [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support.html).
+- A form of BLAS/LAPACK. Recommended either [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) or
+[IntelMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+
+### Installation
+
+
+### CMake integration
     
 ** Installation **
   - Pull the repo as usual
