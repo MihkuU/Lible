@@ -11,7 +11,7 @@ A comprehensive overview of appropriate compilers can be seen at [C++ compiler s
 ### Installation  
 Building and installing Lible is necessary primarily if you intend to work with the source code, for example, to 
 add new features. If you want to just integrate the library in your code and use its features, then it is advisable 
-to use the CMake [`FetchContent`](foo) feature that is explained below. For the separate build, follow the steps:
+to use the CMake `FetchContent` feature that is explained below. For the separate build, follow the steps:
   - Clone the repo as usual.  
   - Then run:
   ```bash
