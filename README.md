@@ -3,7 +3,7 @@
 ## Set up 
 
 ### Preqrequisites
-- Compiler that enables C++20 features such as `std::format` or `consteval`. For example, GNU-13 or newer.
+- Compiler that enables C++20 features such as `std::format` or `consteval`. For example, GCC-13 or newer.
 A comprehensive overview of appropriate compilers can be seen at [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support.html).
 - Some form of BLAS/LAPACK. Recommended either [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) or
 [IntelMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
