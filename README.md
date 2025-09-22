@@ -14,22 +14,35 @@ add new features. If you want to just integrate the library in your code and use
 to use the CMake `FetchContent` feature that is explained below. For the separate build, follow the steps:
   - Clone the repo as usual.  
   - Then run:
-  ```
+  ```bash
     1. cmake -S . -B build -DCMAKE_BUILD_TYPE=<Specify Debug or Release>
     2. cmake --build build/ -j <nprocs>
     3. cmake --install build/ --prefix "<full path to the chosen installdir, can be build/"
    ```
 
 ### CMake integration
-
-** Using Lible **
-
-The 3. step in Installation ensures that the Lible can be conveniently incorporated in your CMake project using the 'find_package()' function call. In your 'CMakeLists.txt' file you can write:
+  1. The 3. step in Installation ensures that Lible can be incorporated in your CMake project using the 'find_package()' command. 
+  To do that, write in your 'CMakeLists.txt' file:
   ```
-  find_package(Lible REQUIRED)
-  target_link_libraries(YourProject PRIVATE Lible::lible)
+    find_package(Lible REQUIRED)
+    target_link_libraries(YourProject PRIVATE lible::lible)
   ```
-For the find_package() to work, your CMake project configuration has to find Lible. That means, you need to provide the path to the directory, where it was installed:
-```
-  -DCMAKE_PREFIX_PATH=<Path to where you installed Lible in 'Installation'>
-```
+  For the `find_package()` command to work, your CMake configuration has to find Lible. This can be facilitated by pointing the
+  CMake search path to the Lible installation location:
+  ```
+    -DCMAKE_PREFIX_PATH=<full path to the Lible installdir>
+  ```
+  
+  2. Lible can be incorporated in your CMake project directly using `FetchContent`. Write in your `CMakeLists.txt` file:
+  ```
+    include(FetchContent)
+
+    FetchContent_Declare(lible
+      GIT_REPOSITORY https://github.com/MihkuU/Lible
+      GIT_TAG <XXX>)
+
+    FetchContent_MakeAvailable(lible)
+    target_link_libraries(<your target> PRIVATE lible::lible)
+  ```
+  This approach downloads the library and integrates it directly in your build. For more details see 
+  [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html).
