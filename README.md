@@ -25,7 +25,7 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
   To do that, write in your 'CMakeLists.txt' file:
   ```
     find_package(lible REQUIRED)
-    target_link_libraries(YourProject PRIVATE lible::lible)
+    target_link_libraries(<your target> PRIVATE lible::lible)
   ```
   For the `find_package()` command to work, your CMake configuration has to find Lible. This can be facilitated by pointing the
   CMake search path to the Lible installation location:
