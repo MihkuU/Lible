@@ -24,7 +24,7 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
   1. The 3. step in Installation ensures that Lible can be incorporated in your CMake project using the 'find_package()' command. 
   To do that, write in your 'CMakeLists.txt' file:
   ```
-    find_package(Lible REQUIRED)
+    find_package(lible REQUIRED)
     target_link_libraries(YourProject PRIVATE lible::lible)
   ```
   For the `find_package()` command to work, your CMake configuration has to find Lible. This can be facilitated by pointing the
