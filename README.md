@@ -4,14 +4,14 @@
 
 ### Preqrequisites
 - A compiler that enables C++20 features such as `std::format` or `consteval`. For example, GNU-13 or newer.
-For the appropriate compilers, see [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support.html).
+A comprehensive overview of appropriate compilers can be seen at [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support.html).
 - A form of BLAS/LAPACK. Recommended either [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) or
 [IntelMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
 
 ### Installation  
 Building and installing Lible is necessary primarily if you intend to work with the source code, for example, to 
 add new features. If you want to just integrate the library in your code and use its features, then it is advisable 
-to use the CMake `FetchContent` feature that is explained below. For the separate build, follow the steps:
+to use the CMake [`FetchContent`](foo) feature that is explained below. For the separate build, follow the steps:
   - Clone the repo as usual.  
   - Then run:
   ```bash
