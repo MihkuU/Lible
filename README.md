@@ -17,7 +17,7 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
   ```bash
     1. cmake -S . -B build -DCMAKE_BUILD_TYPE=<Specify Debug or Release>
     2. cmake --build build/ -j <nprocs>
-    3. cmake --install build/ --prefix "<full path to the chosen installdir, can be build/"
+    3. cmake --install build/ --prefix "<full path to the chosen installdir, can be build/>"
    ```
 
 ### CMake integration
