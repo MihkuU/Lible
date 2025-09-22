@@ -33,7 +33,7 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
     -DCMAKE_PREFIX_PATH=<full path to the Lible installdir>
   ```
   
-  2. Lible can be incorporated in your CMake project directly using `FetchContent`. Write in your `CMakeLists.txt` file:
+  2. Lible can be incorporated in a CMake project directly using `FetchContent`. Write in your `CMakeLists.txt` file:
   ```
     include(FetchContent)
 
