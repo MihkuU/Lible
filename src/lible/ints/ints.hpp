@@ -110,7 +110,7 @@ namespace lible::ints
     /**
      * \ingroup IntsMainInterface
      * Computes the entire nuclear Coulomb attraction integral matrix for a given molecular
-     * structure with the nuclear charges represented with the error function.
+     * structure with the nuclear charges represented by the error function.
      *
      * \param structure `Structure` object representing the molecular geometry and basis sets.
      * \param omegas list of width parameters for the Gaussian in the error function. The length
@@ -132,12 +132,17 @@ namespace lible::ints
     vec2d externalCharges(const std::vector<std::array<double, 4>> &point_charges,
                           const Structure &structure);
 
-    // /**
-    //      * Calculates the one-electron Coulombic interaction integral matrix for given point
-    //      * charges using the erf-attenuated (screened) Coulomb operator.
-    //      * \param omegas vector holding the screening parameters. Has to have the same size as the
-    //      * point_charges.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the entire nuclear Coulomb interaction integral matrix for a given molecular
+     * structure with the point charges represented with by the error function.
+     *
+     * \param point_charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param omegas list of width parameters for the Gaussian in the error function. The length
+     * of this list has to equal the number of point charges.
+     * \param structure `Structure` object representing the molecular geometry and basis sets.
+     * \return Normalized spherical-basis erf-attenuated nuclear attraction Coulomb integrals.
+     */
     vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges,
                              const std::vector<double> &omegas,
                              const Structure &structure);
