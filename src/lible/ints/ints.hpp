@@ -147,32 +147,40 @@ namespace lible::ints
                              const std::vector<double> &omegas,
                              const Structure &structure);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
-    //      * pair 'ipair'. In spherical basis. The charges should be given as a list
-    //      * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
-    //      * initialized for lab = la + lb in the given shell pair data.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Calculates the Coulomb interaction integrals for a pair of shells.
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis Coulomb interaction integrals for the given shell pair.
+     */
     vec2d externalChargesKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
-    //      * pair 'ipair'. In spherical basis. The charges should be given as a list
-    //      * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
-    //      * initialized for lab = la + lb in the given shell pair data.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Calculates the Coulomb interaction integrals for a pair of shells. The external charges
+     * are represented by the error function.
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param omegas list of width parameters for the Gaussian in the error function. The length
+     * of this list has to equal the length of `charges`.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis Coulomb interaction integrals for the given shell pair.
+     */
     vec2d externalChargesErfKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                    const std::vector<double> &omegas,
                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic interaction energy integral derivatives for
-    //      * the shell pair 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz).
-    //      * In spherical basis. The charges should be given as a list  {(x, y, z, charge)}, with
-    //      * xyz-coordinates in atomic units. The Boys grid should be initialized for lab = la + lb
-    //      * in the given shell pair data.
-    //      */
     std::array<vec2d, 6>
     externalChargesD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                             const BoysGrid &boys_grid, const ShellPairData &sp_data);
@@ -277,6 +285,7 @@ namespace lible::ints
     //      * Typedef for bundling Gaussian primitive exponents and contraction coefficients
     //      * of a shell.
     //      */
+    /** */
     using shell_exps_coeffs_t = std::pair<std::vector<double>, std::vector<double>>;
 
     /** */
