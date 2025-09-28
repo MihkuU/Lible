@@ -277,39 +277,46 @@ namespace lible::ints
     //      * Typedef for bundling Gaussian primitive exponents and contraction coefficients
     //      * of a shell.
     //      */
-    typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
+    using shell_exps_coeffs_t = std::pair<std::vector<double>, std::vector<double>>;
+
+    /** */
+    using basis_atom_t = std::map<int, std::vector<shell_exps_coeffs_t>>;
+
+    /** */
+    using basis_atoms_t = std::map<int, basis_atom_t>;
 
     // /**
     //      * \ingroup ints
     //      * Returns the basis set for the given atom. The exponents and contraction coefficients
     //      * are listed for every angular momentum.
     //      */
-    std::map<int, std::vector<shell_exps_coeffs_t>>
-    basisForAtom(int atomic_nr, const std::string &basis_set);
+    // std::map<int, std::vector<shell_exps_coeffs_t>>
+    basis_atom_t basisForAtom(int atomic_nr, const std::string &basis_set);
 
     // /**
     //      * \ingroup ints
     //      * Returns the auxiliary basis set the given atom. The exponents and contraction
     //      * coefficients are listed for every angular momentum.
     //      */
-    std::map<int, std::vector<shell_exps_coeffs_t>>
-    basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
+    // std::map<int, std::vector<shell_exps_coeffs_t>>
+
+    basis_atom_t basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
 
     // /**
     //      * \ingroup ints
     //      * Returns the basis set for the given atoms. The exponents and contraction coefficients
     //      * are listed for every angular momentum per atom.
     //      */
-    std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
-    basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
+    // std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
+    basis_atoms_t basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
 
     // /**
     //      * \ingroup ints
     //      * Returns the auxiliary basis set for the given atoms. The exponents and contraction
     //      * coefficients are listed for every angular momentum per atom.
     //      */
-    std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
-    basisForAtomsAux(const std::set<int> &atomic_nrs, const std::string &aux_basis_set);
+    // std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
+    basis_atoms_t basisForAtomsAux(const std::set<int> &atomic_nrs, const std::string &aux_basis_set);
 
     // /**
     //      * \ingroup ints
