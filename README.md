@@ -1,25 +1,48 @@
 # Lible
 
-** Prerequisites **
-  - A C++17-capable compiler
-  - A form of BLAS/LAPACK is probably required. IntelMKL is preferable, otherwise get OpenBLAS.
-    
-** Installation **
-  - Pull the repo as usual
+## Set up 
+
+### Preqrequisites
+- Compiler that enables C++20 features such as `std::format` or `consteval`. For example, GCC-13 or newer.
+A comprehensive overview of appropriate compilers can be seen at [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support.html).
+- Some form of BLAS/LAPACK. Recommended either [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) or
+[IntelMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+
+### Installation  
+Building and installing Lible is necessary primarily if you intend to work with the source code, for example, to 
+add new features. If you want to just integrate the library in your code and use its features, then it is advisable 
+to use the CMake `FetchContent` feature that is explained below. For the separate build, follow the steps:
+  - Clone the repo as usual.  
   - Then run:
-  ```
+  ```bash
     1. cmake -S . -B build -DCMAKE_BUILD_TYPE=<Specify Debug or Release>
     2. cmake --build build/ -j <nprocs>
-    3. cmake --install build/ --prefix "<full path to the build/-directory>"
-  ```
-** Using Lible **
+    3. cmake --install build/ --prefix "<full path to the chosen installdir, can be build/>"
+   ```
 
-The 3. step in Installation ensures that the Lible can be conveniently incorporated in your CMake project using the 'find_package()' function call. In your 'CMakeLists.txt' file you can write:
+### CMake integration
+  1. The 3. step in Installation ensures that Lible can be incorporated in your CMake project using the 'find_package()' command. 
+  To do that, write in your 'CMakeLists.txt' file:
   ```
-  find_package(Lible REQUIRED)
-  target_link_libraries(YourProject PRIVATE Lible::lible)
+    find_package(lible REQUIRED)
+    target_link_libraries(<your target> PRIVATE lible::lible)
   ```
-For the find_package() to work, your CMake project configuration has to find Lible. That means, you need to provide the path to the directory, where it was installed:
-```
-  -DCMAKE_PREFIX_PATH=<Path to where you installed Lible in 'Installation'>
-```
+  For the `find_package()` command to work, your CMake configuration has to find Lible. This can be facilitated by pointing the
+  CMake search path to the Lible installation location:
+  ```
+    -DCMAKE_PREFIX_PATH=<full path to the Lible installdir>
+  ```
+  
+  2. Lible can be incorporated in a CMake project directly using `FetchContent`. Write in your `CMakeLists.txt` file:
+  ```
+    include(FetchContent)
+
+    FetchContent_Declare(lible
+      GIT_REPOSITORY https://github.com/MihkuU/Lible
+      GIT_TAG <XXX>)
+
+    FetchContent_MakeAvailable(lible)
+    target_link_libraries(<your target> PRIVATE lible::lible)
+  ```
+  This approach downloads the library and integrates it directly in your build. For more details see 
+  [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html).
