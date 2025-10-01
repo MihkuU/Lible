@@ -782,11 +782,11 @@ lible::vec2d LI::externalChargesErfKernel(const int ipair,
                 double omega_squared = omegas[icharge] * omegas[icharge];
 
                 // second part of (52) in https://doi.org/10.1039/B605188J
-                double x = p * xyz_pc_dot * omega_squared / (omega_squared + p);
+                double x = p * omega_squared / (omega_squared + p);
 
-                vector<double> fnx = calcBoysF(lab, x, boys_grid);
+                vector<double> fnx = calcBoysF(lab, x * xyz_pc_dot, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab, p, omegas[icharge], &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab, x , &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
@@ -888,7 +888,7 @@ LI::externalChargesErfD1Kernel(const int ipair, const vector<array<double, 4>> &
 
                 vector<double> fnx = calcBoysF(lab + 1, erf_argument * x, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab + 1, p, omega , &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab + 1, p * erf_argument, &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab + 1; t++)
                     for (int u = 0; u <= lab + 1; u++)
@@ -1123,7 +1123,7 @@ LI::externalChargesOperatorErfD1Kernel(const int ipair, const vector<array<doubl
 		double erf_factor = std::sqrt(erf_argument);
                 vector<double> fnx = calcBoysF(lab + 1, erf_argument * x, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab + 1, p, omega, &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab + 1, p * erf_argument, &xyz_pc[0], &fnx[0]);
 
                 for (const auto &[i, j, k, mu] : cart_exps_a)
                     for (const auto &[i_, j_, k_, nu] : cart_exps_b)
@@ -1445,11 +1445,11 @@ LI::potentialAtExternalChargesErfKernel(const int ipair,
                 double omega_squared = omegas[icharge] * omegas[icharge];
 
                 // second part of (52) in https://doi.org/10.1039/B605188J
-                double x = p * xyz_pc_dot * omega_squared / (omega_squared + p);
+                double x = p  * omega_squared / (omega_squared + p);
 
-                vector<double> fnx = calcBoysF(lab, x, boys_grid);
+                vector<double> fnx = calcBoysF(lab, x * xyz_pc_dot, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab, p, omegas[icharge], &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab, x, &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
