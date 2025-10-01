@@ -110,7 +110,7 @@ namespace lible::ints
     /**
      * \ingroup IntsMainInterface
      * Computes the entire nuclear Coulomb attraction integral matrix for a given molecular
-     * structure with the nuclear charges represented with the error function.
+     * structure with the nuclear charges represented by the error function.
      *
      * \param structure `Structure` object representing the molecular geometry and basis sets.
      * \param omegas list of width parameters for the Gaussian in the error function. The length
@@ -132,42 +132,55 @@ namespace lible::ints
     vec2d externalCharges(const std::vector<std::array<double, 4>> &point_charges,
                           const Structure &structure);
 
-    // /**
-    //      * Calculates the one-electron Coulombic interaction integral matrix for given point
-    //      * charges using the erf-attenuated (screened) Coulomb operator.
-    //      * \param omegas vector holding the screening parameters. Has to have the same size as the
-    //      * point_charges.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the entire nuclear Coulomb interaction integral matrix for a given molecular
+     * structure with the point charges represented with by the error function.
+     *
+     * \param point_charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param omegas list of width parameters for the Gaussian in the error function. The length
+     * of this list has to equal the number of point charges.
+     * \param structure `Structure` object representing the molecular geometry and basis sets.
+     * \return Normalized spherical-basis erf-attenuated nuclear attraction Coulomb integrals.
+     */
     vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges,
                              const std::vector<double> &omegas,
                              const Structure &structure);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
-    //      * pair 'ipair'. In spherical basis. The charges should be given as a list
-    //      * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
-    //      * initialized for lab = la + lb in the given shell pair data.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Calculates the Coulomb interaction integrals for a pair of shells.
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis Coulomb interaction integrals for the given shell pair.
+     */
     vec2d externalChargesKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic interaction energy integrals for the shell
-    //      * pair 'ipair'. In spherical basis. The charges should be given as a list
-    //      * {(x, y, z, charge)}, with xyz-coordinates in atomic units. The Boys grid should be
-    //      * initialized for lab = la + lb in the given shell pair data.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Calculates the Coulomb interaction integrals for a pair of shells. The external charges
+     * are represented by the error function.
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param omegas list of width parameters for the Gaussian in the error function. The length
+     * of this list has to equal the length of `charges`.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis Coulomb interaction integrals for the given shell pair.
+     */
     vec2d externalChargesErfKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                    const std::vector<double> &omegas,
                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic interaction energy integral derivatives for
-    //      * the shell pair 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz).
-    //      * In spherical basis. The charges should be given as a list  {(x, y, z, charge)}, with
-    //      * xyz-coordinates in atomic units. The Boys grid should be initialized for lab = la + lb
-    //      * in the given shell pair data.
-    //      */
     std::array<vec2d, 6>
     externalChargesD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                             const BoysGrid &boys_grid, const ShellPairData &sp_data);
@@ -296,39 +309,47 @@ namespace lible::ints
     //      * Typedef for bundling Gaussian primitive exponents and contraction coefficients
     //      * of a shell.
     //      */
-    typedef std::pair<std::vector<double>, std::vector<double>> shell_exps_coeffs_t;
+    /** */
+    using shell_exps_coeffs_t = std::pair<std::vector<double>, std::vector<double>>;
+
+    /** */
+    using basis_atom_t = std::map<int, std::vector<shell_exps_coeffs_t>>;
+
+    /** */
+    using basis_atoms_t = std::map<int, basis_atom_t>;
 
     // /**
     //      * \ingroup ints
     //      * Returns the basis set for the given atom. The exponents and contraction coefficients
     //      * are listed for every angular momentum.
     //      */
-    std::map<int, std::vector<shell_exps_coeffs_t>>
-    basisForAtom(int atomic_nr, const std::string &basis_set);
+    // std::map<int, std::vector<shell_exps_coeffs_t>>
+    basis_atom_t basisForAtom(int atomic_nr, const std::string &basis_set);
 
     // /**
     //      * \ingroup ints
     //      * Returns the auxiliary basis set the given atom. The exponents and contraction
     //      * coefficients are listed for every angular momentum.
     //      */
-    std::map<int, std::vector<shell_exps_coeffs_t>>
-    basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
+    // std::map<int, std::vector<shell_exps_coeffs_t>>
+
+    basis_atom_t basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
 
     // /**
     //      * \ingroup ints
     //      * Returns the basis set for the given atoms. The exponents and contraction coefficients
     //      * are listed for every angular momentum per atom.
     //      */
-    std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
-    basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
+    // std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
+    basis_atoms_t basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
 
     // /**
     //      * \ingroup ints
     //      * Returns the auxiliary basis set for the given atoms. The exponents and contraction
     //      * coefficients are listed for every angular momentum per atom.
     //      */
-    std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
-    basisForAtomsAux(const std::set<int> &atomic_nrs, const std::string &aux_basis_set);
+    // std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
+    basis_atoms_t basisForAtomsAux(const std::set<int> &atomic_nrs, const std::string &aux_basis_set);
 
     // /**
     //      * \ingroup ints
