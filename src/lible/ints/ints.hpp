@@ -173,6 +173,18 @@ namespace lible::ints
                             const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
     // /**
+    //      * Calculates a batch of normalized Coulombic interaction energy integral derivatives for
+    //      * the shell pair 'ipair'. The derivatives are given as (Ax, Ay, Az, Bx, By, Bz).
+    //      * In spherical basis. The charges should be given as a list  {(x, y, z, charge)}, with
+    //      * xyz-coordinates in atomic units. The Boys grid should be initialized for lab = la + lb
+    //      * in the given shell pair data.
+    //      */
+    std::array<vec2d, 6>
+    externalChargesErfD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
+		    	       const std::vector<double> &omegas, const BoysGrid &boys_grid, 
+			       const ShellPairData &sp_data);
+
+    // /**
     //      * Calculates a batch of normalized Coulombic operator derivative integrals for the shell
     //      * pair 'ipair'. The derivatives are given for each charge as (Ax, Ay, Az). In spherical basis.
     //      * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
@@ -182,6 +194,18 @@ namespace lible::ints
     std::vector<std::array<vec2d, 3>>
     externalChargesOperatorD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+    // /**
+    //      * Calculates a batch of normalized Coulombic operator derivative integrals for the shell
+    //      * pair 'ipair'. The derivatives are given for each charge as (Ax, Ay, Az). In spherical basis.
+    //      * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
+    //      * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
+    //      * pair data.
+    //      */
+    std::vector<std::array<vec2d, 3>>
+    externalChargesOperatorErfD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
+                                       const std::vector<double> &omegas, const BoysGrid &boys_grid, 
+				       const ShellPairData &sp_data);
 
     // /**
     //      * Calculates a batch of normalized Coulombic operator integrals for the shell pair 'ipair'.
