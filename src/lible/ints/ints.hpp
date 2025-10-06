@@ -181,17 +181,52 @@ namespace lible::ints
                                    const std::vector<double> &omegas,
                                    const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the integrals for the first derivative of the external charges for a pair of two
+     * shells. Calculates the AO part of the derivatives,
+     * \f[
+     *   \left\{(\nabla a| \hat{g}(r) | b), (a| \hat{g}(r) |\nabla b)\right\}
+     *   \; \text{with the operator} \;
+     *   \hat{g}(r) = -\sum_i \frac{q_i}{|\mathbf{r} - \mathbf{r}_i|}
+     * \f]
+     * The operator part is calculated by `externalChargesOperatorD1Kernel`.
+     *
+     * \param ipair Index of the shell pair.
+     * @param charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
+     * Bohr.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l = l_a + l_b + 1\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return 6D-array of normalized spherical-basis external integral derivatives. The integral
+     * derivatives correspond to \f$(A_x, A_y, A_z, B_x, B_y, B_z)\f$.
+     */
     std::array<vec2d, 6>
     externalChargesD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                             const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic operator derivative integrals for the shell
-    //      * pair 'ipair'. The derivatives are given for each charge as (Ax, Ay, Az). In spherical basis.
-    //      * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
-    //      * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
-    //      * pair data.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the integrals for the first derivative of the Coulomb operator for given external
+     * charges,
+     * \f[
+     *   \{(a| \nabla_i \hat{g}_i(r) |b)\}
+     *   \; \text{with the operator} \;
+     *   \hat{g}(r) = -\sum_i \frac{q_i}{|\mathbf{r} - \mathbf{r}_i|}
+     * \f]
+     *
+     * \param ipair Index of the shell pair.
+     * @param charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
+     * Bohr.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l = l_a + l_b + 1\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return A vector of 3D-arrays corresponding to the operator derivative integrals. The
+     * returned list is of the length of `charges`.
+     * The integrals are returned normalized and in the spherical basis.
+     */
     std::vector<std::array<vec2d, 3>>
     externalChargesOperatorD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
@@ -203,6 +238,8 @@ namespace lible::ints
     //      * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
     //      * pair data.
     //      */
+
+    /** */
     std::vector<vec2d>
     potentialAtExternalChargesKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                      const BoysGrid &boys_grid, const ShellPairData &sp_data);
@@ -219,10 +256,16 @@ namespace lible::ints
                                         const std::vector<double> &omegas,
                                         const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * \ingroup ints
-    //      * Calculates the dipole moment integral matrices for the \f$x,y,z\f$-directions.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the dipole moment integral matrices for the three Cartesian directions.
+     *
+     * \param origin Origin of the Cartesian dipole moments, \f$(O_x, O_y, O_z)\f$. Given in
+     * atomic units (Bohr).
+     * \param structure `Structure` object representing the molecular geometry and basis sets.
+     * \return Normalized spherical-basis dipole moment integrals for each Cartesian direction,
+     * \f$(x, y, z)\f$.
+     */
     std::array<vec2d, 3> dipoleMoment(const std::array<double, 3> &origin,
                                       const Structure &structure);
 
@@ -436,35 +479,65 @@ namespace lible::ints
     // /** TODO: */
     vec3d calcRInts3D(int l, double p, const double *xyz_ab, const double *fnx);
 
-    // /**
-    //      * \ingroup ints
-    //      * TODO: write dox.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the norm of the spherical Gaussian primitive function from
+     * \f[
+     *   N = \left(\frac{(2a/\pi)^{3/2}(4a)^l}{(2l - 1)!!}\right)^{1/2}
+     * \f]
+     *
+     * \param l angular momentum
+     * \param exp Gaussian exponent
+     * \return Norm of the spherical Gaussian primitive
+     */
     double purePrimitiveNorm(int l, double exp);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns the number of Cartesian Gaussians.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the number of Cartesian Gaussians for the given angular momentum using
+     * \f[
+     *   N = (l + 1)(l + 2)/2
+     * \f]
+     *
+     * \param l angular momentum
+     * \return Number of Cartesian Gaussians.
+     */
     constexpr int numCartesians(int l);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns the number of spherical Gaussians.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the number of spherical Gaussians for the given angular momentum using
+     * \f[
+     *   N = 2l + 1
+     * \f]
+     *
+     * \param l angular momentum
+     * \return Number of spherical Gaussians.
+     */
     constexpr int numSphericals(int l);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns the number of Hermite Gaussians.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the total number of Hermite Gaussians up the given angular momentum (included)
+     * based on the formula
+     * \f[
+     *   N = (l + 1)(l + 2)(l + 3) / 6
+     * \f]
+     *
+     * \param l angular momentum
+     * \return Number of Hermite Gaussians up to total angular momentum `l`.
+     */
     constexpr int numHermites(int l);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns the exponents of a Cartesian Gaussian \f$(x,y,z)\f$-directions for the given
-    //      * angular momentum.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the list of Cartesian Gaussian exponents for the given angular momentum.
+     * The length of this list is given by \f$(l + 1)(l + 2) / 2\f. The Cartesian gaussians
+     * follow the so-called alphabetic ordering.
+     *
+     * \param l angular momentum
+     * \return List of Cartesian Gaussian exponents \f$\{(i, j, k)\}\f$.
+     */
     std::vector<std::array<int, 3>> cartExps(int l);
 
     // /**

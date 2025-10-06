@@ -38,10 +38,10 @@ namespace lible::ints
                              const std::vector<double> &omegas,
                              const Structure &structure);
 
-    vec2d externalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
+    vec2d externalChargesKernel(int ipair, const vector<array<double, 4>> &charges,
                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    vec2d externalChargesErfKernel(const int ipair,
+    vec2d externalChargesErfKernel(int ipair,
                                    const vector<array<double, 4>> &charges,
                                    const vector<double> &omegas,
                                    const BoysGrid &boys_grid,
@@ -49,26 +49,26 @@ namespace lible::ints
 
     array<vec2d, 3> spinOrbitCoupling1El(const Structure &structure);
 
-    array<vec2d, 3> spinOrbitCoupling1ElKernel(const int ipair,
+    array<vec2d, 3> spinOrbitCoupling1ElKernel(int ipair,
                                                const vector<array<double, 4>> &charges,
                                                const BoysGrid &boys_grid,
                                                const ShellPairData &sp_data);
 
-    array<vec2d, 6> externalChargesD1Kernel(const int ipair,
+    array<vec2d, 6> externalChargesD1Kernel(int ipair,
                                             const vector<array<double, 4>> &charges,
                                             const BoysGrid &boys_grid,
                                             const ShellPairData &sp_data);
 
     vector<array<vec2d, 3>>
-    externalChargesOperatorD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
+    externalChargesOperatorD1Kernel(int ipair, const vector<array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
     std::vector<vec2d>
-    potentialAtExternalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
+    potentialAtExternalChargesKernel(int ipair, const vector<array<double, 4>> &charges,
                                      const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
     std::vector<vec2d>
-    potentialAtExternalChargesErfKernel(const int ipair, const vector<array<double, 4>> &charges,
+    potentialAtExternalChargesErfKernel(int ipair, const vector<array<double, 4>> &charges,
                                         const vector<double> &omegas,
                                         const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
