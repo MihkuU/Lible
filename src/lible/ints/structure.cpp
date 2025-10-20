@@ -3,23 +3,13 @@
 #include <lible/ints/defs.hpp>
 #include <lible/ints/utils.hpp>
 
-#include <algorithm>
-#include <cassert>
-#include <cctype>
 #include <filesystem>
-#include <format>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <set>
 
 namespace lints = lible::ints;
 
 using std::array, std::string, std::vector;
-
-lints::Structure::Structure()
-{
-}
 
 lints::Structure::Structure(const string &basis_set, const vector<int> &atomic_nrs,
                             const vector<array<double, 3>> &coords_angstrom)

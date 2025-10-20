@@ -10,12 +10,13 @@
 #include <format>
 #include <map>
 
-namespace LI = lible::ints;
+namespace lints = lible::ints;
 
 using std::array, std::map, std::pair, std::vector;
 
 namespace lible::ints
 {
+    // Forward declarations
     vec2d eri4Diagonal(const Structure &structure);
 
     vec4d eri4(const Structure &structure);
@@ -43,7 +44,7 @@ namespace lible::ints
     }
 }
 
-lible::vec4d LI::eri4(const Structure &structure)
+lible::vec4d lints::eri4(const Structure &structure)
 {
     vector<ShellPairData> sp_data = shellPairData(true, structure);
 
@@ -102,13 +103,13 @@ lible::vec4d LI::eri4(const Structure &structure)
     return eri4;
 }
 
-void LI::eri4Benchmark(const Structure &structure)
+void lints::eri4Benchmark(const Structure &structure)
 {
     palPrint(std::format("Lible::{:<40}\n", "ERI4 benchmark..."));
 
-    auto start{std::chrono::steady_clock::now()};
+    const auto start{std::chrono::steady_clock::now()};
 
-    vector<ShellPairData> sp_data = shellPairData(true, structure);
+    const vector<ShellPairData> sp_data = shellPairData(true, structure);
 
     double sum_eri4 = 0;
     for (size_t ispdata_ab = 0; ispdata_ab < sp_data.size(); ispdata_ab++)
@@ -152,16 +153,16 @@ void LI::eri4Benchmark(const Structure &structure)
 
     palPrint(std::format("   sum_eri4 = {:16.12f}\n", sum_eri4));
 
-    auto end{std::chrono::steady_clock::now()};
+    const auto end{std::chrono::steady_clock::now()};
     std::chrono::duration<double> duration{end - start};
     palPrint(std::format("done {:.2e} s\n", duration.count()));
 }
 
-lible::vec2d LI::eri4Diagonal(const Structure &structure)
+lible::vec2d lints::eri4Diagonal(const Structure &structure)
 {
-    vector<ShellPairData> sp_data = shellPairData(true, structure);
+    const vector<ShellPairData> sp_data = shellPairData(true, structure);
 
-    int dim_ao = structure.getDimAO();
+    const int dim_ao = structure.getDimAO();
     vec2d eri4_diagonal(Fill(0), dim_ao, dim_ao);
     for (size_t ispdata = 0; ispdata < sp_data.size(); ispdata++)
     {

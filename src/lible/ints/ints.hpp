@@ -149,7 +149,7 @@ namespace lible::ints
 
     /**
      * \ingroup IntsMainInterface
-     * Calculates the Coulomb interaction integrals for a pair of shells.
+     * Computes the Coulomb interaction integrals for a pair of shells.
      *
      * \param ipair Index of the shell pair.
      * \param charges list of point charges given by \f$(x, y, z, q)\f$.
@@ -164,12 +164,12 @@ namespace lible::ints
 
     /**
      * \ingroup IntsMainInterface
-     * Calculates the Coulomb interaction integrals for a pair of shells. The external charges
+     * Computes the Coulomb interaction integrals for a pair of shells. The external charges
      * are represented by the error function.
      *
      * \param ipair Index of the shell pair.
-     * \param charges list of point charges given by \f$(x, y, z, q)\f$.
-     * \param omegas list of width parameters for the Gaussian in the error function. The length
+     * \param charges List of point charges given by \f$(x, y, z, q)\f$.
+     * \param omegas List of width parameters for the Gaussian in the error function. The length
      * of this list has to equal the length of `charges`.
      * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
      * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
@@ -231,26 +231,45 @@ namespace lible::ints
     externalChargesOperatorD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalized Coulombic operator integrals for the shell pair 'ipair'.
-    //      * For every charge a batch of integrals is calculated.
-    //      * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
-    //      * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
-    //      * pair data.
-    //      */
-
-    /** */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes a batch of integrals for the Coulomb interaction with electrons at each charge.
+     * \f[
+     *   \{(a| \frac{-q_i}{|\mathbf{r} - \mathbf{r}_i|} |b)\}
+     * \f]
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges List of point charges, \f$(x, y, z, q)\f$, with their coordinates in
+     * Bohr.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return A list of normalized spherical-basis integrals with the length of `charges`.
+     */
     std::vector<vec2d>
     potentialAtExternalChargesKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                      const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * Calculates a batch of normalizederf-attenuated  Coulombic operator integrals for the shell pair 'ipair'.
-    //      * For every charge a batch of integrals is calculated.
-    //      * The charges should be given as a list  {(x, y, z, charge)}, with xyz-coordinates in
-    //      * atomic units. The Boys grid should be initialized for lab = la + lb in the given shell
-    //      * pair data. The screening factor omega should be given as a std::vector<double>
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes a batch of integrals for the Coulomb interaction with electrons at each charge.
+     * \f[
+     *   \{(a| \frac{-q_i \cdot \text{erf}(\omega |\mathbf{r} - \mathbf{r}_i|)}
+     *   {|\mathbf{r} - \mathbf{r}_i|} |b)\}
+     * \f]
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges List of point charges, \f$\{(x, y, z, q)\}\f$, with their coordinates in
+     * Bohr.
+     * \param omegas List of width parameters for the Gaussian in the error function. The length
+     * of this list has to equal the length of `charges`.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return A list of normalized spherical-basis integrals with the length of `charges`.
+     */
     std::vector<vec2d>
     potentialAtExternalChargesErfKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                         const std::vector<double> &omegas,
@@ -258,7 +277,7 @@ namespace lible::ints
 
     /**
      * \ingroup IntsMainInterface
-     * Computes the dipole moment integral matrices for the three Cartesian directions.
+     * Computes all the dipole moment integral matrices for the three Cartesian directions.
      *
      * \param origin Origin of the Cartesian dipole moments, \f$(O_x, O_y, O_z)\f$. Given in
      * atomic units (Bohr).
@@ -269,53 +288,124 @@ namespace lible::ints
     std::array<vec2d, 3> dipoleMoment(const std::array<double, 3> &origin,
                                       const Structure &structure);
 
-    // /**
-    //      * Calculates a batch of normalized dipole moment integrals for the shell pair 'ipair'.
-    //      * In spherical basis. The integrals are given as (x, y, z). The origin is expected in
-    //      * atomic units (bohr).
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes a batch of dipole moment integrals for the three Cartesian directions.
+     *
+     * \param ipair Index of the shell pair.
+     * \param origin Origin of the Cartesian dipole moments, \f$(O_x, O_y, O_z)\f$. Given in
+     * atomic units (Bohr).
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis dipole moment integrals for each Cartesian direction,
+     * \f$(x, y, z)\f$.
+     */
     std::array<vec2d, 3> dipoleMomentKernel(int ipair, const std::array<double, 3> &origin,
                                             const ShellPairData &sp_data);
 
     // /**  TODO: dox. */
     std::array<vec2d, 3> spinOrbitCoupling1El(const Structure &structure);
 
-    // /**
-    //      * TODO: mention that it requires lab + 1 angular momentum boys_grid.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes a batch of spin-orbit coupling integrals
+     * \f[
+     *   (a| \frac{\mathbf{r}_C}{r^3_C} \nabla_B |b) = \nabla_A \times \nabla_B (a|r^{-1}_C|b)
+     * \f]
+     *
+     * \param ipair Index of the shell pair.
+     * \param charges list of point charges given by \f$(x, y, z, q)\f$.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l = l_a + l_b + 1\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for
+     * calculating integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis dipole moment integrals for each Cartesian direction.
+     */
     std::array<vec2d, 3>
     spinOrbitCoupling1ElKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    // /**
-    //      * \ingroup ints
-    //      * Calculates the diagonal of the two-center ERI matrix over auxiliary basis functions,
-    //      * \f$(P|P)\f$.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes a batch of linear momentum integrals, \f$\{-(a| \mathbf{\nabla} |b)\}\f$. The
+     * imaginary unit is omitted.
+     *
+     * \param ipair Index of the shell pair.
+     * \param sp_data `ShellPairData` object containing all the information required for
+     * calculating integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis momentum integrals for each Cartesian direction.
+     */
+    std::array<vec2d, 3> momentumKernel(int ipair, const ShellPairData &sp_data);
+
+    /**
+     * \ingroup IntsMainInterface
+     * Computes a batch of linear momentum integrals,
+     * \f$\{-(a| \mathbf{r} \times \mathbf{\nabla} |b)\}\f$. The imaginary unit is omitted.
+     *
+     * \param ipair Index of the shell pair.
+     * \param sp_data `ShellPairData` object containing all the information required for
+     * calculating integrals for the given \f$(l_a, l_b)\f$.
+     * \return Normalized spherical-basis angular momentum integrals for each Cartesian direction.
+     */
+    std::array<vec2d, 3> angularMomentumKernel(int ipair, const ShellPairData &sp_data);
+
+    /** */
+    arr2d<vec2d, 3, 3> pVpKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
+                                 const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the diagonal of the two-center electron repulsion (ERI2) integrals over auxiliary
+     * basis functions, \f$\{(P|P)\}\f$.
+     *
+     * \param structure `Structure` object representing the molecular geometry and basis sets.
+     * \note Uses OMP parallelization.
+     * \return List of normalized spherical-basis integrals.
+     */
     std::vector<double> eri2Diagonal(const Structure &structure);
 
-    // /**
-    //      * \ingroup ints
-    //      * Calculates the two-center ERI matrix over the auxiliary basis functions, \f$(P|Q)\f$.
-    //      */
+
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the two-center electron repulsion integrals (ERI2) over auxiliary basis functions,
+     * \f$\{(P|Q)\}\f$.
+     *
+     * \param structure `Structure` object representing the molecular geometry and basis sets.
+     * \note Uses OMP parallelization.
+     * \return 2D array of normalized spherical-basis integrals.
+     */
     vec2d eri2(const Structure &structure);
 
-    // /**
-    //      * \ingroup ints
-    //      * Calculates the diagonal of the four-center ERI matrix, \f$(\mu\nu|\mu\nu)\f$.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the diagonal of the four-center electron repulsion integrals (ERI4),
+     * \f$(\mu\mu|\nu\nu)\f$.
+     *
+     * @param structure `Structure` object representing the molecular geometry and basis sets.
+     * @note Uses OMP parallelization.
+     * @return 2D array of normalized spherical-basis integrals.
+     */
     vec2d eri4Diagonal(const Structure &structure);
 
-    // /**
-    //      * \ingroup ints
-    //      * Calculates the three-center ERIs, \f$(\mu\nu|P)\f$.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the three-center electron repulsion integrals (ERI3), \f$(\mu\nu|P)\f$.
+     *
+     * @param structure `Structure` object representing the molecular geometry and basis sets.
+     * @note Uses OMP parallelization.
+     * @return 3D array of normalized spherical-basis integrals.
+     */
     vec3d eri3(const Structure &structure);
 
-    // /**
-    //      * \ingroup ints
-    //      * Calculates the four-center ERIs, \f$(\mu\nu|\kappa\tau)\f$.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the four-center electron repulsion integrals (ERI4) over main basis functions,
+     * \f$(\mu\nu|\kappa\tau)\f$.
+     *
+     * @param structure `Structure` object representing the molecular geometry and basis sets.
+     * @note Uses OMP parallelization.
+     * @return 4D array of normalized spherical-basis integrals
+     */
     vec4d eri4(const Structure &structure);
 
     // /**
@@ -453,7 +543,7 @@ namespace lible::ints
 
     // /** */
     vec3d ecoeffsRecurrence2_n1(double a, double b, int la, int lb, double A, double B,
-                                const vec3d &ecoeffs);
+                                const vec3d &ecoeffs0);
 
     // /** */
     std::array<vec2d, 3> ecoeffsPrimitive(double a, int l);
@@ -465,7 +555,7 @@ namespace lible::ints
     // /** */
     std::array<vec3d, 3> ecoeffsPrimitivePair_n1(double a, double b, int la, int lb,
                                                  const double *xyz_a, const double *xyz_b,
-                                                 const std::array<vec3d, 3> &ecoeffs);
+                                                 const std::array<vec3d, 3> &ecoeffs0);
 
     // /** */
     std::vector<std::vector<double>> ecoeffsShell(int l, const std::vector<double> &exps);
@@ -518,8 +608,8 @@ namespace lible::ints
 
     /**
      * \ingroup IntsMainInterface
-     * Computes the total number of Hermite Gaussians up the given angular momentum (included)
-     * based on the formula
+     * Computes the total number of Hermite Gaussians up the given angular momentum
+     * using
      * \f[
      *   N = (l + 1)(l + 2)(l + 3) / 6
      * \f]
@@ -532,7 +622,7 @@ namespace lible::ints
     /**
      * \ingroup IntsMainInterface
      * Computes the list of Cartesian Gaussian exponents for the given angular momentum.
-     * The length of this list is given by \f$(l + 1)(l + 2) / 2\f. The Cartesian gaussians
+     * The length of this list is given by \f$(l + 1)(l + 2) / 2\f$. The Cartesian gaussians
      * follow the so-called alphabetic ordering.
      *
      * \param l angular momentum
@@ -540,29 +630,41 @@ namespace lible::ints
      */
     std::vector<std::array<int, 3>> cartExps(int l);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns a list of angular momentum pairs such that la >= lb:
-    //      *   {(0, 0), (1, 0), (1, 1), ..., (l_max, l_max)}.
-    //      */
-    std::vector<std::pair<int, int>> getLPairsSymm(int l_max);
+    /**
+     * \ingroup IntsMainInterface
+     *  Computes a list of angular momentum pairs up to the given angular momentum such that
+     *  \f$l_a >= l_b\f$:
+     * \f[
+     *   \{(0, 0), (1, 0), (1, 1), \ldots, (l, l) \}
+     * \f]
+     *
+     * \param l angular momentum
+     * \return List of angular momentum pairs.
+     */
+    std::vector<std::pair<int, int>> getLPairsSymm(int l);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns a list of angular momentum pairs: {(0, 0), (1, 0), (0, 1), ..., (l_max, l_max)}.
-    //      */
-    std::vector<std::pair<int, int>> getLPairsNoSymm(int l_max);
+    /**
+     * \ingroup IntsMainInterface
+     *  Computes a list of all angular momentum pairs up to the given angular momentum:
+     * \f[
+     *   \{(0, 0), (0, 1), (1, 0), (1, 1), \ldots, (l, l) \}
+     * \f]
+     *
+     * \param l angular momentum
+     * \return List of angular momentum pairs.
+     */
+    std::vector<std::pair<int, int>> getLPairsNoSymm(int l);
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns the names of all available basis sets in lower case.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * \return Names (lower case) of all the available main basis sets in the library.
+     */
     std::set<std::string> availableBasisSets();
 
-    // /**
-    //      * \ingroup ints
-    //      * Returns the names of all available auxiliary basis sets in lower case.
-    //      */
+    /**
+     * \ingroup IntsMainInterface
+     * \return Names (lower case) of all the available auxiliary basis sets in the library.
+     */
     std::set<std::string> availableBasisSetsAux();
 
     /** TODO: */

@@ -329,14 +329,14 @@ vector<double> LI::calcRInts_ERISOC(const int l, const double fac, const double 
                                     const vector<array<int, 3>> &hermite_idxs_bra,
                                     const vector<array<int, 3>> &hermite_idxs_ket)
 {
-    vec3d rints_3d = calcRInts3D(l + 1, alpha, xyz_pq, fnx);
-
     const int n_hermite_bra = hermite_idxs_bra.size();
     const int n_hermite_ket = hermite_idxs_ket.size();
     const int n_rints = n_hermite_bra * n_hermite_ket;
     const int ofs0 = n_rints * 0;
     const int ofs1 = n_rints * 1;
     const int ofs2 = n_rints * 2;
+
+    const vec3d rints_3d = calcRInts3D(l + 1, alpha, xyz_pq, fnx);
 
     vector<double> rints(3 * n_rints);
     for (int j = 0; j < n_hermite_ket; j++)
