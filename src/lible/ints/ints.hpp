@@ -367,7 +367,7 @@ namespace lible::ints
      * @param point_charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
      * Bohr.
      * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
-     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * with \f$l_{ab} = l_a + l_b + 2\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
      * \param sp_data `ShellPairData` object containing all the information required for
      * calculating integrals for the given \f$(l_a, l_b)\f$.
      */
