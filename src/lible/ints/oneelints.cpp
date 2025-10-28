@@ -1931,7 +1931,7 @@ lible::arr2d<lible::vec2d, 3, 3> lints::pVpIntegrals(const Structure &structure)
             ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
 
             int lab = la + lb;
-            BoysGrid boys_grid(lab);
+            BoysGrid boys_grid(lab+2);
 
 #pragma omp parallel for
             for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
