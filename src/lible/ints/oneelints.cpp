@@ -54,6 +54,8 @@ namespace lible::ints
                                                const BoysGrid &boys_grid,
                                                const ShellPairData &sp_data);
 
+    arr2d<vec2d, 3, 3> pVpIntegrals(const Structure &structure);
+
     arr2d<vec2d, 3, 3> pVpKernel(int ipair, const vector<array<double, 4>> &charges,
                                  const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
@@ -1895,6 +1897,57 @@ lible::vec2d lints::nuclearAttractionErf(const Structure &structure, const vecto
                         ints(ofs_a + mu, ofs_b + nu) = ints_ipair(mu, nu);
                         ints(ofs_b + nu, ofs_a + mu) = ints_ipair(mu, nu);
                     }
+            }
+        }
+
+    return ints;
+}
+
+
+
+lible::arr2d<lible::vec2d, 3, 3> lints::pVpIntegrals(const Structure &structure)
+{
+    const int l_max = structure.getMaxL();
+    const int dim_ao = structure.getDimAO();
+
+    vector<array<double, 4>> charges(structure.getNAtoms());
+    for (int iatom = 0; iatom < structure.getNAtoms(); iatom++)
+    {
+        array<double, 3> coords = structure.getCoordsAtom(iatom);
+        array<double, 3> xyz_c{coords[0], coords[1], coords[2]};
+    
+        const double Z = structure.getZ(iatom);
+        charges[iatom] = {xyz_c[0], xyz_c[1], xyz_c[2], Z};
+    }
+
+    arr2d<vec2d,3,3> ints;
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            ints[i][j] = vec2d(Fill(0), dim_ao, dim_ao);
+
+    for (int la = l_max; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--)
+        {
+            ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
+
+            int lab = la + lb;
+            BoysGrid boys_grid(lab);
+
+#pragma omp parallel for
+            for (int ipair = 0; ipair < sp_data.n_pairs; ipair++)
+            {
+                arr2d<vec2d, 3, 3> ints_ipair = pVpKernel(ipair, charges, boys_grid, sp_data);
+
+                int ofs_a = sp_data.offsets_sph[2 * ipair + 0];
+                int ofs_b = sp_data.offsets_sph[2 * ipair + 1];
+
+                for (int i = 0; i < 3; i++)
+                    for (int j = 0; j < 3; j++)
+                        for (size_t mu = 0; mu < ints_ipair[i][j].dim<0>(); mu++)
+                            for (size_t nu = 0; nu < ints_ipair[i][j].dim<1>(); nu++)
+                            { 
+                                ints[i][j](ofs_a + mu, ofs_b + nu) = ints_ipair[i][j](mu, nu);
+                            }
             }
         }
 

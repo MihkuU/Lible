@@ -349,7 +349,28 @@ namespace lible::ints
      */
     std::array<vec2d, 3> angularMomentumKernel(int ipair, const ShellPairData &sp_data);
 
-    /** */
+    /** 
+     * \ingroup IntsMainInterface
+     * Calculates the pVp integrals special required for the relativistic 
+     * potential matrices W_{ij} (see equations 2 and 6 in doi:10.1063/1.4803693) 
+     * @param structure `Structure` object representing the molecular geometry and basis sets.
+     * \return Normalized pVp integrals for pairs of Cartesian coordinates. 
+     * 
+     */
+    arr2d<vec2d, 3, 3> pVpIntegrals(const Structure &structure);
+
+    /**
+     * \ingroup IntsMainInterface
+     * Calculates a batch of pVp integrals special required for the relativistic 
+     * potential matrices W_{ij} (see equations 2 and 6 in doi:10.1063/1.4803693) 
+     * \param ipair Index of the shell pair.
+     * @param point_charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
+     * Bohr.
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l_{ab} = l_a + l_b\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for
+     * calculating integrals for the given \f$(l_a, l_b)\f$.
+     */
     arr2d<vec2d, 3, 3> pVpKernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                  const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
