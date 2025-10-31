@@ -1622,10 +1622,10 @@ lible::arr2d<lible::vec2d, 3, 3> lints::pVpKernel(const int ipair,
                                 for (int id = 0; id < 3; id++)
                                     for (int jd = 0; jd < 3; jd++)
                                     {
-                                        ints_cart[id][jd](mu, nu) += // -1 charge of electron
-                                                (-1) * fac * ((ab / p2) * pp[id][jd] -
-                                                              (a / p) * pr[id][jd] +
-                                                              (b / p) * pr[jd][id] - rr[id][jd]);
+                                        ints_cart[id][jd](mu, nu) +=
+                                                fac * ((ab / p2) * pp[id][jd] -
+                                                       (a / p) * pr[id][jd] +
+                                                       (b / p) * pr[jd][id] - rr[id][jd]);
                                     }
                             }
         }
