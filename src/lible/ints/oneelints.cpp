@@ -64,12 +64,23 @@ namespace lible::ints
                                             const BoysGrid &boys_grid,
                                             const ShellPairData &sp_data);
 
+    array<vec2d, 6> externalChargesErfD1Kernel(const int ipair,
+                                            const vector<array<double, 4>> &charges,
+                                            const vector<double> &omegas,
+                                            const BoysGrid &boys_grid,
+                                            const ShellPairData &sp_data);
+
     vector<array<vec2d, 3>>
     externalChargesOperatorD1Kernel(int ipair, const vector<array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
-    vector<vec2d>
-    potentialAtExternalChargesKernel(int ipair, const vector<array<double, 4>> &charges,
+    vector<array<vec2d, 3>>
+    externalChargesOperatorErfD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
+                                       const std::vector<double> &omegas, const BoysGrid &boys_grid,
+				                               const ShellPairData &sp_data);
+
+    std::vector<vec2d>
+    potentialAtExternalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
                                      const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
     vector<vec2d>
@@ -770,11 +781,11 @@ lible::vec2d lints::externalChargesErfKernel(const int ipair,
                 double omega_squared = omegas[icharge] * omegas[icharge];
 
                 // second part of (52) in https://doi.org/10.1039/B605188J
-                double x = p * xyz_pc_dot * omega_squared / (omega_squared + p);
+                double x = p * omega_squared / (omega_squared + p);
 
-                vector<double> fnx = calcBoysF(lab, x, boys_grid);
+                vector<double> fnx = calcBoysF(lab, x * xyz_pc_dot, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab, p, omegas[icharge], &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab, x , &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
@@ -804,6 +815,126 @@ lible::vec2d lints::externalChargesErfKernel(const int ipair,
             double norm_b = sp_data.norms[ofs_norm_b + nu];
             ints_sph(mu, nu) *= norm_a * norm_b;
         }
+
+    return ints_sph;
+}
+
+array<lible::vec2d, 6>
+lints::externalChargesErfD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
+                                  const vector<double> &omegas, const BoysGrid &boys_grid,
+                                  const ShellPairData &sp_data)
+{
+    int la = sp_data.la;
+    int lb = sp_data.lb;
+    int lab = la + lb;
+    int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    int cofs_b = sp_data.coffsets[2 * ipair + 1];
+
+    const double *cexps_a = &sp_data.exps[cofs_a];
+    const double *cexps_b = &sp_data.exps[cofs_b];
+    const double *ccoeffs_a = &sp_data.coeffs[cofs_a];
+    const double *ccoeffs_b = &sp_data.coeffs[cofs_b];
+    const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+    const double *xyz_b = &sp_data.coords[6 * ipair + 3];
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    int n_cart_a = numCartesians(la);
+    int n_cart_b = numCartesians(lb);
+
+    array<vec2d, 6> ints_cart;
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        ints_cart[ideriv] = vec2d(Fill(0), n_cart_a, n_cart_b);
+
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            double a = cexps_a[ia];
+            double b = cexps_b[ib];
+            double da = ccoeffs_a[ia];
+            double db = ccoeffs_b[ib];
+
+            double p = a + b;
+            double dadb = da * db;
+            double fac = 2 * (M_PI / p) * dadb;
+
+            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
+
+            auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b,
+                                                           {Ex, Ey, Ez});
+
+            array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                   (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                   (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+            vec3d rints_sum(Fill(0), lab + 2);
+            for (size_t icharge = 0; icharge < charges.size(); icharge++)
+            {
+                auto [xc, yc, zc, charge] = charges[icharge];
+
+                array<double, 3> xyz_pc{xyz_p[0] - xc, xyz_p[1] - yc, xyz_p[2] - zc};
+
+                double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
+                double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
+                double x = p * xyz_pc_dot;
+
+                double omega = omegas[icharge];
+                double erf_argument = omega * omega / (omega * omega + p);
+                double erf_factor = std::sqrt(erf_argument);
+
+                vector<double> fnx = calcBoysF(lab + 1, erf_argument * x, boys_grid);
+
+                vec3d rints = calcRInts3D(lab + 1, p * erf_argument, &xyz_pc[0], &fnx[0]);
+
+                for (int t = 0; t <= lab + 1; t++)
+                    for (int u = 0; u <= lab + 1; u++)
+                        for (int v = 0; v <= lab + 1; v++)
+                            rints_sum(t, u, v) += erf_factor * charge * rints(t, u, v);
+            }
+
+            for (const auto &[i, j, k, mu]: cart_exps_a)
+                for (const auto &[i_, j_, k_, nu]: cart_exps_b)
+                    for (int t = 0; t <= i + i_; t++)
+                        for (int u = 0; u <= j + j_; u++)
+                            for (int v = 0; v <= k + k_; v++)
+                            {
+                                double dpx = fac * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t + 1, u, v);
+                                double dpy = fac * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u + 1, v);
+                                double dpz = fac * Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u, v + 1);
+
+                                double drx = fac * E1x(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u, v);
+                                double dry = fac * Ex(i, i_, t) * E1y(j, j_, u) * Ez(k, k_, v) * rints_sum(t, u, v);
+                                double drz = fac * Ex(i, i_, t) * Ey(j, j_, u) * E1z(k, k_, v) * rints_sum(t, u, v);
+
+                                // d/dA
+                                ints_cart[0](mu, nu) += -1 * ((a / p) * dpx + drx); // -1 = charge of electron
+                                ints_cart[1](mu, nu) += -1 * ((a / p) * dpy + dry);
+                                ints_cart[2](mu, nu) += -1 * ((a / p) * dpz + drz);
+
+                                // d/dB
+                                ints_cart[3](mu, nu) += -1 * ((b / p) * dpx - drx);
+                                ints_cart[4](mu, nu) += -1 * ((b / p) * dpy - dry);
+                                ints_cart[5](mu, nu) += -1 * ((b / p) * dpz - drz);
+                            }
+        }
+
+    array<vec2d, 6> ints_sph;
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        ints_sph[ideriv] = trafo2Spherical(la, lb, ints_cart[ideriv]);
+
+    int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
+    int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+    for (int ideriv = 0; ideriv < 6; ideriv++)
+        for (size_t mu = 0; mu < ints_sph[ideriv].dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph[ideriv].dim<1>(); nu++)
+            {
+                double norm_a = sp_data.norms[ofs_norm_a + mu];
+                double norm_b = sp_data.norms[ofs_norm_b + nu];
+                ints_sph[ideriv](mu, nu) *= norm_a * norm_b;
+            }
 
     return ints_sph;
 }
@@ -917,6 +1048,119 @@ lints::externalChargesD1Kernel(const int ipair, const vector<array<double, 4>> &
                 double norm_a = sp_data.norms[ofs_norm_a + mu];
                 double norm_b = sp_data.norms[ofs_norm_b + nu];
                 ints_sph[ideriv](mu, nu) *= norm_a * norm_b;
+            }
+
+    return ints_sph;
+}
+
+vector<array<lible::vec2d, 3>>
+lints::externalChargesOperatorErfD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
+                                          const std::vector<double> &omegas, const BoysGrid &boys_grid,
+                                          const ShellPairData &sp_data)
+{
+    const int la = sp_data.la;
+    const int lb = sp_data.lb;
+    const int lab = la + lb;
+    const int cdepth_a = sp_data.cdepths[2 * ipair + 0];
+    const int cdepth_b = sp_data.cdepths[2 * ipair + 1];
+    const int cofs_a = sp_data.coffsets[2 * ipair + 0];
+    const int cofs_b = sp_data.coffsets[2 * ipair + 1];
+
+    const double *cexps_a = &sp_data.exps[cofs_a];
+    const double *cexps_b = &sp_data.exps[cofs_b];
+    const double *ccoeffs_a = &sp_data.coeffs[cofs_a];
+    const double *ccoeffs_b = &sp_data.coeffs[cofs_b];
+    const double *xyz_a = &sp_data.coords[6 * ipair + 0];
+    const double *xyz_b = &sp_data.coords[6 * ipair + 3];
+
+    const auto &cart_exps_a = cart_exps[la];
+    const auto &cart_exps_b = cart_exps[lb];
+
+    const int n_cart_a = numCartesians(la);
+    const int n_cart_b = numCartesians(lb);
+
+    int n_charges = charges.size();
+    vector<array<vec2d, 3>> ints_cart(n_charges);
+    for (int icharge = 0; icharge < n_charges; icharge++)
+        for (int icoord = 0; icoord < 3; icoord++)
+            ints_cart[icharge][icoord] = vec2d(Fill(0), n_cart_a, n_cart_b);
+
+    for (int ia = 0, iab = 0; ia < cdepth_a; ia++)
+        for (int ib = 0; ib < cdepth_b; ib++, iab++)
+        {
+            double a = cexps_a[ia];
+            double b = cexps_b[ib];
+            double da = ccoeffs_a[ia];
+            double db = ccoeffs_b[ib];
+
+            double p = a + b;
+            double dadb = da * db;
+            double fac = 2 * (M_PI / p) * dadb;
+
+            auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
+
+            auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b,
+                                                           {Ex, Ey, Ez});
+
+            array<double, 3> xyz_p{(a * xyz_a[0] + b * xyz_b[0]) / p,
+                                   (a * xyz_a[1] + b * xyz_b[1]) / p,
+                                   (a * xyz_a[2] + b * xyz_b[2]) / p};
+
+            for (int icharge = 0; icharge < n_charges; icharge++)
+            {
+                auto [xc, yc, zc, charge] = charges[icharge];
+
+                array<double, 3> xyz_pc{xyz_p[0] - xc, xyz_p[1] - yc, xyz_p[2] - zc};
+
+                double xx{xyz_pc[0]}, xy{xyz_pc[1]}, xz{xyz_pc[2]};
+                double xyz_pc_dot = xx * xx + xy * xy + xz * xz;
+                double x = p * xyz_pc_dot;
+
+                double omega = omegas[icharge];
+                double erf_argument = omega * omega / (omega * omega + p);
+                double erf_factor = std::sqrt(erf_argument);
+                vector<double> fnx = calcBoysF(lab + 1, erf_argument * x, boys_grid);
+
+                vec3d rints = calcRInts3D(lab + 1, p * erf_argument, &xyz_pc[0], &fnx[0]);
+
+                for (const auto &[i, j, k, mu]: cart_exps_a)
+                    for (const auto &[i_, j_, k_, nu]: cart_exps_b)
+                        for (int t = 0; t <= i + i_; t++)
+                            for (int u = 0; u <= j + j_; u++)
+                                for (int v = 0; v <= k + k_; v++)
+                                {
+                                    double Exyz = Ex(i, i_, t) * Ey(j, j_, u) * Ez(k, k_, v);
+
+                                    ints_cart[icharge][0](mu, nu) +=
+                                            erf_factor * charge * fac * Exyz * rints(t + 1, u, v);
+                                    ints_cart[icharge][1](mu, nu) +=
+                                            erf_factor * charge * fac * Exyz * rints(t, u + 1, v);
+                                    ints_cart[icharge][2](mu, nu) +=
+                                            erf_factor * charge * fac * Exyz * rints(t, u, v + 1);
+                                }
+            }
+        }
+
+    vector<array<vec2d, 3>> ints_sph(n_charges);
+    for (int icharge = 0; icharge < n_charges; icharge++)
+    {
+        ints_sph[icharge][0] = trafo2Spherical(la, lb, ints_cart[icharge][0]);
+        ints_sph[icharge][1] = trafo2Spherical(la, lb, ints_cart[icharge][1]);
+        ints_sph[icharge][2] = trafo2Spherical(la, lb, ints_cart[icharge][2]);
+    }
+
+    int ofs_norm_a = sp_data.offsets_norms[2 * ipair + 0];
+    int ofs_norm_b = sp_data.offsets_norms[2 * ipair + 1];
+    for (int icharge = 0; icharge < n_charges; icharge++)
+        for (size_t mu = 0; mu < ints_sph[icharge][0].dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph[icharge][0].dim<1>(); nu++)
+            {
+                double norm_a = sp_data.norms[ofs_norm_a + mu];
+                double norm_b = sp_data.norms[ofs_norm_b + nu];
+
+                ints_sph[icharge][0](mu, nu) *= norm_a * norm_b;
+                ints_sph[icharge][1](mu, nu) *= norm_a * norm_b;
+                ints_sph[icharge][2](mu, nu) *= norm_a * norm_b;
             }
 
     return ints_sph;
@@ -1199,11 +1443,11 @@ lints::potentialAtExternalChargesErfKernel(const int ipair,
                 double omega_squared = omegas[icharge] * omegas[icharge];
 
                 // second part of (52) in https://doi.org/10.1039/B605188J
-                double x = p * xyz_pc_dot * omega_squared / (omega_squared + p);
+                double x = p  * omega_squared / (omega_squared + p);
 
-                vector<double> fnx = calcBoysF(lab, x, boys_grid);
+                vector<double> fnx = calcBoysF(lab, x * xyz_pc_dot, boys_grid);
 
-                vec3d rints = calcRInts3DErf(lab, p, omegas[icharge], &xyz_pc[0], &fnx[0]);
+                vec3d rints = calcRInts3D(lab, x, &xyz_pc[0], &fnx[0]);
 
                 for (int t = 0; t <= lab; t++)
                     for (int u = 0; u <= lab; u++)
@@ -1915,7 +2159,7 @@ lible::arr2d<lible::vec2d, 3, 3> lints::pVpIntegrals(const Structure &structure)
     {
         array<double, 3> coords = structure.getCoordsAtom(iatom);
         array<double, 3> xyz_c{coords[0], coords[1], coords[2]};
-    
+
         const double Z = structure.getZ(iatom);
         charges[iatom] = {xyz_c[0], xyz_c[1], xyz_c[2], Z};
     }
@@ -1945,7 +2189,7 @@ lible::arr2d<lible::vec2d, 3, 3> lints::pVpIntegrals(const Structure &structure)
                     for (int j = 0; j < 3; j++)
                         for (size_t mu = 0; mu < ints_ipair[i][j].dim<0>(); mu++)
                             for (size_t nu = 0; nu < ints_ipair[i][j].dim<1>(); nu++)
-                            { 
+                            {
                                 ints[i][j](ofs_a + mu, ofs_b + nu) = ints_ipair[i][j](mu, nu);
                             }
             }

@@ -208,6 +208,33 @@ namespace lible::ints
 
     /**
      * \ingroup IntsMainInterface
+     * Computes the integrals for the first derivative of the erf-attenuated external charges for a pair of two
+     * shells. Calculates the AO part of the derivatives,
+     * \f[
+     *   \left\{(\nabla a| \hat{g}(r) | b), (a| \hat{g}(r) |\nabla b)\right\}
+     *   \; \text{with the operator} \;
+     *   \hat{g}(r) = -\sum_i \frac{q_i * erf( \omega_i * |\mathbf{r} - \mathbf{r}_i| ) }{|\mathbf{r} - \mathbf{r}_i|}
+     * \f]
+     * The operator part is calculated by `externalChargesOperatorErfD1Kernel`.
+     *
+     * \param ipair Index of the shell pair.
+     * @param charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
+     * Bohr.
+     * \param omegas list of omega screening factors for operator
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l = l_a + l_b + 1\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return 6D-array of normalized spherical-basis external integral derivatives. The integral
+     * derivatives correspond to \f$(A_x, A_y, A_z, B_x, B_y, B_z)\f$.
+     */
+    std::array<vec2d, 6>
+    externalChargesErfD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
+		    	       const std::vector<double> &omegas, const BoysGrid &boys_grid,
+			           const ShellPairData &sp_data);
+
+    /**
+     * \ingroup IntsMainInterface
      * Computes the integrals for the first derivative of the Coulomb operator for given external
      * charges,
      * \f[
@@ -230,6 +257,33 @@ namespace lible::ints
     std::vector<std::array<vec2d, 3>>
     externalChargesOperatorD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
                                     const BoysGrid &boys_grid, const ShellPairData &sp_data);
+
+    /**
+     * \ingroup IntsMainInterface
+     * Computes the integrals for the first derivative of the erf-attenuated Coulomb operator for given external
+     * charges,
+     * \f[
+     *   \{(a| \nabla_i \hat{g}_i(r) |b)\}
+     *   \; \text{with the operator} \;
+     *   \hat{g}(r) = -\sum_i \frac{q_i * erf( \omega_i * |\mathbf{r} - \mathbf{r}_i| ) }{|\mathbf{r} - \mathbf{r}_i|}
+     * \f]
+     *
+     * \param ipair Index of the shell pair.
+     * @param charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
+     * Bohr.
+     * \param omegas list of omega screening factors
+     * \param boys_grid Pre-initialized grid for calculating the Boys function. Must be initialized
+     * with \f$l = l_a + l_b + 1\f$ where the \f$(l_a, l_b)\f$ corresponds to the given `sp_data`.
+     * \param sp_data `ShellPairData` object containing all the information required for calculating
+     * integrals for the given \f$(l_a, l_b)\f$.
+     * \return A vector of 3D-arrays corresponding to the operator derivative integrals. The
+     * returned list is of the length of `charges`.
+     * The integrals are returned normalized and in the spherical basis.
+     */
+    std::vector<std::array<vec2d, 3>>
+    externalChargesOperatorErfD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
+                                       const std::vector<double> &omegas, const BoysGrid &boys_grid,
+                                       const ShellPairData &sp_data);
 
     /**
      * \ingroup IntsMainInterface
@@ -349,20 +403,20 @@ namespace lible::ints
      */
     std::array<vec2d, 3> angularMomentumKernel(int ipair, const ShellPairData &sp_data);
 
-    /** 
+    /**
      * \ingroup IntsMainInterface
-     * Calculates the pVp integrals special required for the relativistic 
-     * potential matrices W_{ij} (see equations 2 and 6 in doi:10.1063/1.4803693) 
+     * Calculates the pVp integrals special required for the relativistic
+     * potential matrices W_{ij} (see equations 2 and 6 in doi:10.1063/1.4803693)
      * @param structure `Structure` object representing the molecular geometry and basis sets.
-     * \return Normalized pVp integrals for pairs of Cartesian coordinates. 
-     * 
+     * \return Normalized pVp integrals for pairs of Cartesian coordinates.
+     *
      */
     arr2d<vec2d, 3, 3> pVpIntegrals(const Structure &structure);
 
     /**
      * \ingroup IntsMainInterface
-     * Calculates a batch of pVp integrals special required for the relativistic 
-     * potential matrices W_{ij} (see equations 2 and 6 in doi:10.1063/1.4803693) 
+     * Calculates a batch of pVp integrals special required for the relativistic
+     * potential matrices W_{ij} (see equations 2 and 6 in doi:10.1063/1.4803693)
      * \param ipair Index of the shell pair.
      * @param point_charges list of point charges, \f$(x, y, z, q)\f$, with their coordinates in
      * Bohr.
