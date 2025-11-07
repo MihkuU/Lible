@@ -1,25 +1,26 @@
+#include <lible/ints/ints.hpp>
 #include <lible/ints/utils.hpp>
 
-namespace LI = lible::ints;
+namespace lints = lible::ints;
 
 using std::array, std::map, std::pair, std::vector;
 
-double LI::purePrimitiveNorm(const int l, const double exp)
+double lints::purePrimitiveNorm(const int l, const double exp)
 {
-    double norm = std::sqrt(std::pow(2 * exp / M_PI, 1.5) * std::pow(4 * exp, l) /
-                                    doubleFactorial(2 * l - 1));
-
-    return norm;
+    return std::sqrt(std::pow(2 * exp / M_PI, 1.5) * std::pow(4 * exp, l) /
+                     doubleFactorial(2 * l - 1));
 }
 
-double LI::doubleFactorial(const int n)
+double lints::doubleFactorial(const int n)
 {    
     double double_factorial = 1;
     if (n == 0)
         return double_factorial;
-    else if (n == -1)
+
+    if (n == -1)
         return double_factorial;
-    else if (n > 0 and (n % 2 == 0))
+
+    if (n > 0 and (n % 2 == 0))
         for (int i = n; i >= 2; i -= 2)
             double_factorial *= i;
     else if (n > 0 and (n % 2 == 1))
@@ -31,9 +32,9 @@ double LI::doubleFactorial(const int n)
     return double_factorial;
 }
 
-vector<array<int, 3>> LI::cartExps(const int l)
+vector<array<int, 3>> lints::cartExps(const int l)
 {
-    size_t dim_cart = numCartesians(l);
+    const size_t dim_cart = numCartesians(l);
 
     vector<array<int, 3>> cartesian_exps(dim_cart);
     for (int x = l, pos = 0; x >= 0; x--)
@@ -47,31 +48,33 @@ vector<array<int, 3>> LI::cartExps(const int l)
     return cartesian_exps;
 }
 
-vector<pair<int, int>> LI::getLPairsSymm(const int l_max)
+vector<pair<int, int>> lints::getLPairsSymm(const int l)
 {
-    int n_pairs = (l_max + 1) * (l_max + 2) / 2;
+    const int n_pairs = (l + 1) * (l + 2) / 2;
+
     vector<pair<int, int>> l_pairs(n_pairs);
-    for (int la = 0, idx = 0; la <= l_max; la++)
+    for (int la = 0, idx = 0; la <= l; la++)
         for (int lb = 0; lb <= la; lb++, idx++)
-            l_pairs[idx] = std::make_pair(la, lb);
-
-    return l_pairs;
-}
-
-vector<pair<int, int>> LI::getLPairsNoSymm(const int l_max)
-{
-    int n_pairs = (l_max + 1) * (l_max + 1);
-    vector<pair<int, int>> l_pairs(n_pairs);
-    for (int la = 0, idx = 0; la <= l_max; la++)
-        for (int lb = 0; lb <= l_max; lb++, idx++)
             l_pairs[idx] = {la, lb};
 
     return l_pairs;
 }
 
-map<int, vector<pair<int, int>>> LI::getLPairsMap(const int l_max)
+vector<pair<int, int>> lints::getLPairsNoSymm(const int l)
 {
-    int l_max_pair = 2 * l_max;
+    const int n_pairs = (l + 1) * (l + 1);
+
+    vector<pair<int, int>> l_pairs(n_pairs);
+    for (int la = 0, idx = 0; la <= l; la++)
+        for (int lb = 0; lb <= l; lb++, idx++)
+            l_pairs[idx] = {la, lb};
+
+    return l_pairs;
+}
+
+map<int, vector<pair<int, int>>> lints::getLPairsMap(const int l_max)
+{
+    const int l_max_pair = 2 * l_max;
 
     map<int, vector<pair<int, int>>> l_pairs_map;
     for (int lab = 0; lab <= l_max_pair; lab++)
@@ -80,7 +83,7 @@ map<int, vector<pair<int, int>>> LI::getLPairsMap(const int l_max)
         for (int la = 0; la <= l_max; la++)
             for (int lb = 0; lb <= la; lb++)
                 if (la + lb == lab)
-                    lpairs.push_back(std::make_pair(la, lb));
+                    lpairs.emplace_back(la, lb);
 
         l_pairs_map[lab] = lpairs;
     }
@@ -88,7 +91,7 @@ map<int, vector<pair<int, int>>> LI::getLPairsMap(const int l_max)
     return l_pairs_map;
 }
 
-lible::vec3i LI::getHermiteGaussianPositions(const int l)
+lible::vec3i lints::getHermiteGaussianPositions(const int l)
 {
     vec3i tuv_poss(Fill(-1), l + 1, l + 1, l + 1);
     for (int n = 0, tuv = 0; n <= l; n++)
@@ -102,7 +105,7 @@ lible::vec3i LI::getHermiteGaussianPositions(const int l)
     return tuv_poss;
 }
 
-vector<array<int, 3>> LI::getHermiteGaussianIdxs(const int l)
+vector<array<int, 3>> lints::getHermiteGaussianIdxs(const int l)
 {
     vector<array<int, 3>> idxs_tuv((l + 1) * (l + 2) * (l + 3) / 6);
     for (int n = 0, tuv = 0; n <= l; n++)

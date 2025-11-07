@@ -19,7 +19,7 @@ namespace lible
         struct ShellData
         {
             /** */
-            ShellData(const int l, const std::vector<Shell> &shells);
+            ShellData(int l, const std::vector<Shell> &shells);
 
             int l{};            /** Angular momentum. */
             int n_shells{};     /** Number of shells. */
@@ -50,8 +50,8 @@ namespace lible
          */
         struct ShellPairData
         {
-            ShellPairData(const bool use_symm, const int la, const int lb,
-                          const std::vector<Shell> &shells_a, const std::vector<Shell> &shells_b);
+            ShellPairData(bool use_symm, int la, int lb, const std::vector<Shell> &shells_a,
+                          const std::vector<Shell> &shells_b);
 
             bool uses_symm{}; /** Flag indicating whether symmetry is used or not. */
 
