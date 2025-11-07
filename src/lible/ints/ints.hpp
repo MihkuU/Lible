@@ -195,7 +195,7 @@ namespace lible::ints
     std::array<vec2d, 6>
     externalChargesErfD1Kernel(int ipair, const std::vector<std::array<double, 4>> &charges,
 		    	       const std::vector<double> &omegas, const BoysGrid &boys_grid, 
-			       const ShellPairData &sp_data);
+			           const ShellPairData &sp_data);
 
     // /**
     //      * Calculates a batch of normalized Coulombic operator derivative integrals for the shell

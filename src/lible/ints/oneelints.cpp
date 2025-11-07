@@ -72,7 +72,7 @@ namespace lible::ints
     vector<array<vec2d, 3>>
     externalChargesOperatorErfD1Kernel(const int ipair, const vector<array<double, 4>> &charges,
                                        const std::vector<double> &omegas, const BoysGrid &boys_grid, 
-				       const ShellPairData &sp_data);
+				                               const ShellPairData &sp_data);
 
     std::vector<vec2d>
     potentialAtExternalChargesKernel(const int ipair, const vector<array<double, 4>> &charges,
