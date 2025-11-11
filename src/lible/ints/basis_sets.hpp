@@ -37,7 +37,8 @@ namespace lible
         basisForAtoms(const std::set<int> &atomic_nrs, const std::string &basis_set);
 
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
-        basisForEachAtom(const std::vector<int> &atomic_nrs, const std::map<int, std::string> &basis_per_atom);
+        basisForEachAtom(const std::vector<int> &atomic_nrs, const std::map<int,
+                         std::string> &basis_per_atom);
 
         std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
         basisForAtomsAux(const std::set<int> &atomic_nrs, const std::string &aux_basis_set);
