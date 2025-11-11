@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -105,6 +106,18 @@ lints::basisForAtoms(const std::set<int> &atomic_nrs, const string &basis_set)
     {
         auto basis_atom = basisForAtom(atomic_nr, basis_set);
         basis_atoms[atomic_nr] = basis_atom;
+    }
+
+    return basis_atoms;
+}
+
+std::map<int, std::map<int, vector<lints::shell_exps_coeffs_t>>>
+lints::basisForEachAtom(const std::vector<int> &atomic_nrs, const std::map<int, std::string> &basis_per_atom)
+{
+    std::map<int, std::map<int, vector<shell_exps_coeffs_t>>> basis_atoms;
+    for (auto iatom : basis_per_atom)
+    {
+        basis_atoms[iatom.first] = basisForAtom(atomic_nrs[iatom.first], basis_per_atom.at(iatom.first));
     }
 
     return basis_atoms;

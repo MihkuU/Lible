@@ -529,6 +529,15 @@ namespace lible::ints
 
     // /**
     //      * \ingroup ints
+    //      * Returns the basis set for each atom (not for each atomic nr.). The exponents and
+    //      * contraction coefficients are listed for every angular momentum per atom.
+    //      */
+    // std::map<int, std::map<int, std::vector<shell_exps_coeffs_t>>>
+    basis_atoms_t basisForEachAtom(const std::vector<int> &atomic_nrs,
+                                   const std::map<int, std::string> &basis_per_atom);
+
+    // /**
+    //      * \ingroup ints
     //      * Returns the auxiliary basis set for the given atoms. The exponents and contraction
     //      * coefficients are listed for every angular momentum per atom.
     //      */

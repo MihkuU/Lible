@@ -66,7 +66,15 @@ vector<lints::Shell> lints::constructShells(const basis_atoms_t &basis_atoms,
         const array<double, 3> coords_iatom = coords_atoms[iatom];
 
         const int atomic_nr = atomic_nrs[iatom];
-        basis_atom_t basis_atom = basis_atoms.at(atomic_nr);
+
+        basis_atom_t basis_atom;
+        if (atomic_nrs.size() == basis_atoms.size())
+        {
+            basis_atom = basis_atoms.at(iatom);
+        }else
+        {
+            basis_atom = basis_atoms.at(atomic_nr);
+        }
 
         for (const auto &[l, exps_coeffs_list] : basis_atom)
         {
