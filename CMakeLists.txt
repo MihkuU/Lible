@@ -127,4 +127,6 @@ if(lible_is_top_level)
 	add_executable(testlible)
 
 	add_subdirectory("${src_dir}/test")
+
+	target_link_libraries(testlible PRIVATE OpenMP::OpenMP_CXX)
 endif()

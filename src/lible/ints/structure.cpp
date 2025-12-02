@@ -1,215 +1,211 @@
 #include <lible/ints/structure.hpp>
 #include <lible/ints/basis_sets.hpp>
 #include <lible/ints/defs.hpp>
+#include <lible/ints/ints.hpp>
 #include <lible/ints/utils.hpp>
 
 #include <filesystem>
 #include <map>
-#include <set>
 
 namespace lints = lible::ints;
 
-using std::array, std::string, std::vector;
-
-lints::Structure::Structure(const string &basis_set, const vector<int> &atomic_nrs,
-                            const vector<array<double, 3>> &coords_angstrom)
-    : basis_set(basis_set), coords(coords_angstrom), atomic_nrs(atomic_nrs)
+lints::Structure::Structure(const std::string &basis_set, const std::vector<int> &atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom)
+    : coords_(coords_angstrom), atomic_nrs_(atomic_nrs), basis_set_(basis_set)
 {
-    if (atomic_nrs.size() != coords.size())
+    if (atomic_nrs.size() != coords_.size())
         throw std::runtime_error("Structure::Structure(): number of atomic numbers does not match "
-                                 "the number of (x, y, z)-oordinates");
+            "the number of (x, y, z)-oordinates");
 
-    n_atoms = atomic_nrs.size();
+    n_atoms_ = atomic_nrs.size();
 
-    for (int iatom = 0; iatom < n_atoms; iatom++)
+    for (size_t iatom = 0; iatom < n_atoms_; iatom++)
         for (int icart = 0; icart < 3; icart++)
-            coords[iatom][icart] *= _ang_to_bohr_;
+            coords_[iatom][icart] *= _ang_to_bohr_;
 
-    std::set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
-    basis_atoms_t basis_atoms = basisForAtoms(atomic_nrs_set, basis_set);
+    basis_atoms_t basis_atoms = basisForAtoms(atomic_nrs_, basis_set);
 
-    shells = constructShells(basis_atoms, atomic_nrs, coords);
+    shells_ = constructShells(basis_atoms, coords_);
 
-    for (const Shell &shell : shells)
+    for (const Shell &shell : shells_)
     {
-        shells_map[shell.l].push_back(shell);
+        shells_map_[shell.l_].push_back(shell);
 
-        if (shell.l > max_l)
-            max_l = shell.l;
+        if (shell.l_ > max_l_)
+            max_l_ = shell.l_;
 
-        dim_ao += shell.dim_sph;
-        dim_ao_cart += shell.dim_cart;
+        dim_ao_ += shell.dim_sph_;
+        dim_ao_cart_ += shell.dim_cart_;
     }
 }
 
-lints::Structure::Structure(const string &basis_set, const string &basis_set_aux,
-                            const vector<int> &atomic_nrs,
-                            const vector<array<double, 3>> &coords_angstrom)
+lints::Structure::Structure(const std::string &basis_set, const std::string &basis_set_aux,
+                            const std::vector<int> &atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom)
     : Structure(basis_set, atomic_nrs, coords_angstrom)
 {
-    this->basis_set_aux = basis_set_aux;
-    use_ri = true;
+    basis_set_aux_ = basis_set_aux;
+    use_ri_ = true;
 
-    std::set<int> atomic_nrs_set(atomic_nrs.begin(), atomic_nrs.end());
-    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_set, basis_set_aux);
+    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux);
 
-    shells_aux = constructShells(basis_atoms_aux, atomic_nrs, coords);
+    shells_aux_ = constructShells(basis_atoms_aux, coords_);
 
-    for (const Shell &shell : shells_aux)
+    for (const Shell &shell : shells_aux_)
     {
-        shells_map_aux[shell.l].push_back(shell);
+        shells_map_aux_[shell.l_].push_back(shell);
 
-        if (shell.l > max_l_aux)
-            max_l_aux = shell.l;
+        if (shell.l_ > max_l_aux_)
+            max_l_aux_ = shell.l_;
 
-        dim_ao_aux += shell.dim_sph;
-        dim_ao_cart_aux += shell.dim_cart;
+        dim_ao_aux_ += shell.dim_sph_;
+        dim_ao_cart_aux_ += shell.dim_cart_;
     }
 }
 
-lints::Structure::Structure(const basis_atoms_t &basis_set, const vector<int> &atomic_nrs,
-                            const vector<array<double, 3>> &coords_angstrom)
-    : coords(coords_angstrom), atomic_nrs(atomic_nrs)
+lints::Structure::Structure(const basis_atoms_t &basis_set, const std::vector<int> &atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom)
+    : coords_(coords_angstrom), atomic_nrs_(atomic_nrs)
 {
-    if (atomic_nrs.size() != coords.size())
+    if (atomic_nrs.size() != coords_.size())
         throw std::runtime_error("Structure::Structure(): number of atomic numbers does not match "
-                                 "the number of (x, y, z)-oordinates");
+            "the number of (x, y, z)-oordinates");
 
-    this->basis_set = "custom";
-    n_atoms = atomic_nrs.size();
+    this->basis_set_ = "custom";
+    n_atoms_ = atomic_nrs.size();
 
-    for (int iatom = 0; iatom < n_atoms; iatom++)
+    for (size_t iatom = 0; iatom < n_atoms_; iatom++)
         for (int icart = 0; icart < 3; icart++)
-            coords[iatom][icart] *= _ang_to_bohr_;
+            coords_[iatom][icart] *= _ang_to_bohr_;
 
-    shells = constructShells(basis_set, atomic_nrs, coords);
+    shells_ = constructShells(basis_set, coords_);
 
-    for (const Shell &shell : shells)
+    for (const Shell &shell : shells_)
     {
-        shells_map[shell.l].push_back(shell);
+        shells_map_[shell.l_].push_back(shell);
 
-        if (shell.l > max_l)
-            max_l = shell.l;
+        if (shell.l_ > max_l_)
+            max_l_ = shell.l_;
 
-        dim_ao += shell.dim_sph;
-        dim_ao_cart += shell.dim_cart;
+        dim_ao_ += shell.dim_sph_;
+        dim_ao_cart_ += shell.dim_cart_;
     }
 }
 
 lints::Structure::Structure(const basis_atoms_t &basis_set,
                             const basis_atoms_t &basis_set_aux,
-                            const vector<int> &atomic_nrs,
-                            const vector<array<double, 3>> &coords_angstrom)
+                            const std::vector<int> &atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom)
     : Structure(basis_set, atomic_nrs, coords_angstrom)
 {
-    this->basis_set_aux = "custom";
-    use_ri = true;
+    this->basis_set_aux_ = "custom";
+    use_ri_ = true;
 
-    shells_aux = constructShells(basis_set_aux, atomic_nrs, coords);
+    shells_aux_ = constructShells(basis_set_aux, coords_);
 
-    for (const Shell &shell : shells_aux)
+    for (const Shell &shell : shells_aux_)
     {
-        shells_map_aux[shell.l].push_back(shell);
+        shells_map_aux_[shell.l_].push_back(shell);
 
-        if (shell.l > max_l_aux)
-            max_l_aux = shell.l;
+        if (shell.l_ > max_l_aux_)
+            max_l_aux_ = shell.l_;
 
-        dim_ao_aux += shell.dim_sph;
-        dim_ao_cart_aux += shell.dim_cart;
+        dim_ao_aux_ += shell.dim_sph_;
+        dim_ao_cart_aux_ += shell.dim_cart_;
     }
 }
 
 bool lints::Structure::getUseRI() const
 {
-    return use_ri;
+    return use_ri_;
 }
 
 int lints::Structure::getMaxL() const
 {
-    return max_l;
+    return max_l_;
 }
 
 int lints::Structure::getMaxLAux() const
 {
-    return max_l_aux;
+    return max_l_aux_;
 }
 
-int lints::Structure::getZ(const int iatom) const
+int lints::Structure::getZ(const size_t iatom) const
 {
-    return atomic_nrs[iatom];
+    return atomic_nrs_[iatom];
 }
 
-int lints::Structure::getDimAO() const
+size_t lints::Structure::getDimAO() const
 {
-    return dim_ao;
+    return dim_ao_;
 }
 
-int lints::Structure::getDimAOAux() const
+size_t lints::Structure::getDimAOAux() const
 {
-    return dim_ao_aux;
+    return dim_ao_aux_;
 }
 
-int lints::Structure::getDimAOCart() const
+size_t lints::Structure::getDimAOCart() const
 {
-    return dim_ao_cart;
+    return dim_ao_cart_;
 }
 
-int lints::Structure::getDimAOCartAux() const
+size_t lints::Structure::getDimAOCartAux() const
 {
-    return dim_ao_cart_aux;
+    return dim_ao_cart_aux_;
 }
 
-int lints::Structure::getNAtoms() const
+size_t lints::Structure::getNAtoms() const
 {
-    return n_atoms;
+    return n_atoms_;
 }
 
-array<double, 3> lints::Structure::getCoordsAtom(const int iatom) const
+std::array<double, 3> lints::Structure::getCoordsAtom(const size_t iatom) const
 {
-    return coords[iatom];
+    return coords_[iatom];
 }
 
-vector<array<double, 4>> lints::Structure::getZs() const
+std::vector<std::array<double, 4>> lints::Structure::getZs() const
 {
-    int n_atoms = getNAtoms();
+    size_t n_atoms = getNAtoms();
 
-    vector<array<double, 4>> atomic_charges(n_atoms);
-    for (int iatom = 0; iatom < n_atoms; iatom++)
+    std::vector<std::array<double, 4>> atomic_charges(n_atoms);
+    for (size_t iatom = 0; iatom < n_atoms; iatom++)
     {
-        auto [x, y, z] = coords[iatom];
-        double Z = atomic_nrs[iatom];
+        auto [x, y, z] = coords_[iatom];
+        double Z = atomic_nrs_[iatom];
         atomic_charges[iatom] = {x, y, z, Z};
     }
 
     return atomic_charges;
 }
 
-vector<lints::Shell> lints::Structure::getShells() const
+std::vector<lints::Shell> lints::Structure::getShells() const
 {
-    return shells;
+    return shells_;
 }
 
-vector<lints::Shell> lints::Structure::getShellsAux() const
+std::vector<lints::Shell> lints::Structure::getShellsAux() const
 {
-    return shells_aux;
+    return shells_aux_;
 }
 
-vector<lints::Shell> lints::Structure::getShellsL(const int l) const
+std::vector<lints::Shell> lints::Structure::getShellsL(const int l) const
 {
-    return shells_map.at(l);
+    return shells_map_.at(l);
 }
 
-vector<lints::Shell> lints::Structure::getShellsLAux(const int l) const
+std::vector<lints::Shell> lints::Structure::getShellsLAux(const int l) const
 {
-    return shells_map_aux.at(l);
+    return shells_map_aux_.at(l);
 }
 
-std::map<int, vector<lints::Shell>> lints::Structure::getShellsMap() const
+std::map<int, std::vector<lints::Shell>> lints::Structure::getShellsMap() const
 {
-    return shells_map;
+    return shells_map_;
 }
 
-std::map<int, vector<lints::Shell>> lints::Structure::getShellsMapAux() const
+std::map<int, std::vector<lints::Shell>> lints::Structure::getShellsMapAux() const
 {
-    return shells_map_aux;
+    return shells_map_aux_;
 }

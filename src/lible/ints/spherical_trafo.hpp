@@ -1,26 +1,15 @@
 #pragma once
 
 #include <lible/types.hpp>
-#include <lible/ints/shell.hpp>
-#include <lible/ints/shell_pair_data.hpp>
 
 #include <tuple>
 
-namespace lible
+namespace lible::ints
 {
-    namespace ints
-    {
-        /*
-         * TODO: explain here the conventions regarding ordering of spherical gaussian functions and
-         * cartesian gaussian functions.
-         */
+    /// Returns the Cartesian to spherical transformation as {{mu, mu_, val}}, where mu and mu_
+    /// refer to the spherical and Cartesian Gaussians, respectively.
+    std::vector<std::tuple<int, int, double>> sphericalTrafo(int l);
 
-        /**
-         *
-         */
-        std::vector<std::tuple<int, int, double>> sphericalTrafo(const int l);
-
-        /** */
-        vec2d trafo2Spherical(const int la, const int lb, const vec2d &ints_cart);
-    }
+    /// Transforms the input Cartesian-basis integrals to the spherical basis.
+    vec2d trafo2Spherical(int la, int lb, const vec2d &ints_cart);
 }
