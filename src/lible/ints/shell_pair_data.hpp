@@ -2,98 +2,118 @@
 
 #include <lible/ints/structure.hpp>
 
-namespace lible
+namespace lible::ints
 {
-    namespace ints
+    /// Structure containing contiguous data from shells for calculating integrals.
+    struct ShellData
     {
-        /** \defgroup spdata */    
+        /// Constructor for the shell data. Expects that the angular momentum in `shells`
+        /// equals `l`. Cannot be called in an OMP parallel region.
+        ShellData(int l, const std::vector<Shell> &shells);
 
-        /**
-         * \ingroup spdata
-         *
-         * Structure for representing rolled out data of shells that is utilized in the
-         * calculation of integrals. By rolled out it is meant that the data in the shells
-         * is placed into memory contiguously. Desired data can be accessed with offset indices
-         * and dimensions.
-         */
-        struct ShellData
+        /// Angular momentum.
+        int l_{};
+        /// Number of shells.
+        size_t n_shells_{};
+        /// Number of Gaussian primitives.
+        size_t n_primitives_{};
+
+        /// Contraction coefficients with the primitive norms multiplied into.
+        std::vector<double> coeffs_;
+        /// Coordinates of atoms corresponding to shells.
+        std::vector<double> coords_;
+        /// Exponents of the Gaussian primitives.
+        std::vector<double> exps_;
+        /// Normalization constants of the atomic orbitals in the spherical basis.
+        std::vector<double> norms_;
+
+        /// Indices of atoms involved in the shells.
+        std::vector<size_t> atomic_idxs_;
+        /// Contraction depth for each shell.
+        std::vector<size_t> cdepths_;
+        /// Offsets of the contraction data (coeffs and exps) for each shell.
+        std::vector<size_t> coffsets_;
+        /// Offsets of the spherical Hermite expansion coefficients.
+        std::vector<size_t> offsets_ecoeffs_;
+        /// Offsets of the shell atomic orbital norms.
+        std::vector<size_t> offsets_norms_;
+        /// Offsets of the atomic orbital positions in the list of all atomic orbitals.
+        std::vector<size_t> offsets_sph_;
+        /// Indices of the involved shells in the list of all shells.
+        std::vector<size_t> shell_idxs_;
+    };
+
+    /// Structure containing contiguous data from shell pairs for calculating integrals. By
+    /// default, the Gaussian primitives are screened based on the values of the exponential
+    /// pre-factor and contraction coefficients. Screening can be disabled by setting the
+    /// threshold to zero.
+    struct ShellPairData
+    {
+        /// Constructor for the shell pair data. Expects that the angular momentum in `shells_a`
+        /// equals `la` and the same for `shells_b` and `lb`. Cannot be called in an OMP parallel
+        /// region.
+        ShellPairData(bool use_symm, int la, int lb, const std::vector<Shell> &shells_a,
+                      const std::vector<Shell> &shells_b, double primitives_thrs = 1e-15); // TODO: add this number as a constant somewhere
+
+        /// Flag indicating whether symmetry is used or not.
+        bool uses_symm_{};
+
+        /// Threshold for screening the primitive Gaussian pairs.
+        double primitives_thrs_{};
+
+        /// Angular momentum in bra-shell.
+        int la_{};
+        /// Angular momentum in ket-shell.
+        int lb_{};
+        /// Number of shell pairs after screening.
+        size_t n_pairs_{};
+        /// Total number of shell pairs.
+        size_t n_pairs_total_{};
+        /// Number of primitive Gaussian pairs after screening.
+        size_t n_ppairs_{};
+        /// Total number of primitive Gaussian pairs.
+        size_t n_ppairs_total_{};
+
+        /// Exponents of the Gaussian primitives.
+        std::vector<double> exps_;
+        /// Contraction coefficients including the primitive norms.
+        std::vector<double> coeffs_;
+        /// Coordinates of shells in the shell pairs.
+        std::vector<double> coords_;
+        /// Normalization consts of the atomic orbitals in the spherical basis.
+        std::vector<double> norms_;
+
+        /// Number of Gaussian primitive pairs for each shell pair.
+        std::vector<size_t> nrs_ppairs_;
+        /// Offsets of the Gaussians for each shell pair.
+        std::vector<size_t> offsets_primitives_;
+        /// Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals.
+        std::vector<size_t> offsets_sph_;
+        /// Offsets of the atomic orbital (cartesian) positions in the list of all atomic orbitals.
+        std::vector<size_t> offsets_cart_;
+        /// Offsets of the shell atomic orbital norms.
+        std::vector<size_t> offsets_norms_;
+        /// Offsets of the spherical Hermite expansion coefficients.
+        std::vector<size_t> offsets_ecoeffs_;
+        /// Offsets of the 1st derivative spherical Hermite expansion coefficients.
+        std::vector<size_t> offsets_ecoeffs_deriv1_;
+        /// Offsets of the 2nd derivative spherical Hermite expansion coefficients.
+        std::vector<size_t> offsets_ecoeffs_deriv2_;
+        /// Indices of atoms involved in the shell pairs.
+        std::vector<size_t> atomic_idxs_;
+        /// Indices of the involved shells in the list of all shells.
+        std::vector<size_t> shell_idxs_;
+
+        /// Returns the angular momentum pair.
+        std::pair<int, int> getLPair() const
         {
-            /** */
-            ShellData(int l, const std::vector<Shell> &shells);
+            return {la_, lb_};
+        }
 
-            int l{};            /** Angular momentum. */
-            int n_shells{};     /** Number of shells. */
-            int n_primitives{}; /** Total number of Gaussian primitives. */
-
-            std::vector<double> coeffs; /** Contraction coefficients with the primitive norms multiplied into. */
-            std::vector<double> coords; /** Coordinates of atoms corresponding to shells. */
-            std::vector<double> exps;   /** Exponents of the Gaussian primitives. */
-            std::vector<double> norms;  /** Normalization constants of the atomic orbitals in spherical basis. */
-
-            std::vector<int> atomic_idxs;     /** Indices of atoms involved in the shells. */
-            std::vector<int> cdepths;         /** Contraction depths corresponding to each shell. */
-            std::vector<int> coffsets;        /** Offsets of the contraction data (coeffs and exps) for each shell.*/
-            std::vector<int> offsets_ecoeffs; /** Offsets of the spherical Hermite expansion coefficients. */
-            std::vector<int> offsets_norms;   /** Offsets of the shell atomic orbital norms. */
-            std::vector<int> offsets_sph;     /** Offsets of the atomic orbital positions in the list of all atomic orbitals. */
-            std::vector<int> shell_idxs;      /** Indices of the involved shells in the list of all shells. */
-        };
-
-        /**
-         * \ingroup spdata
-         *
-         * Structure for representing contiguously rolled out data of shell pairs. The data of
-         * each shell in a pair is placed side-by-side to each other in a corresponding vector.
-         * If \f$l_a \neq l_b\f$, all of the shells are taken. When \f$l_a = l_b\f$, we enforce
-         * \f$i \geq j\f$ where \f$i, j\f$ refer to the shell indices. Contains a few additional
-         * gadgets that might be useful.
-         */
-        struct ShellPairData
-        {
-            ShellPairData(bool use_symm, int la, int lb, const std::vector<Shell> &shells_a,
-                          const std::vector<Shell> &shells_b);
-
-            bool uses_symm{}; /** Flag indicating whether symmetry is used or not. */
-
-            int la{};           /** Angular momentum of the left shell. */
-            int lb{};           /** Angular momentum of the right shell. */
-            int n_pairs{};      /** Total number of shell pairs. */
-            int n_prim_pairs{}; /** Total number of Gaussian primitive pairs. */
-
-            std::vector<double> coeffs; /** Contraction coefficients including the primitive norms. */
-            std::vector<double> coords; /** Coordinates of shells in the shell pairs. */
-            std::vector<double> exps;   /** Exponents of the Gaussian primitives. */
-            std::vector<double> norms;  /** Normalization consts of the atomic orbitals in spherical basis. */
-
-            std::vector<int> atomic_idxs;            /** Indices of atoms involved in the shell pairs. */
-            std::vector<int> cdepths;                /** Contraction depths corresponding to each shell in a shell pair. */
-            std::vector<int> coffsets;               /** Offsets of the contraction data (coeffs and exps) for each shell in a shell pair.*/
-            std::vector<int> offsets_cart;           /** Offsets of the atomic orbital (cartesian) positions in the list of all atomic orbitals. */
-            std::vector<int> offsets_ecoeffs;        /** Offsets of the spherical Hermite expansion coefficients. */
-            std::vector<int> offsets_ecoeffs_deriv1; /** Offsets of the 1st derivative spherical Hermite expansion coefficients. */
-            std::vector<int> offsets_ecoeffs_deriv2; /** Offsets of the 2nd derivative spherical Hermite expansion coefficients. */
-            std::vector<int> offsets_norms;          /** Offsets of the shell atomic orbital norms. */
-            std::vector<int> offsets_sph;            /** Offsets of the atomic orbital (spherical) positions in the list of all atomic orbitals. */
-            std::vector<int> shell_idxs;             /** Indices of the involved shells in the list of all shells. */
-
-            /** Returns the angular momentum pair. */
-            std::pair<int, int> getLPair() const
-            {
-                return {la, lb};
-            }
-        };
-
-        /**
-         * Constructs the shell datas for the auxiliary basis set, up to max L.
-         */
-        std::vector<ShellData> shellDataAux(const Structure &structure);
-
-        /**
-         *
-         */
-        std::vector<ShellPairData> shellPairData(bool use_symm, const Structure &structure);
-
-        std::vector<ShellPairData> shellPairData(const std::vector<Shell> &shells_a,
-                                                 const std::vector<Shell> &shells_b);
-    }
+    private:
+        /// Counts the numbers of total and screened shell and primitive Gaussian pairs.
+        void countPairs(const std::vector<Shell> &shells_a, const std::vector<Shell> &shells_b,
+                        size_t &n_pairs, size_t &n_pairs_total, size_t &n_ppairs,
+                        size_t &n_ppairs_total) const;
+    };
 }

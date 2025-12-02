@@ -4,185 +4,161 @@
 #include <cmath>
 #include <vector>
 
-namespace lible
+namespace lible::ints
 {
-    namespace ints
+    /// Class for precalculating and using the Boys function grid.
+    class BoysGrid
     {
-        /**
-         *
-         */
-        class BoysF
+    public:
+        /// Default ctor.
+        BoysGrid() = default;
+
+        /// Initializes the Boys function grid for the maximal value of `n`.
+        explicit BoysGrid(int max_n);
+
+        /// Returns the value of x after which the Boys function is calculated approximately.
+        double getLargeX() const;
+
+        /// Returns the interval size.
+        double getIntervalSize() const;
+
+        /// Returns the maximum n-value for which the Boys function grid is constructed.
+        int getMaxN() const;
+
+        /// Returns a constant reference to the calculated Boys function grid values.
+        const std::vector<double> &getFnxGrid() const;
+
+    private:
+        /// Convergence threshold for eq. (9.8.12) from https://doi.org/10.1007/s10008-001-0256-1.
+        double boys_f_threshold_ = 1e-16;
+
+        /// Length of the Boys function grid interval.
+        double interval_size_ = 0.01;
+
+        /// Value of x after which the boys function is calculated approximately. E.g., using
+        /// eq. (9.8.13) from https://doi.org/10.1007/s10008-001-0256-1.
+        double large_x_ = 30;
+
+        /// Maximum number of `n` for using the recursion to hit the target n.
+        int max_n_{};
+        /// Number of grid intervals.
+        int n_intervals_{};
+
+        /// The precalculated Boys function grid.
+        std::vector<double> fnx_grid_;
+
+        /// First, constructs Fn(0) for `max_n_` using eq. (9.8.6) from
+        /// https://doi.org/10.1007/s10008-001-0256-1. Then, uses the downward recursion from
+        /// eq. (9.8.14) to calculate the grid values for different n.
+        std::vector<double> preEvaluate() const;
+    };
+
+    /**
+     * The Boys function is represented as a 2D grid (matrix) that is rolled out as a vector.
+     * The number of rows corresponds to each value of x from 0 to 30 with a distance of 0.01.
+     * The rows correspond to different angular momentum plus the number of terms in the
+     * Taylor series (eq. (9.8.12) from HJO).
+     *
+     * TODO: Figure out a better name.
+     * TODO: Move this version of the function to a separate file.
+     */
+    template <const int L>
+    class BoysF2
+    {
+    public:
+        /** Calculates the Boys function at value x. */
+        void calcFnx(const double x, double *fnx) const
         {
-        public:
-            BoysF(const int max_n) : max_n(max_n + 6)
+            if (x == 0)
             {
-                n_intervals = large_x / interval_size + 1;
-                fnx_grid = preEvaluate();
+                // (9.8.6) from the bible.
+                fnx[0] = 1;
+                for (int k = 1; k <= L; k++)
+                    fnx[k] = 1.0 / (2 * k + 1);
             }
+            else if (x > 30.0)
+            {
+                // Adapted from HUMMR, should be (9.8.9) in the book.
+                fnx[0] = 0.5 * std::sqrt(M_PI / x);
+                for (int k = 1; k <= L; k++)
+                    fnx[k] = fnx[k - 1] * (k - 0.5) / x;
+            }
+            else
+            {
+                // (9.8.12) from HJO.
+                int ival = x / interval_size_;
 
-            /**
-             *
-             */
-            void calcFnx(const int max_n, const double x, std::vector<double> &fnx) const; // TODO: make return
+                double origin_x = ival * interval_size_;
+                double delta_x = x - origin_x;
 
-        private:
-            int max_n;
-            int n_intervals;
+                double k_factorial = 1.0;
+                double deltax_k = 1.0;
 
-            double boys_f_threshold = 1e-16;
-            double interval_size = 0.01;
-            double large_x = 30;
+                double sum = fnx_grid_[ival * n_cols_ + L];
+                for (int k = 1; k < 7; k++)
+                {
+                    deltax_k *= -delta_x;
+                    k_factorial *= k;
+                    sum += fnx_grid_[ival * n_cols_ + (L + k)] * deltax_k / k_factorial;
+                }
 
-            std::vector<double> fnx_grid;
+                fnx[L] = sum;
 
-            std::vector<double> preEvaluate() const;
-        };
+                double exp_x = std::exp(-x);
+                for (int k = L - 1; k >= 0; k--)
+                    fnx[k] = (2.0 * x * fnx[k + 1] + exp_x) / (2 * k + 1);
+            }
+        }
 
-        /** */
-        class BoysGrid
+    private:
+        static constexpr double boys_f_threshold_ = 1e-16;
+
+        static constexpr double interval_size_ = 0.01;
+
+        static constexpr double large_x_ = 30;
+
+        static constexpr int n_terms_ = 7;
+
+        static constexpr int n_rows_ = large_x_ / interval_size_ + 1;
+
+        static constexpr int n_cols_ = L + n_terms_;
+
+        static consteval int calcFnxGridSize()
         {
-        public:
-            BoysGrid();
-            
-            BoysGrid(const int max_n);
+            return n_rows_ * n_cols_;
+        }
 
-            /** */
-            double getLargeX() const;
+        /// Evaluates the Boys function at the grid points based on (9.8.11) from HJO.
+        static consteval std::array<double, calcFnxGridSize()> preEvaluateGrid()
+        {
+            std::array<double, calcFnxGridSize()> fnx_grid;
 
-            /** */
-            double getIntervalSize() const;
-
-            /** */
-            int getMaxN() const;
-
-            /** */
-            // std::vector<double> getFnxGrid() const;
-
-            const std::vector<double>& getFnxGrid() const;
-
-        private:
-            double boys_f_threshold = 1e-16; /** */
-            double interval_size = 0.01;     /** */
-            double large_x = 30;             /** */
-
-            int max_n;       /** */
-            int n_intervals; /** */
-
-            std::vector<double> fnx_grid; /** */
-
-            /** */
-            std::vector<double> preEvaluate() const;
-        };
-
-        std::vector<double> calcBoysF(const int max_n, const double x, const BoysGrid &boys_grid);
-
-        /**                  
-         * The Boys function is represented as a 2D grid (matrix) that is rolled out as a vector. 
-         * The number of rows corresponds to each value of x from 0 to 30 with a distance of 0.01. 
-         * The rows correspond to different angular momentum plus the number of terms in the 
-         * Taylor series (eq. (9.8.12) from HJO).        
-         *          
-         * TODO: Figure out a better name. 
-         * TODO: Move this version of the function to a separate file.
-         */
-        template <const int l>
-        class BoysF2
-        {                        
-        public:
-            /** Calculates the Boys function at value x. */
-            void calcFnx(const double x, double *fnx) const
+            double x = 0;
+            for (int ival = 0; ival < n_rows_; ival++)
             {
-                if (x == 0)
+                int k = 1;
+                double exp_x = std::exp(-x);
+                double term = 1.0 / (2.0 * (n_cols_ - 1) + 1.0);
+                double sum = term;
+                while (true)
                 {
-                    // (9.8.6) from the bible.
-                    fnx[0] = 1;
-                    for (int k = 1; k <= l; k++)
-                        fnx[k] = 1.0 / (2 * k + 1);
+                    term *= x / ((n_cols_ - 1) + 0.5 + k);
+                    sum += term;
+                    if (std::fabs(term) < boys_f_threshold_)
+                        break;
+                    k++;
                 }
-                else if (x > 30.0)
-                {
-                    // Adapted from HUMMR, should be (9.8.9) in the book.
-                    fnx[0] = 0.5 * std::sqrt(M_PI / x);
-                    for (int k = 1; k <= l; k++)
-                        fnx[k] = fnx[k - 1] * (k - 0.5) / x;
-                }
-                else
-                {
-                    // (9.8.12) from HJO.
-                    int ival = x / interval_size;
 
-                    double origin_x = ival * interval_size;
-                    double delta_x = x - origin_x;
+                fnx_grid[ival * n_cols_ + (n_cols_ - 1)] = exp_x * sum;
+                for (int k = n_cols_ - 2; k >= 0; k--)
+                    fnx_grid[ival * n_cols_ + k] = (2.0 * x * fnx_grid[ival * n_cols_ + (k + 1)] + exp_x) / (2 * k + 1);
 
-                    double k_factorial = 1.0;
-                    double deltax_k = 1.0;
-
-                    double sum = fnx_grid[ival * n_cols + l];
-                    for (int k = 1; k < 7; k++)
-                    {
-                        deltax_k *= -delta_x;
-                        k_factorial *= k;
-                        sum += fnx_grid[ival * n_cols + (l + k)] * deltax_k / k_factorial;
-                    }
-
-                    fnx[l] = sum;
-
-                    double exp_x = std::exp(-x);
-                    for (int k = l - 1; k >= 0; k--)
-                        fnx[k] = (2.0 * x * fnx[k + 1] + exp_x) / (2 * k + 1);
-                }
+                x += interval_size_;
             }
 
-        private:
-            static constexpr double boys_f_threshold = 1e-16;
+            return fnx_grid;
+        }
 
-            static constexpr double interval_size = 0.01;
-            
-            static constexpr double large_x = 30;            
-
-            static constexpr int n_terms = 7;
-
-            static constexpr int n_rows = large_x / interval_size + 1;
-
-            static constexpr int n_cols = l + n_terms;            
-
-            static consteval int calcFnxGridSize()
-            {
-                return n_rows * n_cols;
-            }
-
-            /** Evaluates the Boys function at the grid points based on (9.8.11) from HJO. */
-            static consteval std::array<double, calcFnxGridSize()> preEvaluateGrid()
-            {
-                std::array<double, calcFnxGridSize()> fnx_grid;
-
-                double x = 0;
-                for (int ival = 0; ival < n_rows; ival++)
-                {
-                    int k = 1;
-                    double exp_x = std::exp(-x);
-                    double term = 1.0 / (2.0 * (n_cols - 1) + 1.0);
-                    double sum = term;
-                    while (true)
-                    {
-                        term *= x / ((n_cols - 1) + 0.5 + k);
-                        sum += term;
-                        if (std::fabs(term) < boys_f_threshold)
-                            break;
-                        k++;
-                    }
-
-                    fnx_grid[ival * n_cols + (n_cols - 1)] = exp_x * sum;
-                    for (int k = n_cols - 2; k >= 0; k--)
-                        fnx_grid[ival * n_cols + k] = (2.0 * x * fnx_grid[ival * n_cols + (k + 1)] + exp_x) / (2 * k + 1);
-
-                    x += interval_size;
-                }
-
-                return fnx_grid;
-            }
-
-            static constexpr std::array<double, calcFnxGridSize()> fnx_grid{preEvaluateGrid()};
-        };
-    }
+        static constexpr std::array<double, calcFnxGridSize()> fnx_grid_{preEvaluateGrid()};
+    };
 }

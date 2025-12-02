@@ -1,263 +1,223 @@
 #pragma once
 
 #include <lible/ints/boys_function.hpp>
-#include <lible/ints/rints.hpp>
 #include <lible/ints/shell_pair_data.hpp>
 
 #include <functional>
 
-namespace lible
+namespace lible::ints
 {
-    namespace ints
+    struct ERI4Kernel;
+    struct ERI3Kernel;
+    struct ERI2Kernel;
+
+    struct ERI4D1Kernel;
+    struct ERI3D1Kernel;
+    struct ERI2D1Kernel;
+
+    struct ERI2D2Kernel;
+
+    struct ERI4SOCKernel;
+    struct ERI3SOCKernel;
+
+    using eri4_kernelfun_t = std::function<vec4d(
+        size_t ipair_ab, size_t ipair_cd, const ShellPairData &sp_data_ab,
+        const ShellPairData &sp_data_cd, const ERI4Kernel *eri4_kernel)>;
+
+    using eri3_kernelfun_t = std::function<vec3d(
+        size_t ipair_ab, size_t ishell_c, const ShellPairData &sp_data_ab,
+        const ShellData &sh_data_c, const ERI3Kernel *eri3_kernel)>;
+
+    using eri2_kernelfun_t = std::function<vec2d(
+        size_t ishell_a, size_t ishell_b, const ShellData &sp_data_a,
+        const ShellData &sh_data_b, const ERI2Kernel *eri2_kernel)>;
+
+    using eri4d1_kernelfun_t = std::function<std::array<vec4d, 12>(
+        size_t ipair_ab, size_t ipair_cd, const ShellPairData &sp_data_ab,
+        const ShellPairData &sp_data_cd, const ERI4D1Kernel *eri4d1_kernel)>;
+
+    using eri3d1_kernelfun_t = std::function<std::array<vec3d, 9>(
+        size_t ipair_ab, size_t ishell_c, const ShellPairData &sp_data_ab,
+        const ShellData &sh_data_c, const ERI3D1Kernel *eri3d1_kernel)>;
+
+    using eri2d1_kernelfun_t = std::function<std::array<vec2d, 6>(
+        size_t ishell_a, size_t ishell_b, const ShellData &sh_data_a,
+        const ShellData &sh_data_b, const ERI2D1Kernel *eri2d1_kernel)>;
+
+    using eri2d2_kernelfun_t = std::function<arr2d<vec2d, 6, 6>(
+        size_t ishell_a, size_t ishell_b, const ShellData &sh_data_a,
+        const ShellData &sh_data_b, const ERI2D2Kernel *eri2d2_kernel)>;
+
+    using eri4soc_kernelfun_t = std::function<std::array<vec4d, 3>(
+        size_t ipair_ab, size_t ipair_cd, const ShellPairData &sp_data_ab,
+        const ShellPairData &sp_data_cd, const ERI4SOCKernel *eri4soc_kernel)>;
+
+    using eri3soc_kernelfun_t = std::function<std::array<vec3d, 3>(
+        size_t ipair_ab, size_t ishell_c, const ShellPairData &sp_data_ab,
+        const ShellData &sh_data_c, const ERI3SOCKernel *eri3soc_kernel)>;
+
+    struct ERI4Kernel
     {
-        struct ERI4Kernel;
-        struct ERI3Kernel;
-        struct ERI2Kernel;
+        ERI4Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd);
 
-        struct ERI4D1Kernel;
-        struct ERI3D1Kernel;
-        struct ERI2D1Kernel;
-
-        struct ERI2D2Kernel;
-
-        struct ERI4SOCKernel;
-        struct ERI3SOCKernel;
-
-        using eri4_kernelfun_t = std::function<vec4d(
-            const int ipair_ab, const int ipair_cd, const ShellPairData &sp_data_ab,
-            const ShellPairData &sp_data_cd, const ERI4Kernel *eri4_kernel)>;
-
-        using eri3_kernelfun_t = std::function<vec3d(
-            const int ipair_ab, const int ishell_c, const ShellPairData &sp_data_ab,
-            const ShellData &sh_data_c, const ERI3Kernel *eri3_kernel)>;
-
-        using eri2_kernelfun_t = std::function<vec2d(
-            const int ishell_a, const int ishell_b, const ShellData &sp_data_a,
-            const ShellData &sh_data_b, const ERI2Kernel *eri2_kernel)>;
-
-        using eri4d1_kernelfun_t = std::function<std::array<vec4d, 12>(
-            const int ipair_ab, const int ipair_cd, const ShellPairData &sp_data_ab,
-            const ShellPairData &sp_data_cd, const ERI4D1Kernel *eri4d1_kernel)>;
-
-        using eri3d1_kernelfun_t = std::function<std::array<vec3d, 9>(
-            const int ipair_ab, const int ishell_c, const ShellPairData &sp_data_ab,
-            const ShellData &sh_data_c, const ERI3D1Kernel *eri3d1_kernel)>;
-
-        using eri2d1_kernelfun_t = std::function<std::array<vec2d, 6>(
-            const int ishell_a, const int ishell_b, const ShellData &sh_data_a,
-            const ShellData &sh_data_b, const ERI2D1Kernel *eri2d1_kernel)>;
-
-        using eri2d2_kernelfun_t = std::function<arr2d<vec2d, 6, 6>(
-            const int ishell_a, const int ishell_b, const ShellData &sh_data_a,
-            const ShellData &sh_data_b, const ERI2D2Kernel *eri2d2_kernel)>;
-
-        using eri4soc_kernelfun_t = std::function<std::array<vec4d, 3>(
-            const int ipair_ab, const int ipair_cd, const ShellPairData &sp_data_ab,
-            const ShellPairData &sp_data_cd, const ERI4SOCKernel *eri4soc_kernel)>;
-
-        using eri3soc_kernelfun_t = std::function<std::array<vec3d, 3>(
-            const int ipair_ab, const int ishell_c, const ShellPairData &sp_data_ab,
-            const ShellData &sh_data_c, const ERI3SOCKernel *eri3soc_kernel)>;
-
-        struct ERI4Kernel
+        vec4d operator()(const size_t ipair_ab, const size_t ipair_cd,
+                         const ShellPairData &sp_data_ab,
+                         const ShellPairData &sp_data_cd) const
         {
-            ERI4Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
-                       const eri4_kernelfun_t &eri4_kernelfun);
+            return eri4_kernelfun_(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd, this);
+        }
 
-            vec4d operator()(const int ipair_ab, const int ipair_cd,
-                             const ShellPairData &sp_data_ab,
-                             const ShellPairData &sp_data_cd) const
-            {
-                return eri4_kernelfun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd, this);
-            }
+        std::vector<double> ecoeffs_bra_;
+        std::vector<double> ecoeffs_ket_;
+        eri4_kernelfun_t eri4_kernelfun_;
 
-            std::vector<double> ecoeffs_bra;
-            std::vector<double> ecoeffs_ket;
-            eri4_kernelfun_t eri4_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI3Kernel
+    {
+        ERI3Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c);
 
-        struct ERI3Kernel
+        vec3d operator()(const size_t ipair_ab, const size_t ishell_c,
+                         const ShellPairData &sp_data_ab,
+                         const ShellData &sh_data_c) const
         {
-            ERI3Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
-                       const eri3_kernelfun_t &eri3_kernelfun);
+            return eri3_kernelfun_(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
+        }
 
-            vec3d operator()(const int ipair_ab, const int ishell_c,
-                             const ShellPairData &sp_data_ab,
-                             const ShellData &sh_data_c) const
-            {
-                return eri3_kernelfun(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
-            }
+        std::vector<double> ecoeffs_bra_;
+        std::vector<double> ecoeffs_ket_;
+        eri3_kernelfun_t eri3_kernelfun_;
 
-            std::vector<double> ecoeffs_bra;
-            std::vector<double> ecoeffs_ket;
-            eri3_kernelfun_t eri3_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI2Kernel
+    {
+        ERI2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b);
 
-        struct ERI2Kernel
+        vec2d operator()(const size_t ishell_a, const size_t ishell_b,
+                         const ShellData &sh_data_a,
+                         const ShellData &sh_data_b) const
         {
-            ERI2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
-                       const eri2_kernelfun_t &eri2_kernelfun);
+            return eri2_kernelfun_(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
+        }
 
-            vec2d operator()(const int ishell_a, const int ishell_b,
-                             const ShellData &sh_data_a,
-                             const ShellData &sh_data_b) const
-            {
-                return eri2_kernelfun(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
-            }
+        std::vector<double> ecoeffs_bra_;
+        std::vector<double> ecoeffs_ket_;
+        eri2_kernelfun_t eri2_kernelfun_;
 
-            std::vector<double> ecoeffs_bra;
-            std::vector<double> ecoeffs_ket;
-            eri2_kernelfun_t eri2_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI4D1Kernel
+    {
+        ERI4D1Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd);
 
-        struct ERI4D1Kernel
+        std::array<vec4d, 12> operator()(const size_t ipair_ab, const size_t ipair_cd,
+                                         const ShellPairData &sp_data_ab,
+                                         const ShellPairData &sp_data_cd) const
         {
-            ERI4D1Kernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
-                         const eri4d1_kernelfun_t &eri4d1_kernelfun);
+            return eri4d1_kernelfun_(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd, this);
+        }
 
-            std::array<vec4d, 12> operator()(const int ipair_ab, const int ipair_cd,
-                                             const ShellPairData &sp_data_ab,
-                                             const ShellPairData &sp_data_cd) const
-            {
-                return eri4d1_kernelfun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd, this);
-            }
+        std::vector<double> ecoeffs0_bra_;
+        std::vector<double> ecoeffs1_bra_;
+        std::vector<double> ecoeffs0_ket_;
+        std::vector<double> ecoeffs1_ket_;
+        eri4d1_kernelfun_t eri4d1_kernelfun_;
 
-            std::vector<double> ecoeffs0_bra;
-            std::vector<double> ecoeffs1_bra;
-            std::vector<double> ecoeffs0_ket;
-            std::vector<double> ecoeffs1_ket;
-            eri4d1_kernelfun_t eri4d1_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI3D1Kernel
+    {
+        ERI3D1Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c);
 
-        struct ERI3D1Kernel
+        std::array<vec3d, 9> operator()(const size_t ipair_ab, const size_t ishell_c,
+                                        const ShellPairData &sp_data_ab,
+                                        const ShellData &sh_data_c) const
         {
-            ERI3D1Kernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
-                         const eri3d1_kernelfun_t &eri3d1_kernelfun);
+            return eri3d1_kernelfun_(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
+        }
 
-            std::array<vec3d, 9> operator()(const int ipair_ab, const int ishell_c,
-                                            const ShellPairData &sp_data_ab,
-                                            const ShellData &sh_data_c) const
-            {
-                return eri3d1_kernelfun(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
-            }
+        std::vector<double> ecoeffs0_bra_;
+        std::vector<double> ecoeffs1_bra_;
+        std::vector<double> ecoeffs0_ket_;
+        eri3d1_kernelfun_t eri3d1_kernelfun_;
 
-            std::vector<double> ecoeffs0_bra;
-            std::vector<double> ecoeffs1_bra;
-            std::vector<double> ecoeffs0_ket;
-            eri3d1_kernelfun_t eri3d1_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI2D1Kernel
+    {
+        ERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b);
 
-        struct ERI2D1Kernel
+        std::array<vec2d, 6> operator()(const size_t ishell_a, const size_t ishell_b,
+                                        const ShellData &sh_data_a,
+                                        const ShellData &sh_data_b) const
         {
-            ERI2D1Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
-                         const eri2d1_kernelfun_t &eri2d1_kernelfun);
+            return eri2d1_kernelfun_(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
+        }
 
-            std::array<vec2d, 6> operator()(const int ishell_a, const int ishell_b,
-                                            const ShellData &sh_data_a,
-                                            const ShellData &sh_data_b) const
-            {
-                return eri2d1_kernelfun(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
-            }
+        std::vector<double> ecoeffs_bra_;
+        std::vector<double> ecoeffs_ket_;
+        eri2d1_kernelfun_t eri2d1_kernelfun_;
 
-            std::vector<double> ecoeffs_bra;
-            std::vector<double> ecoeffs_ket;
-            eri2d1_kernelfun_t eri2d1_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI2D2Kernel
+    {
+        ERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b);
 
-        struct ERI2D2Kernel
+        arr2d<vec2d, 6, 6> operator()(const size_t ishell_a, const size_t ishell_b,
+                                      const ShellData &sh_data_a,
+                                      const ShellData &sh_data_b) const
         {
-            ERI2D2Kernel(const ShellData &sh_data_a, const ShellData &sh_data_b,
-                         const eri2d2_kernelfun_t &eri2d2_kernelfun);
+            return eri2d2_kernelfun_(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
+        }
 
-            arr2d<vec2d, 6, 6> operator()(const int ishell_a, const int ishell_b,
-                                          const ShellData &sh_data_a,
-                                          const ShellData &sh_data_b) const
-            {
-                return eri2d2_kernelfun(ishell_a, ishell_b, sh_data_a, sh_data_b, this);
-            }
+        std::vector<double> ecoeffs_bra_;
+        std::vector<double> ecoeffs_ket_;
+        eri2d2_kernelfun_t eri2d2_kernelfun_;
 
-            std::vector<double> ecoeffs_bra;
-            std::vector<double> ecoeffs_ket;
-            eri2d2_kernelfun_t eri2d2_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI4SOCKernel
+    {
+        ERI4SOCKernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd);
 
-        struct ERI4SOCKernel
+        std::array<vec4d, 3> operator()(const size_t ipair_ab, const size_t ipair_cd,
+                                        const ShellPairData &sp_data_ab,
+                                        const ShellPairData &sp_data_cd) const
         {
-            ERI4SOCKernel(const ShellPairData &sp_data_ab, const ShellPairData &sp_data_cd,
-                          const eri4soc_kernelfun_t &eri4soc_kernelfun);
+            return eri4soc_kernelfun_(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd, this);
+        }
 
-            std::array<vec4d, 3> operator()(const int ipair_ab, const int ipair_cd,
-                                            const ShellPairData &sp_data_ab,
-                                            const ShellPairData &sp_data_cd) const
-            {
-                return eri4soc_kernelfun(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd, this);
-            }
+        std::vector<double> ecoeffs1_bra_;
+        std::vector<double> ecoeffs0_ket_;
+        eri4soc_kernelfun_t eri4soc_kernelfun_;
 
-            std::vector<double> ecoeffs1_bra;
-            std::vector<double> ecoeffs0_ket;
-            eri4soc_kernelfun_t eri4soc_kernelfun;
+        BoysGrid boys_grid_;
+    };
 
-            BoysGrid boys_grid;
-        };
+    struct ERI3SOCKernel
+    {
+        ERI3SOCKernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c);
 
-        struct ERI3SOCKernel
+        std::array<vec3d, 3> operator()(const size_t ipair_ab, const size_t ishell_c,
+                                        const ShellPairData &sp_data_ab,
+                                        const ShellData &sh_data_c) const
         {
-            ERI3SOCKernel(const ShellPairData &sp_data_ab, const ShellData &sh_data_c,
-                          const eri3soc_kernelfun_t &eri3soc_kernelfun);
+            return eri3soc_kernelfun_(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
+        }
 
-            std::array<vec3d, 3> operator()(const int ipair_ab, const int ishell_c,
-                                            const ShellPairData &sp_data_ab,
-                                            const ShellData &sh_data_c) const
-            {
-                return eri3soc_kernelfun(ipair_ab, ishell_c, sp_data_ab, sh_data_c, this);
-            }
+        std::vector<double> ecoeffs1_bra_;
+        std::vector<double> ecoeffs0_ket_;
+        eri3soc_kernelfun_t eri3soc_kernelfun_;
 
-            std::vector<double> ecoeffs1_bra;
-            std::vector<double> ecoeffs0_ket;
-            eri3soc_kernelfun_t eri3soc_kernelfun;
-
-            BoysGrid boys_grid;
-        };
-
-        ERI4Kernel deployERI4Kernel(const ShellPairData &sp_data_ab,
-                                    const ShellPairData &sp_data_cd);
-
-        ERI3Kernel deployERI3Kernel(const ShellPairData &sp_data_ab,
-                                    const ShellData &sh_data_c);
-
-        ERI2Kernel deployERI2Kernel(const ShellData &sh_data_a,
-                                    const ShellData &sh_data_b);
-
-        ERI4D1Kernel deployERI4D1Kernel(const ShellPairData &sp_data_ab,
-                                        const ShellPairData &sp_data_cd);
-
-        ERI3D1Kernel deployERI3D1Kernel(const ShellPairData &sp_data_ab,
-                                        const ShellData &sh_data_c);
-
-        ERI2D1Kernel deployERI2D1Kernel(const ShellData &sh_data_a,
-                                        const ShellData &sh_data_b);
-
-        ERI2D2Kernel deployERI2D2Kernel(const ShellData &sh_data_a,
-                                        const ShellData &sh_data_b);
-
-        ERI4SOCKernel deployERI4SOCKernel(const ShellPairData &sp_data_ab,
-                                          const ShellPairData &sp_data_cd);
-
-        ERI3SOCKernel deployERI3SOCKernel(const ShellPairData &sp_data_ab,
-                                          const ShellData &sh_data_c);
-    }
+        BoysGrid boys_grid_;
+    };
 }

@@ -1,54 +1,46 @@
 #include <lible/utils.hpp>
 #include <lible/ints/ecoeffs.hpp>
-#include <lible/ints/rints.hpp>
-#include <lible/ints/spherical_trafo.hpp>
-#include <lible/ints/utils.hpp>
+#include <lible/ints/ints.hpp>
 #include <lible/ints/twoel/eri_kernels.hpp>
 
 #include <chrono>
 #include <cstring>
 #include <format>
-#include <map>
 
 namespace lints = lible::ints;
 
-using std::array, std::map, std::pair, std::vector;
-
 namespace lible::ints
 {
-    // Forward declarations
-    vec2d eri4Diagonal(const Structure &structure);
+    /// Copies the integrals from the shell batch to the target container.
+    void transferIntsERI4Diag(int ipair_ab, const ShellPairData &sp_data_ab,
+                              const vec4d &eri4_batch, vec2d &eri4_diagonal);
+}
 
-    vec4d eri4(const Structure &structure);
+void lints::transferIntsERI4Diag(const int ipair_ab, const ShellPairData &sp_data_ab,
+                                 const vec4d &eri4_batch, vec2d &eri4_diagonal)
+{
+    int dim_a = numSphericals(sp_data_ab.la_);
+    int dim_b = numSphericals(sp_data_ab.lb_);
+    size_t ofs_a = sp_data_ab.offsets_sph_[2 * ipair_ab];
+    size_t ofs_b = sp_data_ab.offsets_sph_[2 * ipair_ab + 1];
+    for (int a = 0; a < dim_a; a++)
+        for (int b = 0; b < dim_b; b++)
+        {
+            double integral = eri4_batch(a, b, a, b);
 
-    void eri4Benchmark(const Structure &structure);
+            size_t mu = ofs_a + a;
+            size_t nu = ofs_b + b;
 
-    void transferIntsERI4Diag(const int ipair_ab, const ShellPairData &sp_data_ab,
-                              const vec4d &eri4_batch, vec2d &eri4_diagonal)
-    {
-        int dim_a = numSphericals(sp_data_ab.la);
-        int dim_b = numSphericals(sp_data_ab.lb);
-        int ofs_a = sp_data_ab.offsets_sph[2 * ipair_ab];
-        int ofs_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
-        for (int a = 0; a < dim_a; a++)
-            for (int b = 0; b < dim_b; b++)
-            {
-                double integral = eri4_batch(a, b, a, b);
-
-                int mu = ofs_a + a;
-                int nu = ofs_b + b;
-
-                eri4_diagonal(mu, nu) = integral;
-                eri4_diagonal(nu, mu) = integral;
-            }
-    }
+            eri4_diagonal(mu, nu) = integral;
+            eri4_diagonal(nu, mu) = integral;
+        }
 }
 
 lible::vec4d lints::eri4(const Structure &structure)
 {
-    vector<ShellPairData> sp_data = shellPairData(true, structure);
+    std::vector<ShellPairData> sp_data = shellPairData(true, structure);
 
-    int dim_ao = structure.getDimAO();
+    size_t dim_ao = structure.getDimAO();
     vec4d eri4(Fill(0), dim_ao);
     for (size_t ispdata_ab = 0; ispdata_ab < sp_data.size(); ispdata_ab++)
         for (size_t isp_data_cd = 0; isp_data_cd <= ispdata_ab; isp_data_cd++)
@@ -56,35 +48,35 @@ lible::vec4d lints::eri4(const Structure &structure)
             const ShellPairData &sp_data_ab = sp_data[ispdata_ab];
             const ShellPairData &sp_data_cd = sp_data[isp_data_cd];
 
-            int n_sph_a = numSphericals(sp_data_ab.la);
-            int n_sph_b = numSphericals(sp_data_ab.lb);
-            int n_sph_c = numSphericals(sp_data_cd.la);
-            int n_sph_d = numSphericals(sp_data_cd.lb);
+            int n_sph_a = numSphericals(sp_data_ab.la_);
+            int n_sph_b = numSphericals(sp_data_ab.lb_);
+            int n_sph_c = numSphericals(sp_data_cd.la_);
+            int n_sph_d = numSphericals(sp_data_cd.lb_);
 
-            ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
+            ERI4Kernel eri4_kernel(sp_data_ab, sp_data_cd);
 
-#pragma omp parallel for            
-            for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
+#pragma omp parallel for
+            for (size_t ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs_; ipair_ab++)
             {
-                int bound_cd = (ispdata_ab == isp_data_cd) ? ipair_ab + 1 : sp_data_cd.n_pairs;
-                for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                size_t bound_cd = (ispdata_ab == isp_data_cd) ? ipair_ab + 1 : sp_data_cd.n_pairs_;
+                for (size_t ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
                     vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd);
 
-                    int ofs_a = sp_data_ab.offsets_sph[2 * ipair_ab];
-                    int ofs_b = sp_data_ab.offsets_sph[2 * ipair_ab + 1];
-                    int ofs_c = sp_data_cd.offsets_sph[2 * ipair_cd];
-                    int ofs_d = sp_data_cd.offsets_sph[2 * ipair_cd + 1];
+                    size_t ofs_a = sp_data_ab.offsets_sph_[2 * ipair_ab];
+                    size_t ofs_b = sp_data_ab.offsets_sph_[2 * ipair_ab + 1];
+                    size_t ofs_c = sp_data_cd.offsets_sph_[2 * ipair_cd];
+                    size_t ofs_d = sp_data_cd.offsets_sph_[2 * ipair_cd + 1];
 
                     for (int ia = 0; ia < n_sph_a; ia++)
                         for (int ib = 0; ib < n_sph_b; ib++)
                             for (int ic = 0; ic < n_sph_c; ic++)
                                 for (int id = 0; id < n_sph_d; id++)
                                 {
-                                    int mu = ofs_a + ia;
-                                    int nu = ofs_b + ib;
-                                    int ka = ofs_c + ic;
-                                    int ta = ofs_d + id;
+                                    size_t mu = ofs_a + ia;
+                                    size_t nu = ofs_b + ib;
+                                    size_t ka = ofs_c + ic;
+                                    size_t ta = ofs_d + id;
 
                                     double integral = eri4_batch(ia, ib, ic, id);
                                     eri4(mu, nu, ka, ta) = integral;
@@ -107,9 +99,9 @@ void lints::eri4Benchmark(const Structure &structure)
 {
     palPrint(std::format("Lible::{:<40}\n", "ERI4 benchmark..."));
 
-    const auto start{std::chrono::steady_clock::now()};
+    auto start_total{std::chrono::steady_clock::now()};
 
-    const vector<ShellPairData> sp_data = shellPairData(true, structure);
+    std::vector<ShellPairData> sp_data = shellPairData(true, structure);
 
     double sum_eri4 = 0;
     for (size_t ispdata_ab = 0; ispdata_ab < sp_data.size(); ispdata_ab++)
@@ -120,16 +112,16 @@ void lints::eri4Benchmark(const Structure &structure)
             const auto &sp_data_ab = sp_data[ispdata_ab];
             const auto &sp_data_cd = sp_data[ispdata_cd];
 
-            int n_pairs_ab = sp_data_ab.n_pairs;
-            int n_pairs_cd = sp_data_cd.n_pairs;
+            size_t n_pairs_ab = sp_data_ab.n_pairs_;
+            size_t n_pairs_cd = sp_data_cd.n_pairs_;
 
-            ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_cd);
+            ERI4Kernel eri4_kernel(sp_data_ab, sp_data_cd);
 
             size_t n_shells_abcd = 0;
-            for (int ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
+            for (size_t ipair_ab = 0; ipair_ab < n_pairs_ab; ipair_ab++)
             {
-                int bound_cd = (ispdata_ab == ispdata_cd) ? ipair_ab + 1 : n_pairs_cd;
-                for (int ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
+                size_t bound_cd = (ispdata_ab == ispdata_cd) ? ipair_ab + 1 : n_pairs_cd;
+                for (size_t ipair_cd = 0; ipair_cd < bound_cd; ipair_cd++)
                 {
                     vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_cd, sp_data_ab, sp_data_cd);
 
@@ -143,35 +135,35 @@ void lints::eri4Benchmark(const Structure &structure)
             auto end{std::chrono::steady_clock::now()};
             std::chrono::duration<double> duration{end - start};
 
-            int la = sp_data_ab.la;
-            int lb = sp_data_ab.lb;
-            int lc = sp_data_cd.la;
-            int ld = sp_data_cd.lb;
+            int la = sp_data_ab.la_;
+            int lb = sp_data_ab.lb_;
+            int lc = sp_data_cd.la_;
+            int ld = sp_data_cd.lb_;
             palPrint(std::format("   {} {} {} {} ; {:10} ; {:.2e} s\n", la, lb, lc, ld,
                                  n_shells_abcd, duration.count()));
         }
 
     palPrint(std::format("   sum_eri4 = {:16.12f}\n", sum_eri4));
 
-    const auto end{std::chrono::steady_clock::now()};
-    std::chrono::duration<double> duration{end - start};
+    const auto end_total{std::chrono::steady_clock::now()};
+    std::chrono::duration<double> duration{end_total - start_total};
     palPrint(std::format("done {:.2e} s\n", duration.count()));
 }
 
 lible::vec2d lints::eri4Diagonal(const Structure &structure)
 {
-    const vector<ShellPairData> sp_data = shellPairData(true, structure);
+    std::vector<ShellPairData> sp_data = shellPairData(true, structure);
 
-    const int dim_ao = structure.getDimAO();
+    size_t dim_ao = structure.getDimAO();
     vec2d eri4_diagonal(Fill(0), dim_ao, dim_ao);
     for (size_t ispdata = 0; ispdata < sp_data.size(); ispdata++)
     {
         const auto &sp_data_ab = sp_data[ispdata];
 
-        ERI4Kernel eri4_kernel = deployERI4Kernel(sp_data_ab, sp_data_ab);
+        ERI4Kernel eri4_kernel(sp_data_ab, sp_data_ab);
 
-#pragma omp parallel for        
-        for (int ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs; ipair_ab++)
+#pragma omp parallel for
+        for (size_t ipair_ab = 0; ipair_ab < sp_data_ab.n_pairs_; ipair_ab++)
         {
             vec4d eri4_batch = eri4_kernel(ipair_ab, ipair_ab, sp_data_ab, sp_data_ab);
 

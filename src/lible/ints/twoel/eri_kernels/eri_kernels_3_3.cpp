@@ -1,317 +1,317 @@
 #include <lible/ints/twoel/eri_kernel_funs.hpp>
 
-template lible::vec4d lible::ints::eri4KernelFun<2, 1, 2, 1>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<2, 1, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<1, 2, 1, 2>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<1, 2, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<1, 2, 2, 1>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<1, 2, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<2, 1, 1, 2>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<2, 1, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<2, 1, 3, 0>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<2, 1, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<1, 2, 0, 3>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<1, 2, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<1, 2, 3, 0>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<1, 2, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<2, 1, 0, 3>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<2, 1, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<1, 2, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<2, 1, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<1, 2, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<2, 1, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<3, 0, 2, 1>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<3, 0, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<0, 3, 1, 2>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<0, 3, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<0, 3, 2, 1>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<0, 3, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<3, 0, 1, 2>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<3, 0, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 2, 1>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 2, 1>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 1, 2>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 1, 2>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<3, 0, 3, 0>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<3, 0, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<0, 3, 0, 3>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<0, 3, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<0, 3, 3, 0>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<0, 3, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template lible::vec4d lible::ints::eri4KernelFun<3, 0, 0, 3>(const int ipair_ab, const int ipair_cd,
+template lible::vec4d lible::ints::eri4KernelFun<3, 0, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                              const ShellPairData &sp_data_ab,
                                                              const ShellPairData &sp_data_cd,
                                                              const ERI4Kernel *eri4_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<0, 3, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 12> lible::ints::eri4d1KernelFun<3, 0, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                const ShellPairData &sh_data_ab,
                                                                                const ShellPairData &sp_data_cd,
                                                                                const ERI4D1Kernel *eri4d1_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 3, 0>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<0, 3, 3, 0>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 0, 3>(const int ipair_ab, const int ipair_cd,
+template std::array<lible::vec4d, 3> lible::ints::eri4socKernelFun<3, 0, 0, 3>(const size_t ipair_ab, const size_t ipair_cd,
                                                                                 const ShellPairData &sh_data_ab,
                                                                                 const ShellPairData &sp_data_cd,
                                                                                 const ERI4SOCKernel *eri4soc_kernel);
 
-template lible::vec3d lible::ints::eri3KernelFun<2, 1, 3>(const int ipair_ab, const int ishell_c,
+template lible::vec3d lible::ints::eri3KernelFun<2, 1, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                           const ShellPairData &sp_data_ab,
                                                           const ShellData &sh_data_c,
                                                           const ERI3Kernel *eri3_kernel);
 
-template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<2, 1, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<2, 1, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                            const ShellPairData &sh_data_ab,
                                                                            const ShellData &sh_data_c,
                                                                            const ERI3D1Kernel *eri3d1_kernel);
 
-template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<2, 1, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<2, 1, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                             const ShellPairData &sh_data_ab,
                                                                             const ShellData &sh_data_c,
                                                                             const ERI3SOCKernel *eri3soc_kernel);
 
-template lible::vec3d lible::ints::eri3KernelFun<1, 2, 3>(const int ipair_ab, const int ishell_c,
+template lible::vec3d lible::ints::eri3KernelFun<1, 2, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                           const ShellPairData &sp_data_ab,
                                                           const ShellData &sh_data_c,
                                                           const ERI3Kernel *eri3_kernel);
 
-template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<1, 2, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<1, 2, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                            const ShellPairData &sh_data_ab,
                                                                            const ShellData &sh_data_c,
                                                                            const ERI3D1Kernel *eri3d1_kernel);
 
-template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<1, 2, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<1, 2, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                             const ShellPairData &sh_data_ab,
                                                                             const ShellData &sh_data_c,
                                                                             const ERI3SOCKernel *eri3soc_kernel);
 
-template lible::vec3d lible::ints::eri3KernelFun<3, 0, 3>(const int ipair_ab, const int ishell_c,
+template lible::vec3d lible::ints::eri3KernelFun<3, 0, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                           const ShellPairData &sp_data_ab,
                                                           const ShellData &sh_data_c,
                                                           const ERI3Kernel *eri3_kernel);
 
-template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<3, 0, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<3, 0, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                            const ShellPairData &sh_data_ab,
                                                                            const ShellData &sh_data_c,
                                                                            const ERI3D1Kernel *eri3d1_kernel);
 
-template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<3, 0, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<3, 0, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                             const ShellPairData &sh_data_ab,
                                                                             const ShellData &sh_data_c,
                                                                             const ERI3SOCKernel *eri3soc_kernel);
 
-template lible::vec3d lible::ints::eri3KernelFun<0, 3, 3>(const int ipair_ab, const int ishell_c,
+template lible::vec3d lible::ints::eri3KernelFun<0, 3, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                           const ShellPairData &sp_data_ab,
                                                           const ShellData &sh_data_c,
                                                           const ERI3Kernel *eri3_kernel);
 
-template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<0, 3, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 9> lible::ints::eri3d1KernelFun<0, 3, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                            const ShellPairData &sh_data_ab,
                                                                            const ShellData &sh_data_c,
                                                                            const ERI3D1Kernel *eri3d1_kernel);
 
-template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<0, 3, 3>(const int ipair_ab, const int ishell_c,
+template std::array<lible::vec3d, 3> lible::ints::eri3socKernelFun<0, 3, 3>(const size_t ipair_ab, const size_t ishell_c,
                                                                             const ShellPairData &sh_data_ab,
                                                                             const ShellData &sh_data_c,
                                                                             const ERI3SOCKernel *eri3soc_kernel);
 
-template lible::vec2d lible::ints::eri2KernelFun<3, 3>(const int ishell_a, const int ishell_b,
+template lible::vec2d lible::ints::eri2KernelFun<3, 3>(const size_t ishell_a, const size_t ishell_b,
                                                        const ShellData &sh_data_a,
                                                        const ShellData &sh_data_b,
                                                        const ERI2Kernel *eri2_kernel);
 
-template std::array<lible::vec2d, 6> lible::ints::eri2d1KernelFun<3, 3>(const int ishell_a, const int ishell_b,
+template std::array<lible::vec2d, 6> lible::ints::eri2d1KernelFun<3, 3>(const size_t ishell_a, const size_t ishell_b,
                                                                         const ShellData &sh_data_a,
                                                                         const ShellData &sh_data_b,
                                                                         const ERI2D1Kernel *eri2d1_kernel);
 
 template std::array<std::array<lible::vec2d, 6>, 6> 
-lible::ints::eri2d2KernelFun<3, 3>(const int ishell_a, const int ishell_b,
+lible::ints::eri2d2KernelFun<3, 3>(const size_t ishell_a, const size_t ishell_b,
                                    const ShellData &sh_data_a,
                                    const ShellData &sh_data_b,
                                    const ERI2D2Kernel *eri2d2_kernel);
