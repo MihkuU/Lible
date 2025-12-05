@@ -1,4 +1,3 @@
-#include <lible/ints/ecoeffs.hpp.depr>
 #include <lible/ints/defs.hpp>
 #include <lible/ints/ints.hpp>
 #include <lible/ints/twoel/eri_kernels.hpp>

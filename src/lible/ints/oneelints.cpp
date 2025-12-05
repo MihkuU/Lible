@@ -1,5 +1,4 @@
 #include <lible/ints/cart_exps.hpp>
-#include <lible/ints/ecoeffs.hpp.depr>
 #include <lible/ints/ints.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
