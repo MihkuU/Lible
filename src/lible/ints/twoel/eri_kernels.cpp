@@ -1,9 +1,8 @@
-#include <lible/ints/ecoeffs.hpp>
+#include <lible/ints/ecoeffs.hpp.depr>
 #include <lible/ints/defs.hpp>
-#include <lible/ints/utils.hpp>
+#include <lible/ints/ints.hpp>
 #include <lible/ints/twoel/eri_kernels.hpp>
 
-#include <format>
 #include <tuple>
 
 namespace lints = lible::ints;

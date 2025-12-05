@@ -53,20 +53,13 @@ namespace lible::ints
         std::vector<double> preEvaluate() const;
     };
 
-    /**
-     * The Boys function is represented as a 2D grid (matrix) that is rolled out as a vector.
-     * The number of rows corresponds to each value of x from 0 to 30 with a distance of 0.01.
-     * The rows correspond to different angular momentum plus the number of terms in the
-     * Taylor series (eq. (9.8.12) from HJO).
-     *
-     * TODO: Figure out a better name.
-     * TODO: Move this version of the function to a separate file.
-     */
+    /// Templated class for calculating the Boys function. The Boys function grid is evaluated at
+    /// compile time.
     template <const int L>
     class BoysF2
     {
     public:
-        /** Calculates the Boys function at value x. */
+        /// Calculates the Boys function at x.
         void calcFnx(const double x, double *fnx) const
         {
             if (x == 0)
@@ -159,6 +152,7 @@ namespace lible::ints
             return fnx_grid;
         }
 
+        /// Compile-time calculated Boys function grid.
         static constexpr std::array<double, calcFnxGridSize()> fnx_grid_{preEvaluateGrid()};
     };
 }

@@ -15,9 +15,9 @@ void lints::shark_mm_bra(const int m, const int n, const int k, const double *E,
                 E_x_R_x_ET, n);
 }
 
-void lints::shark_mm_ket(const int m, const int n, const int k, const double *R, const double *E,
+void lints::shark_mm_ket(const int m, const int n, const int k, const double *R, const double *ET,
                          double *R_x_ET)
 {
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, R, k, E, n, 1.0,
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, R, k, ET, n, 1.0,
                 R_x_ET, n);
 }

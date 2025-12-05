@@ -269,60 +269,6 @@ std::vector<double> lints::calcRInts_ERI2D2(const int l, const double alpha, con
     return rints;
 }
 
-std::vector<double> lints::calcRInts_ERI3D2(const int l, const double alpha, const double fac,
-                                            const double *fnx, const double *xyz_pc,
-                                            const std::vector<std::array<int, 3>> &hermite_idxs_bra,
-                                            const std::vector<std::array<int, 3>> &hermite_idxs_ket)
-{
-    vec3d rints_3d = calcRInts3D(l + 2, alpha, xyz_pc, fnx);
-
-    size_t n_hermite_bra = hermite_idxs_bra.size();
-    size_t n_hermite_ket = hermite_idxs_ket.size();
-    size_t n_rints = n_hermite_bra * n_hermite_ket;
-    size_t ofs0 = n_rints * 0;
-    size_t ofs1 = n_rints * 1;
-    size_t ofs2 = n_rints * 2;
-    size_t ofs3 = n_rints * 3;
-    size_t ofs4 = n_rints * 4;
-    size_t ofs5 = n_rints * 5;
-    size_t ofs6 = n_rints * 6;
-    size_t ofs7 = n_rints * 7;
-    size_t ofs8 = n_rints * 8;
-    size_t ofs9 = n_rints * 9;
-
-    std::vector<double> rints(10 * n_rints);
-    for (size_t j = 0; j < n_hermite_ket; j++)
-    {
-        auto [t_, u_, v_] = hermite_idxs_ket[j];
-
-        double sign = 1.0;
-        if ((t_ + u_ + v_) % 2 != 0)
-            sign = -1.0;
-
-        for (size_t i = 0; i < n_hermite_bra; i++)
-        {
-            auto [t, u, v] = hermite_idxs_bra[i];
-
-            size_t idx = i * n_hermite_ket + j;
-
-            rints[ofs0 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_);
-
-            rints[ofs1 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_);
-            rints[ofs2 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_);
-            rints[ofs3 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 1);
-
-            rints[ofs4 + idx] = sign * fac * rints_3d(t + t_ + 2, u + u_, v + v_);
-            rints[ofs5 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_ + 1, v + v_);
-            rints[ofs6 + idx] = sign * fac * rints_3d(t + t_ + 1, u + u_, v + v_ + 1);
-            rints[ofs7 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 2, v + v_);
-            rints[ofs8 + idx] = sign * fac * rints_3d(t + t_, u + u_ + 1, v + v_ + 1);
-            rints[ofs9 + idx] = sign * fac * rints_3d(t + t_, u + u_, v + v_ + 2);
-        }
-    }
-
-    return rints;
-}
-
 std::vector<double> lints::calcRInts_ERISOC(const int l, const double fac, const double alpha,
                                             const double *xyz_pq, const double *fnx,
                                             const std::vector<std::array<int, 3>> &hermite_idxs_bra,

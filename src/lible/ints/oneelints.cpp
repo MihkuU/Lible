@@ -1,5 +1,5 @@
 #include <lible/ints/cart_exps.hpp>
-#include <lible/ints/ecoeffs.hpp>
+#include <lible/ints/ecoeffs.hpp.depr>
 #include <lible/ints/ints.hpp>
 #include <lible/ints/rints.hpp>
 #include <lible/ints/spherical_trafo.hpp>
@@ -1095,6 +1095,7 @@ lible::vec2d lints::externalCharges(const std::vector<std::array<double, 4>> &ch
 
             BoysGrid boys_grid(la + lb);
 
+#pragma omp parallel for
             for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
             {
                 vec2d ints_ipair = externalChargesKernel(ipair, charges, boys_grid, sp_data);
@@ -1134,6 +1135,7 @@ lible::vec2d lints::externalChargesErf(const std::vector<std::array<double, 4>> 
             int lab = la + lb;
             BoysGrid boys_grid(lab);
 
+#pragma omp parallel for
             for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
             {
                 vec2d ints_ipair = externalChargesErfKernel(ipair, charges, omegas, boys_grid, sp_data);
