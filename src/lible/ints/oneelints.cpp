@@ -494,13 +494,11 @@ std::array<lible::vec2d, 3> lints::dipoleMoment(const std::array<double, 3> &ori
                 size_t ofs_b = sp_data.offsets_sph_[2 * ipair + 1];
                 for (size_t mu = 0; mu < ints_ipair[0].dim<0>(); mu++)
                     for (size_t nu = 0; nu < ints_ipair[0].dim<1>(); nu++)
-                    {
                         for (int icart = 0; icart < 3; icart++)
                         {
                             ints[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
                             ints[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);
                         }
-                    }
             }
         }
 
@@ -1470,6 +1468,38 @@ lints::pVpKernel(const size_t ipair, const std::vector<std::array<double, 4>> &c
     return ints_sph;
 }
 
+std::array<lible::vec2d, 3> lints::momentum(const Structure &structure)
+{
+    int l_max = structure.getMaxL();
+    size_t dim_ao = structure.getDimAO();
+
+    vec2d filler(Fill(0), dim_ao, dim_ao);
+    std::array<vec2d, 3> ints{filler, filler, filler};
+    for (int la = l_max; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--)
+        {
+            ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
+
+#pragma omp parallel for
+            for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+            {
+                std::array<vec2d, 3> ints_ipair = momentumKernel(ipair, sp_data);
+
+                size_t ofs_a = sp_data.offsets_sph_[2 * ipair + 0];
+                size_t ofs_b = sp_data.offsets_sph_[2 * ipair + 1];
+                for (size_t mu = 0; mu < ints_ipair[0].dim<0>(); mu++)
+                    for (size_t nu = 0; nu < ints_ipair[0].dim<1>(); nu++)
+                        for (int icart = 0; icart < 3; icart++)
+                        {
+                            ints[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
+                            ints[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);
+                        }
+            }
+        }
+
+    return ints;
+}
+
 std::array<lible::vec2d, 3> lints::momentumKernel(const size_t ipair, const ShellPairData &sp_data)
 {
     auto [la, lb] = sp_data.getLPair();
@@ -1536,8 +1566,42 @@ std::array<lible::vec2d, 3> lints::momentumKernel(const size_t ipair, const Shel
     return ints_sph;
 }
 
+std::array<lible::vec2d, 3> lints::angularMomentum(const std::array<double, 3> &origin,
+                                                   const Structure &structure)
+{
+    int l_max = structure.getMaxL();
+    size_t dim_ao = structure.getDimAO();
+
+    vec2d filler(Fill(0), dim_ao, dim_ao);
+    std::array<vec2d, 3> ints{filler, filler, filler};
+    for (int la = l_max; la >= 0; la--)
+        for (int lb = la; lb >= 0; lb--)
+        {
+            ShellPairData sp_data(true, la, lb, structure.getShellsL(la), structure.getShellsL(lb));
+
+#pragma omp parallel for
+            for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+            {
+                std::array<vec2d, 3> ints_ipair = angularMomentumKernel(ipair, origin, sp_data);
+
+                size_t ofs_a = sp_data.offsets_sph_[2 * ipair + 0];
+                size_t ofs_b = sp_data.offsets_sph_[2 * ipair + 1];
+                for (size_t mu = 0; mu < ints_ipair[0].dim<0>(); mu++)
+                    for (size_t nu = 0; nu < ints_ipair[0].dim<1>(); nu++)
+                        for (int icart = 0; icart < 3; icart++)
+                        {
+                            ints[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
+                            ints[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);
+                        }
+            }
+        }
+
+    return ints;
+}
+
 std::array<lible::vec2d, 3>
-lints::angularMomentumKernel(const size_t ipair, const ShellPairData &sp_data)
+lints::angularMomentumKernel(const size_t ipair, const std::array<double, 3> &origin,
+                             const ShellPairData &sp_data)
 {
     auto [la, lb] = sp_data.getLPair();
 
@@ -1568,10 +1632,10 @@ lints::angularMomentumKernel(const size_t ipair, const ShellPairData &sp_data)
 
         const auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 1, xyz_a, xyz_b);
 
-        std::array<double, 3> xyz_p{
-            (a * xyz_a[0] + b * xyz_b[0]) / p,
-            (a * xyz_a[1] + b * xyz_b[1]) / p,
-            (a * xyz_a[2] + b * xyz_b[2]) / p
+        std::array<double, 3> xyz_po{
+            (a * xyz_a[0] + b * xyz_b[0]) / p - origin[0],
+            (a * xyz_a[1] + b * xyz_b[1]) / p - origin[1],
+            (a * xyz_a[2] + b * xyz_b[2]) / p - origin[2]
         };
 
         for (const auto &[i, j, k, mu] : cart_exps_a)
@@ -1589,15 +1653,15 @@ lints::angularMomentumKernel(const size_t ipair, const ShellPairData &sp_data)
                 if (k_ > 0)
                     D1z += k_ * Ez(k, k_ - 1, 0);
 
-                double S1x = xyz_p[0] * Ex(i, i_, 0);
+                double S1x = xyz_po[0] * Ex(i, i_, 0);
                 if (i + i_ > 0)
                     S1x += Ex(i, i_, 1);
 
-                double S1y = xyz_p[1] * Ey(j, j_, 0);
+                double S1y = xyz_po[1] * Ey(j, j_, 0);
                 if (j + j_ > 0)
                     S1y += Ey(j, j_, 1);
 
-                double S1z = xyz_p[2] * Ez(k, k_, 0);
+                double S1z = xyz_po[2] * Ez(k, k_, 0);
                 if (k + k_ > 0)
                     S1z += Ez(k, k_, 1);
 

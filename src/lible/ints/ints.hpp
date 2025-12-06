@@ -113,17 +113,25 @@ namespace lible::ints
     /// OMP parallelized.
     std::array<vec2d, 3> spinOrbitCoupling1El(const Structure &structure);
 
-    /// Calculates a batch of one-electron spin-orbit coupling integrals in three Cartesian directions.
-    /// The Boys function must be initialized with l = la + lb + 1.
+    /// Calculates a batch of one-electron spin-orbit coupling integrals in three Cartesian
+    /// directions. The Boys function must be initialized with l = la + lb + 1.
     std::array<vec2d, 3>
     spinOrbitCoupling1ElKernel(size_t ipair, const std::vector<std::array<double, 4>> &charges,
                                const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
+    /// Calculates the linear momentum integrals in three Cartesian directions. OMP parallelized.
+    std::array<vec2d, 3> momentum(const Structure &structure);
+
     /// Calculates a batch of linear momentum integrals in three Cartesian directions.
     std::array<vec2d, 3> momentumKernel(size_t ipair, const ShellPairData &sp_data);
 
+    /// Calculates the angular momentum integrals in three Cartesian directions. OMP parallelized.
+    std::array<vec2d, 3> angularMomentum(const std::array<double, 3> &origin,
+                                         const Structure &structure);
+
     /// Calculates a batch of angular momentum integrals in three Cartesian directions.
-    std::array<vec2d, 3> angularMomentumKernel(size_t ipair, const ShellPairData &sp_data);
+    std::array<vec2d, 3> angularMomentumKernel(size_t ipair, const std::array<double, 3> &origin,
+                                               const ShellPairData &sp_data);
 
     /// Calculates the momentum-potential-momentum integrals, used for example in X2C. OMP
     /// parallelized. For reference, see eqs. (6) https://doi.org/10.1063/1.4803693. Returned
