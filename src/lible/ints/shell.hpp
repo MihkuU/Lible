@@ -32,13 +32,13 @@ namespace lible::ints
     {
         Shell() = default;
 
-        Shell(const int l, const int z, const size_t atom_idx, const size_t dim_cart,
+        Shell(const int l, const int z, const size_t idx_atom, const size_t dim_cart,
               const size_t dim_sph, const size_t ofs_cart, const size_t ofs_sph, const size_t idx,
               const std::array<double, 3> &xyz_coords, const std::vector<double> &exps,
               const std::vector<double> &coeffs, const std::vector<double> &norms,
               const std::vector<double> &norms_prim)
-            : l_(l), z_(z), atom_idx_(atom_idx), dim_cart_(dim_cart), dim_sph_(dim_sph),
-              ofs_cart_(ofs_cart), ofs_sph_(ofs_sph), idx_(idx), xyz_coords_(xyz_coords),
+            : l_(l), z_(z), dim_cart_(dim_cart), dim_sph_(dim_sph), ofs_cart_(ofs_cart),
+              ofs_sph_(ofs_sph), idx_(idx), idx_atom_(idx_atom), xyz_coords_(xyz_coords),
               exps_(exps), coeffs_(coeffs), norms_(norms), norms_prim_(norms_prim)
         {
         }
@@ -48,8 +48,6 @@ namespace lible::ints
         /// Atomic number.
         int z_{};
 
-        /// Index of the shell atom in the list of all atoms.
-        size_t atom_idx_{};
         /// Number of atomic orbitals in a Cartesian basis.
         size_t dim_cart_{};
         /// Number of atomic orbitals in a spherical basis.
@@ -61,6 +59,8 @@ namespace lible::ints
 
         /// Index of the shell in the list of all shells.
         size_t idx_{};
+        /// Index of the shell atom in the list of all atoms.
+        size_t idx_atom_{};
 
         /// Coordinates of the atom corresponding to the shell.
         std::array<double, 3> xyz_coords_{};

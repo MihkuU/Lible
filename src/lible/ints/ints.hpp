@@ -190,8 +190,7 @@ namespace lible::ints
     /// Returns data for (la, lb) pairs. If symmetry is used, returns data for (la >= lb).
     std::vector<ShellPairData> shellPairData(bool use_symm, const Structure &structure);
 
-    ///  Constructs the shell pair data from the given shells. Assumes the angular momentum
-    ///  within `shells_a` is the same as in `shells_b`.
+    ///  Constructs the shell pair data from the given shells.
     std::vector<ShellPairData> shellPairData(const std::vector<Shell> &shells_a,
                                              const std::vector<Shell> &shells_b);
 

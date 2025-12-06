@@ -56,7 +56,7 @@ lints::ShellData::ShellData(const int l, const std::vector<Shell> &shells)
         for (int i = 0; i < n_sph; i++)
             norms_[ofs_norms + i] = shell.norms_[i];
 
-        atomic_idxs_[ishell] = shell.atom_idx_;
+        atomic_idxs_[ishell] = shell.idx_atom_;
         cdepths_[ishell] = cdepth;
         coffsets_[ishell] = ofs_coeffs;
         offsets_ecoeffs_[ishell] = ofs_ecoeffs;
@@ -186,8 +186,8 @@ lints::ShellPairData::ShellPairData(const bool use_symm, const int la, const int
                 offsets_ecoeffs_deriv1_[ipair] = ofs_ecoeffs_d1;
                 offsets_ecoeffs_deriv2_[ipair] = ofs_ecoeffs_d2;
 
-                atomic_idxs_[2 * ipair + 0] = shell_a.atom_idx_;
-                atomic_idxs_[2 * ipair + 1] = shell_b.atom_idx_;
+                atomic_idxs_[2 * ipair + 0] = shell_a.idx_atom_;
+                atomic_idxs_[2 * ipair + 1] = shell_b.idx_atom_;
                 shell_idxs_[2 * ipair + 0] = shell_a.idx_;
                 shell_idxs_[2 * ipair + 1] = shell_b.idx_;
 
