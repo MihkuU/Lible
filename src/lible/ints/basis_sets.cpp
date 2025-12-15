@@ -16,8 +16,8 @@ namespace lints = lible::ints;
 namespace lible::ints
 {
     /// Backend function for reading and returning a basis set from the given path.
-    basis_atom_t basisForAtomImpl(int atomic_nr, const std::string &basis_set,
-                                  const std::string &basis_path);
+    BasisAtom basisForAtomImpl(int atomic_nr, const std::string &basis_set,
+                               const std::string &basis_path);
 }
 
 /// Mapping between auxiliary basis set names and their families.
@@ -189,8 +189,8 @@ basis_families{
     {"sto-6g", lints::BasisFamily::sto}
 };
 
-lints::basis_atom_t lints::basisForAtomImpl(const int atomic_nr, const std::string &basis_set,
-                                            const std::string &basis_path)
+lints::BasisAtom lints::basisForAtomImpl(const int atomic_nr, const std::string &basis_set,
+                                         const std::string &basis_path)
 {
     std::ifstream basis_file(basis_path, std::ios::in);
 
@@ -213,7 +213,7 @@ lints::basis_atom_t lints::basisForAtomImpl(const int atomic_nr, const std::stri
             }
         }
 
-        if (!basis_found)
+        if (basis_found == false)
         {
             std::string msg = std::format("Basis set {} not found for element {}!",
                                           basis_set, atomic_symbols.at(atomic_nr));
@@ -222,19 +222,19 @@ lints::basis_atom_t lints::basisForAtomImpl(const int atomic_nr, const std::stri
     }
 
     int l, counter = 0;
-    ShellBasis shell_basis;
-    basis_atom_t basis_atom;
+    BasisShell basis_shell;
+    basis_shells_t basis_shells;
     for (const std::string &line : lines)
     {
         if (line.find("l=") != std::string::npos)
         {
             if (counter != 0)
-                basis_atom.push_back(shell_basis);
+                basis_shells.push_back(basis_shell);
 
             l = line[2] - '0';
-            shell_basis.l_ = l;
-            shell_basis.exps_.clear();
-            shell_basis.coeffs_.clear();
+            basis_shell.l_ = l;
+            basis_shell.exps_.clear();
+            basis_shell.coeffs_.clear();
             counter = 0;
         }
         else
@@ -245,23 +245,23 @@ lints::basis_atom_t lints::basisForAtomImpl(const int atomic_nr, const std::stri
 
             line_ss >> exp;
             line_ss >> coeff;
-            shell_basis.exps_.push_back(exp);
-            shell_basis.coeffs_.push_back(coeff);
+            basis_shell.exps_.push_back(exp);
+            basis_shell.coeffs_.push_back(coeff);
             counter++;
         }
     }
-    basis_atom.push_back(shell_basis);
+    basis_shells.push_back(basis_shell);
 
-    return basis_atom;
+    return {atomic_nr, basis_shells};
 }
 
-lints::basis_atom_t lints::basisForAtom(const int atomic_nr, const std::string &basis_set)
+lints::BasisAtom lints::basisForAtom(const int atomic_nr, const std::string &basis_set)
 {
     std::string basis_path = basisPath(basis_set);
     return basisForAtomImpl(atomic_nr, basis_set, basis_path);
 }
 
-lints::basis_atom_t lints::basisForAtomAux(const int atomic_nr, const std::string &basis_set)
+lints::BasisAtom lints::basisForAtomAux(const int atomic_nr, const std::string &basis_set)
 {
     std::string aux_basis_path = auxBasisPath(basis_set);
     return basisForAtomImpl(atomic_nr, basis_set, aux_basis_path);
@@ -273,8 +273,8 @@ lints::basis_atoms_t lints::basisForAtoms(const std::vector<int> &atomic_nrs,
     basis_atoms_t basis_atoms;
     for (const int atomic_nr : atomic_nrs)
     {
-        basis_atom_t basis_atom = basisForAtom(atomic_nr, basis_set);
-        basis_atoms.push_back({atomic_nr, basis_atom});
+        BasisAtom basis_atom = basisForAtom(atomic_nr, basis_set);
+        basis_atoms.push_back(basis_atom);
     }
 
     return basis_atoms;
@@ -286,8 +286,8 @@ lints::basis_atoms_t lints::basisForAtomsAux(const std::vector<int> &atomic_nrs,
     basis_atoms_t aux_basis_atoms;
     for (const int atomic_nr : atomic_nrs)
     {
-        basis_atom_t basis_atom = basisForAtomAux(atomic_nr, aux_basis_set);
-        aux_basis_atoms.push_back({atomic_nr, basis_atom});
+        BasisAtom basis_atom = basisForAtomAux(atomic_nr, aux_basis_set);
+        aux_basis_atoms.push_back(basis_atom);
     }
 
     return aux_basis_atoms;

@@ -7,7 +7,7 @@ namespace lible::ints
 {
     /// Structure containing angular momentum, Gaussian primitive exponents and contraction
     /// coefficients in one shell.
-    struct ShellBasis
+    struct BasisShell
     {
         int l_;
         std::vector<double> exps_;
@@ -15,17 +15,17 @@ namespace lible::ints
     };
 
     /// Type alias for representing a basis set on an atom.
-    using basis_atom_t = std::vector<ShellBasis>;
+    using basis_shells_t = std::vector<BasisShell>;
 
-    /// Structure containing an atomic number and atomic basis set.
-    struct AtomBasis
+    /// Structure containing an atomic number and the basis sets of atomic orbital shells.
+    struct BasisAtom
     {
         int atomic_nr_;
-        basis_atom_t basis_atom_;
+        basis_shells_t basis_shells_;
     };
 
     /// Type alias for representing the basis set on all atoms.
-    using basis_atoms_t = std::vector<AtomBasis>;
+    using basis_atoms_t = std::vector<BasisAtom>;
 
     /// Structure for representing a shell of atomic orbitals.
     struct Shell

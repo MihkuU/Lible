@@ -165,10 +165,10 @@ namespace lible::ints
     void eri4Benchmark(const Structure &structure);
 
     /// Returns the main basis set for an atom.
-    basis_atom_t basisForAtom(int atomic_nr, const std::string &basis_set);
+    BasisAtom basisForAtom(int atomic_nr, const std::string &basis_set);
 
     /// Returns the auxiliary basis set for an atom.
-    basis_atom_t basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
+    BasisAtom basisForAtomAux(int atomic_nr, const std::string &aux_basis_set);
 
     /// Returns the main basis set for a list of atoms.
     basis_atoms_t basisForAtoms(const std::vector<int> &atomic_nrs, const std::string &basis_set);

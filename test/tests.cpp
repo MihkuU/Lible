@@ -129,6 +129,8 @@ bool ltests::overlap()
     for (double sint : sints)
         sum_sints += std::fabs(sint);
 
+    printf("sum_sints = %16.12lf\n", sum_sints);
+
     if (std::fabs(sum_sints - correct_answer) < tol)
         return true;
 
@@ -720,15 +722,15 @@ bool ltests::basisForAtom()
 {
     const double correct_answer = 107960921.709905013442;
 
-    lints::basis_atom_t basis_atom = lints::basisForAtom(34, "ano-rcc-vtz");
+    lints::BasisAtom basis_atom = lints::basisForAtom(34, "ano-rcc-vtz");
 
     double sum_data = 0;
-    for (const lints::ShellBasis &shell_basis : basis_atom)
+    for (const auto &[l, exps, coeffs] : basis_atom.basis_shells_)
     {
-        for (double exp : shell_basis.exps_)
+        for (double exp : exps)
             sum_data += std::fabs(exp);
 
-        for (double coeff : shell_basis.coeffs_)
+        for (double coeff : coeffs)
             sum_data += std::fabs(coeff);
     }
 
@@ -742,15 +744,15 @@ bool ltests::basisForAtomAux()
 {
     const double correct_answer = 89.733725300000;
 
-    lints::basis_atom_t basis_atom = lints::basisForAtomAux(43, "def2-svpd-rifit");
+    lints::BasisAtom basis_atom = lints::basisForAtomAux(43, "def2-svpd-rifit");
 
     double sum_data = 0;
-    for (const lints::ShellBasis &shell_basis : basis_atom)
+    for (const lints::BasisShell &basis_shell : basis_atom.basis_shells_)
     {
-        for (double exp : shell_basis.exps_)
+        for (double exp : basis_shell.exps_)
             sum_data += std::fabs(exp);
 
-        for (double coeff : shell_basis.coeffs_)
+        for (double coeff : basis_shell.coeffs_)
             sum_data += std::fabs(coeff);
     }
 
@@ -767,13 +769,13 @@ bool ltests::basisForAtoms()
     lints::basis_atoms_t basis_atoms = lints::basisForAtoms({14, 6, 17}, "6-31g(3df,3pd)");
 
     double sum_data = 0;
-    for (const lints::AtomBasis &atom_basis : basis_atoms)
-        for (const lints::ShellBasis &shell_basis : atom_basis.basis_atom_)
+    for (const lints::BasisAtom &basis_atom : basis_atoms)
+        for (const auto& [l, exps, coeffs] : basis_atom.basis_shells_)
         {
-            for (double exp : shell_basis.exps_)
+            for (double exp : exps)
                 sum_data += std::fabs(exp);
 
-            for (double coeff : shell_basis.coeffs_)
+            for (double coeff : coeffs)
                 sum_data += std::fabs(coeff);
         }
 
@@ -790,8 +792,8 @@ bool ltests::basisForAtomsAux()
     lints::basis_atoms_t basis_atoms = lints::basisForAtomsAux({76, 19, 1}, "def2-svpd-rifit");
 
     double sum_data = 0;
-    for (const lints::AtomBasis &atom_basis : basis_atoms)
-        for (const auto &[l, exps, coeffs] : atom_basis.basis_atom_)
+    for (const lints::BasisAtom &basis_atom : basis_atoms)
+        for (const auto &[l, exps, coeffs] : basis_atom.basis_shells_)
             {
                 for (double exp : exps)
                     sum_data += std::fabs(exp);
