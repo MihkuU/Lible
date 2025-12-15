@@ -186,6 +186,10 @@ namespace lible::ints
     std::vector<Shell> constructShells(const basis_atoms_t &basis_atoms,
                                        const std::vector<std::array<double, 3>> &coords_atoms);
 
+    /// Constructs the shells from the given basis on the given atom.
+    std::vector<Shell> constructShells(int atomic_nr, const basis_shells_t &basis_shells,
+                                       const std::array<double, 3> &coords_atom);
+
     /// Calculates the normalization coefficients of the atomic orbitals in a shell.
     std::vector<double> calcShellNorms(int l, const std::vector<double> &coeffs,
                                        const std::vector<double> &exps,

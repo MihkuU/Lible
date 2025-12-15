@@ -45,6 +45,45 @@ std::vector<double> lints::calcShellNorms(const int l, const std::vector<double>
     return norms;
 }
 
+std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
+                                                 const basis_shells_t &basis_shells,
+                                                 const std::array<double, 3> &coords_atom)
+{
+    size_t idx_shell = 0;
+    size_t ofs_sph = 0;
+    size_t ofs_cart = 0;
+
+    std::vector<Shell> shells;
+    for (const auto &[l, exps, coeffs] : basis_shells)
+    {
+        const int dim_cart = numCartesians(l);
+        const int dim_sph = numSphericals(l);
+
+        if (exps.size() != coeffs.size())
+            throw std::runtime_error("constructShells(): number of exponents/coefficients "
+                "doesn't match");
+
+        const size_t cdepth = exps.size();
+
+        std::vector<double> primitive_norms(cdepth);
+        for (size_t i = 0; i < cdepth; i++)
+            primitive_norms[i] = purePrimitiveNorm(l, exps[i]);
+
+        std::vector<double> norms = calcShellNorms(l, coeffs, exps, primitive_norms);
+
+        Shell shell(l, atomic_nr, 0, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
+                    coords_atom, exps, coeffs, norms, primitive_norms);
+
+        shells.push_back(shell);
+
+        idx_shell++;
+        ofs_sph += dim_sph;
+        ofs_cart += dim_cart;
+    }
+
+    return shells;
+}
+
 std::vector<lints::Shell>
 lints::constructShells(const basis_atoms_t &basis_atoms,
                        const std::vector<std::array<double, 3>> &coords_atoms)
