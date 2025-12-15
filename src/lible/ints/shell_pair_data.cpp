@@ -264,6 +264,19 @@ void lints::ShellPairData::countPairs(const std::vector<Shell> &shells_a,
     }
 }
 
+std::vector<lible::ints::ShellData> lible::ints::shellData(const std::vector<Shell> &shells)
+{
+    std::map<int, std::vector<Shell>> shells_map;
+    for (const Shell &shell : shells)
+        shells_map[shell.l_].push_back(shell);
+
+    std::vector<ShellData> sh_data;
+    for (const auto &[l, shells_l] : shells_map)
+        sh_data.emplace_back(l, shells_l);
+
+    return sh_data;
+}
+
 std::vector<lints::ShellData> lints::shellDataAux(const Structure &structure)
 {
     if (structure.getUseRI() == false)

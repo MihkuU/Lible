@@ -195,7 +195,10 @@ namespace lible::ints
                                        const std::vector<double> &exps,
                                        const std::vector<double> &primitive_norms);
 
-    /// Constructs the shell for the auxiliary basis set up to `l_max_aux` (included).
+    /// Constructs the shell data from the given shells.
+    std::vector<ShellData> shellData(const std::vector<Shell> &shells);
+
+    /// Constructs the shell data for the auxiliary basis set up to `l_max_aux` (included).
     std::vector<ShellData> shellDataAux(const Structure &structure);
 
     /// Constructs the shell pair data for the main basis set up to `l_max` (included)
