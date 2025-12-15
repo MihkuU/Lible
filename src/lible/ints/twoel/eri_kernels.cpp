@@ -1170,7 +1170,7 @@ lints::ERI4D1Kernel::ERI4D1Kernel(const ShellPairData &sp_data_ab, const ShellPa
 
     auto [la, lb] = sp_data_ab.getLPair();
     auto [lc, ld] = sp_data_cd.getLPair();
-    int labcd = la + lb + lc + lc;
+    int labcd = la + lb + lc + ld;
     boys_grid_ = BoysGrid(labcd + 1);
 
     if (labcd <= _max_l_rollout_)
