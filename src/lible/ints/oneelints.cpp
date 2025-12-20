@@ -1440,7 +1440,7 @@ lints::pVpKernel(const size_t ipair, const std::vector<std::array<double, 4>> &c
                             for (int id = 0; id < 3; id++)
                                 for (int jd = 0; jd < 3; jd++)
                                 {
-                                    ints_cart[id][jd](mu, nu) +=
+                                    ints_cart[id][jd](mu, nu) += (-1.0) * // -1 charge of electron
                                             fac * ((ab / p2) * pp[id][jd] -
                                                    (a / p) * pr[id][jd] +
                                                    (b / p) * pr[jd][id] - rr[id][jd]);
@@ -1819,7 +1819,10 @@ lible::arr2d<lible::vec2d, 3, 3> lints::pVpIntegrals(const Structure &structure)
                     for (int j = 0; j < 3; j++)
                         for (size_t mu = 0; mu < ints_ipair[i][j].dim<0>(); mu++)
                             for (size_t nu = 0; nu < ints_ipair[i][j].dim<1>(); nu++)
+                            {
                                 ints[i][j](ofs_a + mu, ofs_b + nu) = ints_ipair[i][j](mu, nu);
+                                ints[i][j](ofs_b + nu, ofs_a + mu) = ints_ipair[i][j](mu, nu);
+                            }
             }
         }
 
