@@ -80,7 +80,7 @@ namespace lible::ints
         std::vector<double> coeffs_;
         /// Coordinates of shells in the shell pairs.
         std::vector<double> coords_;
-        /// Normalization consts of the atomic orbitals in the spherical basis.
+        /// Normalization constants of the atomic orbitals in the spherical basis.
         std::vector<double> norms_;
 
         /// Number of Gaussian primitive pairs for each shell pair.

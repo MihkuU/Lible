@@ -1492,7 +1492,8 @@ std::array<lible::vec2d, 3> lints::momentum(const Structure &structure)
                         for (int icart = 0; icart < 3; icart++)
                         {
                             ints[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
-                            ints[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);
+                            // derivative integrals are antisymmetric
+                            ints[icart](ofs_b + nu, ofs_a + mu) = -1 * ints_ipair[icart](mu, nu);
                         }
             }
         }
@@ -1524,11 +1525,11 @@ std::array<lible::vec2d, 3> lints::momentumKernel(const size_t ipair, const Shel
         double da = coeffs[iab * 2];
         double db = coeffs[iab * 2 + 1];
 
-        const double p = a + b;
-        const double dadb = da * db;
-        const double fac = dadb * std::pow(M_PI / p, 1.5);
+        double p = a + b;
+        double dadb = da * db;
+        double fac = dadb * std::pow(M_PI / p, 1.5);
 
-        const auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 1, xyz_a, xyz_b);
+        auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 1, xyz_a, xyz_b);
 
         for (const auto &[i, j, k, mu] : cart_exps_a)
             for (const auto &[i_, j_, k_, nu] : cart_exps_b)
@@ -1591,7 +1592,8 @@ std::array<lible::vec2d, 3> lints::angularMomentum(const std::array<double, 3> &
                         for (int icart = 0; icart < 3; icart++)
                         {
                             ints[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
-                            ints[icart](ofs_b + nu, ofs_a + mu) = ints_ipair[icart](mu, nu);
+                            // derivative integrals are antisymmetric
+                            ints[icart](ofs_b + nu, ofs_a + mu) = (-1) * ints_ipair[icart](mu, nu);
                         }
             }
         }
@@ -1626,11 +1628,11 @@ lints::angularMomentumKernel(const size_t ipair, const std::array<double, 3> &or
         double da = coeffs[iab * 2];
         double db = coeffs[iab * 2 + 1];
 
-        const double p = a + b;
-        const double dadb = da * db;
-        const double fac = dadb * std::pow(M_PI / p, 1.5);
+        double p = a + b;
+        double dadb = da * db;
+        double fac = dadb * std::pow(M_PI / p, 1.5);
 
-        const auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 1, xyz_a, xyz_b);
+        auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb + 1, xyz_a, xyz_b);
 
         std::array<double, 3> xyz_po{
             (a * xyz_a[0] + b * xyz_b[0]) / p - origin[0],
@@ -1665,22 +1667,22 @@ lints::angularMomentumKernel(const size_t ipair, const std::array<double, 3> &or
                 if (k + k_ > 0)
                     S1z += Ez(k, k_, 1);
 
-                ints_cart[0](mu, nu) -= fac * Ex(i, i_, 0) * (S1y * D1z - D1y * S1z);
-                ints_cart[1](mu, nu) -= fac * Ex(j, j_, 0) * (D1x * S1z - S1x * D1z);
-                ints_cart[2](mu, nu) -= fac * Ez(k, k_, 0) * (S1x * D1y - D1x * S1y);
+                ints_cart[0](mu, nu) -= fac * Ex(i, i_, 0) * (S1y * D1z - S1z * D1y);
+                ints_cart[1](mu, nu) -= fac * Ey(j, j_, 0) * (S1z * D1x - S1x * D1z);
+                ints_cart[2](mu, nu) -= fac * Ez(k, k_, 0) * (S1x * D1y - S1y * D1x);
             }
     }
 
     std::array<vec2d, 3> ints_sph;
-    for (int ideriv = 0; ideriv < 3; ideriv++)
-        ints_sph[ideriv] = trafo2Spherical(la, lb, ints_cart[ideriv]);
+    for (int icart = 0; icart < 3; icart++)
+        ints_sph[icart] = trafo2Spherical(la, lb, ints_cart[icart]);
 
     size_t ofs_norm_a = sp_data.offsets_norms_[2 * ipair + 0];
     size_t ofs_norm_b = sp_data.offsets_norms_[2 * ipair + 1];
-    for (int ideriv = 0; ideriv < 3; ideriv++)
-        for (size_t mu = 0; mu < ints_sph[ideriv].dim<0>(); mu++)
-            for (size_t nu = 0; nu < ints_sph[ideriv].dim<1>(); nu++)
-                ints_sph[ideriv](mu, nu) *=
+    for (int icart = 0; icart < 3; icart++)
+        for (size_t mu = 0; mu < ints_sph[icart].dim<0>(); mu++)
+            for (size_t nu = 0; nu < ints_sph[icart].dim<1>(); nu++)
+                ints_sph[icart](mu, nu) *=
                         sp_data.norms_[ofs_norm_a + mu] * sp_data.norms_[ofs_norm_b + nu];
 
     return ints_sph;
