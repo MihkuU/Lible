@@ -9,8 +9,11 @@ namespace lible::ints
     /// coefficients in one shell.
     struct BasisShell
     {
+        /// Angular momentum.
         int l_;
+        /// Gaussian primitive exponents.
         std::vector<double> exps_;
+        /// Gaussian primitive contraction coefficients.
         std::vector<double> coeffs_;
     };
 
@@ -20,7 +23,9 @@ namespace lible::ints
     /// Structure containing an atomic number and the basis sets of atomic orbital shells.
     struct BasisAtom
     {
+        /// Atomic number.
         int atomic_nr_;
+        /// Basis sets for each shell on the atom.
         basis_shells_t basis_shells_;
     };
 
@@ -30,19 +35,6 @@ namespace lible::ints
     /// Structure for representing a shell of atomic orbitals.
     struct Shell
     {
-        Shell() = default;
-
-        Shell(const int l, const int z, const size_t idx_atom, const size_t dim_cart,
-              const size_t dim_sph, const size_t ofs_cart, const size_t ofs_sph, const size_t idx,
-              const std::array<double, 3> &xyz_coords, const std::vector<double> &exps,
-              const std::vector<double> &coeffs, const std::vector<double> &norms,
-              const std::vector<double> &norms_prim)
-            : l_(l), z_(z), dim_cart_(dim_cart), dim_sph_(dim_sph), ofs_cart_(ofs_cart),
-              ofs_sph_(ofs_sph), idx_(idx), idx_atom_(idx_atom), xyz_coords_(xyz_coords),
-              exps_(exps), coeffs_(coeffs), norms_(norms), norms_prim_(norms_prim)
-        {
-        }
-
         /// Angular momentum.
         int l_{};
         /// Atomic number.

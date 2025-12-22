@@ -8,8 +8,6 @@
 #include <lible/ints/twoel/eri_kernels.hpp>
 
 #include <array>
-#include <cassert>
-#include <memory>
 #include <set>
 #include <string>
 #include <tuple>

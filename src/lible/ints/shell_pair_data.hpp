@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lible/ints/structure.hpp>
+#include <lible/ints/shell.hpp>
 
 namespace lible::ints
 {
@@ -53,7 +53,8 @@ namespace lible::ints
         /// equals `la` and the same for `shells_b` and `lb`. Cannot be called in an OMP parallel
         /// region.
         ShellPairData(bool use_symm, int la, int lb, const std::vector<Shell> &shells_a,
-                      const std::vector<Shell> &shells_b, double primitives_thrs = 1e-15); // TODO: add this number as a constant somewhere
+                      const std::vector<Shell> &shells_b,
+                      double primitives_thrs = 1e-15); // TODO: add this number as a constant somewhere
 
         /// Flag indicating whether symmetry is used or not.
         bool uses_symm_{};
@@ -115,5 +116,11 @@ namespace lible::ints
         void countPairs(const std::vector<Shell> &shells_a, const std::vector<Shell> &shells_b,
                         size_t &n_pairs, size_t &n_pairs_total, size_t &n_ppairs,
                         size_t &n_ppairs_total) const;
+    };
+
+
+    struct ShellPairDataTmp
+    {
+    private:
     };
 }

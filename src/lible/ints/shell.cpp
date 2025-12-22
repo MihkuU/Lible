@@ -56,8 +56,8 @@ std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
     std::vector<Shell> shells;
     for (const auto &[l, exps, coeffs] : basis_shells)
     {
-        const int dim_cart = numCartesians(l);
-        const int dim_sph = numSphericals(l);
+        const size_t dim_cart = numCartesians(l);
+        const size_t dim_sph = numSphericals(l);
 
         if (exps.size() != coeffs.size())
             throw std::runtime_error("constructShells(): number of exponents/coefficients "
@@ -71,8 +71,8 @@ std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
 
         std::vector<double> norms = calcShellNorms(l, coeffs, exps, primitive_norms);
 
-        Shell shell(l, atomic_nr, 0, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
-                    coords_atom, exps, coeffs, norms, primitive_norms);
+        Shell shell{l, atomic_nr, 0, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
+                    coords_atom, exps, coeffs, norms, primitive_norms};
 
         shells.push_back(shell);
 

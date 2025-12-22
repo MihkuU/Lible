@@ -62,7 +62,7 @@ add_custom_command(OUTPUT ${sphinx_index_file}
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_api.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_main_interface.rst
-		${CMAKE_CURRENT_SOURCE_DIR}/integrals_introduction.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/integrals_definitions.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_tutorial.rst
 		${doxygen_index_file}
 	MAIN_DEPENDENCY   ${sphinx_source}/conf.py

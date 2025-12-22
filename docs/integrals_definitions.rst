@@ -1,7 +1,7 @@
 
 
-Introduction
-============
+Definitions & Conventions
+=========================
 
 Atomic orbitals
 ---------------
@@ -54,6 +54,3 @@ Angular momentum
 
 Available kernels
 -----------------
-
-Calculation scheme
-------------------

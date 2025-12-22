@@ -25,8 +25,16 @@ if(LIBLE_BUILD_INTS)
 		"${src_dir}/lible/ints/twoel/shark_mm_kernels/*.cpp")
 
 	target_sources(lible PRIVATE ${ints_sources})
-
-	target_include_directories(lible PUBLIC 
-		$<BUILD_INTERFACE:${src_dir}>
-		$<INSTALL_INTERFACE:include>)
 endif()
+
+if(LIBLE_BUILD_SOLVER)
+	file(GLOB solver_sources CONFIGURE_DEPENDS
+		"${src_dir}/lible/solver/*.cpp"
+		"${src_dir}/lible/solver/*.hpp")
+
+	target_sources(lible PRIVATE ${solver_sources})
+endif()
+
+#target_include_directories(lible PUBLIC 
+#	$<BUILD_INTERFACE:${src_dir}>
+#	$<INSTALL_INTERFACE:include>)

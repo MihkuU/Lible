@@ -19,7 +19,7 @@ author = 'MihkuU'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['breathe']
+extensions = ['breathe', 'sphinx.ext.graphviz']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -34,7 +34,9 @@ master_doc = 'index'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-#html_static_path = ['_static']
+
+# -- GraphViz configuration ----------------------------------
+graphviz_output_format = 'svg'
 
 # -- Read the Docs Shenanigans -----------------------------------------------
 import subprocess, os

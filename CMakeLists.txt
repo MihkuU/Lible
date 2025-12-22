@@ -20,7 +20,8 @@ endif()
 ### Options
 option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
-option(LIBLE_BUILD_STATIC "Enables building the static Lible library" OFF)
+option(LIBLE_BUILD_SOLVER   "Build and install solver module" ON)
+option(LIBLE_BUILD_STATIC   "Enables building the static Lible library" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -97,6 +98,10 @@ if(lible_is_top_level)
 		file(GLOB lible_ints_headers3 "${src_dir}/src/lible/ints/twoel/*.hpp")
 	endif()
 
+	if(LIBLE_BUILD_SOLVER)
+		file(GLOB lible_solver_headers "${src_dir}/src/lible/solver/*.hpp")
+	endif()
+
 	include(GNUInstallDirs)
 	install(TARGETS lible
 		EXPORT libleTargets
@@ -109,6 +114,10 @@ if(lible_is_top_level)
 		install(FILES ${lible_ints_headers1} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints)
 		install(FILES ${lible_ints_headers2} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/oneel)
 		install(FILES ${lible_ints_headers3} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/ints/twoel)
+	endif()
+
+	if(LIBLE_BUILD_SOLVER)
+		install(FILES ${lible_solver_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/solver)
 	endif()
 
 	install(EXPORT libleTargets
