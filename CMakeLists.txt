@@ -31,7 +31,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 if(LIBLE_BUILD_STATIC)
 	add_library(lible STATIC)
 else()
-	add_library(lible SHARED)
+	add_library(lible SHARED
+			src/lible/geomopt/utils.hpp
+			src/lible/geomopt/utils.cpp)
 endif()
 
 add_library(lible::lible ALIAS lible)

@@ -1,4 +1,7 @@
 #include <lible/geomopt/geomopt.hpp>
+#include <lible/geomopt/utils.hpp>
+
+#include <numbers>
 
 #include <armadillo>
 
@@ -6,49 +9,6 @@ namespace lgopt = lible::geomopt;
 
 namespace lible::geomopt
 {
-    /// Type alias for a nested (2-dimensional) vector.
-    template<typename T>
-    using vec2d = std::vector<std::vector<T>>;
-
-    /// Type alias for a list of atomic coordinates.
-    using xyz_coords_arma_t = std::vector<arma::vec3>;
-
-    /// Calculates the bond length for two atoms.
-    double bondLength(const arma::vec3 &xyz_m, const arma::vec3 &xyz_n);
-
-    /// Calculates a bond angle between three atoms.
-    double bondAngle(const arma::vec3 &xyz_m, const arma::vec3 &xyz_o, const arma::vec3 &xyz_n);
-
-    /// Calculates a dihedral angle formed by four atoms.
-    double dihedralAngle(const arma::vec3 &xyz_m, const arma::vec3 &xyz_o, const arma::vec3 &xyz_p,
-                         const arma::vec3 &xyz_n);
-
-    /// Finds the bonding partner atoms for each atom.
-    vec2d<size_t> bondingPartners(const std::vector<int> &atomic_nrs,
-                                  const xyz_coords_arma_t &xyz_coords);
-
-    /// Constructs and returns a list of bond length coordinates.
-    std::vector<BondLength> bondLengths(const vec2d<size_t> &bonding_partners,
-                                        const xyz_coords_arma_t &xyz_coords);
-
-    /// Constructs and returns a list of bond angle coordinates.
-    std::vector<BondAngle> bondAngles(const vec2d<size_t> &bonding_partners,
-                                      const xyz_coords_arma_t &xyz_coords);
-
-    /// Constructs and returns a list of dihedral angle coordinates.
-    std::vector<DihedralAngle> dihedralAngles(const vec2d<size_t> &bonding_partners,
-                                              const xyz_coords_arma_t &xyz_coords);
-
-    /// Converts the coordinate list to arma.
-    xyz_coords_arma_t conv2arma(const xyz_coords_t &xyz_coords);
-
-    /// Constructs the Wilson's B matrix using formulas from https://doi.org/10.1063/1.1515483.
-    arma::dmat builB(const xyz_coords_arma_t &xyz_coords, const RedIntCoords &red_int_coords);
-
-    /// Constructs the K matrix defined in eq. (8) from https://doi.org/10.1063/1.1515483.
-    arma::dmat buildK(const arma::dmat &b_matrix, const arma::dvec &grad_redint,
-                      const xyz_coords_arma_t &xyz_coords, const RedIntCoords &red_int_coords);
-
     /// Covalent radii of all elements up to an atomic number of 96 in Bohr. Note, for Mn, Fe and Co
     /// the values for high spin are given, and for C the value for sp3 is given. All data are
     /// extracted from https://doi.org/10.1039/B801115J.
@@ -158,19 +118,17 @@ namespace lible::geomopt
 lgopt::RedIntCoords lgopt::redIntCoords(const std::vector<int> &atomic_nrs,
                                         const xyz_coords_t &xyz_coords)
 {
-    xyz_coords_arma_t xyz_coords_arma = conv2arma(xyz_coords);
-
-    vec2d<size_t> bonding_partners = bondingPartners(atomic_nrs, xyz_coords_arma);
+    vec2d<size_t> bonding_partners = bondingPartners(atomic_nrs, xyz_coords);
 
     return {
-        bondLengths(bonding_partners, xyz_coords_arma),
-        bondAngles(bonding_partners, xyz_coords_arma),
-        dihedralAngles(bonding_partners, xyz_coords_arma)
+        bondLengths(bonding_partners, xyz_coords),
+        bondAngles(bonding_partners, xyz_coords),
+        dihedralAngles(bonding_partners, xyz_coords)
     };
 }
 
 std::vector<lgopt::BondLength> lgopt::bondLengths(const vec2d<size_t> &bonding_partners,
-                                                  const xyz_coords_arma_t &xyz_coords)
+                                                  const xyz_coords_t &xyz_coords)
 {
     std::vector<BondLength> bond_lengths;
     for (size_t m = 0; m < bonding_partners.size(); m++)
@@ -185,7 +143,7 @@ std::vector<lgopt::BondLength> lgopt::bondLengths(const vec2d<size_t> &bonding_p
 }
 
 std::vector<lgopt::BondAngle> lgopt::bondAngles(const vec2d<size_t> &bonding_partners,
-                                                const xyz_coords_arma_t &xyz_coords)
+                                                const xyz_coords_t &xyz_coords)
 {
     std::vector<BondAngle> bond_angles;
     for (size_t o = 0; o < bonding_partners.size(); o++)
@@ -201,7 +159,7 @@ std::vector<lgopt::BondAngle> lgopt::bondAngles(const vec2d<size_t> &bonding_par
 }
 
 std::vector<lgopt::DihedralAngle> lgopt::dihedralAngles(const vec2d<size_t> &bonding_partners,
-                                                        const xyz_coords_arma_t &xyz_coords)
+                                                        const xyz_coords_t &xyz_coords)
 {
     std::vector<std::pair<size_t, size_t>> op_bonds;
     for (size_t o = 0; o < bonding_partners.size(); o++)
@@ -246,7 +204,7 @@ size_t lgopt::numRedIntCoords(const RedIntCoords &red_int_coords)
 }
 
 lgopt::vec2d<size_t> lgopt::bondingPartners(const std::vector<int> &atomic_nrs,
-                                            const xyz_coords_arma_t &xyz_coords)
+                                            const xyz_coords_t &xyz_coords)
 {
     size_t n_atoms = atomic_nrs.size();
 
@@ -279,41 +237,208 @@ lgopt::vec2d<size_t> lgopt::bondingPartners(const std::vector<int> &atomic_nrs,
     return bonding_partners;
 }
 
-double lgopt::bondLength(const arma::vec3 &xyz_m, const arma::vec3 &xyz_n)
+double lgopt::bondLength(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_n)
 {
-    return arma::norm(xyz_m - xyz_n);
+    return norm(xyz_m - xyz_n);
 }
 
-double lgopt::bondAngle(const arma::vec3 &xyz_m, const arma::vec3 &xyz_o, const arma::vec3 &xyz_n)
+double lgopt::bondAngle(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_o,
+                        const std::array<double, 3> &xyz_n)
 {
-    arma::dvec3 u = xyz_m - xyz_o;
-    arma::dvec3 v = xyz_n - xyz_o;
+    std::array<double, 3> u = xyz_m - xyz_o;
+    std::array<double, 3> v = xyz_n - xyz_o;
 
-    return std::acos(arma::dot(u, v) / (arma::norm(u) * arma::norm(v)));
+    return std::acos(dot(u, v) / (norm(u) * norm(v)));
 }
 
-double lgopt::dihedralAngle(const arma::dvec3 &xyz_m, const arma::dvec3 &xyz_o,
-                            const arma::dvec3 &xyz_p, const arma::dvec3 &xyz_n)
+double lgopt::dihedralAngle(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_o,
+                            const std::array<double, 3> &xyz_p, const std::array<double, 3> &xyz_n)
 {
-    arma::dvec3 u = xyz_m - xyz_o;
-    arma::dvec3 v = xyz_n - xyz_p;
-    arma::dvec3 w = xyz_p - xyz_o;
+    std::array<double, 3> u = xyz_m - xyz_o;
+    std::array<double, 3> v = xyz_n - xyz_p;
+    std::array<double, 3> w = xyz_p - xyz_o;
 
-    u /= arma::norm(u);
-    v /= arma::norm(v);
-    w /= arma::norm(w);
+    u = u / norm(u);
+    v = v / norm(v);
+    w = w / norm(w);
 
-    double sin_u = std::sqrt(1 - std::pow(arma::dot(u, w), 2));
-    double sin_v = std::sqrt(1 - std::pow(arma::dot(v, w), 2));
+    double sin_u = std::sqrt(1 - std::pow(dot(u, w), 2));
+    double sin_v = std::sqrt(1 - std::pow(dot(v, w), 2));
 
-    return std::acos(arma::dot(arma::cross(u, w), arma::cross(v, w)) / (sin_u * sin_v));
+    return std::acos(dot(cross(u, w), cross(v, w)) / (sin_u * sin_v));
 }
 
-lgopt::xyz_coords_arma_t lgopt::conv2arma(const xyz_coords_t &xyz_coords)
+lgopt::vec2d<double> lgopt::builBMatrix(const xyz_coords_t &xyz_coords,
+                                        const RedIntCoords &red_int_coords,
+                                        const double tol)
 {
-    xyz_coords_arma_t xyz_coords_arma(xyz_coords.size());
-    for (size_t i = 0; i < xyz_coords.size(); i++)
-        xyz_coords_arma[i] = {xyz_coords[i][0], xyz_coords[i][1], xyz_coords[i][2]};
+    vec2d<double> b_matrix_bonds = buildBMatrixBondLengths(xyz_coords, red_int_coords);
 
-    return xyz_coords_arma;
+    vec2d<double> b_matrix_angles = buildBMatrixBondAngles(xyz_coords, red_int_coords, tol);
+
+    vec2d<double> b_matrix_dihedrals = buildBMatrixDihedralAngles(xyz_coords, red_int_coords, tol);
+
+    vec2d<double> b_matrix = b_matrix_bonds;
+    b_matrix.insert(b_matrix.end(), b_matrix_angles.begin(), b_matrix_angles.end());
+    b_matrix.insert(b_matrix.end(), b_matrix_dihedrals.begin(), b_matrix_dihedrals.end());
+
+    return b_matrix;
+}
+
+lgopt::vec2d<double> lgopt::buildBMatrixBondLengths(const xyz_coords_t &xyz_coords,
+                                                    const RedIntCoords &red_int_coords)
+{
+    size_t n_bond_lenghts = red_int_coords.bond_lengths_.size();
+
+    vec2d<double> b_matrix_bonds(n_bond_lenghts);
+    for (size_t ibond = 0; ibond < n_bond_lenghts; ibond++)
+    {
+        const auto &[m, n, bond_length] = red_int_coords.bond_lengths_[ibond];
+
+        std::array<double, 3> bond_vector = (xyz_coords[n] - xyz_coords[m]) / bond_length;
+        const auto &[x, y, z] = bond_vector;
+        b_matrix_bonds[ibond] = {x, y, z, -x, -y, -z};
+    }
+
+    return b_matrix_bonds;
+}
+
+lgopt::vec2d<double> lgopt::buildBMatrixBondAngles(const xyz_coords_t &xyz_coords,
+                                                   const RedIntCoords &red_int_coords,
+                                                   const double tol)
+{
+    size_t n_bond_angles = red_int_coords.bond_angles_.size();
+
+    vec2d<double> b_matrix_angles(n_bond_angles);
+    for (size_t iangle = 0; iangle < n_bond_angles; iangle++)
+    {
+        const auto &[m, o, n, bond_angle] = red_int_coords.bond_angles_[iangle];
+
+        // u, v
+        std::array<double, 3> u = xyz_coords[m] - xyz_coords[o];
+        std::array<double, 3> v = xyz_coords[n] - xyz_coords[o];
+        double lambda_u = norm(u);
+        double lambda_v = norm(v);
+        u = u / lambda_u;
+        v = v / lambda_v;
+
+        // w
+        bool u_v_parallel = areParallel(u, v, tol);
+        std::array<double, 3> w{};
+        if (u_v_parallel == false)
+            w = cross(u, v);
+        else
+        {
+            std::array<double, 3> tmp{1, -1, 1};
+            if (areParallel(u, tmp, tol) == false)
+                w = cross(u, tmp);
+            else
+            {
+                tmp = {-1, 1, -1};
+                w = cross(u, tmp);
+            }
+        }
+
+        w = w / norm(w);
+
+        // derivatives
+        std::array<double, 3> u_x_w = cross(u, w);
+        std::array<double, 3> w_x_v = cross(w, v);
+
+        auto calcContrib = [&](const size_t a) -> std::array<double, 3>
+        {
+            std::array<double, 3> result{};
+            result[0] = zeta(a, m, o) * u_x_w[0] / lambda_u + zeta(a, n, o) * w_x_v[0] / lambda_v;
+            result[1] = zeta(a, m, o) * u_x_w[1] / lambda_u + zeta(a, n, o) * w_x_v[1] / lambda_v;
+            result[2] = zeta(a, m, o) * u_x_w[2] / lambda_u + zeta(a, n, o) * w_x_v[2] / lambda_v;
+
+            return result;
+        };
+
+        std::array<double, 3> d_m = calcContrib(m);
+        std::array<double, 3> d_o = calcContrib(o);
+        std::array<double, 3> d_n = calcContrib(n);
+
+        b_matrix_angles[iangle] = {
+            d_m[0], d_m[1], d_m[2], d_o[0], d_o[1], d_o[2], d_n[0], d_n[1], d_n[2]
+        };
+    }
+
+    return b_matrix_angles;
+}
+
+lgopt::vec2d<double> lgopt::buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords,
+                                                       const RedIntCoords &red_int_coords,
+                                                       const double tol)
+{
+    size_t n_dihedral_angles = red_int_coords.dihedral_angles_.size();
+
+    using std::numbers::pi;
+
+    vec2d<double> b_matrix_dihedrals(n_dihedral_angles);
+    for (size_t idihedral = 0; idihedral < n_dihedral_angles; idihedral++)
+    {
+        const auto &[m, o, p, n, dihedral_angle] = red_int_coords.dihedral_angles_[idihedral];
+
+        // construct u, v, w and their relative angles
+        std::array<double, 3> u = xyz_coords[m] - xyz_coords[o];
+        std::array<double, 3> v = xyz_coords[n] - xyz_coords[p];
+        std::array<double, 3> w = xyz_coords[p] - xyz_coords[o];
+        double lambda_u = norm(u);
+        double lambda_v = norm(v);
+        double lambda_w = norm(w);
+        u = u / lambda_u;
+        v = v / lambda_v;
+        w = w / lambda_w;
+        double phi_u = angle(u, w);
+        double phi_v = angle(v, w);
+        if (std::fabs(phi_u) < tol || std::fabs(phi_v) < tol ||
+            std::fabs(pi - phi_u) < tol || std::fabs(pi - phi_v) < tol)
+            throw std::runtime_error(
+                std::format("buildBMatrixDihedralAngles(): close to 180 degrees angle between "
+                            "atoms: ({}, {}, {}, {})", m, o, p, n));
+
+        double cos_phi_u = std::cos(phi_u);
+        double cos_phi_v = std::cos(phi_v);
+        double sin_phi_u = std::sin(phi_u);
+        double sin_phi_v = std::sin(phi_v);
+        double sin2_phi_u = sin_phi_u * sin_phi_u;
+        double sin2_phi_v = sin_phi_v * sin_phi_v;
+        std::array<double, 3> u_x_w = cross(u, w);
+        std::array<double, 3> v_x_w = cross(v, w);
+
+        // Lambda for calculating the eq. (34) with varying atomic index 'a'.
+        auto calcContrib = [&](const size_t a) -> std::array<double, 3>
+        {
+            std::array<double, 3> result{};
+            result[0] = zeta(a, m, o) * u_x_w[0] / (lambda_u * sin2_phi_u) +
+                        zeta(a, p, n) * v_x_w[0] / (lambda_v * sin2_phi_v) +
+                        zeta(a, o, p) * u_x_w[0] * cos_phi_u / (lambda_w * sin2_phi_u) -
+                        zeta(a, o, p) * v_x_w[0] * cos_phi_v / (lambda_w * sin2_phi_v);
+
+            result[1] = zeta(a, m, o) * u_x_w[1] / (lambda_u * sin2_phi_u) +
+                        zeta(a, p, n) * v_x_w[1] / (lambda_v * sin2_phi_v) +
+                        zeta(a, o, p) * u_x_w[1] * cos_phi_u / (lambda_w * sin2_phi_u) -
+                        zeta(a, o, p) * v_x_w[1] * cos_phi_v / (lambda_w * sin2_phi_v);
+
+            result[2] = zeta(a, m, o) * u_x_w[2] / (lambda_u * sin2_phi_u) +
+                        zeta(a, p, n) * v_x_w[2] / (lambda_v * sin2_phi_v) +
+                        zeta(a, o, p) * u_x_w[2] * cos_phi_u / (lambda_w * sin2_phi_u) -
+                        zeta(a, o, p) * v_x_w[2] * cos_phi_v / (lambda_w * sin2_phi_v);
+
+            return result;
+        };
+
+        std::array<double, 3> d_m = calcContrib(m);
+        std::array<double, 3> d_o = calcContrib(o);
+        std::array<double, 3> d_p = calcContrib(p);
+        std::array<double, 3> d_n = calcContrib(n);
+
+        b_matrix_dihedrals[idihedral] = {
+            d_m[0], d_m[1], d_m[2], d_o[0], d_o[1], d_o[2], d_p[0], d_p[1], d_p[2], d_n[0], d_n[1],
+            d_n[2]
+        };
+    }
+
+    return b_matrix_dihedrals;
 }
