@@ -25,7 +25,7 @@ arma::dvec lsolver::conv2dvec(const std::vector<double> &vec)
 
 std::vector<double> lsolver::conv2vec(const arma::dvec &vec)
 {
-    return arma::conv_to<std::vector<double> >::from(vec);
+    return arma::conv_to<std::vector<double>>::from(vec);
 }
 
 arma::dvec lsolver::calcSigmaWrap(const cg_sigma_t &calc_sigma, const arma::dvec &trial)
@@ -136,4 +136,50 @@ lsolver::CGResults lsolver::preconditionedCG(const std::vector<double> &guess,
     }
 
     return {converged, iter, max_abs_residuals, conv2vec(x)};
+}
+
+lsolver::PCDResults lsolver::pivotedCD(const std::vector<double> &diagonal,
+                                       const cd_matrix_element_t &cd_matrix_element,
+                                       const PCDSettings &settings)
+{
+    size_t dim = diagonal.size();
+
+    arma::dvec d = conv2dvec(diagonal);
+    arma::uvec pi = arma::linspace<arma::uvec>(1, dim, dim);
+
+    double error = arma::max(arma::abs(d));
+
+    bool converged = false;
+    std::vector<size_t> pivot_indices;
+    std::vector<double> errors;
+    std::vector<std::vector<double>> chol_vecs;
+    size_t m = 0;
+    for (; m < dim; m++)
+    {
+        if (error < settings.conv_tol_)
+        {
+            converged = true;
+            break;
+        }
+
+        size_t imax = arma::dvec(d.elem(pi)).subvec(m, dim - 1).index_max(); // TODO:
+        std::swap(pi(m), pi(imax));
+
+        std::vector<double> chol_vec(dim, 0);
+        chol_vec[pi(m)] = std::sqrt(d(pi(m)));
+        for (size_t i = m + 1; i < dim; i++)
+        {
+            double l_m_pii = cd_matrix_element(pi(m), pi(i));
+            for (size_t j = 0; j < m; j++)
+                l_m_pii -= chol_vecs[j][pi(m)] * chol_vecs[j][pi(i)] / chol_vec[pi(m)];
+
+            d[pi(i)] -= std::pow(l_m_pii, 2);
+        }
+
+        error = arma::max(arma::abs(arma::dvec(d.elem(pi)).subvec(m + 1, dim - 1)));
+
+        chol_vecs.push_back(chol_vec);
+    }
+
+    return {converged, m, pivot_indices, errors, chol_vecs};
 }

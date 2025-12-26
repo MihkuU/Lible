@@ -20,7 +20,8 @@ endif()
 ### Options
 option(LIBLE_BUILD_DOCS     "Enables building sphinx-documentation" OFF)
 option(LIBLE_BUILD_INTS     "Build and install the molecular integrals module" ON)
-option(LIBLE_BUILD_SOLVER   "Build and install solver module" ON)
+option(LIBLE_BUILD_SOLVER   "Build and install the solver module" ON)
+option(LIBLE_BUILD_GEOMOPT  "Build and install the geometry optimization module" ON)
 option(LIBLE_BUILD_STATIC   "Enables building the static Lible library" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -102,6 +103,10 @@ if(lible_is_top_level)
 		file(GLOB lible_solver_headers "${src_dir}/src/lible/solver/*.hpp")
 	endif()
 
+	if(LIBLE_BUILD_GEOMOPT)
+		file(GLOB lible_geomopt_headers "${src_dir}/src/lible/geomopt/*.hpp")
+	endif()
+
 	include(GNUInstallDirs)
 	install(TARGETS lible
 		EXPORT libleTargets
@@ -118,6 +123,10 @@ if(lible_is_top_level)
 
 	if(LIBLE_BUILD_SOLVER)
 		install(FILES ${lible_solver_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/solver)
+	endif()
+
+	if(LIBLE_BUILD_GEOMOPT)
+		install(FILES ${lible_geomopt_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lible/geomopt)
 	endif()
 
 	install(EXPORT libleTargets

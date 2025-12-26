@@ -35,6 +35,10 @@ if(LIBLE_BUILD_SOLVER)
 	target_sources(lible PRIVATE ${solver_sources})
 endif()
 
-#target_include_directories(lible PUBLIC 
-#	$<BUILD_INTERFACE:${src_dir}>
-#	$<INSTALL_INTERFACE:include>)
+if(LIBLE_BUILD_GEOMOPT)
+	file(GLOB geomopt_sources CONFIGURE_DEPENDS
+		"${src_dir}/lible/geomopt/*.cpp"
+		"${src_dir}/lible/geomopt/*.hpp")
+
+	target_sources(lible PRIVATE ${geomopt_sources})
+endif()

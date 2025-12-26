@@ -264,7 +264,7 @@ namespace lible::ints
     /// coefficients multiplied into.
     std::vector<double> ecoeffsSHARK(const ShellData &sh_data, bool transpose = false);
 
-    /// Calculates the first derivate Hermite expansion coefficients,
+    /// Calculates the first derivative Hermite expansion coefficients,
     /// The coefficients have AO norms and primitive contraction coefficients multiplied into.
     std::vector<double> ecoeffsD1SHARK(const ShellPairData &sp_data, bool transpose = false);
 

@@ -5,12 +5,14 @@
 
 namespace lible::solver
 {
+    // Conjugate gradient
+
     /// Settings for the conjugate and preconditioned conjugate gradient (CG and PCG) solver.
     struct CGSettings
     {
         /// Maximum number of iterations.
         size_t max_iter_ = 100;
-        /// Value of the maximum absolute value of the residual to signal convergence.
+        /// Maximum absolute value of the residual to signal convergence.
         double conv_tol_ = 1e-6;
     };
 
@@ -46,4 +48,38 @@ namespace lible::solver
                                const cg_sigma_t &calc_sigma,
                                const pcg_preconditioner_t &preconditioner,
                                const CGSettings &settings = CGSettings());
+
+    // Cholesky decomposition
+
+    /// Settings for the pivoted Cholesky Decomposition.
+    struct PCDSettings
+    {
+        /// Value of the error below which convergence is signaled.
+        double conv_tol_{};
+    };
+
+    /// Results from the pivoted Cholesky Decomposition.
+    struct PCDResults
+    {
+        /// Flag for whether convergence was achieved.
+        bool converged_{false};
+        /// Number of iterations that were run
+        size_t n_iter_{0};
+
+        /// Pivot indices from the Cholesky decomposition.
+        std::vector<size_t> pivot_indices_;
+        /// Values of errors at each iteration.
+        std::vector<double> errors_;
+        /// Cholesky vectors in the lower triangular representation.
+        std::vector<std::vector<double>> cholesky_vectors_;
+    };
+
+    /// Type alias for a function object that calculates/returns a matrix element A_{i,j}.
+    using cd_matrix_element_t = std::function<double(size_t i, size_t j)>;
+
+    /// Runs the pivoted Cholesky decomposition method (pCD). Based on Algorithm 1 from
+    /// https://doi.org/10.1016/j.apnum.2011.10.001.
+    PCDResults pivotedCD(const std::vector<double> &diagonal,
+                         const cd_matrix_element_t &cd_matrix_element,
+                         const PCDSettings &settings = PCDSettings());
 }
