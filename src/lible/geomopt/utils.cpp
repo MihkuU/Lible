@@ -61,11 +61,12 @@ int lgopt::zeta(const size_t a, const size_t m, const size_t n)
 bool lgopt::areParallel(const std::array<double, 3> &u, const std::array<double, 3> &v,
                         const double tol)
 {
-    double ratio = u[0] / v[0];
+    std::array<double, 3> u_normed = u / norm(u);
+    std::array<double, 3> v_normed = v / norm(v);
 
-    for (size_t i = 1; i < 3; ++i)
-        if (std::fabs(u[i] - ratio * v[i]) > tol)
-            return false;
+    double dp = dot(u_normed, v_normed);
+    if (std::fabs(std::fabs(dp) - 1.0) < tol)
+        return true;
 
-    return true;
+    return false;
 }

@@ -21,4 +21,8 @@ namespace lible
 
     template <typename T, size_t d1, size_t d2, size_t d3, size_t d4>
     using arr4d = std::array<std::array<std::array<std::array<T, d4>, d3>, d2>, d1>;
+
+    /// Type alias for a nested (2-dimensional) vector.
+    template <typename T>
+    using vecvec = std::vector<std::vector<T>>;
 }
