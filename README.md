@@ -46,3 +46,10 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
   ```
   This approach downloads the library and integrates it directly in your build. For more details see 
   [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html).
+
+### Tests
+Lible builds a test program whenever it is the [top level project](https://cmake.org/cmake/help/latest/variable/PROJECT_IS_TOP_LEVEL.html). 
+The test cases are implemented via the [CTest](https://cmake.org/cmake/help/latest/module/CTest.html). To run the tests, simply run
+```
+ctest --test-dir build/
+```
