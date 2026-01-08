@@ -50,8 +50,7 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
 ### Tests
 A test program is built whenever Lible is the [top level project](https://cmake.org/cmake/help/latest/variable/PROJECT_IS_TOP_LEVEL.html).
 That is, when Lible is built separately, without using FetchContent. The test cases are implemented via the 
-[CTest](https://cmake.org/cmake/help/latest/module/CTest.html) module. To run the tests, simply call the `ctest` program on the directory
-containing the test program:
+[CTest](https://cmake.org/cmake/help/latest/module/CTest.html) module. To run the tests, call the `ctest` program on the build directory:
 ```
 ctest --test-dir build/
 ```
