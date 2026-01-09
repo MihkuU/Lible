@@ -44,8 +44,7 @@ to use the CMake `FetchContent` feature that is explained below. For the separat
     FetchContent_MakeAvailable(lible)
     target_link_libraries(<your target> PRIVATE lible::lible)
   ```
-  This approach downloads the library and integrates it directly in your build. For more details see 
-  [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html).
+  This approach downloads the library and integrates it directly in your build. 
 
 ### Tests
 A test program is built whenever Lible is the [top level project](https://cmake.org/cmake/help/latest/variable/PROJECT_IS_TOP_LEVEL.html).
