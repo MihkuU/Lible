@@ -10,9 +10,6 @@ Some of the notations and conventions here might bear a close resemblance to wha
 `"Molecular Electronic-Structure Theory" <https://onlinelibrary.wiley.com/doi/book/10.1002/9781119019572>`__.
 This book served as the main reference in implementing the library. In order to use the library, 
 include the main header ``<lible/ints/ints.hpp>`` in your source code.
-
-Available integral kernels
---------------------------
    
 Definitions & conventions
 -------------------------
@@ -62,6 +59,9 @@ The quantities in this expression are defined as:
 
 Angular momentum
 ~~~~~~~~~~~~~~~~
+
+Available integral kernels
+--------------------------
 
 Main Interface
 --------------
