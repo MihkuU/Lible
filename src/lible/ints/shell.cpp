@@ -119,7 +119,7 @@ lints::constructShells(const basis_atoms_t &basis_atoms,
 
             std::vector<double> norms = calcShellNorms(l, coeffs, exps, primitive_norms);
 
-            Shell shell(l, atomic_nr, iatom, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
+            Shell shell(l, atomic_nr, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell, iatom,
                         coords_iatom, exps, coeffs, norms, primitive_norms);
 
             shells.push_back(shell);

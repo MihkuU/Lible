@@ -658,6 +658,7 @@ lible::vec2d lgopt::buildKMatrix(const vecvec<double> &b_matrix,
                                  const xyz_coords_t &xyz_coords,
                                  const RedIntCoords &red_int_coords)
 {
+    return {};
 }
 
 lible::vec2d lgopt::buildKMatrixBondLengths(const std::vector<double> &grad_redint,
