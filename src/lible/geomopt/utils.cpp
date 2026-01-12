@@ -47,16 +47,15 @@ std::array<double, 3> lgopt::operator/(const std::array<double, 3> &u, const dou
 }
 
 
-size_t lgopt::delta(const size_t i, const size_t j)
+double lgopt::delta(const size_t i, const size_t j)
 {
     return i == j ? 1 : 0;
 }
 
-int lgopt::zeta(const size_t a, const size_t m, const size_t n)
+double lgopt::zeta(const size_t a, const size_t m, const size_t n)
 {
-    return static_cast<int>(delta(a, m)) - static_cast<int>(delta(a, n));
+    return delta(a, m) - delta(a, n);
 }
-
 
 bool lgopt::areParallel(const std::array<double, 3> &u, const std::array<double, 3> &v,
                         const double tol)

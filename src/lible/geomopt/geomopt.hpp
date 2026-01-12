@@ -49,13 +49,14 @@ namespace lible::geomopt
         std::vector<DihedralAngle> dihedral_angles_;
     };
 
-    /// Constructs redundant internal coordinates from the given Cartesian coordinates.
+    /// Constructs redundant internal coordinates from the given Cartesian coordinates. Expects
+    /// coordinates in Bohr (a.u.).
     RedIntCoords redIntCoords(const std::vector<int> &atomic_nrs, const xyz_coords_t &xyz_coords);
 
     /// Returns the total number of redundant internal coordinates.
     size_t numRedIntCoords(const RedIntCoords &red_int_coords);
 
-    /// Finds the bonding partner atoms for each atom.
+    /// Finds the bonding partner atoms for each atom. Expects coordinates in Bohr (a.u.).
     vecvec<size_t> bondingPartners(const std::vector<int> &atomic_nrs,
                                    const xyz_coords_t &xyz_coords);
 
@@ -74,8 +75,11 @@ namespace lible::geomopt
     // TODO: do this instead?
     struct BMatrix
     {
+        /// Bond length Cartesian derivatives for m, n.
         std::vector<std::array<double, 6>> bmat_bonds_;
+        /// Bond angle Cartesian derivatives for m, o, n.
         std::vector<std::array<double, 9>> bmat_angles_;
+        /// Dihedral angle Cartesian derivatives for m, o, p, n.
         std::vector<std::array<double, 12>> bmat_dihedrals_;
     };
 
@@ -128,6 +132,11 @@ namespace lible::geomopt
                                  const RedIntCoords &red_int_coords);
 
     // TODO:
+    vec2d buildKMatrixDihedralAngles(const std::vector<double> &grad_redint,
+                                     const xyz_coords_t &xyz_coords,
+                                     const RedIntCoords &red_int_coords);
+
+    // TODO:
     vec2d buildKMatrixBondLengthsFD(double dx, double dy, const std::vector<double> &grad_redint,
                                     const xyz_coords_t &xyz_coords,
                                     const RedIntCoords &red_int_coords);
@@ -136,6 +145,10 @@ namespace lible::geomopt
     vec2d buildKMatrixBondAnglesFD(double dx, double dy, const std::vector<double> &grad_redint,
                                    const xyz_coords_t &xyz_coords,
                                    const RedIntCoords &red_int_coords);
+
+    vec2d buildKMatrixDihedralAnglesFD(double dx, double dy, const std::vector<double> &grad_redint,
+                                       const xyz_coords_t &xyz_coords,
+                                       const RedIntCoords &red_int_coords);
 
     /// Calculates the bond length for two atoms.
     double bondLength(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_n);
