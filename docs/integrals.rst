@@ -29,7 +29,7 @@ coefficient :math:`N_{\mu}` is usually obtained from the overlap integral
    \; \Rightarrow \; N_{\mu} = 1.0 / \sqrt{(\mu|\mu)}
 
 The primitive Gaussian basis functions are normalized, and depend on the orbital angular momentum
-:math:`l` and its projection, :math:`m = -l, -l + 1, \ldots, l`. Omitting here the 
+:math:`l` and its projection, :math:`m_l = -l, -l + 1, \ldots, l`. Omitting here the 
 :math:`\mu`-label, the primitive Gaussian basis function can be written as 
 
 .. math::
@@ -57,11 +57,106 @@ The quantities in this expression are defined as:
 .. math::
    S_{lm} = \sum_{ijk} t_{lm,ijk} x_A^i y_A^j z_A^k 
 
-Angular momentum
-~~~~~~~~~~~~~~~~
+This transformation is accessible from the library via the function ``lible::ints::sphericalTrafo``
+which returns the transformation coefficients up to :math:`l=9`. Lible follows a convention where 
+the spherical atomic orbitals are ordered *alternatingly* by the :math:`m_l` quantum number. The 
+orbitals are order
+
++---+---------------------+
+| l | :math:`m_l`         | 
++===+=====================+
+| 0 | 0                   |
++---+---------------------+
+| 1 | 0, 1,-1             |
++---+---------------------+
+| 2 | 0, 1,-1, 2,-2       |
++---+---------------------+
+| 3 | 0, 1,-1, 2,-2, 3,-3 |
++---+---------------------+
+
+The Cartesian Gaussian functions are ordered alphabetically by the Cartesian exponents. For the 
+first few angular momenta, :math:`l = 0-3`, the Cartesian exponents are given by:
+
++-----------+--------------------------------------------------+
+| :math:`l` | Cartesian exponents                              |
++===========+==================================================+
+| 0         | 1                                                |
++-----------+--------------------------------------------------+
+| 1         | x, y, z                                          |
++-----------+--------------------------------------------------+
+| 2         | xx, xy, xz, yy, yz, zz                           |
++-----------+--------------------------------------------------+
+| 3         | xxx, xxy, xxz, xyy, xyz, xzz, yyy, yyz, yzz, zzz |
++-----------+--------------------------------------------------+
+
+To get the Cartesian exponents for arbitrary angular momentum, `l`, use 
+``lible::ints::cartExps(int l)``. The total number of Cartesian exponents is given by, 
+:math:`N = (l + 1)(l + 2) / 2`, ``lible::ints::numCartesians(int l)``.
+
 
 Available integral kernels
 --------------------------
+
+The library provides kernel functions for various integral types. A kernel function calculates 
+the integrals for one batch, which is either one shell doublet, triplet or a quartet. In the spirit 
+of the SHARK method, all of the kernel functions return the integrals normalized and in a spherical 
+basis. The available integral kernels are summarized in the table below:
+
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| Integral                                                                                        | Function                                            |
++=================================================================================================+=====================================================+
+| :math:`(a|b)`                                                                                   | ``lible::ints::overlapKernel``                      |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{AB} (a|b)`                                                          | ``lible::ints::overlapD1Kernel``                    |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|{-\tfrac{1}{2}}\nabla^2|b)`                                                           | ``lible::ints::kineticEnergyKernel``                |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{AB} (a|{-\tfrac{1}{2}}\nabla^2|b)`                                  | ``lible::ints::kineticEnergyD1Kernel``              |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|\sum_q \frac{-q}{r_{1q}}|b)`                                                          | ``lible::ints::externalChargesKernel``              |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|\sum_q \frac{-q \cdot \text{erf}(\omega r_{1q})}{r_{1q}}|b)`                          | ``lible::ints::externalChargesErfKernel``           |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{AB} (a|\sum_q \frac{-q}{r_{1q}}|b)`                                 | ``lible::ints::externalChargesD1Kernel``            |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{AB} (a|\sum_q \frac{-q \cdot \text{erf}(\omega r_{1q})}{r_{1q}}|b)` | ``lible::ints::externalChargesErfD1Kernel``         |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{q} (a|\frac{-q}{r_{1q}}|b)`                                         | ``lible::ints::externalChargesOperatorD1Kernel``    |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{q} (a| \frac{-q \cdot \text{erf}(\omega r_{1q})}{r_{1q}}|b)`        | ``lible::ints::externalChargesOperatorErfD1Kernel`` |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|\frac{-q}{r_{1q}}|b)`                                                                 | ``lible::ints::potentialAtExternalChargesKernel``   |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a| \frac{-q \cdot \text{erf}(\omega r_{1q})}{r_{1q}}|b)`                                | ``lible::ints::potentialAtExternalChargesErfKernel``|
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|\boldsymbol{\hat{\mu}}_O|b)`                                                          | ``lible::ints::dipoleMomentKernel``                 |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{A} \times \boldsymbol{\nabla}_{B} (a|\sum_q \frac{-q}{r_{1q}}|b)`   | ``lible::ints::spinOrbitCoupling1ElKernel``         |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|{-\boldsymbol{\nabla}}|b)`                                                            | ``lible::ints::momentumKernel``                     |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|{-\boldsymbol{r} \times \boldsymbol{\nabla}}|b)`                                      | ``lible::ints::angularMomentumKernel``              |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|\hat{p}_i \hat{V} \hat{p}_j|b)`                                                       | ``lible::ints::pVpKernel``                          |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(ab|\frac{1}{r_{12}}|cd)`                                                                | ``lible::ints::ERI4Kernel::operator()``             |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(ab|\frac{1}{r_{12}}|c)`                                                                 | ``lible::ints::ERI3Kernel::operator()``             |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(a|\frac{1}{r_{12}}|b)`                                                                  | ``lible::ints::ERI2Kernel::operator()``             |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{ABCD}(ab|\frac{1}{r_{12}}|cd)`                                      | ``lible::ints::ERI4D1Kernel::operator()``           |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{ABC}(ab|\frac{1}{r_{12}}|c)`                                        | ``lible::ints::ERI3D1Kernel::operator()``           |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{AB}(a|\frac{1}{r_{12}}|b)`                                          | ``lible::ints::ERI2D1Kernel::operator()``           |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`(\boldsymbol{\nabla}_{AB} \otimes \boldsymbol{\nabla}_{AB})(a|\frac{1}{r_{12}}|b)`       | ``lible::ints::ERI2D2Kernel::operator()``           |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{A} \times \boldsymbol{\nabla}_{B}(ab|\frac{1}{r_{12}}|cd)`          | ``lible::ints::ERI4SOCKernel::operator()``          |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
+| :math:`\boldsymbol{\nabla}_{A} \times \boldsymbol{\nabla}_{B}(ab|\frac{1}{r_{12}}|c)`           | ``lible::ints::ERI3SOCKernel::operator()``          |
++-------------------------------------------------------------------------------------------------+-----------------------------------------------------+
 
 Main Interface
 --------------
@@ -192,7 +287,6 @@ i.e., the shells, can be constructed. This section provides an overview of the c
    Type representing a list of basis sets on atoms. Object of this type can be used to represent 
    the entire molecular basis set (main or auxiliary).
 
-
 .. cpp:struct:: lible::ints::Shell
 
    Structure representing an atomic orbital shell. Contains essential data for calculating 
@@ -250,9 +344,3 @@ i.e., the shells, can be constructed. This section provides an overview of the c
 
       Normalization coefficients of the Gaussian primitives.
   
-
-..   integrals_definitions 
-  
-   integrals_main_interface
-   integrals_tutorial
-   integrals_api
