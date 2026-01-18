@@ -83,17 +83,17 @@ The number of spherical harmonic atomic orbitals is given by :math:`N = 2l + 1`,
 The Cartesian Gaussian functions are ordered alphabetically by the Cartesian exponents. For the 
 first few angular momenta, :math:`l = 0-3`, the Cartesian exponents are given by:
 
-+-----------+--------------------------------------------------+
-| :math:`l` | Cartesian exponents                              |
-+===========+==================================================+
-| 0         | 1                                                |
-+-----------+--------------------------------------------------+
-| 1         | x, y, z                                          |
-+-----------+--------------------------------------------------+
-| 2         | xx, xy, xz, yy, yz, zz                           |
-+-----------+--------------------------------------------------+
-| 3         | xxx, xxy, xxz, xyy, xyz, xzz, yyy, yyz, yzz, zzz |
-+-----------+--------------------------------------------------+
++-----------+--------------------------------------------------------------------------------------------------------------+
+| :math:`l` | Cartesian exponents                                                                                          |
++===========+==============================================================================================================+
+| 0         | 1                                                                                                            |
++-----------+--------------------------------------------------------------------------------------------------------------+
+| 1         | (1, 0, 0), (0, 1, 0), (0, 0, 1)                                                                              |
++-----------+--------------------------------------------------------------------------------------------------------------+
+| 2         | (2, 0, 0), (1, 1, 0), (1, 0, 1), (0, 2, 0), (0, 1, 1), (0, 0, 2)                                             |
++-----------+--------------------------------------------------------------------------------------------------------------+
+| 3         | (3, 0, 0), (2, 1, 0), (2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 2), (0, 3, 0), (0, 2, 1), (0, 1, 2), (0, 0, 3) |
++-----------+--------------------------------------------------------------------------------------------------------------+
 
 To get the Cartesian exponents for arbitrary angular momentum, `l`, use 
 ``lible::ints::cartExps(int l)``. The total number of Cartesian exponents is given by, 
@@ -168,9 +168,9 @@ Main Interface
 --------------
 
 Assume that Lible is properly built/installed and linked against your code. To use the library for 
-calculating integrals, the main header ``#include <lible/ints/ints.hpp>`` has to be then included. 
+calculating integrals, include the main header ``#include <lible/ints/ints.hpp>`` in your source code. 
 This header file constitutes the main interface. The main interface contains inclusions of other 
-header files as well and may be illustrated diagrammatically:
+header files which may be illustrated diagrammatically:
 
 .. graphviz::
 
