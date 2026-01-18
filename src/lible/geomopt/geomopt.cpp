@@ -6,7 +6,6 @@
 #include <format>
 #include <map>
 #include <numbers>
-#include <set>
 #include <stdexcept>
 
 #include <armadillo>
@@ -410,10 +409,6 @@ lible::vecvec<double> lgopt::buildBMatrixDihedralAngles(const xyz_coords_t &xyz_
         double cos_v = std::cos(phi_v);
         double sin_u = std::sin(phi_u);
         double sin_v = std::sin(phi_v);
-        // double cos_u = dot(u, w);
-        // double sin_u = std::sqrt(1 - std::pow(cos_u, 2));
-        // double cos_v = -dot(v, w);
-        // double sin_v = std::sqrt(1 - std::pow(cos_v, 2));
         double sin2_u = sin_u * sin_u;
         double sin2_v = sin_v * sin_v;
         std::array<double, 3> u_x_w = cross(u, w);
@@ -570,7 +565,7 @@ lible::vecvec<double> lgopt::buildBMatrixBondAnglesFD(const double dx,
     return b_matrix_angles;
 }
 
-lible::vecvec<double> lgopt::buildBMatrixDihedralAnglesFD(double dx,
+lible::vecvec<double> lgopt::buildBMatrixDihedralAnglesFD(const double dx,
                                                           const xyz_coords_t &xyz_coords,
                                                           const RedIntCoords &red_int_coords)
 {
@@ -648,6 +643,69 @@ lible::vecvec<double> lgopt::buildBMatrixDihedralAnglesFD(double dx,
         }
 
         b_matrix_dihedrals[idihedral] = b_matrix_row;
+    }
+
+    return b_matrix_dihedrals;
+}
+
+lible::vecvec<double> lgopt::buildBMatrixBondLengthsHD(const xyz_coords_t &xyz_coords,
+                                                       const RedIntCoords &red_int_coords)
+{
+    size_t n_bond_lengths = red_int_coords.bond_lengths_.size();
+
+    vecvec<double> b_matrix_bonds(n_bond_lengths);
+    for (size_t ibond = 0; ibond < n_bond_lengths; ibond++)
+    {
+        const auto &[m, n, bond_length] = red_int_coords.bond_lengths_[ibond];
+
+        std::array<double, 6> derivs = bondLengthGradient(xyz_coords[m], xyz_coords[n]);
+
+        b_matrix_bonds[ibond] = {derivs[0], derivs[1], derivs[2], derivs[3], derivs[4], derivs[5]};
+    }
+
+    return b_matrix_bonds;
+}
+
+lible::vecvec<double> lgopt::buildBMatrixBondAnglesHD(const xyz_coords_t &xyz_coords,
+                                                      const RedIntCoords &red_int_coords)
+{
+    size_t n_bond_angles = red_int_coords.bond_angles_.size();
+
+    vecvec<double> b_matrix_bonds(n_bond_angles);
+    for (size_t iangle = 0; iangle < n_bond_angles; iangle++)
+    {
+        const auto &[m, o, n, bond_angle] = red_int_coords.bond_angles_[iangle];
+
+        std::array<double, 9> derivs = bondAngleGradient(xyz_coords[m], xyz_coords[o],
+                                                         xyz_coords[n]);
+
+        b_matrix_bonds[iangle] = {
+            derivs[0], derivs[1], derivs[2], derivs[3], derivs[4], derivs[5],
+            derivs[6], derivs[7], derivs[8]
+        };
+    }
+
+    return b_matrix_bonds;
+}
+
+lible::vecvec<double> lgopt::buildBMatrixDihedralAnglesHD(const xyz_coords_t &xyz_coords,
+                                                          const RedIntCoords &red_int_coords)
+{
+    size_t n_dihedral_angles = red_int_coords.dihedral_angles_.size();
+
+    vecvec<double> b_matrix_dihedrals(n_dihedral_angles);
+    for (size_t idihedral = 0; idihedral < n_dihedral_angles; idihedral++)
+    {
+        const auto &[m, o, p, n, dihedral_angle] = red_int_coords.dihedral_angles_[idihedral];
+
+        std::array<double, 12> derivs = dihedralAngleGradient(xyz_coords[m], xyz_coords[o],
+                                                              xyz_coords[p], xyz_coords[n]);
+
+        b_matrix_dihedrals[idihedral] = {
+            derivs[0], derivs[1], derivs[2], derivs[3], derivs[4],
+            derivs[5], derivs[6], derivs[7], derivs[8], derivs[9],
+            derivs[10], derivs[11]
+        };
     }
 
     return b_matrix_dihedrals;
@@ -822,7 +880,6 @@ lible::vec2d lgopt::buildKMatrixDihedralAngles(const std::vector<double> &grad_r
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
             {
-                // int j = i;
                 // First 6 terms.
                 double term1 = (u_x_w[i] * (w[j] * cos_u - u[j]) +
                                 u_x_w[j] * (w[i] * cos_u - u[i])) /
@@ -1107,7 +1164,6 @@ lible::vec2d lgopt::buildKMatrixDihedralAnglesFD(const double dx, const double d
             coords_n[0], coords_n[1], coords_n[2]
         };
 
-        std::array<size_t, 4> mopn{m, o, p, n};
         std::array<size_t, 4> ofs_mopn{ofs_m, ofs_o, ofs_p, ofs_n};
 
         for (int ia = 0; ia < 4; ia++)
@@ -1115,12 +1171,6 @@ lible::vec2d lgopt::buildKMatrixDihedralAnglesFD(const double dx, const double d
                 for (int i = 0; i < 3; i++)
                     for (int j = 0; j < 3; j++)
                     {
-                        // int j = i;
-                        size_t a = mopn[ia];
-                        size_t b = mopn[ib];
-
-                        printf("a = %zu, b = %zu\n", a, b);
-
                         std::array<double, 12> uu = coords_mopn;
                         std::array<double, 12> ud = coords_mopn;
                         std::array<double, 12> du = coords_mopn;
@@ -1166,13 +1216,102 @@ lible::vec2d lgopt::buildKMatrixDihedralAnglesFD(const double dx, const double d
                                         dihedralAngle(dd_m, dd_o, dd_p, dd_n)) /
                                        (4 * dx * dy);
 
-                        // printf("deriv = %16.12lf, grad_redint[idx] = %16.12lf\n",
-                        //        deriv, grad_redint[idx]);
-
                         size_t ofs_a = ofs_mopn[ia];
                         size_t ofs_b = ofs_mopn[ib];
                         k_matrix_dihedrals(ofs_a + i, ofs_b + j) += grad_redint[idx] * deriv;
                     }
+    }
+
+    return k_matrix_dihedrals;
+}
+
+lible::vec2d lgopt::buildKMatrixBondLengthsHD(const std::vector<double> &grad_redint,
+                                              const xyz_coords_t &xyz_coords,
+                                              const RedIntCoords &red_int_coords)
+{
+    size_t n_coords = 3 * xyz_coords.size();
+
+    vec2d k_matrix_bonds(Fill(0), n_coords, n_coords);
+    for (size_t ibond = 0; ibond < red_int_coords.bond_lengths_.size(); ibond++)
+    {
+        const auto &[m, n, bond_length] = red_int_coords.bond_lengths_[ibond];
+
+        size_t ofs_m = 3 * m;
+        size_t ofs_n = 3 * n;
+        std::array<size_t, 6> idxs{ofs_m, ofs_m + 1, ofs_m + 2, ofs_n, ofs_n + 1, ofs_n + 2};
+
+        size_t idx_grad = ibond;
+
+        arr2d<double, 6, 6> derivs = bondLengthHessian(xyz_coords[m], xyz_coords[n]);
+
+        for (int i = 0; i < 6; i++)
+            for (int j = 0; j < 6; j++)
+                k_matrix_bonds(idxs[i], idxs[j]) += derivs[i][j] * grad_redint[idx_grad];
+    }
+
+    return k_matrix_bonds;
+}
+
+lible::vec2d lgopt::buildKMatrixBondAnglesHD(const std::vector<double> &grad_redint,
+                                             const xyz_coords_t &xyz_coords,
+                                             const RedIntCoords &red_int_coords)
+{
+    size_t n_coords = 3 * xyz_coords.size();
+
+    vec2d k_matrix_bonds(Fill(0), n_coords, n_coords);
+    for (size_t iangle = 0; iangle < red_int_coords.bond_angles_.size(); iangle++)
+    {
+        const auto &[m, o, n, bond_angle] = red_int_coords.bond_angles_[iangle];
+
+        size_t ofs_m = 3 * m;
+        size_t ofs_o = 3 * o;
+        size_t ofs_n = 3 * n;
+        std::array<size_t, 9> idxs{
+            ofs_m, ofs_m + 1, ofs_m + 2, ofs_o, ofs_o + 1, ofs_o + 2,
+            ofs_n, ofs_n + 1, ofs_n + 2
+        };
+
+        size_t idx_grad = red_int_coords.bond_lengths_.size() + iangle;
+
+        arr2d<double, 9, 9> derivs = bondAngleHessian(xyz_coords[m], xyz_coords[o], xyz_coords[n]);
+
+        for (int i = 0; i < 9; i++)
+            for (int j = 0; j < 9; j++)
+                k_matrix_bonds(idxs[i], idxs[j]) += derivs[i][j] * grad_redint[idx_grad];
+    }
+
+    return k_matrix_bonds;
+}
+
+lible::vec2d lgopt::buildKMatrixDihedralAnglesHD(const std::vector<double> &grad_redint,
+                                                 const xyz_coords_t &xyz_coords,
+                                                 const RedIntCoords &red_int_coords)
+{
+    size_t n_coords = 3 * xyz_coords.size();
+
+    vec2d k_matrix_dihedrals(Fill(0), n_coords, n_coords);
+    for (size_t idihedral = 0; idihedral < red_int_coords.dihedral_angles_.size(); idihedral++)
+    {
+        const auto &[m, o, p, n, dihedral_angle] = red_int_coords.dihedral_angles_[idihedral];
+
+        size_t ofs_m = 3 * m;
+        size_t ofs_o = 3 * o;
+        size_t ofs_p = 3 * p;
+        size_t ofs_n = 3 * n;
+        std::array<size_t, 12> idxs{
+            ofs_m, ofs_m + 1, ofs_m + 2, ofs_o, ofs_o + 1, ofs_o + 2,
+            ofs_p, ofs_p + 1, ofs_p + 2, ofs_n, ofs_n + 1, ofs_n + 2
+        };
+
+        size_t idx_grad = red_int_coords.bond_lengths_.size() +
+                          red_int_coords.bond_angles_.size() + idihedral;
+
+        arr2d<double, 12, 12> derivs = dihedralAngleHessian(xyz_coords[m], xyz_coords[o],
+                                                            xyz_coords[p], xyz_coords[n]);
+
+        for (int i = 0; i < 12; i++)
+            for (int j = 0; j < 12; j++)
+                k_matrix_dihedrals(idxs[i], idxs[j]) += derivs[i][j] * grad_redint[idx_grad];
     }
 
     return k_matrix_dihedrals;

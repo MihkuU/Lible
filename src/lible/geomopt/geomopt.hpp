@@ -72,6 +72,8 @@ namespace lible::geomopt
     std::vector<DihedralAngle> dihedralAngles(const vecvec<size_t> &bonding_partners,
                                               const xyz_coords_t &xyz_coords);
 
+    // B-matrix
+
     // TODO: do this instead?
     struct BMatrix
     {
@@ -116,37 +118,63 @@ namespace lible::geomopt
     vecvec<double> buildBMatrixDihedralAnglesFD(double dx, const xyz_coords_t &xyz_coords,
                                                 const RedIntCoords &red_int_coords);
 
+    /// Calculates the B-matrix for bond lengths using hyper-dual numbers.
+    vecvec<double> buildBMatrixBondLengthsHD(const xyz_coords_t &xyz_coords,
+                                             const RedIntCoords &red_int_coords);
+
+    /// Calculates the B-matrix for bond angles using hyper-dual numbers.
+    vecvec<double> buildBMatrixBondAnglesHD(const xyz_coords_t &xyz_coords,
+                                            const RedIntCoords &red_int_coords);
+
+    /// Calculates the B-matrix for dihedral angles using hyper-dual numbers.
+    vecvec<double> buildBMatrixDihedralAnglesHD(const xyz_coords_t &xyz_coords,
+                                                const RedIntCoords &red_int_coords);
+
+    // K-matrix
+
     /// Constructs the K matrix defined in eq. (8) from https://doi.org/10.1063/1.1515483.
     vec2d buildKMatrix(const vecvec<double> &b_matrix, const std::vector<double> &grad_redint,
                        const xyz_coords_t &xyz_coords, const RedIntCoords &red_int_coords);
 
-    // TODO:
+
     vec2d buildKMatrixBondLengths(const std::vector<double> &grad_redint,
                                   const xyz_coords_t &xyz_coords,
                                   const RedIntCoords &red_int_coords);
 
-    // TODO:
+
     vec2d buildKMatrixBondAngles(const vecvec<double> &b_matrix,
                                  const std::vector<double> &grad_redint,
                                  const xyz_coords_t &xyz_coords,
                                  const RedIntCoords &red_int_coords);
 
-    // TODO:
+
     vec2d buildKMatrixDihedralAngles(const std::vector<double> &grad_redint,
                                      const xyz_coords_t &xyz_coords,
                                      const RedIntCoords &red_int_coords);
 
-    // TODO:
+
     vec2d buildKMatrixBondLengthsFD(double dx, double dy, const std::vector<double> &grad_redint,
                                     const xyz_coords_t &xyz_coords,
                                     const RedIntCoords &red_int_coords);
 
-    // TODO:
+
     vec2d buildKMatrixBondAnglesFD(double dx, double dy, const std::vector<double> &grad_redint,
                                    const xyz_coords_t &xyz_coords,
                                    const RedIntCoords &red_int_coords);
 
     vec2d buildKMatrixDihedralAnglesFD(double dx, double dy, const std::vector<double> &grad_redint,
+                                       const xyz_coords_t &xyz_coords,
+                                       const RedIntCoords &red_int_coords);
+
+    vec2d buildKMatrixBondLengthsHD(const std::vector<double> &grad_redint,
+                                    const xyz_coords_t &xyz_coords,
+                                    const RedIntCoords &red_int_coords);
+
+    vec2d buildKMatrixBondAnglesHD(const std::vector<double> &grad_redint,
+                                   const xyz_coords_t &xyz_coords,
+                                   const RedIntCoords &red_int_coords);
+
+    vec2d buildKMatrixDihedralAnglesHD(const std::vector<double> &grad_redint,
                                        const xyz_coords_t &xyz_coords,
                                        const RedIntCoords &red_int_coords);
 

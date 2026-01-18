@@ -18,19 +18,19 @@ Lible provides utilities to calculate molecular integrals over contracted Gaussi
 orbitals (GTAOs). A contracted GTAO can be written as 
 
 .. math::
-   G_{\mu} = N_{\mu} \sum^K_{i=1} d_{\mu,i} g_{\mu,i}
+   G^{lm}_{\mu} = N_{\mu} \sum^K_{i=1} d_{\mu,i} g^{lm}_{\mu,i}
 
-where :math:`g_{\mu,i}` denotes a primitive Gaussian basis function. The contraction depth is 
+where :math:`g^{lm}_{\mu,i}` denotes a primitive Gaussian basis function. The contraction depth is 
 denoted by :math:`K` and the contraction coefficients by :math:`d_{\mu,i}`. The normalization 
 coefficient :math:`N_{\mu}` is usually obtained from the overlap integral
 
 .. math::
-   (G_{\mu}|G_{\nu}) = (\mu|\nu) = \int^{\infty}_{-\infty}  (G_{\mu} G_{\nu}) d^3\mathbf{r}
+   (\mu|\nu) = \int^{\infty}_{-\infty}  (G^{lm}_{\mu} G^{lm}_{\nu}) d^3\mathbf{r}
    \; \Rightarrow \; N_{\mu} = 1.0 / \sqrt{(\mu|\mu)}
 
 The primitive Gaussian basis functions are normalized, and depend on the orbital angular momentum
 :math:`l` and its projection, :math:`m_l = -l, -l + 1, \ldots, l`. Omitting here the 
-:math:`\mu`-label, the primitive Gaussian basis function can be written as 
+:math:`\mu`-label, a primitive Gaussian basis function can be written as 
 
 .. math::
    g^{lm}_{i}(\mathbf{r}, \mathbf{a}, \mathbf{A}) = N_{l} (a_i) S_{lm} (\mathbf{r}, \mathbf{A})
@@ -51,16 +51,19 @@ The quantities in this expression are defined as:
    N_{l}(a_i) = \sqrt{\frac{(2a_i/\pi)^{3/2}(4a_i)^l}{(2l - 1)!!}}
 
 6. :math:`S_{lm} (\mathbf{A})` -- a real-valued solic harmonic. The explicit expressions for these 
-   shall be not given here. However, what is important is that the solid harmonics can be expressed 
-   in terms of Cartesian directions through the transformation :math:`t_{lm;ijk}`,
+   shall not be given here. Essentially, the solid harmonics can be expressed in terms of Cartesian 
+   directions through the transformation :math:`t_{lm;ijk}`,
 
-.. math::
-   S_{lm} = \sum_{ijk} t_{lm,ijk} x_A^i y_A^j z_A^k 
+   .. math::
+      S_{lm} = \sum_{ijk} t_{lm,ijk} x_A^i y_A^j z_A^k 
+   
+   where transformation coefficients are given by given by eq. (9.1.9) in 
+   `"Molecular Electronic-Structure Theory" <https://onlinelibrary.wiley.com/doi/book/10.1002/9781119019572>`__.
 
-This transformation is accessible from the library via the function ``lible::ints::sphericalTrafo``
-which returns the transformation coefficients up to :math:`l=9`. Lible follows a convention where 
-the spherical atomic orbitals are ordered *alternatingly* by the :math:`m_l` quantum number. The 
-orbitals are order
+The Cartesian to spherical transformation is accessible from the library via the function 
+``lible::ints::sphericalTrafo`` which returns the transformation coefficients up to :math:`l=9`. 
+Lible follows a convention where the spherical atomic orbitals are ordered *alternatingly* by the 
+:math:`m_l` quantum number, as in the table:
 
 +---+---------------------+
 | l | :math:`m_l`         | 
@@ -73,6 +76,9 @@ orbitals are order
 +---+---------------------+
 | 3 | 0, 1,-1, 2,-2, 3,-3 |
 +---+---------------------+
+
+The number of spherical harmonic atomic orbitals is given by :math:`N = 2l + 1`,
+``lible::ints::numSphericals(int l)``.
 
 The Cartesian Gaussian functions are ordered alphabetically by the Cartesian exponents. For the 
 first few angular momenta, :math:`l = 0-3`, the Cartesian exponents are given by:
