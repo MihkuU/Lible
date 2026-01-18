@@ -11,6 +11,7 @@ import sys
 import os
 import subprocess
 import breathe
+import graphviz
 
 project = 'Lible'
 copyright = '2024, MihkuU'
