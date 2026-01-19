@@ -1591,9 +1591,12 @@ std::array<lible::vec2d, 3> lints::angularMomentum(const std::array<double, 3> &
                     for (size_t nu = 0; nu < ints_ipair[0].dim<1>(); nu++)
                         for (int icart = 0; icart < 3; icart++)
                         {
-                            ints[icart](ofs_a + mu, ofs_b + nu) = ints_ipair[icart](mu, nu);
+                            size_t i = ofs_a + mu;
+                            size_t j = ofs_b + nu;
+                            ints[icart](i, j) = ints_ipair[icart](mu, nu);
                             // derivative integrals are antisymmetric
-                            ints[icart](ofs_b + nu, ofs_a + mu) = (-1) * ints_ipair[icart](mu, nu);
+                            if (i != j)
+                                ints[icart](j, i) = (-1) * ints_ipair[icart](mu, nu);
                         }
             }
         }

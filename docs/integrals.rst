@@ -252,8 +252,8 @@ Basis and Shells
 
 The information content of the previous diagrams is a simplicistic representation of what happens 
 in quantum chemical calculations and more specifically, in calculating integrals which is a central
-task in the former. Having chosen a molecular geometry and a basis set, the basic building blocks, 
-i.e., the shells, can be constructed. This section provides an overview of the contents in 
+task. Having chosen a molecular geometry and a basis set, the basic building blocks, i.e., the 
+shells, can be constructed. This section provides an overview of the contents in 
 ``<lible/ints/shell.hpp>``.
 
 .. cpp:struct:: lible::ints::BasisShell
