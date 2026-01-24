@@ -290,7 +290,7 @@ namespace lible::ints
     /// has the length `n + 1`. At `x = 0`, the function uses eq. (9.8.6) from
     /// https://doi.org/10.1007/s10008-001-0256-1. At large x values of above 30, eq. (9.8.13)
     /// gets used, omitting the exponential terms. At values between 0 and 30, first, eq. (9.8.12)
-    /// is used with seven evaluations and then, the downward recursion from 9.8.14 is used.
+    /// is used with seven evaluations, and then, the downward recursion from 9.8.14 is used.
     std::vector<double> calcBoysF(int n, double x, const BoysGrid &boys_grid);
 
     // /** TODO: */

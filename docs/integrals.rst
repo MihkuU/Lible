@@ -1,3 +1,4 @@
+.. _Calculation-of-molecular-integrals:
 
 Integrals
 =========
@@ -6,7 +7,7 @@ The integrals module (namespace ``lible::ints``) provides utilities to calculate
 integrals over Gaussian-type basis functions. The implementation is based on the 
 `McMurchie-Davidson scheme <https://doi.org/10.1016/0021-9991(78)90092-X>`__; calculation of the 
 two-electron integrals makes use of the `SHARK algorithm <https://doi.org/10.1002/jcc.26942>`__. 
-Some of the notations and conventions here might bear a close resemblance to what is written in the 
+Some of the notations and conventions here might bear a close resemblance to what is in the 
 `"Molecular Electronic-Structure Theory" <https://onlinelibrary.wiley.com/doi/book/10.1002/9781119019572>`__.
 This book served as the main reference in implementing the library. In order to use the library, 
 include the main header ``<lible/ints/ints.hpp>`` in your source code.
@@ -28,9 +29,10 @@ coefficient :math:`N_{\mu}` is usually obtained from the overlap integral
    (\mu|\nu) = \int^{\infty}_{-\infty}  (G^{lm}_{\mu} G^{lm}_{\nu}) d^3\mathbf{r}
    \; \Rightarrow \; N_{\mu} = 1.0 / \sqrt{(\mu|\mu)}
 
-The primitive Gaussian basis functions are normalized, and depend on the orbital angular momentum
-:math:`l` and its projection, :math:`m_l = -l, -l + 1, \ldots, l`. Omitting here the 
-:math:`\mu`-label, a primitive Gaussian basis function can be written as 
+The function ``lible::ints::calcShellNorms`` may be used for that purpose. The primitive Gaussian 
+basis functions are normalized, and depend on the orbital angular momentum :math:`l` and its 
+projection, :math:`m_l = -l, -l + 1, \ldots, l`. Omitting here the :math:`\mu`-label, a primitive 
+Gaussian basis function can be written as 
 
 .. math::
    g^{lm}_{i}(\mathbf{r}, \mathbf{a}, \mathbf{A}) = N_{l} (a_i) S_{lm} (\mathbf{r}, \mathbf{A})
@@ -44,8 +46,8 @@ The quantities in this expression are defined as:
 
 3. :math:`\mathbf{r}_A = (x - A_x, y - A_y, z - A_z)`.
 4. :math:`\mathbf{a} = (a_1,\ldots,a_K)` -- list of Gaussian primitive exponents.   
-5. :math:`N_{l} (a_i)` -- pure (harmonic) Gaussian primitive normalization coefficient that can be 
-   calculated analytically from
+5. :math:`N_{l} (a_i)` -- pure (harmonic) Gaussian primitive normalization coefficient, 
+   ``lible::ints::purePrimitiveNorm``, that is calculated analytically from
 
 .. math::
    N_{l}(a_i) = \sqrt{\frac{(2a_i/\pi)^{3/2}(4a_i)^l}{(2l - 1)!!}}
@@ -58,7 +60,7 @@ The quantities in this expression are defined as:
       S_{lm} = \sum_{ijk} t_{lm,ijk} x_A^i y_A^j z_A^k 
    
    where transformation coefficients are given by given by eq. (9.1.9) in 
-   `"Molecular Electronic-Structure Theory" <https://onlinelibrary.wiley.com/doi/book/10.1002/9781119019572>`__.
+   `"Molecular Electronic-Structure Theory" <https://onlinelibrary.wiley.com/doi/book/10.1002/9781119019572>`__.   
 
 The Cartesian to spherical transformation is accessible from the library via the function 
 ``lible::ints::sphericalTrafo`` which returns the transformation coefficients up to :math:`l=9`. 
@@ -78,7 +80,7 @@ Lible follows a convention where the spherical atomic orbitals are ordered *alte
 +---+---------------------+
 
 The number of spherical harmonic atomic orbitals is given by :math:`N = 2l + 1`,
-``lible::ints::numSphericals(int l)``.
+``lible::ints::numSphericals``.
 
 The Cartesian Gaussian functions are ordered alphabetically by the Cartesian exponents. For the 
 first few angular momenta, :math:`l = 0-3`, the Cartesian exponents are given by:
@@ -95,9 +97,9 @@ first few angular momenta, :math:`l = 0-3`, the Cartesian exponents are given by
 | 3         | (3, 0, 0), (2, 1, 0), (2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 2), (0, 3, 0), (0, 2, 1), (0, 1, 2), (0, 0, 3) |
 +-----------+--------------------------------------------------------------------------------------------------------------+
 
-To get the Cartesian exponents for arbitrary angular momentum, `l`, use 
-``lible::ints::cartExps(int l)``. The total number of Cartesian exponents is given by, 
-:math:`N = (l + 1)(l + 2) / 2`, ``lible::ints::numCartesians(int l)``.
+To get the Cartesian exponents for arbitrary angular momentum, `l`, use ``lible::ints::cartExps``. 
+The total number of Cartesian exponents is given by :math:`N = (l + 1)(l + 2) / 2`, 
+``lible::ints::numCartesians``.
 
 
 Available integral kernels
