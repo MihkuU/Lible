@@ -1,11 +1,14 @@
 #pragma once
 
-#include <lible/geomopt/geomopt.hpp>
+#include <lible/types.hpp>
 
 #include <array>
 
 namespace lible::geomopt
 {
+    /// Tolerance used for judging various things: vector zero length, vector parallelity, etc.
+    constexpr double tolerance = 1e-10;
+
     using std::size_t;
 
     /// Test for whether the vectors are parallel.
@@ -88,58 +91,61 @@ namespace lible::geomopt
     /// Type alias for a 3-element array of hyper-dual numbers.
     using hd3_t = std::array<HyperDual, 3>;
 
-    ///
+    /// Calculates the norm of a 3-array of hyper-dual numbers.
     HyperDual norm(const hd3_t &u);
 
-    ///
+    /// Calculates the product of a 3-array of hyper-dual numbers.
     HyperDual dot(const hd3_t &u, const hd3_t &v);
 
-    ///
+    /// Calculates the cross-product of two 3-arrays of hyper-dual numbers.
     hd3_t cross(const hd3_t &u, const hd3_t &v);
 
-    ///
+    /// Subtracts two 3-arrays of hyper-dual numbers.
     hd3_t operator-(const hd3_t &u, const hd3_t &v);
 
-    ///
+    /// Divides the 3-array of hyper-dual numbers with another hyper-dual number, `x`.
     hd3_t operator/(const hd3_t &u, const HyperDual &x);
 
-    ///
+    /// Calculates the bond length with hyper-dual numbers. Based on FIG 1 from
+    /// https://doi.org/10.1063/1.1515483.
     HyperDual bondLengthHD(const hd3_t &xyz_m, const hd3_t &xyz_n);
 
-    ///
+    /// Calculates the bond angle with hyper-dual numbers. Using eq. (23) from
+    /// https://doi.org/10.1063/1.1515483.
     HyperDual bondAngleHD(const hd3_t &xyz_m, const hd3_t &xyz_o, const hd3_t &xyz_n);
 
-    ///
+    /// Calculates the dihedral angle with hyper-dual numbers. Using eq. (31) from
+    /// https://doi.org/10.1063/1.1515483.
     HyperDual dihedralAngleHD(const hd3_t &xyz_m, const hd3_t &xyz_o, const hd3_t &xyz_p,
                               const hd3_t &xyz_n);
 
-    ///
-    std::array<double, 6> bondLengthGradient(const std::array<double, 3> &xyz_m,
-                                             const std::array<double, 3> &xyz_n);
+    /// Calculates the first derivatives of a bond length using hyper-dual numbers.
+    std::array<double, 6> bondLengthGradientHD(const std::array<double, 3> &xyz_m,
+                                               const std::array<double, 3> &xyz_n);
 
-    ///
-    std::array<double, 9> bondAngleGradient(const std::array<double, 3> &xyz_m,
-                                            const std::array<double, 3> &xyz_o,
+    /// Calculates the first derivatives of a bond angle using hyper-dual numbers.
+    std::array<double, 9> bondAngleGradientHD(const std::array<double, 3> &xyz_m,
+                                              const std::array<double, 3> &xyz_o,
+                                              const std::array<double, 3> &xyz_n);
+
+    /// Calculates the first derivatives of a dihedral angle using hyper-dual numbers.
+    std::array<double, 12> dihedralAngleGradientHD(const std::array<double, 3> &xyz_m,
+                                                   const std::array<double, 3> &xyz_o,
+                                                   const std::array<double, 3> &xyz_p,
+                                                   const std::array<double, 3> &xyz_n);
+
+    /// Calculates the second derivatives of a bond length using hyper-dual numbers.
+    arr2d<double, 6, 6> bondLengthHessianHD(const std::array<double, 3> &xyz_m,
                                             const std::array<double, 3> &xyz_n);
 
-    ///
-    std::array<double, 12> dihedralAngleGradient(const std::array<double, 3> &xyz_m,
+    /// Calculates the second derivatives of a bond angle using hyper-dual numbers.
+    arr2d<double, 9, 9> bondAngleHessianHD(const std::array<double, 3> &xyz_m,
+                                           const std::array<double, 3> &xyz_o,
+                                           const std::array<double, 3> &xyz_n);
+
+    /// Calculates the second derivatives of a dihedral angle using hyper-dual numbers.
+    arr2d<double, 12, 12> dihedralAngleHessianHD(const std::array<double, 3> &xyz_m,
                                                  const std::array<double, 3> &xyz_o,
                                                  const std::array<double, 3> &xyz_p,
                                                  const std::array<double, 3> &xyz_n);
-
-    ///
-    arr2d<double, 6, 6> bondLengthHessian(const std::array<double, 3> &xyz_m,
-                                          const std::array<double, 3> &xyz_n);
-
-    ///
-    arr2d<double, 9, 9> bondAngleHessian(const std::array<double, 3> &xyz_m,
-                                         const std::array<double, 3> &xyz_o,
-                                         const std::array<double, 3> &xyz_n);
-
-    ///
-    arr2d<double, 12, 12> dihedralAngleHessian(const std::array<double, 3> &xyz_m,
-                                               const std::array<double, 3> &xyz_o,
-                                               const std::array<double, 3> &xyz_p,
-                                               const std::array<double, 3> &xyz_n);
 }
