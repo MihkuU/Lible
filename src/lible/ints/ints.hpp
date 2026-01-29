@@ -196,6 +196,9 @@ namespace lible::ints
     /// and val is the value of the transformation coefficient.
     std::vector<std::tuple<int, int, double>> sphericalTrafo(int l);
 
+    /// Transforms the input Cartesian basis integrals to the spherical basis.
+    vec2d trafo2Spherical(int la, int lb, const vec2d &ints_cart);
+
     /// Constructs the shells from the given basis and coordinates of the atoms (a.u.).
     std::vector<Shell> constructShells(const basis_atoms_t &basis_atoms,
                                        const std::vector<std::array<double, 3>> &coords_atoms);

@@ -1,7 +1,3 @@
-
-.. |br| raw:: html
-
-   <br />
    
 =====
 Lible
@@ -14,7 +10,7 @@ of custom types and thin-grained functions and aims to cover various concepts in
 * :ref:`Calculation-of-molecular-integrals`
 * Geometry optimization
 * Spin adaptation
-* Linear algebra solvers
+* :ref:`Linear-algebra-solvers`
 * Formula derivation
 * etc.
 
@@ -26,3 +22,4 @@ a separate programming interface, or *namespace*, to be specific.
    :maxdepth: 1
 
    integrals
+   solvers

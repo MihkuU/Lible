@@ -11,9 +11,9 @@ namespace lible::solver
     struct CGSettings
     {
         /// Maximum number of iterations.
-        size_t max_iter_ = 100;
+        size_t max_iter_{100};
         /// Maximum absolute value of the residual to signal convergence.
-        double conv_tol_ = 1e-6;
+        double conv_tol_{1e-6};
     };
 
     /// Results returned by the conjugate and preconditioned conjugate gradient (CG and PCG) solver.
@@ -37,7 +37,8 @@ namespace lible::solver
     using pcg_preconditioner_t = std::function<std::vector<double>(
         const std::vector<double> &residual)>;
 
-    /// Runs the conjugate gradient method. Based on Section 2.7.6 from "Numerical Recipes 3rd. ed."
+    /// Runs the conjugate gradient (CG) method. Based on Section 2.7.6 from
+    /// "Numerical Recipes 3rd. ed."
     CGResults conjugateGradient(const std::vector<double> &guess, const std::vector<double> &rhs,
                                 const cg_sigma_t &calc_sigma,
                                 const CGSettings &settings = CGSettings());

@@ -146,10 +146,6 @@ lgopt::HyperDual lgopt::acos(const HyperDual &a)
         std::acos(a0), -a1 / std::sqrt(1 - a0 * a0), -a2 / std::sqrt(1 - a0 * a0),
         -(a12 / std::sqrt(1 - a0 * a0) + a0 * a1 * a2 / std::pow(1 - a0 * a0, 1.5)) // Gambled it right lul
     };
-    // return {
-    //     std::acos(a0), -a1 / std::sqrt(1 - a0 * a0), -a2 / std::sqrt(1 - a0 * a0),
-    //     -a0 * a1 * a2 / std::pow(1 - a0 * a0, 1.5)
-    // };
 }
 
 lgopt::HyperDual lgopt::norm(const hd3_t &u)

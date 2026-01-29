@@ -60,6 +60,7 @@ add_custom_command(OUTPUT ${sphinx_index_file}
 	DEPENDS
 		${CMAKE_CURRENT_SOURCE_DIR}/index.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals.rst
+		${CMAKE_CURRENT_SOURCE_DIR}/solvers.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_api.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_main_interface.rst
 		${CMAKE_CURRENT_SOURCE_DIR}/integrals_definitions.rst

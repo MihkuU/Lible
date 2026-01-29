@@ -199,25 +199,21 @@ namespace lible::geomopt
                                   const xyz_coords_t &xyz_coords,
                                   const RedIntCoords &red_int_coords);
 
-
     /// Constructs the K matrix for bond angles using eq. (27) from
     /// https://doi.org/10.1063/1.1515483.
     vec2d buildKMatrixBondAngles(const BMatrix &b_matrix, const std::vector<double> &grad_redint,
                                  const xyz_coords_t &xyz_coords,
                                  const RedIntCoords &red_int_coords);
 
-
     /// Constructs the K matrix for dihedral angles using hyper-dual numbers.
     vec2d buildKMatrixDihedralAngles(const std::vector<double> &grad_redint,
                                      const xyz_coords_t &xyz_coords,
                                      const RedIntCoords &red_int_coords);
 
-
     /// Constructs the K matrix for bond lengths using finite differences.
     vec2d buildKMatrixBondLengthsFD(double dx, double dy, const std::vector<double> &grad_redint,
                                     const xyz_coords_t &xyz_coords,
                                     const RedIntCoords &red_int_coords);
-
 
     /// Constructs the K matrix for bond angles using finite differences.
     vec2d buildKMatrixBondAnglesFD(double dx, double dy, const std::vector<double> &grad_redint,

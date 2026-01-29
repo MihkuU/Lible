@@ -59,7 +59,7 @@ The quantities in this expression are defined as:
    .. math::
       S_{lm} = \sum_{ijk} t_{lm,ijk} x_A^i y_A^j z_A^k 
    
-   where transformation coefficients are given by given by eq. (9.1.9) in 
+   where the transformation coefficients are given by given by eq. (9.1.9) in 
    `"Molecular Electronic-Structure Theory" <https://onlinelibrary.wiley.com/doi/book/10.1002/9781119019572>`__.   
 
 The Cartesian to spherical transformation is accessible from the library via the function 
@@ -169,85 +169,42 @@ basis. The available integral kernels are summarized in the table below:
 Main Interface
 --------------
 
-Assume that Lible is properly built/installed and linked against your code. To use the library for 
-calculating integrals, include the main header ``#include <lible/ints/ints.hpp>`` in your source code. 
-This header file constitutes the main interface. The main interface contains inclusions of other 
-header files which may be illustrated diagrammatically:
+The integral kernels may be used separately with arbitrarily set up data. In general, however, 
+integral calculation in a quantum chemistry programs involves choosing a molecular geometry 
+and a basis set. From this data, shells (``lible::ints::Shell``) can be constructed that contain 
+all the information required for calculating the integrals. In Lible, the shells are processed 
+further to create a special data structure called the *shell pair data* (``lible::ints::ShellPairData``).
+Hence, most of the kernel calls involve the shell pair data and require specifying a pair of shells 
+with an index. This process may summarized graphically:
 
-.. graphviz::
+.. figure:: path2.png   
 
-   digraph {
-      rankdir="LR";
-      graph [fontname="Verdana", fontsize="12"];
-      node [fontname="Verdana", fontsize="12"];
-      edge [fontname="Sans", fontsize="9"];
+It should be noted here, that sometimes, the shells are transformed into the so-called *shell data*
+(``lible::ints::ShellData``) data structure. This data structure is used for calculating integrals 
+such as :math:`(\mu\nu|P)`.
 
-      vectormd [label="<lible/vectormd.hpp>"]
-      types [label="<lible/types.hpp>"]
-      ints [label="<lible/ints/ints.hpp>"]
-      shell [label="<lible/ints/shell.hpp>"]
-      spdata [label="<lible/ints/shell_pair_data.hpp>"]
-      boysfun [label="<lible/ints/boys_function.hpp>"]
-      utils [label="<lible/ints/utils.hpp>"]
-      structure [label="<lible/ints/structure.hpp>"]
-      erikernels [label="<lible/ints/eri_kernels.hpp>"]
+For convenience, it is possible to calculate some integrals without utilizing the shell pair data.
+Lible provides a special data structure that records all the information about geometry, basis sets 
+and shells for that purpose: ``lible::ints::Structure``. Using ``lible::ints::Structure``, integrals
+can be calculated directly such that the management of shell pair data is done in the backend. 
+Graphically this looks as follows: 
 
-      vectormd -> types 
-      types -> ints 
-      shell -> spdata
-      spdata -> ints
-      boysfun -> ints
-      utils -> ints
-      structure -> ints
-      erikernels -> ints
-   }
+.. figure:: path3.png   
 
-Below are is described the programming utilities from these files. But before that, another diagram 
-is useful for a conceptual understanding of how to calculate integrals with Lible:
+This approach can be preferable for testing and prototyping. For large scale implementation, the 
+previous scheme is probably preferable. For example, the function ``lible::ints::eri4`` calculates 
+all of the four-center two-electron integrals. With large systems, the returned data would become 
+too large to be stored in memory. 
+   
+Let us assume that Lible is properly built/installed and linked against your code. To use the 
+library for calculating integrals, include the main header ``#include <lible/ints/ints.hpp>`` in 
+your source code. This header file constitutes the main interface. The main interface contains 
+inclusions of other Lible header files which may be illustrated diagrammatically:
 
-.. graphviz::
+.. figure:: path1.png   
 
-   digraph {
-      rankdir="LR"
-      graph [fontname="Verdana", fontsize="12"];
-      node [fontname="Verdana", fontsize="12"];
-      edge [fontname="Sans", fontsize="9"];
-
-      geom
-      basisset
-      shells
-      spdata
-      integrals
-      
-      geom -> shells
-      basisset -> shells
-      shells -> spdata
-      spdata -> integrals
-   }
-
-A simplified path to calculating integrals, that hides dealing with shells and the shell pair data,
-is via the structure object:
-
-.. graphviz::
-
-   digraph {
-      rankdir="LR"
-      graph [fontname="Verdana", fontsize="12"];
-      node [fontname="Verdana", fontsize="12"];
-      edge [fontname="Sans", fontsize="9"];
-
-      geom
-      basisset
-      structure
-      integrals 
-     
-      geom -> structure
-      basisset -> structure
-      structure -> integrals
-   }
-
-For prototyping and simple usage this scheme is to be preferrer. For more control and large scale 
-application, the previous scheme is the way to go.
+In the following we shall expose the contents of these header files and provide small usage 
+examples of the provided utilities.
 
 Basis and Shells
 ~~~~~~~~~~~~~~~~
@@ -262,15 +219,15 @@ shells, can be constructed. This section provides an overview of the contents in
    
    Structure representing the basis set of a specific atomic orbital shell.
 
-   .. cpp:var:: int l_; 
+   .. cpp:var:: int l_
 
       Angular momentum of the shell.
 
-   .. cpp:var:: std::vector<double> exps_;
+   .. cpp:var:: std::vector<double> exps_
 
       Gaussian primitive exponents. 
 
-   .. cpp:var:: std::vector<double> coeffs_;
+   .. cpp:var:: std::vector<double> coeffs_
 
       Contraction coefficients of the Gaussian primitives.      
 
@@ -282,11 +239,11 @@ shells, can be constructed. This section provides an overview of the contents in
 
    Structure representing the basis set on a specific atom.
 
-   .. cpp:var:: int atomic_nr_; 
+   .. cpp:var:: int atomic_nr_
 
       Atomic number of the atom.
 
-   .. cpp:var:: basis_shells_t basis_shells_;
+   .. cpp:var:: basis_shells_t basis_shells_
 
       List of shell basis sets on the atom.
 
@@ -300,55 +257,55 @@ shells, can be constructed. This section provides an overview of the contents in
    Structure representing an atomic orbital shell. Contains essential data for calculating 
    integrals. rambleramble.
 
-   .. cpp:var:: int l_; 
+   .. cpp:var:: int l_
 
       Angular momentum of the shell.
 
-   .. cpp:var:: int z_;
+   .. cpp:var:: int z_
       
       Atomic number of the shell's atom.
 
-   .. cpp:var:: size_t dim_cart_;
+   .. cpp:var:: size_t dim_cart_
 
       Number of Cartesian atomic orbitals.
 
-   .. cpp:var:: size_t dim_sph_;
+   .. cpp:var:: size_t dim_sph_
 
       Number of spherical atomic orbitals.
 
-   .. cpp:var:: size_t ofs_cart_;
+   .. cpp:var:: size_t ofs_cart_
 
       Starting position of the current shell's Cartesian atomic orbitals in the list of all AOs.
 
-   .. cpp:var:: size_t ofs_sph_;
+   .. cpp:var:: size_t ofs_sph_
 
       Starting position of the current shell's spherical atomic orbitals in the list of all AOs.
 
-   .. cpp:var:: size_t idx_;
+   .. cpp:var:: size_t idx_
 
       Index of the current shell in the list of all shells.
 
-   .. cpp:var:: size_t idx_atom_;
+   .. cpp:var:: size_t idx_atom_
 
       Index of the current shell's atom in the list of all atoms.
 
-   .. cpp:var:: std::array<double, 3> xyz_coords_;
+   .. cpp:var:: std::array<double, 3> xyz_coords_
 
       Cartesian coordinates of the shell's atom.
 
-   .. cpp:var:: std::vector<double> exps_;
+   .. cpp:var:: std::vector<double> exps_
 
       Gaussian primitive exponents.
 
-   .. cpp:var:: std::vector<double> coeffs_;
+   .. cpp:var:: std::vector<double> coeffs_
 
       Contraction coefficients of the Gaussian primitives.      
 
-   .. cpp:var:: std::vector<double> norms_;
+   .. cpp:var:: std::vector<double> norms_
 
       Normalization coefficients of the spherical atomic orbitals.
 
-   .. cpp:var:: std::vector<double> norms_prim_;
+   .. cpp:var:: std::vector<double> norms_prim_
 
       Normalization coefficients of the Gaussian primitives.
   
