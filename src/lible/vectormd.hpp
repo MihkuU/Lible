@@ -32,7 +32,7 @@ namespace lible
         /// Default constructor.
         VectorMD() = default;
 
-        /// Constructor for initializing a multidimensional array with a given set of dimensions
+        /// Constructor for initializing a multidimensional array with given dimensions
         /// (dim1, dim2, ...). The length of the list must equal the dimension of the array.
         template <std::integral... Args,
             typename = std::enable_if_t<sizeof...(Args) == N>>
@@ -44,11 +44,11 @@ namespace lible
         }
 
         /// Constructor for initializing a multidimensional array with a given initial value,
-        /// Fill(init_val), and a set of dimensions (dim1, dim2, ...). The length of the list must
+        /// Fill(init_val), and dimensions (dim1, dim2, ...). The length of the list must
         /// equal the dimension of the array.
         template <typename U, std::integral... Args,
             typename = std::enable_if_t<sizeof...(Args) == N>>
-        explicit VectorMD(Fill<U> init_val, Args... dims)
+        explicit VectorMD(const Fill<U> init_val, Args... dims)
             : VectorMD(dims...)
         {
             std::fill(data_.begin(), data_.end(), init_val.val_);
@@ -63,7 +63,7 @@ namespace lible
         /// Constructor for initializing a multidimensional array with a given initial value,
         /// Fill(init_val), and all equal dimensions.
         template <typename U>
-        VectorMD(Fill<U> init_val, std::size_t dim)
+        VectorMD(const Fill<U> init_val, const std::size_t dim)
             : VectorMD(dim)
         {
             std::fill(data_.begin(), data_.end(), init_val.val_);
@@ -87,13 +87,13 @@ namespace lible
         }
 
         /// Constant `begin` iterator.
-        std::vector<T>::const_iterator begin() const
+        std::vector<T>::iterator begin()
         {
             return data_.begin();
         }
 
         /// Constant `end` iterator.
-        std::vector<T>::const_iterator end() const
+        std::vector<T>::iterator end()
         {
             return data_.end();
         }
@@ -130,7 +130,7 @@ namespace lible
         }
 
         /// Resizes the dimensions (all equal) and underlying data.
-        void resize(std::size_t dim)
+        void resize(const std::size_t dim)
         {
             for (std::size_t i = 0; i < N; i++)
                 dimensions_[i] = dim;

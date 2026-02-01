@@ -12,7 +12,7 @@ of custom types and thin-grained functions and aims to cover various concepts in
 * Spin adaptation
 * :ref:`Linear-algebra-solvers`
 * Formula derivation
-* etc.
+* :ref:`Types`
 
 Therefore, Lible is designed in a modular manner, where each of these topics comes with a
 a separate programming interface, or *namespace*, to be specific. 
@@ -23,3 +23,4 @@ a separate programming interface, or *namespace*, to be specific.
 
    integrals
    solvers
+   types

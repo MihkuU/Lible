@@ -89,8 +89,8 @@ lints::constructShells(const basis_atoms_t &basis_atoms,
                        const std::vector<std::array<double, 3>> &coords_atoms)
 {
     if (basis_atoms.size() != coords_atoms.size())
-        throw std::runtime_error("constructShells(): number of atoms in the basis set and the list "
-            "of coordinates doesn't match");
+        throw std::runtime_error("constructShells(): number of atoms in the basis set and the in "
+            "list of coordinates doesn't match");
 
     size_t idx_shell = 0;
     size_t ofs_sph = 0;
