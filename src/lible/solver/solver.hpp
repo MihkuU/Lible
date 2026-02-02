@@ -37,6 +37,7 @@ namespace lible::solver
     using pcg_preconditioner_t = std::function<std::vector<double>(
         const std::vector<double> &residual)>;
 
+    // TODO: cite matrix computations by Golub here instead.
     /// Runs the conjugate gradient (CG) method. Based on Section 2.7.6 from
     /// "Numerical Recipes 3rd. ed."
     CGResults conjugateGradient(const std::vector<double> &guess, const std::vector<double> &rhs,

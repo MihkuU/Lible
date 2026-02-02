@@ -9,16 +9,18 @@ namespace lible::geomopt
     /// Type alias for a list of xyz-coordinates.
     using xyz_coords_t = std::vector<std::array<double, 3>>;
 
-    /// Structure representing the bond length coordinate between atoms m_ and n_.
-    struct BondLength
+    /// Structure representing the bond length coordinate between atoms m and n. See FIG. 1 in
+    /// https://doi.org/10.1063/1.1515483.
+    struct BondLength // TODO: rename to bond?
     {
         size_t m_;
         size_t n_;
         double val_;
     };
 
-    /// Structure representing the bond angle coordinate between atoms m_, o_, n_.
-    struct BondAngle
+    /// Structure representing the bond angle coordinate between atoms m, o, n. See FIG. 2 in
+    /// https://doi.org/10.1063/1.1515483.
+    struct BondAngle // TODO: rename to angle?
     {
         size_t m_;
         size_t o_;
@@ -26,8 +28,9 @@ namespace lible::geomopt
         double val_;
     };
 
-    /// Structure representing the dihedral angle coordinate between atoms m_, o_, p_ and n_.
-    struct DihedralAngle
+    /// Structure representing the dihedral angle coordinate between atoms m, o, p and n. See
+    /// FIG. 3 in https://doi.org/10.1063/1.1515483.
+    struct DihedralAngle // TODO: rename to Dihedral?
     {
         size_t m_;
         size_t o_;
@@ -65,11 +68,11 @@ namespace lible::geomopt
     double bondAngle(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_o,
                      const std::array<double, 3> &xyz_n);
 
+    // TODO: contains an angle error?
     /// Calculates a dihedral angle formed by four atoms. Using eq. (31) from
     /// https://doi.org/10.1063/1.1515483.
     double dihedralAngle(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_o,
-                         const std::array<double, 3> &xyz_p,
-                         const std::array<double, 3> &xyz_n); // TODO: contains an angle error?
+                         const std::array<double, 3> &xyz_p, const std::array<double, 3> &xyz_n);
 
     /// Constructs and returns a list of bond length coordinates. Expects coordinates in Bohr
     /// (a.u.).
@@ -153,8 +156,7 @@ namespace lible::geomopt
     buildBMatrixBondAngles(const xyz_coords_t &xyz_coords, const RedIntCoords &red_int_coords,
                            double tol = tolerance);
 
-    /// Constructs the B-matrix for dihedral angles using eq. (34) from
-    /// https://doi.org/10.1063/1.1515483.
+    /// Constructs the B-matrix for dihedral angles using dual numbers.
     std::vector<std::array<double, 12>>
     buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords, const RedIntCoords &red_int_coords,
                                double tol = tolerance);

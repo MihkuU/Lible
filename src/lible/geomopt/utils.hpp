@@ -41,6 +41,86 @@ namespace lible::geomopt
     /// Divides the 3-vector elements by the given value.
     std::array<double, 3> operator/(const std::array<double, 3> &u, double x);
 
+    // Dual numbers.
+
+    /// Structure representing a dual number. Based on https://doi.org/10.36890/iejg.888373.
+    struct Dual
+    {
+        /// Constructor for typical second derivative calculations.
+        explicit Dual(const double x0) : x0_(x0)
+        {
+        }
+
+        /// Generic constructor.
+        Dual(const double x0, const double x1) : x0_(x0), x1_(x1)
+        {
+        }
+
+        double x0_{};
+        double x1_{};
+    };
+
+    /// Adds two dual numbers using eq. (2.3) in https://doi.org/10.36890/iejg.888373.
+    Dual operator+(const Dual &a, const Dual &b);
+
+    /// Subtracts two dual numbers.
+    Dual operator-(const Dual &a, const Dual &b);
+
+    /// Multiplies two dual numbers using eq. (2.4) in https://doi.org/10.36890/iejg.888373.
+    Dual operator*(const Dual &a, const Dual &b);
+
+    /// Scales a dual number.
+    Dual operator*(double f, const Dual &a);
+
+    /// Divids two dual numbers using eq. (2.5) in https://doi.org/10.36890/iejg.888373.
+    Dual operator/(const Dual &a, const Dual &b);
+
+    /// Calculates a dual number inverse using eq. (2.5) in https://doi.org/10.36890/iejg.888373.
+    Dual inv(const Dual &a);
+
+    /// Calculates the square root of a dual number using eq. (2.6) in
+    /// https://doi.org/10.36890/iejg.888373.
+    Dual sqrt(const Dual &a);
+
+    /// Calculates the sine function of a dual number.
+    Dual sin(const Dual &a);
+
+    /// Calculate s the inverse cosine of a dual number.
+    Dual acos(const Dual &a);
+
+    /// Calculates the atan2 function of the given dual numbers.
+    Dual atan2(const Dual &y, const Dual &x);
+
+    /// Type alias for a 3-element array of dual numbers.
+    using dual3_t = std::array<Dual, 3>;
+
+    /// Calculates the norm of a dual number 3-array.
+    Dual norm(const dual3_t &u);
+
+    /// Calculates the dot product of two dual number 3-arrays.
+    Dual dot(const dual3_t &u, const dual3_t &v);
+
+    /// Calculates the cross-product between two dual number 3-arrays.
+    dual3_t cross(const dual3_t &u, const dual3_t &v);
+
+    /// Calculates the difference of two dual number 3-arrays.
+    dual3_t operator-(const dual3_t &u, const dual3_t &v);
+
+    /// Divides the 3-array of dual numbers with another dual number, `x`.
+    dual3_t operator/(const dual3_t &u, const Dual &x);
+
+    /// Calculates the dihedral angle using dual numbers.
+    Dual dihedralAngleDual(const dual3_t &xyz_m, const dual3_t &xyz_o, const dual3_t &xyz_p,
+                           const dual3_t &xyz_n);
+
+    /// Calculates the second derivatives of a bond angle using dual numbers.
+    std::array<double, 12> dihedralAngleGradientDual(const std::array<double, 3> &xyz_m,
+                                                     const std::array<double, 3> &xyz_o,
+                                                     const std::array<double, 3> &xyz_p,
+                                                     const std::array<double, 3> &xyz_n);
+
+    // Hyper-dual numbers.
+
     /// Structure representing a hyper-dual number. Based on https://doi.org/10.3390/math13243909.
     struct HyperDual
     {
@@ -87,6 +167,9 @@ namespace lible::geomopt
 
     /// Calculates the inverse cosine of a hyper-dual number.
     HyperDual acos(const HyperDual &a);
+
+    /// Calculates the atan2 function of the given hyper-dual numbers.
+    HyperDual atan2(const HyperDual &y, const HyperDual &x);
 
     /// Type alias for a 3-element array of hyper-dual numbers.
     using hd3_t = std::array<HyperDual, 3>;

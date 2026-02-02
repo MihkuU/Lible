@@ -471,21 +471,39 @@ double lgopt::bondAngle(const std::array<double, 3> &xyz_m, const std::array<dou
 double lgopt::dihedralAngle(const std::array<double, 3> &xyz_m, const std::array<double, 3> &xyz_o,
                             const std::array<double, 3> &xyz_p, const std::array<double, 3> &xyz_n)
 {
-    std::array<double, 3> u = xyz_m - xyz_o;
-    std::array<double, 3> v = xyz_n - xyz_p;
-    std::array<double, 3> w = xyz_p - xyz_o;
+    // std::array<double, 3> u = xyz_m - xyz_o;
+    // std::array<double, 3> v = xyz_n - xyz_p;
+    // std::array<double, 3> w = xyz_p - xyz_o;
+    //
+    // u = u / norm(u);
+    // v = v / norm(v);
+    // w = w / norm(w);
+    //
+    // double sin_u = std::sqrt(1 - std::pow(dot(u, w), 2));
+    // double sin_v = std::sqrt(1 - std::pow(dot(v, w), 2));
+    //
+    // double arg = dot(cross(u, w), cross(v, w)) / (sin_u * sin_v);
+    // arg = std::clamp(arg, -1.0, 1.0);
+    //
+    // return std::acos(arg);
 
-    u = u / norm(u);
-    v = v / norm(v);
-    w = w / norm(w);
+    // New definition:
+    std::array<double, 3> b1 = xyz_o - xyz_m;
+    std::array<double, 3> b2 = xyz_p - xyz_o;
+    std::array<double, 3> b3 = xyz_n - xyz_p;
 
-    double sin_u = std::sqrt(1 - std::pow(dot(u, w), 2));
-    double sin_v = std::sqrt(1 - std::pow(dot(v, w), 2));
+    std::array<double, 3> n1 = cross(b1, b2);
+    std::array<double, 3> n2 = cross(b2, b3);
+    n1 = n1 / norm(n1);
+    n2 = n2 / norm(n2);
 
-    double arg = dot(cross(u, w), cross(v, w)) / (sin_u * sin_v);
-    arg = std::clamp(arg, -1.0, 1.0);
+    b2 = b2 / norm(b2);
+    std::array<double, 3> m1 = cross(n1, b2);
 
-    return std::acos(arg);
+    double x = dot(n1, n2);
+    double y = dot(m1, n2);
+
+    return std::atan2(y, x);
 }
 
 lgopt::BMatrix lgopt::builBMatrix(const xyz_coords_t &xyz_coords,
@@ -548,7 +566,7 @@ lgopt::buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords,
         const auto &[m, o, p, n, val] = red_int_coords.dihedral_angles_[idihedral];
 
         b_matrix_dihedrals[idihedral] =
-                dihedralAngleGradient(xyz_coords[m], xyz_coords[o], xyz_coords[p], xyz_coords[n], tol);
+            dihedralAngleGradientDual(xyz_coords[m], xyz_coords[o], xyz_coords[p], xyz_coords[n]);
     }
 
     return b_matrix_dihedrals;
@@ -925,7 +943,6 @@ lible::vec2d lgopt::buildKMatrixDihedralAngles(const std::vector<double> &grad_r
 
     return k_matrix_dihedrals;
 }
-
 
 lible::vec2d lgopt::buildKMatrixBondLengthsFD(const double dx, const double dy,
                                               const std::vector<double> &grad_redint,

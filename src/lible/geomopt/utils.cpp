@@ -70,6 +70,156 @@ bool lgopt::areParallel(const std::array<double, 3> &u, const std::array<double,
     return false;
 }
 
+lgopt::Dual lgopt::operator+(const Dual &a, const Dual &b)
+{
+    return {a.x0_ + b.x0_, a.x1_ + b.x1_};
+}
+
+lgopt::Dual lgopt::operator-(const Dual &a, const Dual &b)
+{
+    return {a.x0_ - b.x0_, a.x1_ - b.x1_};
+}
+
+lgopt::Dual lgopt::operator*(const Dual &a, const Dual &b)
+{
+    return {a.x0_ * b.x0_, a.x0_ * b.x1_ + a.x1_ * b.x0_};
+}
+
+lgopt::Dual lgopt::operator*(const double f, const Dual &a)
+{
+    return {a.x0_ * f, a.x1_ * f};
+}
+
+lgopt::Dual lgopt::inv(const Dual &a)
+{
+    return {1.0 / a.x0_, -a.x1_ / (a.x0_ * a.x0_)};
+}
+
+lgopt::Dual lgopt::operator/(const Dual &a, const Dual &b)
+{
+    return a * inv(b);
+}
+
+lgopt::Dual lgopt::sqrt(const Dual &a)
+{
+    return {std::sqrt(a.x0_), a.x1_ / (2 * std::sqrt(a.x0_))};
+}
+
+lgopt::Dual lgopt::sin(const Dual &a)
+{
+    return {std::sin(a.x0_), a.x1_ * std::cos(a.x0_)};
+}
+
+lgopt::Dual lgopt::acos(const Dual &a)
+{
+    return {std::acos(a.x0_), -a.x1_ / std::sqrt(1 - a.x0_ * a.x0_)};
+}
+
+lgopt::Dual lgopt::atan2(const Dual &y, const Dual &x)
+{
+    const auto &[y0, y1] = y;
+    const auto &[x0, x1] = x;
+
+    double denom = x0 * x0 + y0 * y0;
+
+    return {std::atan2(y0, x0), (x0 * y1 - y0 * x1) / denom};
+}
+
+lgopt::Dual lgopt::norm(const dual3_t &u)
+{
+    const auto &[x, y, z] = u;
+
+    return sqrt(x * x + y * y + z * z);
+}
+
+lgopt::Dual lgopt::dot(const dual3_t &u, const dual3_t &v)
+{
+    return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+}
+
+lgopt::dual3_t lgopt::cross(const dual3_t &u, const dual3_t &v)
+{
+    return {{u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]}};
+}
+
+lgopt::dual3_t lgopt::operator-(const dual3_t &u, const dual3_t &v)
+{
+    return {u[0] - v[0], u[1] - v[1], u[2] - v[2]};
+}
+
+lgopt::dual3_t lgopt::operator/(const dual3_t &u, const Dual &x)
+{
+    return {u[0] / x, u[1] / x, u[2] / x};
+}
+
+lgopt::Dual lgopt::dihedralAngleDual(const dual3_t &xyz_m, const dual3_t &xyz_o,
+                                     const dual3_t &xyz_p, const dual3_t &xyz_n)
+{
+    // // TODO: error handling
+    // dual3_t u = xyz_m - xyz_o;
+    // dual3_t v = xyz_n - xyz_p;
+    // dual3_t w = xyz_p - xyz_o;
+    //
+    // u = u / norm(u);
+    // v = v / norm(v);
+    // w = w / norm(w);
+    //
+    // Dual dot_uw = dot(u, w);
+    // Dual dot_vw = dot(v, w);
+    // Dual sin_u = sqrt(Dual(1) - dot_uw * dot_uw);
+    // Dual sin_v = sqrt(Dual(1) - dot_vw * dot_vw);
+    //
+    // Dual arg = dot(cross(u, w), cross(v, w)) / (sin_u * sin_v);
+    // return acos(arg);
+
+    // New definition:
+    dual3_t b1 = xyz_o - xyz_m;
+    dual3_t b2 = xyz_p - xyz_o;
+    dual3_t b3 = xyz_n - xyz_p;
+
+    dual3_t n1 = cross(b1, b2);
+    dual3_t n2 = cross(b2, b3);
+    n1 = n1 / norm(n1);
+    n2 = n2 / norm(n2);
+
+    b2 = b2 / norm(b2);
+    dual3_t m1 = cross(n1, b2);
+
+    Dual x = dot(n1, n2);
+    Dual y = dot(m1, n2);
+
+    return atan2(y, x);
+}
+
+std::array<double, 12> lgopt::dihedralAngleGradientDual(const std::array<double, 3> &xyz_m,
+                                                        const std::array<double, 3> &xyz_o,
+                                                        const std::array<double, 3> &xyz_p,
+                                                        const std::array<double, 3> &xyz_n)
+{
+    std::array<double, 12> result{};
+    for (int i = 0; i < 12; i++)
+    {
+        std::array<Dual, 12> coords_dual{
+            Dual(xyz_m[0]), Dual(xyz_m[1]), Dual(xyz_m[2]),
+            Dual(xyz_o[0]), Dual(xyz_o[1]), Dual(xyz_o[2]),
+            Dual(xyz_p[0]), Dual(xyz_p[1]), Dual(xyz_p[2]),
+            Dual(xyz_n[0]), Dual(xyz_n[1]), Dual(xyz_n[2])
+        };
+
+        coords_dual[i] = {coords_dual[i].x0_, 1};
+
+        Dual dihedral_angle = dihedralAngleDual(
+            {coords_dual[0], coords_dual[1], coords_dual[2]},
+            {coords_dual[3], coords_dual[4], coords_dual[5]},
+            {coords_dual[6], coords_dual[7], coords_dual[8]},
+            {coords_dual[9], coords_dual[10], coords_dual[11]});
+
+        result[i] = dihedral_angle.x1_;
+    }
+
+    return result;
+}
+
 lgopt::HyperDual lgopt::operator+(const HyperDual &a, const HyperDual &b)
 {
     const auto &[a0, a1, a2, a12] = a;
@@ -148,6 +298,23 @@ lgopt::HyperDual lgopt::acos(const HyperDual &a)
     };
 }
 
+lgopt::HyperDual lgopt::atan2(const HyperDual &y, const HyperDual &x)
+{
+    // TODO: error handling
+    const auto &[y0, y1, y2, y12] = y;
+    const auto &[x0, x1, x2, x12] = x;
+
+    double denom = x0 * x0 + y0 * y0;
+    double term0 = std::atan2(y0, x0);
+    double term1 = (x0 * y1 - y0 * x1) / denom;
+    double term2 = (x0 * y2 - y0 * x2) / denom;
+    double term12 = (x0 * y12 - y0 * x12 + x1 * y2 - y1 * x2) / denom
+                    - 2 * (x0 * x1 + y0 * y1) * (x0 * y2 - y0 * x2) / (denom * denom);
+
+    return {term0, term1, term2, term12};
+}
+
+
 lgopt::HyperDual lgopt::norm(const hd3_t &u)
 {
     const auto &[x, y, z] = u;
@@ -157,7 +324,7 @@ lgopt::HyperDual lgopt::norm(const hd3_t &u)
 
 lgopt::hd3_t lgopt::operator-(const hd3_t &u, const hd3_t &v)
 {
-    return {{u[0] - v[0], u[1] - v[1], u[2] - v[2]}};
+    return {u[0] - v[0], u[1] - v[1], u[2] - v[2]};
 }
 
 lgopt::hd3_t lgopt::operator/(const hd3_t &u, const HyperDual &x)
@@ -181,23 +348,41 @@ lgopt::HyperDual lgopt::bondAngleHD(const hd3_t &xyz_m, const hd3_t &xyz_o, cons
 lgopt::HyperDual lgopt::dihedralAngleHD(const hd3_t &xyz_m, const hd3_t &xyz_o, const hd3_t &xyz_p,
                                         const hd3_t &xyz_n)
 {
-    // TODO: error handling
-    hd3_t u = xyz_m - xyz_o;
-    hd3_t v = xyz_n - xyz_p;
-    hd3_t w = xyz_p - xyz_o;
+    // // TODO: error handling
+    // hd3_t u = xyz_m - xyz_o;
+    // hd3_t v = xyz_n - xyz_p;
+    // hd3_t w = xyz_p - xyz_o;
+    //
+    // u = u / norm(u);
+    // v = v / norm(v);
+    // w = w / norm(w);
+    //
+    // HyperDual dot_uw = dot(u, w);
+    // HyperDual dot_vw = dot(v, w);
+    //
+    // HyperDual sin_u = sqrt(HyperDual(1) - dot_uw * dot_uw);
+    // HyperDual sin_v = sqrt(HyperDual(1) - dot_vw * dot_vw);
+    //
+    // HyperDual arg = dot(cross(u, w), cross(v, w)) / (sin_u * sin_v);
+    // return acos(arg);
 
-    u = u / norm(u);
-    v = v / norm(v);
-    w = w / norm(w);
+    // New definition:
+    hd3_t b1 = xyz_o - xyz_m;
+    hd3_t b2 = xyz_p - xyz_o;
+    hd3_t b3 = xyz_n - xyz_p;
 
-    HyperDual dot_uw = dot(u, w);
-    HyperDual dot_vw = dot(v, w);
+    hd3_t n1 = cross(b1, b2);
+    hd3_t n2 = cross(b2, b3);
+    n1 = n1 / norm(n1);
+    n2 = n2 / norm(n2);
 
-    HyperDual sin_u = sqrt(HyperDual(1) - dot_uw * dot_uw);
-    HyperDual sin_v = sqrt(HyperDual(1) - dot_vw * dot_vw);
+    b2 = b2 / norm(b2);
+    hd3_t m1 = cross(n1, b2);
 
-    HyperDual arg = dot(cross(u, w), cross(v, w)) / (sin_u * sin_v);
-    return acos(arg);
+    HyperDual x = dot(n1, n2);
+    HyperDual y = dot(m1, n2);
+
+    return atan2(y, x);
 }
 
 lgopt::HyperDual lgopt::dot(const hd3_t &u, const hd3_t &v)
@@ -211,7 +396,7 @@ lgopt::hd3_t lgopt::cross(const hd3_t &u, const hd3_t &v)
 }
 
 std::array<double, 6> lgopt::bondLengthGradientHD(const std::array<double, 3> &xyz_m,
-                                                const std::array<double, 3> &xyz_n)
+                                                  const std::array<double, 3> &xyz_n)
 {
     std::array<double, 6> result{};
     for (int i = 0; i < 6; i++)
@@ -233,8 +418,8 @@ std::array<double, 6> lgopt::bondLengthGradientHD(const std::array<double, 3> &x
 }
 
 std::array<double, 9> lgopt::bondAngleGradientHD(const std::array<double, 3> &xyz_m,
-                                               const std::array<double, 3> &xyz_o,
-                                               const std::array<double, 3> &xyz_n)
+                                                 const std::array<double, 3> &xyz_o,
+                                                 const std::array<double, 3> &xyz_n)
 {
     std::array<double, 9> result{};
     for (int i = 0; i < 9; i++)
@@ -258,9 +443,9 @@ std::array<double, 9> lgopt::bondAngleGradientHD(const std::array<double, 3> &xy
 }
 
 std::array<double, 12> lgopt::dihedralAngleGradientHD(const std::array<double, 3> &xyz_m,
-                                                    const std::array<double, 3> &xyz_o,
-                                                    const std::array<double, 3> &xyz_p,
-                                                    const std::array<double, 3> &xyz_n)
+                                                      const std::array<double, 3> &xyz_o,
+                                                      const std::array<double, 3> &xyz_p,
+                                                      const std::array<double, 3> &xyz_n)
 {
     std::array<double, 12> result{};
     for (int i = 0; i < 12; i++)
@@ -286,7 +471,7 @@ std::array<double, 12> lgopt::dihedralAngleGradientHD(const std::array<double, 3
 }
 
 lible::arr2d<double, 6, 6> lgopt::bondLengthHessianHD(const std::array<double, 3> &xyz_m,
-                                                    const std::array<double, 3> &xyz_n)
+                                                      const std::array<double, 3> &xyz_n)
 {
     arr2d<double, 6, 6> result{};
 
@@ -329,8 +514,8 @@ lible::arr2d<double, 6, 6> lgopt::bondLengthHessianHD(const std::array<double, 3
 }
 
 lible::arr2d<double, 9, 9> lgopt::bondAngleHessianHD(const std::array<double, 3> &xyz_m,
-                                                   const std::array<double, 3> &xyz_o,
-                                                   const std::array<double, 3> &xyz_n)
+                                                     const std::array<double, 3> &xyz_o,
+                                                     const std::array<double, 3> &xyz_n)
 {
     arr2d<double, 9, 9> result{};
 
@@ -377,9 +562,9 @@ lible::arr2d<double, 9, 9> lgopt::bondAngleHessianHD(const std::array<double, 3>
 }
 
 lible::arr2d<double, 12, 12> lgopt::dihedralAngleHessianHD(const std::array<double, 3> &xyz_m,
-                                                         const std::array<double, 3> &xyz_o,
-                                                         const std::array<double, 3> &xyz_p,
-                                                         const std::array<double, 3> &xyz_n)
+                                                           const std::array<double, 3> &xyz_o,
+                                                           const std::array<double, 3> &xyz_p,
+                                                           const std::array<double, 3> &xyz_n)
 {
     arr2d<double, 12, 12> result{};
 
