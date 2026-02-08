@@ -56,14 +56,14 @@ std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
     std::vector<Shell> shells;
     for (const auto &[l, exps, coeffs] : basis_shells)
     {
-        const size_t dim_cart = numCartesians(l);
-        const size_t dim_sph = numSphericals(l);
+        size_t dim_cart = numCartesians(l);
+        size_t dim_sph = numSphericals(l);
 
         if (exps.size() != coeffs.size())
             throw std::runtime_error("constructShells(): number of exponents/coefficients "
                 "doesn't match");
 
-        const size_t cdepth = exps.size();
+        size_t cdepth = exps.size();
 
         std::vector<double> primitive_norms(cdepth);
         for (size_t i = 0; i < cdepth; i++)
@@ -104,14 +104,14 @@ lints::constructShells(const basis_atoms_t &basis_atoms,
 
         for (const auto &[l, exps, coeffs] : basis_atom)
         {
-            const int dim_cart = numCartesians(l);
-            const int dim_sph = numSphericals(l);
+            int dim_cart = numCartesians(l);
+            int dim_sph = numSphericals(l);
 
             if (exps.size() != coeffs.size())
                 throw std::runtime_error("constructShells(): number of exponents/coefficients "
                     "doesn't match");
 
-            const size_t cdepth = exps.size();
+            size_t cdepth = exps.size();
 
             std::vector<double> primitive_norms(cdepth);
             for (size_t i = 0; i < cdepth; i++)
