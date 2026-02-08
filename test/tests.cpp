@@ -129,8 +129,6 @@ bool ltests::overlap()
     for (double sint : sints)
         sum_sints += std::fabs(sint);
 
-    printf("sum_sints = %16.12lf\n", sum_sints);
-
     if (std::fabs(sum_sints - correct_answer) < tol)
         return true;
 
