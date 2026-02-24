@@ -5,7 +5,7 @@
 
 namespace lible::tests
 {
-    std::set<std::string> basis_sets_table{
+    inline const std::set<std::string> basis_sets_table{
         "3-21g",
         "4-31g",
         "5-21g",
@@ -149,9 +149,10 @@ namespace lible::tests
         "sto-3g*",
         "sto-4g",
         "sto-5g",
-        "sto-6g"};
+        "sto-6g"
+    };
 
-    std::set<std::string> auxbasis_sets_table{
+    inline const std::set<std::string> auxbasis_sets_table{
         "def2-qzvp-rifit",
         "def2-qzvpp-rifit",
         "def2-qzvppd-rifit",
@@ -164,5 +165,27 @@ namespace lible::tests
         "def2-tzvpp-rifit",
         "def2-tzvppd-rifit",
         "def2-universal-jfit",
-        "def2-universal-jkfit"};
+        "def2-universal-jkfit",
+        "cc-pvqz-rifit",
+        "cc-pvdz-rifit",
+        "aug-cc-pwcvdz-rifit",
+        "cc-pv6z-rifit",
+        "aug-cc-pwcv5z-rifit",
+        "cc-pvtz-rifit",
+        "aug-cc-pwcvqz-rifit",
+        "aug-cc-pv5z-rifit",
+        "cc-pwcvqz-rifit",
+        "aug-cc-pvtz-rifit",
+        "aug-cc-pwcvtz-rifit",
+        "cc-pvqz-jkfit",
+        "cc-pv5z-rifit",
+        "aug-cc-pv6z-rifit",
+        "cc-pwcvtz-rifit",
+        "cc-pwcv5z-rifit",
+        "aug-cc-pvdz-rifit",
+        "cc-pwcvdz-rifit",
+        "aug-cc-pvqz-rifit",
+        "cc-pv5z-jkfit",
+        "cc-pvtz-jkfit"
+    };
 }
