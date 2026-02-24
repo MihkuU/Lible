@@ -9,6 +9,7 @@ namespace lible::ints
     enum class AuxBasisFamily
     {
         ahlrichs_fit,
+        dunning_fit,
     };
 
     /// Family of the main basis set. Used for parsing the JSON file from

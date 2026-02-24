@@ -69,7 +69,7 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const std::vector<in
 {
     if (atomic_nrs.size() != coords_.size())
         throw std::runtime_error("Structure::Structure(): number of atomic numbers does not match "
-            "the number of (x, y, z)-oordinates");
+            "the number of (x, y, z)-coordinates");
 
     this->basis_set_ = "custom";
     n_atoms_ = atomic_nrs.size();

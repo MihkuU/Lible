@@ -35,7 +35,28 @@ aux_basis_families{
     {"def2-tzvpp-rifit", lints::AuxBasisFamily::ahlrichs_fit},
     {"def2-tzvppd-rifit", lints::AuxBasisFamily::ahlrichs_fit},
     {"def2-universal-jfit", lints::AuxBasisFamily::ahlrichs_fit},
-    {"def2-universal-jkfit", lints::AuxBasisFamily::ahlrichs_fit}
+    {"def2-universal-jkfit", lints::AuxBasisFamily::ahlrichs_fit},
+    {"cc-pvqz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pvdz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pwcvdz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pv6z-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pwcv5z-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pvtz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pwcvqz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pv5z-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pwcvqz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pvtz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pwcvtz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pvqz-jkfit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pv5z-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pv6z-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pwcvtz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pwcv5z-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pvdz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pwcvdz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"aug-cc-pvqz-rifit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pv5z-jkfit", lints::AuxBasisFamily::dunning_fit},
+    {"cc-pvtz-jkfit", lints::AuxBasisFamily::dunning_fit}
 };
 
 /// Mapping between main basis set names and their families.
@@ -377,9 +398,9 @@ std::string lints::auxBasisFamilyString(const std::string &aux_basis_set)
 
     switch (aux_basis_families.at(basis_set_lc))
     {
-        case AuxBasisFamily::ahlrichs_fit :
+        case AuxBasisFamily::ahlrichs_fit:
             return "ahlrichs";
-        default :
+        default:
             throw std::runtime_error("");
     }
 }
@@ -399,17 +420,17 @@ std::string lints::basisFamilyString(const std::string &basis_set)
 
     switch (basis_families.at(basis_set_lc))
     {
-        case BasisFamily::ahlrichs :
+        case BasisFamily::ahlrichs:
             return "ahlrichs";
-        case BasisFamily::ano :
+        case BasisFamily::ano:
             return "ano";
-        case BasisFamily::dunning :
+        case BasisFamily::dunning:
             return "dunning";
-        case BasisFamily::pople :
+        case BasisFamily::pople:
             return "pople";
-        case BasisFamily::sto :
+        case BasisFamily::sto:
             return "sto";
-        default :
+        default:
             throw std::runtime_error("");
     }
 }
