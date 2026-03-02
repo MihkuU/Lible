@@ -400,6 +400,8 @@ std::string lints::auxBasisFamilyString(const std::string &aux_basis_set)
     {
         case AuxBasisFamily::ahlrichs_fit:
             return "ahlrichs";
+        case AuxBasisFamily::dunning_fit:
+            return "dunning";
         default:
             throw std::runtime_error("");
     }
