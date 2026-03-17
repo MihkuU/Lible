@@ -24,7 +24,7 @@ option(LIBLE_BUILD_SOLVER   "Build and install the solver module" ON)
 option(LIBLE_BUILD_GEOMOPT  "Build and install the geometry optimization module" ON)
 option(LIBLE_BUILD_STATIC   "Enables building the static Lible library" OFF)
 
-option(LIBLE_USE_OPENBLAS   "Directs to Lible to use OpenBLAS" OFF)
+option(LIBLE_USE_OPENBLAS   "Directs Lible to use OpenBLAS" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -54,7 +54,7 @@ target_link_libraries(lible PRIVATE OpenMP::OpenMP_CXX)
 
 # BLAS/LAPACK
 find_package(MKL QUIET)
-if(MKL_FOUND AND (NOT LIBLE_USE_OPENBLAS))
+if(MKL_FOUND AND NOT LIBLE_USE_OPENBLAS)
 	target_compile_definitions(lible PRIVATE _LIBLE_USE_MKL_)
     target_include_directories(lible PRIVATE ${MKL_ROOT}/include)
 	if (LIBLE_BUILD_STATIC)
@@ -68,9 +68,7 @@ if(MKL_FOUND AND (NOT LIBLE_USE_OPENBLAS))
 	endif()
 else()
 	set(BLA_VENDOR OpenBLAS)
-	#find_package(BLAS REQUIRED)
 	find_package(BLAS REQUIRED)
-	message("BLAS_LIBRARIES: ${BLAS_LIBRARIES}")
 	target_link_libraries(lible PRIVATE BLAS::BLAS)
 endif()
 
