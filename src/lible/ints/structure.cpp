@@ -47,7 +47,7 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
     basis_set_aux_ = basis_set_aux;
     use_ri_ = true;
 
-    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux);
+    const basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux);
 
     shells_aux_ = constructShells(basis_atoms_aux, coords_);
 
