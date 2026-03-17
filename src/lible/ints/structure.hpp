@@ -32,6 +32,32 @@ namespace lible::ints
                   const std::vector<int> &atomic_nrs,
                   const std::vector<std::array<double, 3>> &coords_angstrom);
 
+        /// Constructor for initializing the object without RI approximation but with ghost atoms.
+        Structure(const std::string &basis_set, const std::string &ghost_basis_set,
+                            const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom,
+                            const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+
+        /// Constructor for initializing the object with RI approximation and with ghost atoms.
+        Structure(const std::string &basis_set, const std::string &ghost_basis_set,
+                  const std::string &basis_set_aux, const std::string &ghost_basis_set_aux,
+                  const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+                  const std::vector<std::array<double, 3>> &coords_angstrom,
+                  const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+
+        /// Constructor for initalizing the object without RI approximation but with ghost atoms.
+        Structure(const basis_atoms_t &basis_set, const basis_atoms_t &ghost_basis_set,
+                            const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom,
+                            const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+
+        /// Constructor for initializing the object with RI approximation and with ghost atoms.
+        Structure(const basis_atoms_t &basis_set, const basis_atoms_t &ghost_basis_set,
+                            const basis_atoms_t &basis_set_aux, const basis_atoms_t &ghost_basis_set_aux,
+                            const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+                            const std::vector<std::array<double, 3>> &coords_angstrom,
+                            const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+
         // Some getters
 
         /// Returns the flag for using RI.
@@ -104,20 +130,34 @@ namespace lible::ints
         size_t dim_ao_cart_aux_{};
         /// Number of atoms in the structure.
         size_t n_atoms_{};
+        /// Number of ghost atoms in the structure.
+        size_t n_ghost_atoms_{};
 
         /// Coordinates of the atoms in Bohr (a.u.).
         std::vector<std::array<double, 3>> coords_;
+        /// Coordinates of the ghost atoms in Bohr (a.u.).
+        std::vector<std::array<double, 3>> ghost_coords_;
         /// Atomic numbers.
         std::vector<int> atomic_nrs_;
+        /// Ghost atomic numbers.
+        std::vector<int> ghost_atomic_nrs_;
 
         /// Name of the main basis set.
         std::string basis_set_;
+        /// Name of the main ghost basis set/
+        std::string ghost_basis_set_;
         /// Name of the auxiliary basis set.
         std::string basis_set_aux_;
+        /// Name of the auxiliary ghost basis set.
+        std::string ghost_basis_set_aux_;
         /// All the shells corresponding to the main basis set.
         std::vector<Shell> shells_;
+        /// All the shells corresponding to the ghost atoms main basis set.
+        std::vector<Shell> shells_ghost_;
         /// All the shells corresponding to the auxiliary basis set.
         std::vector<Shell> shells_aux_;
+        /// All the shells corresponding to the ghost atoms auxiliary basis set.
+        std::vector<Shell> shells_ghost_aux_;
         /// Shells corresponding to the main basis set for each angular momentum.
         std::map<int, std::vector<Shell>> shells_map_;
         /// Shells corresponding to the auxiliary basis set for each angular momentum.
