@@ -113,7 +113,7 @@ namespace lible::geomopt
     Dual dihedralAngleDual(const dual3_t &xyz_m, const dual3_t &xyz_o, const dual3_t &xyz_p,
                            const dual3_t &xyz_n);
 
-    /// Calculates the second derivatives of a bond angle using dual numbers.
+    /// Calculates the first derivatives of a bond angle using dual numbers.
     std::array<double, 12> dihedralAngleGradientDual(const std::array<double, 3> &xyz_m,
                                                      const std::array<double, 3> &xyz_o,
                                                      const std::array<double, 3> &xyz_p,

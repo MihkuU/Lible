@@ -158,8 +158,7 @@ namespace lible::geomopt
 
     /// Constructs the B-matrix for dihedral angles using dual numbers.
     std::vector<std::array<double, 12>>
-    buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords, const RedIntCoords &red_int_coords,
-                               double tol = tolerance);
+    buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords, const RedIntCoords &red_int_coords);
 
     /// Calculates the B-matrix for bond lengths using finite differences (FD).
     std::vector<std::array<double, 6>>

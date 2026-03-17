@@ -290,15 +290,15 @@ std::array<double, 9> lgopt::bondAngleGradient(const std::array<double, 3> &xyz_
     w = w / norm(w);
 
     // derivatives
-    std::array<double, 3> u_x_w = cross(u, w);
-    std::array<double, 3> w_x_v = cross(w, v);
+    std::array<double, 3> u_x_w = cross(u, w) / lambda_u;
+    std::array<double, 3> w_x_v = cross(w, v) / lambda_v;
 
     auto calcDerivs = [&](const size_t a) -> std::array<double, 3>
     {
         std::array<double, 3> derivs{};
-        derivs[0] = zeta(a, 0, 1) * u_x_w[0] / lambda_u + zeta(a, 2, 1) * w_x_v[0] / lambda_v;
-        derivs[1] = zeta(a, 0, 1) * u_x_w[1] / lambda_u + zeta(a, 2, 1) * w_x_v[1] / lambda_v;
-        derivs[2] = zeta(a, 0, 1) * u_x_w[2] / lambda_u + zeta(a, 2, 1) * w_x_v[2] / lambda_v;
+        derivs[0] = zeta(a, 0, 1) * u_x_w[0] + zeta(a, 2, 1) * w_x_v[0];
+        derivs[1] = zeta(a, 0, 1) * u_x_w[1] + zeta(a, 2, 1) * w_x_v[1];
+        derivs[2] = zeta(a, 0, 1) * u_x_w[2] + zeta(a, 2, 1) * w_x_v[2];
 
         return derivs;
     };
@@ -435,7 +435,7 @@ lible::arr2d<double, 9, 9> lgopt::bondAngleHessian(const std::array<double, 9> &
             for (int a = 0; a < 3; a++)
                 for (int b = 0; b < 3; b++)
                 {
-                    // zeta terms
+                    // // zeta terms
                     derivs[a * 3 + i][b * 3 + j] += zeta(a, 0, 1) * zeta(b, 0, 1) * term1;
                     derivs[a * 3 + i][b * 3 + j] += zeta(a, 2, 1) * zeta(b, 2, 1) * term2;
                     derivs[a * 3 + i][b * 3 + j] += zeta(a, 0, 1) * zeta(b, 2, 1) * term3;
@@ -443,8 +443,7 @@ lible::arr2d<double, 9, 9> lgopt::bondAngleHessian(const std::array<double, 9> &
 
                     // B-matrix term
                     derivs[a * 3 + i][b * 3 + j] -= (cos_q / sin_q) *
-                                                   bond_angle_gradient[a * 3 + i] *
-                                                   bond_angle_gradient[b * 3 + j];
+                            bond_angle_gradient[a * 3 + i] * bond_angle_gradient[b * 3 + j];
                 }
         }
 
@@ -517,7 +516,7 @@ lgopt::BMatrix lgopt::builBMatrix(const xyz_coords_t &xyz_coords,
             buildBMatrixBondAngles(xyz_coords, red_int_coords, tol);
 
     std::vector<std::array<double, 12>> b_matrix_dihedrals =
-            buildBMatrixDihedralAngles(xyz_coords, red_int_coords, tol);
+            buildBMatrixDihedralAngles(xyz_coords, red_int_coords);
 
     return {b_matrix_bonds, b_matrix_angles, b_matrix_dihedrals};
 }
@@ -556,7 +555,7 @@ lgopt::buildBMatrixBondAngles(const xyz_coords_t &xyz_coords,
 
 std::vector<std::array<double, 12>>
 lgopt::buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords,
-                                  const RedIntCoords &red_int_coords, const double tol)
+                                  const RedIntCoords &red_int_coords)
 {
     size_t n_dihedral_angles = red_int_coords.dihedral_angles_.size();
 
@@ -565,8 +564,8 @@ lgopt::buildBMatrixDihedralAngles(const xyz_coords_t &xyz_coords,
     {
         const auto &[m, o, p, n, val] = red_int_coords.dihedral_angles_[idihedral];
 
-        b_matrix_dihedrals[idihedral] =
-            dihedralAngleGradientDual(xyz_coords[m], xyz_coords[o], xyz_coords[p], xyz_coords[n]);
+        b_matrix_dihedrals[idihedral] = dihedralAngleGradientDual(xyz_coords[m], xyz_coords[o],
+                                                                  xyz_coords[p], xyz_coords[n]);
     }
 
     return b_matrix_dihedrals;
