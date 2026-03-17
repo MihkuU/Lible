@@ -36,13 +36,13 @@ SET(OpenBLAS_FOUND ON)
 #    Check include files
 IF(NOT OpenBLAS_INCLUDE_DIR)
     SET(OpenBLAS_FOUND OFF)
-    MESSAGE(STATUS "Could not find OpenBLAS include. Turning OpenBLAS_FOUND off")
+    MESSAGE(FATAL_ERROR "Could not find OpenBLAS include.")
 ENDIF()
 
 #    Check libraries
 IF(NOT OpenBLAS_LIB)
     SET(OpenBLAS_FOUND OFF)
-    MESSAGE(STATUS "Could not find OpenBLAS lib. Turning OpenBLAS_FOUND off")
+    MESSAGE(FATAL_ERROR "Could not find OpenBLAS lib.")
 ENDIF()
 
 IF (OpenBLAS_FOUND)

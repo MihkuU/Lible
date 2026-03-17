@@ -76,10 +76,6 @@ else()
 	include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindOpenBLAS.cmake)
 	target_link_libraries(lible PRIVATE ${OpenBLAS_LIB})
 	target_include_directories(lible PRIVATE ${OpenBLAS_INCLUDE_DIR})
-
-	#set(BLA_VENDOR OpenBLAS)
-	#find_package(BLAS REQUIRED)
-	#target_link_libraries(lible PRIVATE BLAS::BLAS)
 endif()
 
 # Basis sets
