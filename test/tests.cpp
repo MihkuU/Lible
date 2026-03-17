@@ -1,5 +1,7 @@
 #include <tests.hpp>
 #include <available_basis_sets.hpp>
+#include <iostream>
+#include <ostream>
 
 #include <lible/ints/ints.hpp>
 
@@ -62,6 +64,14 @@ namespace lible::tests
         {0.0, 0.0, 0.0},
         {0.757, 0.586, 0.0},
         {-0.757, 0.586, 0.0}
+    };
+
+    // ghost H2O
+    std::vector<int> atomic_nrs_ghost_h2o{8, 1, 1};
+    std::vector<std::array<double, 3>> coords_ghost_h2o{
+        {0.0, 1.0, 0.0},
+        {0.757, 1.586, 0.0},
+        {-0.757, 1.586, 0.0}
     };
 
     // Ozone
@@ -768,7 +778,7 @@ bool ltests::basisForAtoms()
 
     double sum_data = 0;
     for (const lints::BasisAtom &basis_atom : basis_atoms)
-        for (const auto& [l, exps, coeffs] : basis_atom.basis_shells_)
+        for (const auto &[l, exps, coeffs] : basis_atom.basis_shells_)
         {
             for (double exp : exps)
                 sum_data += std::fabs(exp);
@@ -792,13 +802,13 @@ bool ltests::basisForAtomsAux()
     double sum_data = 0;
     for (const lints::BasisAtom &basis_atom : basis_atoms)
         for (const auto &[l, exps, coeffs] : basis_atom.basis_shells_)
-            {
-                for (double exp : exps)
-                    sum_data += std::fabs(exp);
+        {
+            for (double exp : exps)
+                sum_data += std::fabs(exp);
 
-                for (double coeff : coeffs)
-                    sum_data += std::fabs(coeff);
-            }
+            for (double coeff : coeffs)
+                sum_data += std::fabs(coeff);
+        }
 
     if (std::fabs(sum_data - correct_answer) < tol)
         return true;
@@ -1431,4 +1441,112 @@ bool ltests::getLPairsNoSymm()
     std::vector<std::pair<int, int>> l_pairs = lints::getLPairsNoSymm(l_max);
 
     return (l_pairs == correct_answer);
+}
+
+bool ltests::structureGhost()
+{
+    // Test ghost constructor without RI approximation (string basis sets)
+    const size_t correct_answer_shells = 24; // 12 shells from H2O + 12 shells from ghost H2O
+    const double correct_answer_max_l = 2; // p orbitals are max
+    const size_t correct_answer_dim_ao = 48; // Total AOs from both molecules
+
+    lints::Structure structure("def2-SVP", "def2-SVP",
+                               atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                               coords_h2o, coords_ghost_h2o);
+
+    size_t num_shells = structure.getShells().size();
+    int max_l = structure.getMaxL();
+    size_t dim_ao = structure.getDimAO();
+
+    if (num_shells == correct_answer_shells &&
+        max_l == correct_answer_max_l &&
+        dim_ao == correct_answer_dim_ao)
+        return true;
+
+    return false;
+}
+
+bool ltests::structureGhostRI()
+{
+    // Test ghost constructor with RI approximation (string basis sets)
+    const size_t correct_answer_shells = 24; // 12 shells from H2O + 12 shells from ghost H2O
+    const double correct_answer_max_l = 2; // p orbitals are max
+    const size_t correct_answer_dim_ao = 48; // Total AOs from both molecules
+    const bool correct_use_ri = true;
+
+    lints::Structure structure("def2-SVP", "def2-SVP",
+                               "def2-universal-jkfit", "def2-universal-jkfit",
+                               atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                               coords_h2o, coords_ghost_h2o);
+
+    size_t num_shells = structure.getShells().size();
+    int max_l = structure.getMaxL();
+    size_t dim_ao = structure.getDimAO();
+    bool use_ri = structure.getUseRI();
+
+    if (num_shells == correct_answer_shells &&
+        max_l == correct_answer_max_l &&
+        dim_ao == correct_answer_dim_ao &&
+        use_ri == correct_use_ri)
+        return true;
+
+    return false;
+}
+
+bool ltests::structureGhostCustom()
+{
+    // Test ghost constructor without RI approximation (custom basis sets)
+    const size_t correct_answer_shells = 24;
+    const double correct_answer_max_l = 2;
+    const size_t correct_answer_dim_ao = 48;
+
+    lints::basis_atoms_t basis_atoms = lints::basisForAtoms(atomic_nrs_h2o, "def2-SVP");
+    lints::basis_atoms_t ghost_basis_atoms = lints::basisForAtoms(atomic_nrs_ghost_h2o, "def2-SVP");
+
+    lints::Structure structure(basis_atoms, ghost_basis_atoms,
+                               atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                               coords_h2o, coords_ghost_h2o);
+
+    size_t num_shells = structure.getShells().size();
+    int max_l = structure.getMaxL();
+    size_t dim_ao = structure.getDimAO();
+
+    if (num_shells == correct_answer_shells &&
+        max_l == correct_answer_max_l &&
+        dim_ao == correct_answer_dim_ao)
+        return true;
+
+    return false;
+}
+
+bool ltests::structureGhostCustomRI()
+{
+    // Test ghost constructor with RI approximation (custom basis sets)
+    const size_t correct_answer_shells = 24;
+    const double correct_answer_max_l = 2;
+    const size_t correct_answer_dim_ao = 48;
+    const bool correct_use_ri = true;
+
+    lints::basis_atoms_t basis_atoms = lints::basisForAtoms(atomic_nrs_h2o, "def2-SVP");
+    lints::basis_atoms_t ghost_basis_atoms = lints::basisForAtoms(atomic_nrs_ghost_h2o, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_aux = lints::basisForAtomsAux(atomic_nrs_h2o, "def2-universal-jkfit");
+    lints::basis_atoms_t ghost_basis_atoms_aux = lints::basisForAtomsAux(atomic_nrs_ghost_h2o, "def2-universal-jkfit");
+
+    lints::Structure structure(basis_atoms, ghost_basis_atoms,
+                               basis_atoms_aux, ghost_basis_atoms_aux,
+                               atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                               coords_h2o, coords_ghost_h2o);
+
+    size_t num_shells = structure.getShells().size();
+    int max_l = structure.getMaxL();
+    size_t dim_ao = structure.getDimAO();
+    bool use_ri = structure.getUseRI();
+
+    if (num_shells == correct_answer_shells &&
+        max_l == correct_answer_max_l &&
+        dim_ao == correct_answer_dim_ao &&
+        use_ri == correct_use_ri)
+        return true;
+
+    return false;
 }

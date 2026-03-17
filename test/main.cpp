@@ -65,6 +65,14 @@ int main(int argc, char **argv)
         success = lible::tests::getLPairsSymm();
     else if (test_name == "getLPairsNoSymm")
         success = lible::tests::getLPairsNoSymm();
+    else if (test_name == "structureGhost")
+        success = lible::tests::structureGhost();
+    else if (test_name == "structureGhostRI")
+        success = lible::tests::structureGhostRI();
+    else if (test_name == "structureGhostCustom")
+        success = lible::tests::structureGhostCustom();
+    else if (test_name == "structureGhostCustomRI")
+        success = lible::tests::structureGhostCustomRI();
     else if (test_name == "dipoleMoment")
         success = lible::tests::dipoleMoment();
     else if (test_name == "dipoleMomentKernel")

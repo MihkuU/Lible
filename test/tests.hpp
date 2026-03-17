@@ -1,121 +1,126 @@
 #pragma once
 
-namespace lible
+namespace lible::tests
 {
-    namespace tests
-    {
-        bool overlap();
+    bool overlap();
 
-        bool overlapKernel();
+    bool overlapKernel();
 
-        bool overlapD1Kernel();
+    bool overlapD1Kernel();
 
-        bool kineticEnergy();
+    bool kineticEnergy();
 
-        bool kineticEnergyKernel();
+    bool kineticEnergyKernel();
 
-        bool kineticEnergyD1Kernel();
+    bool kineticEnergyD1Kernel();
 
-        bool nuclearAttraction();
+    bool nuclearAttraction();
 
-        bool nuclearAttractionErf();
+    bool nuclearAttractionErf();
 
-        bool externalCharges();
+    bool externalCharges();
 
-        bool externalChargesErf();
+    bool externalChargesErf();
 
-        bool externalChargesKernel();
+    bool externalChargesKernel();
 
-        bool externalChargesErfKernel();
+    bool externalChargesErfKernel();
 
-        bool externalChargesD1Kernel();
+    bool externalChargesD1Kernel();
 
-        bool externalChargesOperatorD1Kernel();
+    bool externalChargesOperatorD1Kernel();
 
-        bool potentialAtExternalChargesKernel();
+    bool potentialAtExternalChargesKernel();
 
-        bool potentialAtExternalChargesErfKernel();
+    bool potentialAtExternalChargesErfKernel();
 
-        bool dipoleMoment();
+    bool dipoleMoment();
 
-        bool dipoleMomentKernel();
+    bool dipoleMomentKernel();
 
-        bool spinOrbitCoupling1El();
+    bool spinOrbitCoupling1El();
 
-        bool spinOrbitCoupling1ElKernel();
+    bool spinOrbitCoupling1ElKernel();
 
-        bool eri2Diagonal();
+    bool eri2Diagonal();
 
-        bool eri2();
+    bool eri2();
 
-        bool eri4Diagonal();
+    bool eri4Diagonal();
 
-        bool eri3();
-        
-        bool eri4();
+    bool eri3();
 
-        bool basisForAtom();
+    bool eri4();
 
-        bool basisForAtomAux();
+    bool basisForAtom();
 
-        bool basisForAtoms();
+    bool basisForAtomAux();
 
-        bool basisForAtomsAux();
-        
-        bool availableBasisSets();
+    bool basisForAtoms();
 
-        bool availableBasisSetsAux();
+    bool basisForAtomsAux();
 
-        bool sphericalTrafo();
+    bool availableBasisSets();
 
-        bool deployERI4Kernel();
+    bool availableBasisSetsAux();
 
-        bool deployERI3Kernel();
+    bool sphericalTrafo();
 
-        bool deployERI2Kernel();
+    bool deployERI4Kernel();
 
-        bool deployERI4D1Kernel();
+    bool deployERI3Kernel();
 
-        bool deployERI3D1Kernel();
+    bool deployERI2Kernel();
 
-        bool deployERI2D1Kernel();
+    bool deployERI4D1Kernel();
 
-        bool deployERI2D2Kernel();
+    bool deployERI3D1Kernel();
 
-        bool deployERI4SOCKernel();        
+    bool deployERI2D1Kernel();
 
-        bool deployERI3SOCKernel();
+    bool deployERI2D2Kernel();
 
-        bool ecoeffsRecurrence1();
+    bool deployERI4SOCKernel();
 
-        bool ecoeffsRecurrence2();
+    bool deployERI3SOCKernel();
 
-        bool ecoeffsRecurrence2_n1();
+    bool ecoeffsRecurrence1();
 
-        bool ecoeffsPrimitive();
+    bool ecoeffsRecurrence2();
 
-        bool ecoeffsPrimitivePair();
+    bool ecoeffsRecurrence2_n1();
 
-        bool ecoeffsPrimitivePair_n1();
+    bool ecoeffsPrimitive();
 
-        bool ecoeffsShell();
+    bool ecoeffsPrimitivePair();
 
-        bool calcBoysF();
+    bool ecoeffsPrimitivePair_n1();
 
-        bool calcRInts3D();
+    bool ecoeffsShell();
 
-        bool purePrimitiveNorm();
+    bool calcBoysF();
 
-        bool numCartesians();
+    bool calcRInts3D();
 
-        bool numSphericals();
+    bool purePrimitiveNorm();
 
-        bool numHermites();
+    bool numCartesians();
 
-        bool cartExps();
+    bool numSphericals();
 
-        bool getLPairsSymm();
+    bool numHermites();
 
-        bool getLPairsNoSymm();
-    }
+    bool cartExps();
+
+    bool getLPairsSymm();
+
+    bool getLPairsNoSymm();
+
+    bool structureGhost();
+
+    bool structureGhostRI();
+
+    bool structureGhostCustom();
+
+    bool structureGhostCustomRI();
 }
