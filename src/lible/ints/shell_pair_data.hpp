@@ -101,7 +101,7 @@ namespace lible::ints
         /// Offsets of the 2nd derivative spherical Hermite expansion coefficients.
         std::vector<size_t> offsets_ecoeffs_deriv2_;
         /// Indices of atoms involved in the shell pairs.
-        std::vector<size_t> atomic_idxs_;
+        std::vector<size_t> atomic_idxs_; // TODO: remove
         /// Indices of the involved shells in the list of all shells.
         std::vector<size_t> shell_idxs_;
 
