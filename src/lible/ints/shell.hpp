@@ -52,7 +52,7 @@ namespace lible::ints
         /// Index of the shell in the list of all shells.
         size_t idx_{};
         /// Index of the shell atom in the list of all atoms.
-        size_t idx_atom_{};
+        size_t idx_atom_{}; // TODO: remove
 
         /// Coordinates of the atom corresponding to the shell.
         std::array<double, 3> xyz_coords_{};

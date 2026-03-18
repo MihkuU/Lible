@@ -65,7 +65,11 @@ set(IntsTests
 	numHermites
 	cartExps
 	getLPairsSymm
-	getLPairsNoSymm)
+	getLPairsNoSymm
+	structureGhost
+	structureGhostRI
+	structureGhostCustom
+	structureGhostCustomRI)
 
 foreach(item ${IntsTests})
 	add_test(NAME "lible::ints::${item}" COMMAND ${CMAKE_BINARY_DIR}/testlible ${item})

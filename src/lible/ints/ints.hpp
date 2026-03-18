@@ -199,6 +199,9 @@ namespace lible::ints
     /// Transforms the input Cartesian basis integrals to the spherical basis.
     vec2d trafo2Spherical(int la, int lb, const vec2d &ints_cart);
 
+    // TODO: docstri
+    using xyz_coords_t = std::vector<std::array<double, 3>>;
+
     /// Constructs the shells from the given basis and coordinates of the atoms (a.u.).
     std::vector<Shell> constructShells(const basis_atoms_t &basis_atoms,
                                        const std::vector<std::array<double, 3>> &coords_atoms);
@@ -206,6 +209,12 @@ namespace lible::ints
     /// Constructs the shells from the given basis on the given atom.
     std::vector<Shell> constructShells(int atomic_nr, const basis_shells_t &basis_shells,
                                        const std::array<double, 3> &coords_atom);
+
+    /// Constructs the shells from the given basis and coordinates of the atoms and ghost atoms (a.u.).
+    std::vector<Shell> constructShellsGhost(const basis_atoms_t &basis_atoms,
+                                            const basis_atoms_t &basis_atoms_ghost,
+                                            const xyz_coords_t &coords_atom,
+                                            const xyz_coords_t &coords_atom_ghost);
 
     /// Calculates the normalization coefficients of the atomic orbitals in a shell.
     std::vector<double> calcShellNorms(int l, const std::vector<double> &coeffs,

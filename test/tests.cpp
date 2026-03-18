@@ -1,5 +1,7 @@
 #include <tests.hpp>
 #include <available_basis_sets.hpp>
+#include <iostream>
+#include <ostream>
 
 #include <lible/ints/ints.hpp>
 
@@ -62,6 +64,51 @@ namespace lible::tests
         {0.0, 0.0, 0.0},
         {0.757, 0.586, 0.0},
         {-0.757, 0.586, 0.0}
+    };
+
+    // ghost H2O
+    std::vector<int> atomic_nrs_ghost_h2o{8, 1, 1};
+    std::vector<std::array<double, 3>> coords_ghost_h2o{
+        {0.0, 1.0, 0.0},
+        {0.757, 1.586, 0.0},
+        {-0.757, 1.586, 0.0}
+    };
+
+    // ghost H2O 100 Angtrom
+    std::vector<int> atomic_nrs_ghost_h2o_100a{8, 1, 1};
+    std::vector<std::array<double, 3>> coords_ghost_h2o_100a{
+        {0.0, 100.0, 0.0},
+        {0.757, 100.586, 0.0},
+        {-0.757, 100.586, 0.0}
+    };
+
+    // double H2O
+    std::vector<int> atomic_nrs_dh2o{8, 1, 1, 8, 1, 1};
+    std::vector<std::array<double, 3>> coords_dh2o{
+        {0.0, 0.0, 0.0},
+        {0.757, 0.586, 0.0},
+        {-0.757, 0.586, 0.0},
+        {0.0, 1.0, 0.0},
+        {0.757, 1.586, 0.0},
+        {-0.757, 1.586, 0.0}
+    };
+
+    // double H2O 100 Angstrom
+    std::vector<int> atomic_nrs_dh2o_100a{8, 1, 1, 8, 1, 1};
+    std::vector<std::array<double, 3>> coords_dh2o_100a{
+            {0.0, 0.0, 0.0},
+            {0.757, 0.586, 0.0},
+            {-0.757, 0.586, 0.0},
+            {0.0, 100.0, 0.0},
+            {0.757, 100.586, 0.0},
+            {-0.757, 100.586, 0.0}
+    };
+
+    // H2
+    std::vector<int> atomic_nrs_h2{1, 1};
+    std::vector<std::array<double, 3>> coords_h2{
+            {0.0, 0.0, 0.0},
+            {1.0, 0.0, 0.0}
     };
 
     // Ozone
@@ -768,7 +815,7 @@ bool ltests::basisForAtoms()
 
     double sum_data = 0;
     for (const lints::BasisAtom &basis_atom : basis_atoms)
-        for (const auto& [l, exps, coeffs] : basis_atom.basis_shells_)
+        for (const auto &[l, exps, coeffs] : basis_atom.basis_shells_)
         {
             for (double exp : exps)
                 sum_data += std::fabs(exp);
@@ -792,13 +839,13 @@ bool ltests::basisForAtomsAux()
     double sum_data = 0;
     for (const lints::BasisAtom &basis_atom : basis_atoms)
         for (const auto &[l, exps, coeffs] : basis_atom.basis_shells_)
-            {
-                for (double exp : exps)
-                    sum_data += std::fabs(exp);
+        {
+            for (double exp : exps)
+                sum_data += std::fabs(exp);
 
-                for (double coeff : coeffs)
-                    sum_data += std::fabs(coeff);
-            }
+            for (double coeff : coeffs)
+                sum_data += std::fabs(coeff);
+        }
 
     if (std::fabs(sum_data - correct_answer) < tol)
         return true;
@@ -1431,4 +1478,331 @@ bool ltests::getLPairsNoSymm()
     std::vector<std::pair<int, int>> l_pairs = lints::getLPairsNoSymm(l_max);
 
     return (l_pairs == correct_answer);
+}
+
+bool ltests::structureGhost()
+{
+    const size_t correct_answer_shells = 24;
+    const int correct_answer_max_l = 2;
+    const size_t correct_answer_dim_ao = 48;
+    const double correct_answer_wo_ghost_overlap = 244.4233204920032279;
+    const double correct_answer_w_ghost_overlap = 244.4233204920032279;
+    const double correct_answer_wo_ghost_overlap_100a = 144.3191856097000425;
+    const double correct_answer_w_ghost_overlap_100a = 144.3191856097000425;
+
+    lints::Structure structure_monomer("def2-SVP",
+                                       atomic_nrs_h2o,
+                                       coords_h2o);
+
+    lints::Structure structure_wo_ghost("def2-SVP",
+                                        atomic_nrs_dh2o,
+                                        coords_dh2o);
+
+    lints::Structure structure_w_ghost("def2-SVP", "def2-SVP",
+                                       atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                                       coords_h2o, coords_ghost_h2o);
+
+    lints::Structure structure_wo_ghost_100a("def2-SVP",
+                                             atomic_nrs_dh2o_100a,
+                                             coords_dh2o_100a);
+
+    lints::Structure structure_w_ghost_100a("def2-SVP", "def2-SVP",
+                                            atomic_nrs_h2o, atomic_nrs_ghost_h2o_100a,
+                                            coords_h2o, coords_ghost_h2o_100a);
+
+    vec2d sints_monomer = lints::overlap(structure_monomer);
+    vec2d sints_wo_ghost = lints::overlap(structure_wo_ghost);
+    vec2d sints_w_ghost = lints::overlap(structure_w_ghost);
+    vec2d sints_wo_ghost_100a = lints::overlap(structure_wo_ghost_100a);
+    vec2d sints_w_ghost_100a = lints::overlap(structure_w_ghost_100a);
+
+    vec2d diff_wo_w_ghost(sints_wo_ghost.dim<0>(), sints_wo_ghost.dim<1>());
+    vec2d diff_wo_w_ghost_100a(sints_wo_ghost_100a.dim<0>(), sints_wo_ghost_100a.dim<1>());
+
+    double sum_sints_monomer = 0;
+    for (double sint : sints_monomer)
+        sum_sints_monomer += std::fabs(sint);
+
+    double sum_sints_wo_ghost = 0;
+    for (double sint : sints_wo_ghost)
+        sum_sints_wo_ghost += std::fabs(sint);
+
+    double sum_sints_w_ghost = 0;
+    for (double sint : sints_w_ghost)
+        sum_sints_w_ghost += std::fabs(sint);
+
+    double sum_sints_wo_ghost_100a = 0;
+    for (double sint : sints_wo_ghost_100a)
+        sum_sints_wo_ghost_100a += std::fabs(sint);
+
+    double sum_sints_w_ghost_100a = 0;
+    for (double sint : sints_w_ghost_100a)
+        sum_sints_w_ghost_100a += std::fabs(sint);
+
+    double sum_diff_wo_w_ghost = 0.0;
+    for (size_t i = 0; i < sints_wo_ghost.size(); i++)
+    {
+        sum_diff_wo_w_ghost += std::fabs(sints_wo_ghost[i] - sints_w_ghost[i]);
+        diff_wo_w_ghost[i] = sints_wo_ghost[i] - sints_w_ghost[i];
+    }
+
+    double sum_diff_wo_w_ghost_100a = 0.0;
+    for (size_t i = 0; i < sints_wo_ghost_100a.size(); i++)
+    {
+        sum_diff_wo_w_ghost_100a += std::fabs(sints_wo_ghost_100a[i] - sints_w_ghost_100a[i]);
+        diff_wo_w_ghost_100a[i] = sints_wo_ghost_100a[i] - sints_w_ghost_100a[i];
+    }
+
+    double diff_wo_ghost_100a_2_monoemer = sum_sints_wo_ghost_100a - 2 * sum_sints_monomer;
+
+    double max_diff = *std::max_element(diff_wo_w_ghost.begin(), diff_wo_w_ghost.end());
+    double min_diff = *std::min_element(diff_wo_w_ghost.begin(), diff_wo_w_ghost.end());
+
+    double max_diff_100a = *std::max_element(diff_wo_w_ghost_100a.begin(), diff_wo_w_ghost_100a.end());
+    double min_diff_100a = *std::min_element(diff_wo_w_ghost_100a.begin(), diff_wo_w_ghost_100a.end());
+
+    if (structure_w_ghost.getShells().size() == correct_answer_shells &&
+        structure_w_ghost.getMaxL() == correct_answer_max_l &&
+        structure_w_ghost.getDimAO() == correct_answer_dim_ao &&
+        (std::fabs(sum_sints_wo_ghost - correct_answer_wo_ghost_overlap) < tol) &&
+        (std::fabs(sum_sints_w_ghost - correct_answer_w_ghost_overlap) < tol) &&
+        (std::fabs(sum_sints_w_ghost - sum_sints_wo_ghost) < tol) &&
+        (std::fabs(sum_diff_wo_w_ghost) < tol) &&
+        (max_diff < tol) &&
+        (min_diff < tol) &&
+        (std::fabs(sum_sints_wo_ghost_100a - correct_answer_wo_ghost_overlap_100a) < tol) &&
+        (std::fabs(sum_sints_w_ghost_100a - correct_answer_w_ghost_overlap_100a) < tol) &&
+        (std::fabs(sum_sints_w_ghost_100a - sum_sints_wo_ghost_100a) < tol) &&
+        (std::fabs(sum_diff_wo_w_ghost_100a) < tol) &&
+        (max_diff_100a < tol) &&
+        (min_diff_100a < tol) &&
+        (diff_wo_ghost_100a_2_monoemer < tol))
+        return true;
+
+    return false;
+}
+
+bool ltests::structureGhostRI()
+{
+    const size_t correct_answer_shells = 24;
+    const int correct_answer_max_l = 2;
+    const size_t correct_answer_dim_ao = 48;
+    const double correct_answer_w_ghost_eri2 = 25945.0489409606234403;
+    const double correct_answer_wo_ghost_eri2 = 25945.0489409606234403;
+
+    lints::Structure structure_wo_ghost("def2-SVP",
+                                        "def2-universal-jkfit",
+                                        atomic_nrs_dh2o,
+                                        coords_dh2o);
+
+    lints::Structure structure_w_ghost("def2-SVP", "def2-SVP",
+                                       "def2-universal-jkfit", "def2-universal-jkfit",
+                                       atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                                       coords_h2o, coords_ghost_h2o);
+
+    vec2d eri2_wo_ghost = lints::eri2(structure_wo_ghost);
+    vec2d eri2_w_ghost = lints::eri2(structure_w_ghost);
+
+    vec2d diffs(eri2_wo_ghost.dim<0>(), eri2_wo_ghost.dim<1>());
+
+    double sum_sints_wo_ghost = 0;
+    for (double sint : eri2_wo_ghost)
+        sum_sints_wo_ghost += std::fabs(sint);
+
+    double sum_sints_w_ghost = 0;
+    for (double sint : eri2_w_ghost)
+        sum_sints_w_ghost += std::fabs(sint);
+
+    double sum_diff = 0.0;
+    for (size_t i = 0; i < eri2_wo_ghost.size(); i++)
+    {
+        sum_diff += std::fabs(eri2_wo_ghost[i] - eri2_w_ghost[i]);
+        diffs[i] = eri2_wo_ghost[i] - eri2_w_ghost[i];
+    }
+
+    double max_diff = *std::max_element(diffs.begin(), diffs.end());
+    double min_diff = *std::min_element(diffs.begin(), diffs.end());
+
+    if (structure_w_ghost.getShells().size() == correct_answer_shells &&
+        structure_w_ghost.getMaxL() == correct_answer_max_l &&
+        structure_w_ghost.getDimAO() == correct_answer_dim_ao &&
+        (std::fabs(sum_sints_wo_ghost - correct_answer_wo_ghost_eri2) < tol) &&
+        (std::fabs(sum_sints_w_ghost - correct_answer_w_ghost_eri2) < tol) &&
+        (std::fabs(sum_sints_w_ghost - sum_sints_wo_ghost) < tol) &&
+        (std::fabs(sum_diff) < tol) &&
+        (max_diff < tol) &&
+        (min_diff < tol))
+        return true;
+
+    return false;
+}
+
+bool ltests::structureGhostCustom()
+{
+    const size_t correct_answer_shells = 24;
+    const int correct_answer_max_l = 2;
+    const size_t correct_answer_dim_ao = 48;
+    const double correct_answer_wo_ghost_overlap = 244.4233204920032279;
+    const double correct_answer_w_ghost_overlap = 244.4233204920032279;
+    const double correct_answer_wo_ghost_overlap_100a = 144.3191856097000425;
+    const double correct_answer_w_ghost_overlap_100a = 144.3191856097000425;
+
+    lints::basis_atoms_t basis_atoms_dh2o = lints::basisForAtoms(atomic_nrs_dh2o, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_dh2o_100a = lints::basisForAtoms(atomic_nrs_dh2o_100a, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_h2o = lints::basisForAtoms(atomic_nrs_h2o, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_ghost_h2o = lints::basisForAtoms(atomic_nrs_ghost_h2o, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_ghost_h2o_100a = lints::basisForAtoms(atomic_nrs_ghost_h2o_100a, "def2-SVP");
+
+    lints::Structure structure_monomer(basis_atoms_h2o,
+                                       atomic_nrs_h2o,
+                                       coords_h2o);
+
+    lints::Structure structure_wo_ghost(basis_atoms_dh2o,
+                                        atomic_nrs_dh2o,
+                                        coords_dh2o);
+
+    lints::Structure structure_w_ghost(basis_atoms_h2o, basis_atoms_ghost_h2o,
+                                       atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                                       coords_h2o, coords_ghost_h2o);
+
+    lints::Structure structure_wo_ghost_100a(basis_atoms_dh2o_100a,
+                                             atomic_nrs_dh2o_100a,
+                                             coords_dh2o_100a);
+
+    lints::Structure structure_w_ghost_100a(basis_atoms_h2o, basis_atoms_ghost_h2o_100a,
+                                            atomic_nrs_h2o, atomic_nrs_ghost_h2o_100a,
+                                            coords_h2o, coords_ghost_h2o_100a);
+
+    vec2d sints_monomer = lints::overlap(structure_monomer);
+    vec2d sints_wo_ghost = lints::overlap(structure_wo_ghost);
+    vec2d sints_w_ghost = lints::overlap(structure_w_ghost);
+    vec2d sints_wo_ghost_100a = lints::overlap(structure_wo_ghost_100a);
+    vec2d sints_w_ghost_100a = lints::overlap(structure_w_ghost_100a);
+
+    vec2d diff_wo_w_ghost(sints_wo_ghost.dim<0>(), sints_wo_ghost.dim<1>());
+    vec2d diff_wo_w_ghost_100a(sints_wo_ghost_100a.dim<0>(), sints_wo_ghost_100a.dim<1>());
+
+    double sum_sints_monomer = 0;
+    for (double sint : sints_monomer)
+        sum_sints_monomer += std::fabs(sint);
+
+    double sum_sints_wo_ghost = 0;
+    for (double sint : sints_wo_ghost)
+        sum_sints_wo_ghost += std::fabs(sint);
+
+    double sum_sints_w_ghost = 0;
+    for (double sint : sints_w_ghost)
+        sum_sints_w_ghost += std::fabs(sint);
+
+    double sum_sints_wo_ghost_100a = 0;
+    for (double sint : sints_wo_ghost_100a)
+        sum_sints_wo_ghost_100a += std::fabs(sint);
+
+    double sum_sints_w_ghost_100a = 0;
+    for (double sint : sints_w_ghost_100a)
+        sum_sints_w_ghost_100a += std::fabs(sint);
+
+    double sum_diff_wo_w_ghost = 0.0;
+    for (size_t i = 0; i < sints_wo_ghost.size(); i++)
+    {
+        sum_diff_wo_w_ghost += std::fabs(sints_wo_ghost[i] - sints_w_ghost[i]);
+        diff_wo_w_ghost[i] = sints_wo_ghost[i] - sints_w_ghost[i];
+    }
+
+    double sum_diff_wo_w_ghost_100a = 0.0;
+    for (size_t i = 0; i < sints_wo_ghost_100a.size(); i++)
+    {
+        sum_diff_wo_w_ghost_100a += std::fabs(sints_wo_ghost_100a[i] - sints_w_ghost_100a[i]);
+        diff_wo_w_ghost_100a[i] = sints_wo_ghost_100a[i] - sints_w_ghost_100a[i];
+    }
+
+    double diff_wo_ghost_100a_2_monoemer = sum_sints_wo_ghost_100a - 2 * sum_sints_monomer;
+
+    double max_diff = *std::max_element(diff_wo_w_ghost.begin(), diff_wo_w_ghost.end());
+    double min_diff = *std::min_element(diff_wo_w_ghost.begin(), diff_wo_w_ghost.end());
+
+    double max_diff_100a = *std::max_element(diff_wo_w_ghost_100a.begin(), diff_wo_w_ghost_100a.end());
+    double min_diff_100a = *std::min_element(diff_wo_w_ghost_100a.begin(), diff_wo_w_ghost_100a.end());
+
+    if (structure_w_ghost.getShells().size() == correct_answer_shells &&
+        structure_w_ghost.getMaxL() == correct_answer_max_l &&
+        structure_w_ghost.getDimAO() == correct_answer_dim_ao &&
+        (std::fabs(sum_sints_wo_ghost - correct_answer_wo_ghost_overlap) < tol) &&
+        (std::fabs(sum_sints_w_ghost - correct_answer_w_ghost_overlap) < tol) &&
+        (std::fabs(sum_sints_w_ghost - sum_sints_wo_ghost) < tol) &&
+        (std::fabs(sum_diff_wo_w_ghost) < tol) &&
+        (max_diff < tol) &&
+        (min_diff < tol) &&
+        (std::fabs(sum_sints_wo_ghost_100a - correct_answer_wo_ghost_overlap_100a) < tol) &&
+        (std::fabs(sum_sints_w_ghost_100a - correct_answer_w_ghost_overlap_100a) < tol) &&
+        (std::fabs(sum_sints_w_ghost_100a - sum_sints_wo_ghost_100a) < tol) &&
+        (std::fabs(sum_diff_wo_w_ghost_100a) < tol) &&
+        (max_diff_100a < tol) &&
+        (min_diff_100a < tol) &&
+        (diff_wo_ghost_100a_2_monoemer < tol))
+        return true;
+
+    return false;
+}
+
+bool ltests::structureGhostCustomRI()
+{
+    const size_t correct_answer_shells = 24;
+    const int correct_answer_max_l = 2;
+    const size_t correct_answer_dim_ao = 48;
+    const double correct_answer_w_ghost_eri2 = 25945.0489409606234403;
+    const double correct_answer_wo_ghost_eri2 = 25945.0489409606234403;
+
+    lints::basis_atoms_t basis_atoms_dh2o = lints::basisForAtoms(atomic_nrs_dh2o, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_h2o = lints::basisForAtoms(atomic_nrs_h2o, "def2-SVP");
+    lints::basis_atoms_t ghost_basis_atoms_h2o = lints::basisForAtoms(atomic_nrs_ghost_h2o, "def2-SVP");
+    lints::basis_atoms_t basis_atoms_dh2o_aux = lints::basisForAtomsAux(atomic_nrs_dh2o, "def2-universal-jkfit");
+    lints::basis_atoms_t basis_atoms_h2o_aux = lints::basisForAtomsAux(atomic_nrs_h2o, "def2-universal-jkfit");
+    lints::basis_atoms_t ghost_basis_atoms_h2o_aux = lints::basisForAtomsAux(atomic_nrs_ghost_h2o, "def2-universal-jkfit");
+
+    lints::Structure structure_wo_ghost(basis_atoms_dh2o,
+                                        basis_atoms_dh2o_aux,
+                                        atomic_nrs_dh2o,
+                                        coords_dh2o);
+
+    lints::Structure structure_w_ghost(basis_atoms_h2o, ghost_basis_atoms_h2o,
+                                       basis_atoms_h2o_aux, ghost_basis_atoms_h2o_aux,
+                                       atomic_nrs_h2o, atomic_nrs_ghost_h2o,
+                                       coords_h2o, coords_ghost_h2o);
+
+    vec2d eri2_wo_ghost = lints::eri2(structure_wo_ghost);
+    vec2d eri2_w_ghost = lints::eri2(structure_w_ghost);
+
+    vec2d diffs(eri2_wo_ghost.dim<0>(), eri2_wo_ghost.dim<1>());
+
+    double sum_sints_wo_ghost = 0;
+    for (double sint : eri2_wo_ghost)
+        sum_sints_wo_ghost += std::fabs(sint);
+
+    double sum_sints_w_ghost = 0;
+    for (double sint : eri2_w_ghost)
+        sum_sints_w_ghost += std::fabs(sint);
+
+    double sum_diff = 0.0;
+    for (size_t i = 0; i < eri2_wo_ghost.size(); i++)
+    {
+        sum_diff += std::fabs(eri2_wo_ghost[i] - eri2_w_ghost[i]);
+        diffs[i] = eri2_wo_ghost[i] - eri2_w_ghost[i];
+    }
+
+    double max_diff = *std::max_element(diffs.begin(), diffs.end());
+    double min_diff = *std::min_element(diffs.begin(), diffs.end());
+
+    if (structure_w_ghost.getShells().size() == correct_answer_shells &&
+        structure_w_ghost.getMaxL() == correct_answer_max_l &&
+        structure_w_ghost.getDimAO() == correct_answer_dim_ao &&
+        (std::fabs(sum_sints_wo_ghost - correct_answer_wo_ghost_eri2) < tol) &&
+        (std::fabs(sum_sints_w_ghost - correct_answer_w_ghost_eri2) < tol) &&
+        (std::fabs(sum_sints_w_ghost - sum_sints_wo_ghost) < tol) &&
+        (std::fabs(sum_diff) < tol) &&
+        (max_diff < tol) &&
+        (min_diff < tol))
+        return true;
+
+    return false;
 }

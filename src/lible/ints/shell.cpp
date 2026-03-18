@@ -71,8 +71,10 @@ std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
 
         std::vector<double> norms = calcShellNorms(l, coeffs, exps, primitive_norms);
 
-        Shell shell{l, atomic_nr, 0, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
-                    coords_atom, exps, coeffs, norms, primitive_norms};
+        Shell shell{
+            l, atomic_nr, 0, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell,
+            coords_atom, exps, coeffs, norms, primitive_norms
+        };
 
         shells.push_back(shell);
 
@@ -101,6 +103,63 @@ lints::constructShells(const basis_atoms_t &basis_atoms,
     {
         std::array<double, 3> coords_iatom = coords_atoms[iatom];
         const auto &[atomic_nr, basis_atom] = basis_atoms[iatom];
+
+        for (const auto &[l, exps, coeffs] : basis_atom)
+        {
+            int dim_cart = numCartesians(l);
+            int dim_sph = numSphericals(l);
+
+            if (exps.size() != coeffs.size())
+                throw std::runtime_error("constructShells(): number of exponents/coefficients "
+                    "doesn't match");
+
+            size_t cdepth = exps.size();
+
+            std::vector<double> primitive_norms(cdepth);
+            for (size_t i = 0; i < cdepth; i++)
+                primitive_norms[i] = purePrimitiveNorm(l, exps[i]);
+
+            std::vector<double> norms = calcShellNorms(l, coeffs, exps, primitive_norms);
+
+            Shell shell(l, atomic_nr, dim_cart, dim_sph, ofs_cart, ofs_sph, idx_shell, iatom,
+                        coords_iatom, exps, coeffs, norms, primitive_norms);
+
+            shells.push_back(shell);
+
+            idx_shell++;
+            ofs_sph += dim_sph;
+            ofs_cart += dim_cart;
+        }
+    }
+
+    return shells;
+}
+
+std::vector<lints::Shell>
+lints::constructShellsGhost(const basis_atoms_t &basis_atoms,
+                            const basis_atoms_t &basis_atoms_ghost,
+                            const xyz_coords_t &coords_atoms,
+                            const xyz_coords_t &coords_atoms_ghost)
+{
+    if (basis_atoms.size() != coords_atoms.size() or basis_atoms_ghost.size() != coords_atoms_ghost.size())
+        throw std::runtime_error("constructShells(): number of ghost and/and/or normal atoms in the basis set and the in "
+            "list of coordinates doesn't match");
+
+    size_t idx_shell = 0;
+    size_t ofs_sph = 0;
+    size_t ofs_cart = 0;
+
+    std::vector<Shell> shells;
+
+    basis_atoms_t basis_atoms_all = basis_atoms;
+    xyz_coords_t coords_atoms_all = coords_atoms;
+    basis_atoms_all.insert(basis_atoms_all.end(), basis_atoms_ghost.begin(), basis_atoms_ghost.end());
+    coords_atoms_all.insert(coords_atoms_all.end(), coords_atoms_ghost.begin(), coords_atoms_ghost.end());
+
+    for (size_t iatom = 0; iatom < basis_atoms_all.size(); iatom++)
+    {
+        std::array<double, 3> coords_iatom = coords_atoms_all[iatom];
+        const auto &[atomic_nr, basis_atom] = basis_atoms_all[iatom];
 
         for (const auto &[l, exps, coeffs] : basis_atom)
         {
