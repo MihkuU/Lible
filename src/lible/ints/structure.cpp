@@ -71,7 +71,7 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const std::vector<in
         throw std::runtime_error("Structure::Structure(): number of atomic numbers does not match "
             "the number of (x, y, z)-coordinates");
 
-    this->basis_set_ = "custom";
+    basis_set_ = "custom";
     n_atoms_ = atomic_nrs.size();
 
     for (size_t iatom = 0; iatom < n_atoms_; iatom++)
@@ -98,7 +98,7 @@ lints::Structure::Structure(const basis_atoms_t &basis_set,
                             const std::vector<std::array<double, 3>> &coords_angstrom)
     : Structure(basis_set, atomic_nrs, coords_angstrom)
 {
-    this->basis_set_aux_ = "custom";
+    basis_set_aux_ = "custom";
     use_ri_ = true;
 
     shells_aux_ = constructShells(basis_set_aux, coords_);
@@ -115,7 +115,6 @@ lints::Structure::Structure(const basis_atoms_t &basis_set,
     }
 }
 
-/// Constructor for ghost atoms.
 lints::Structure::Structure(const std::string &basis_set, const std::string &basis_set_ghost,
                             const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
                             const std::vector<std::array<double, 3>> &coords_angstrom,
@@ -138,9 +137,9 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
             coords_ghost_[iatom][icart] *= _ang_to_bohr_;
 
     const basis_atoms_t basis_atoms = basisForAtoms(atomic_nrs_, basis_set_);
-    const basis_atoms_t ghost_basis_atoms = basisForAtoms(atomic_nrs_ghost_, basis_set_ghost_);
+    const basis_atoms_t basis_atoms_ghost = basisForAtoms(atomic_nrs_ghost_, basis_set_ghost_);
 
-    shells_ = constructShellsGhost(basis_atoms, ghost_basis_atoms, coords_, coords_ghost_);
+    shells_ = constructShellsGhost(basis_atoms, basis_atoms_ghost, coords_, coords_ghost_);
 
     for (const Shell &shell : shells_)
     {
@@ -166,9 +165,9 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
     use_ri_ = true;
 
     const basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux_);
-    const basis_atoms_t ghost_basis_atoms_aux = basisForAtomsAux(atomic_nrs_ghost_, basis_set_aux_ghost_);
+    const basis_atoms_t basis_atoms_aux_ghost = basisForAtomsAux(atomic_nrs_ghost_, basis_set_aux_ghost_);
 
-    shells_aux_ = constructShellsGhost(basis_atoms_aux, ghost_basis_atoms_aux, coords_, coords_ghost_);
+    shells_aux_ = constructShellsGhost(basis_atoms_aux, basis_atoms_aux_ghost, coords_, coords_ghost_);
 
     for (const Shell &shell : shells_aux_)
     {
@@ -192,7 +191,7 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t 
         throw std::runtime_error("Structure::Structure(): number of atomic numbers does not match "
             "the number of (x, y, z)-coordinates");
 
-    this->basis_set_ = "custom";
+    basis_set_ = "custom";
     n_atoms_ = atomic_nrs_.size();
     n_atoms_ghost_ = atomic_nrs_ghost_.size();
 
@@ -217,17 +216,17 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t 
     }
 }
 
-lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t &ghost_basis_set,
-                            const basis_atoms_t &basis_set_aux, const basis_atoms_t &ghost_basis_set_aux,
-                            const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_ghost,
+                            const basis_atoms_t &basis_set_aux, const basis_atoms_t &basis_set_ghost_aux,
+                            const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
                             const std::vector<std::array<double, 3>> &coords_angstrom,
-                            const std::vector<std::array<double, 3>> &ghost_coords_angstrom)
-    : Structure(basis_set, ghost_basis_set, atomic_nrs, ghost_atomic_nrs, coords_angstrom, ghost_coords_angstrom)
+                            const std::vector<std::array<double, 3>> &coords_angstrom_ghost)
+    : Structure(basis_set, basis_set_ghost, atomic_nrs, atomic_nrs_ghost, coords_angstrom, coords_angstrom_ghost)
 {
-    this->basis_set_aux_ = "custom";
+    basis_set_aux_ = "custom";
     use_ri_ = true;
 
-    shells_aux_ = constructShellsGhost(basis_set_aux, ghost_basis_set_aux, coords_, coords_ghost_);
+    shells_aux_ = constructShellsGhost(basis_set_aux, basis_set_ghost_aux, coords_, coords_ghost_);
 
     for (const Shell &shell : shells_aux_)
     {
