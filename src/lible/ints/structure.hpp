@@ -7,14 +7,14 @@
 
 namespace lible::ints
 {
-    /// Structure for representing the atomic structure and various data for calculating intgrals.
+    /// Structure for representing the atomic structure and various data for calculating integrals.
     /// Contains the xyz-coordinates, shells, etc.
     struct Structure
     {
         /// Default constructor.
         Structure() = default;
 
-        /// Constructor for initializing the object without the RI approximiation.
+        /// Constructor for initializing the object without the RI approximation.
         Structure(const std::string &basis_set, const std::vector<int> &atomic_nrs,
                   const std::vector<std::array<double, 3>> &coords_angstrom);
 
@@ -23,7 +23,7 @@ namespace lible::ints
                   const std::vector<int> &atomic_nrs,
                   const std::vector<std::array<double, 3>> &coords_angstrom);
 
-        /// Constructor for initializing the object without the RI approximiation.
+        /// Constructor for initializing the object without the RI approximation.
         Structure(const basis_atoms_t &basis_set, const std::vector<int> &atomic_nrs,
                   const std::vector<std::array<double, 3>> &coords_angstrom);
 
@@ -39,24 +39,24 @@ namespace lible::ints
                   const std::vector<std::array<double, 3>> &coords_angstrom_ghost);
 
         /// Constructor for initializing the object with RI approximation and with ghost atoms.
-        Structure(const std::string &basis_set, const std::string &ghost_basis_set,
-                  const std::string &basis_set_aux, const std::string &ghost_basis_set_aux,
-                  const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+        Structure(const std::string &basis_set, const std::string &basis_set_ghost,
+                  const std::string &basis_set_aux, const std::string &basis_set_aux_ghost,
+                  const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
                   const std::vector<std::array<double, 3>> &coords_angstrom,
-                  const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+                  const std::vector<std::array<double, 3>> &coords_angstrom_ghost);
 
-        /// Constructor for initalizing the object without RI approximation but with ghost atoms.
-        Structure(const basis_atoms_t &basis_set, const basis_atoms_t &ghost_basis_set,
-                  const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+        /// Constructor for initializing the object without RI approximation but with ghost atoms.
+        Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_ghost,
+                  const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
                   const std::vector<std::array<double, 3>> &coords_angstrom,
-                  const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+                  const std::vector<std::array<double, 3>> &coords_angstrom_ghost);
 
         /// Constructor for initializing the object with RI approximation and with ghost atoms.
-        Structure(const basis_atoms_t &basis_set, const basis_atoms_t &ghost_basis_set,
-                  const basis_atoms_t &basis_set_aux, const basis_atoms_t &ghost_basis_set_aux,
-                  const std::vector<int> &atomic_nrs, const std::vector<int> &ghost_atomic_nrs,
+        Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_ghost,
+                  const basis_atoms_t &basis_set_aux, const basis_atoms_t &basis_set_ghost_aux,
+                  const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
                   const std::vector<std::array<double, 3>> &coords_angstrom,
-                  const std::vector<std::array<double, 3>> &ghost_coords_angstrom);
+                  const std::vector<std::array<double, 3>> &coords_angstrom_ghost);
 
         // Some getters
 

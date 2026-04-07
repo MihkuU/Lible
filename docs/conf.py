@@ -11,7 +11,6 @@ import sys
 import os
 import subprocess
 import breathe
-import graphviz
 
 project = 'Lible'
 copyright = '2024, MihkuU'
@@ -20,7 +19,7 @@ author = 'MihkuU'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['breathe', 'sphinx.ext.graphviz']
+extensions = ['breathe']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -35,9 +34,6 @@ master_doc = 'index'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-
-# -- GraphViz configuration ----------------------------------
-graphviz_output_format = 'svg'
 
 # -- Read the Docs Shenanigans -----------------------------------------------
 import subprocess, os

@@ -169,47 +169,121 @@ basis. The available integral kernels are summarized in the table below:
 Main Interface
 --------------
 
-The integral kernels may be used separately with arbitrarily set up data. In general, however, 
-integral calculation in a quantum chemistry programs involves choosing a molecular geometry 
+Typically, integral calculation in a quantum chemistry programs involves choosing a molecular geometry
 and a basis set. From this data, shells (``lible::ints::Shell``) can be constructed that contain 
 all the information required for calculating the integrals. In Lible, the shells are processed 
 further to create a special data structure called the *shell pair data* (``lible::ints::ShellPairData``).
-Hence, most of the kernel calls involve the shell pair data and require specifying a pair of shells 
-with an index. This process may summarized graphically:
+Therefore, most of the kernel calls involve the shell pair data and require specifying a pair of shells
+with an index. Graphically,
 
 .. figure:: path2.png   
 
 It should be noted here, that sometimes, the shells are transformed into the so-called *shell data*
-(``lible::ints::ShellData``) data structure. This data structure is used for calculating integrals 
-such as :math:`(\mu\nu|P)`.
+(``lible::ints::ShellData``) data structure. This data structure is used for calculating integrals
+involving auxiliary basis functions, such as :math:`(\mu\nu|P)`.
 
-For convenience, it is possible to calculate some integrals without utilizing the shell pair data.
-Lible provides a special data structure that records all the information about geometry, basis sets 
-and shells for that purpose: ``lible::ints::Structure``. Using ``lible::ints::Structure``, integrals
-can be calculated directly such that the management of shell pair data is done in the backend. 
-Graphically this looks as follows: 
+For convenience, it is possible to calculate some integrals directly, without utilizing the shell
+pair data. Lible provides a special data structure that records all the information about geometry,
+basis sets and shells for that purpose: ``lible::ints::Structure``.
+Using ``lible::ints::Structure``, integrals can be calculated such that the management of shell pair
+data is done in the backend. Graphically, this looks as follows:
 
 .. figure:: path3.png   
 
 This approach can be preferable for testing and prototyping. For large scale implementation, the 
 previous scheme is probably preferable. For example, the function ``lible::ints::eri4`` calculates 
-all of the four-center two-electron integrals. With large systems, the returned data would become 
-too large to be stored in memory. 
+all of the four-center two-electron integrals. For large systems, the returned 4D array of integrals
+would become too large to be stored in memory.
    
 Let us assume that Lible is properly built/installed and linked against your code. To use the 
 library for calculating integrals, include the main header ``#include <lible/ints/ints.hpp>`` in 
-your source code. This header file constitutes the main interface. The main interface contains 
-inclusions of other Lible header files which may be illustrated diagrammatically:
+your source code. This header file constitutes the so-called main interface. The main interface
+contains inclusions of some other Lible header files which may be illustrated diagrammatically:
 
 .. figure:: path1.png   
 
-In the following we shall expose the contents of these header files and provide small usage 
-examples of the provided utilities.
+In the following we shall expose the contents of the main header file. After that, the documentation
+of the other header files will be provided.
+
+\<lible/ints/ints.hpp\>
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For the code snippets shown below, assume the following data is available:
+
+.. code-block:: c++
+
+    std::string basis_set = "def2-svp";
+    std::string basis_set_aux = "def2-universal-jkfit";
+    std::vector<int> atomic_nrs_h2o{8, 1, 1};
+    std::vector<std::array<double, 3>> coords_h2o_ang{
+        {0.00000, 0.00000, 0.11779},
+        {0.00000, 0.75545,-0.47116},
+        {0.00000,-0.75545,-0.47116}};
+
+.. cpp:function:: vec2d overlap(const Structure &structure)
+
+    Calculates the overlap integrals for the given molecular structure. Uses OpenMP parallelization.
+
+    .. code-block:: c++
+
+        lible::ints::Structure structure(basis_set, atomic_nrs, coords_h2o_ang);
+        lible::vec2d ovlp_ints = lible::ints::overlap(structure);
+
+.. cpp:function:: vec2d overlapKernel(size_t ipair, const ShellPairData &sp_data)
+
+    Calculates a batch of overlap integrals. The shell pair index ``ipair`` refers to a pair of
+    shells in the shell pair data ``sp_data``.
+
+    .. code-block:: c++
+
+        for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+        {
+            // The index `ipair` is used by the kernel function to read the data necessary for
+            // integral calculation.
+            lible::vec2d ints_batch = lible::ints::overlapKernel(ipair, sp_data);
+            ...
+        }
+
+.. cpp:function:: std::array<vec2d, 6> overlapD1Kernel(size_t ipair, const ShellPairData &sp_data)
+
+    Calculates a batch of first derivative overlap integrals. Returns the derivative integrals for
+    the atomic centers involved in the shell pair (``ipair``):
+    :math:`({\partial_A}_x, {\partial_A}_y, {\partial_A}_z, {\partial_B}_x, {\partial_B}_y, {\partial_B}_z)`.
+
+    .. code-block:: c++
+
+        for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+        {
+            std::array<lible::vec2d, 6> ints_batch = lible::ints::overlapD1Kernel(ipair, sp_data);
+
+            // The indices of the atoms (A and B) involved in the integrals batch can be obtained
+            // from the shell pair data.
+            size_t iatom_a = atomic_idxs_[2 * ipair];
+            size_t iatom_b = atomic_idxs_[2 * ipair + 1];
+        }
+
+.. cpp:function:: vec2d kineticEnergy(const Structure &structure)
+
+    Calculates the kinetic energy integrals for the given molecular structure. Uses OpenMP
+    parallelization.
+
+.. cpp:function:: vec2d kineticEnergyKernel(size_t ipair, const ShellPairData &sp_data)
+
+    Calculates a batch of kinetic energy integrals.
+
+.. cpp:function:: std::array<vec2d, 6> kineticEnergyD1Kernel(size_t ipair, const ShellPairData &sp_data)
+
+    Calculates a batch of first derivative kinetic energy integrals.
+
+.. cpp:function:: vec2d nuclearAttraction(const Structure &structure)
+
+    Calculates nuclear attraction integrals for the given molecular structure. Uses OpenMP
+    parallelization.
 
 Basis and Shells
 ~~~~~~~~~~~~~~~~
 
-The information content of the previous diagrams is a simplicistic representation of what happens 
+The information content of the previous diagrams is a simplistic representation of what happens
 in quantum chemical calculations and more specifically, in calculating integrals which is a central
 task. Having chosen a molecular geometry and a basis set, the basic building blocks, i.e., the 
 shells, can be constructed. This section provides an overview of the contents in 

@@ -92,8 +92,7 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const std::vector<in
     }
 }
 
-lints::Structure::Structure(const basis_atoms_t &basis_set,
-                            const basis_atoms_t &basis_set_aux,
+lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_aux,
                             const std::vector<int> &atomic_nrs,
                             const std::vector<std::array<double, 3>> &coords_angstrom)
     : Structure(basis_set, atomic_nrs, coords_angstrom)
@@ -116,7 +115,8 @@ lints::Structure::Structure(const basis_atoms_t &basis_set,
 }
 
 lints::Structure::Structure(const std::string &basis_set, const std::string &basis_set_ghost,
-                            const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
+                            const std::vector<int> &atomic_nrs,
+                            const std::vector<int> &atomic_nrs_ghost,
                             const std::vector<std::array<double, 3>> &coords_angstrom,
                             const std::vector<std::array<double, 3>> &coords_angstrom_ghost)
     : coords_(coords_angstrom), coords_ghost_(coords_angstrom_ghost), atomic_nrs_(atomic_nrs),
@@ -132,6 +132,7 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
     for (size_t iatom = 0; iatom < n_atoms_; iatom++)
         for (int icart = 0; icart < 3; icart++)
             coords_[iatom][icart] *= _ang_to_bohr_;
+
     for (size_t iatom = 0; iatom < n_atoms_ghost_; iatom++)
         for (int icart = 0; icart < 3; icart++)
             coords_ghost_[iatom][icart] *= _ang_to_bohr_;
@@ -154,18 +155,21 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
 }
 
 lints::Structure::Structure(const std::string &basis_set, const std::string &basis_set_ghost,
-                            const std::string &basis_set_aux, const std::string &basis_set_aux_ghost,
-                            const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
+                            const std::string &basis_set_aux,
+                            const std::string &basis_set_aux_ghost,
+                            const std::vector<int> &atomic_nrs,
+                            const std::vector<int> &atomic_nrs_ghost,
                             const std::vector<std::array<double, 3>> &coords_angstrom,
                             const std::vector<std::array<double, 3>> &coords_angstrom_ghost)
-    : Structure(basis_set, basis_set_ghost, atomic_nrs, atomic_nrs_ghost, coords_angstrom, coords_angstrom_ghost)
+    : Structure(basis_set, basis_set_ghost, atomic_nrs, atomic_nrs_ghost, coords_angstrom,
+                coords_angstrom_ghost)
 {
     basis_set_aux_ = basis_set_aux;
     basis_set_aux_ghost_ = basis_set_aux_ghost;
     use_ri_ = true;
 
-    const basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux_);
-    const basis_atoms_t basis_atoms_aux_ghost = basisForAtomsAux(atomic_nrs_ghost_, basis_set_aux_ghost_);
+    basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux_);
+    basis_atoms_t basis_atoms_aux_ghost = basisForAtomsAux(atomic_nrs_ghost_, basis_set_aux_ghost_);
 
     shells_aux_ = constructShellsGhost(basis_atoms_aux, basis_atoms_aux_ghost, coords_, coords_ghost_);
 
@@ -182,10 +186,12 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
 }
 
 lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_ghost,
-                            const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
+                            const std::vector<int> &atomic_nrs,
+                            const std::vector<int> &atomic_nrs_ghost,
                             const std::vector<std::array<double, 3>> &coords_angstrom,
                             const std::vector<std::array<double, 3>> &coords_angstrom_ghost)
-    : coords_(coords_angstrom), coords_ghost_(coords_angstrom_ghost), atomic_nrs_(atomic_nrs), atomic_nrs_ghost_(atomic_nrs_ghost)
+    : coords_(coords_angstrom), coords_ghost_(coords_angstrom_ghost), atomic_nrs_(atomic_nrs),
+      atomic_nrs_ghost_(atomic_nrs_ghost)
 {
     if (atomic_nrs_.size() != coords_.size() or atomic_nrs_ghost_.size() != coords_ghost_.size())
         throw std::runtime_error("Structure::Structure(): number of atomic numbers does not match "
@@ -198,6 +204,7 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t 
     for (size_t iatom = 0; iatom < n_atoms_; iatom++)
         for (int icart = 0; icart < 3; icart++)
             coords_[iatom][icart] *= _ang_to_bohr_;
+
     for (size_t iatom = 0; iatom < n_atoms_ghost_; iatom++)
         for (int icart = 0; icart < 3; icart++)
             coords_ghost_[iatom][icart] *= _ang_to_bohr_;
@@ -217,11 +224,14 @@ lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t 
 }
 
 lints::Structure::Structure(const basis_atoms_t &basis_set, const basis_atoms_t &basis_set_ghost,
-                            const basis_atoms_t &basis_set_aux, const basis_atoms_t &basis_set_ghost_aux,
-                            const std::vector<int> &atomic_nrs, const std::vector<int> &atomic_nrs_ghost,
+                            const basis_atoms_t &basis_set_aux,
+                            const basis_atoms_t &basis_set_ghost_aux,
+                            const std::vector<int> &atomic_nrs,
+                            const std::vector<int> &atomic_nrs_ghost,
                             const std::vector<std::array<double, 3>> &coords_angstrom,
                             const std::vector<std::array<double, 3>> &coords_angstrom_ghost)
-    : Structure(basis_set, basis_set_ghost, atomic_nrs, atomic_nrs_ghost, coords_angstrom, coords_angstrom_ghost)
+    : Structure(basis_set, basis_set_ghost, atomic_nrs, atomic_nrs_ghost, coords_angstrom,
+                coords_angstrom_ghost)
 {
     basis_set_aux_ = "custom";
     use_ri_ = true;
