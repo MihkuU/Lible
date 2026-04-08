@@ -683,6 +683,9 @@ std::array<lible::vec2d, 6>
 lints::externalChargesD1Kernel(const size_t ipair, const std::vector<std::array<double, 4>> &charges,
                                const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
+    if (boys_grid.getN() - 1 != sp_data.la_ + sp_data.lb_)
+        throw std::runtime_error("externalChargesD1Kernel() wrong n-value given to `BoysGrid`");
+
     auto [la, lb] = sp_data.getLPair();
     const int lab = la + lb;
 
@@ -788,6 +791,9 @@ std::vector<std::array<lible::vec2d, 3>>
 lints::externalChargesOperatorD1Kernel(const size_t ipair, const std::vector<std::array<double, 4>> &charges,
                                        const BoysGrid &boys_grid, const ShellPairData &sp_data)
 {
+    if (boys_grid.getN() - 1 != sp_data.la_ + sp_data.lb_)
+        throw std::runtime_error("externalChargesOperatorD1Kernel() wrong n-value given to `BoysGrid`");
+
     auto [la, lb] = sp_data.getLPair();
     int lab = la + lb;
 
@@ -1078,7 +1084,7 @@ lints::potentialAtExternalChargesErfKernel(const size_t ipair,
     return ints_sph;
 }
 
-lible::vec2d lints::externalCharges(const std::vector<std::array<double, 4>> &charges,
+lible::vec2d lints::externalCharges(const std::vector<std::array<double, 4>> &point_charges,
                                     const Structure &structure)
 {
     int l_max = structure.getMaxL();
@@ -1095,7 +1101,7 @@ lible::vec2d lints::externalCharges(const std::vector<std::array<double, 4>> &ch
 #pragma omp parallel for
             for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
             {
-                vec2d ints_ipair = externalChargesKernel(ipair, charges, boys_grid, sp_data);
+                vec2d ints_ipair = externalChargesKernel(ipair, point_charges, boys_grid, sp_data);
 
                 size_t ofs_a = sp_data.offsets_sph_[2 * ipair + 0];
                 size_t ofs_b = sp_data.offsets_sph_[2 * ipair + 1];

@@ -14,13 +14,16 @@ namespace lible::ints
         BoysGrid() = default;
 
         /// Initializes the Boys function grid for the maximal value of `n`.
-        explicit BoysGrid(int max_n);
+        explicit BoysGrid(int n);
 
         /// Returns the value of x after which the Boys function is calculated approximately.
         double getLargeX() const;
 
         /// Returns the interval size.
         double getIntervalSize() const;
+
+        /// Returns the target n-value for which the Boys function grid is constructed.
+        int getN() const;
 
         /// Returns the maximum n-value for which the Boys function grid is constructed.
         int getMaxN() const;
@@ -39,6 +42,8 @@ namespace lible::ints
         /// eq. (9.8.13) from https://doi.org/10.1007/s10008-001-0256-1.
         double large_x_ = 30;
 
+        /// Maximum target `n` that can be calculated
+        int n_{};
         /// Maximum number of `n` for using the recursion to hit the target n.
         int max_n_{};
         /// Number of grid intervals.

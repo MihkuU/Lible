@@ -3,6 +3,7 @@ target_sources(testlible PRIVATE
 	${tests_dir}/main.cpp 
 	${tests_dir}/tests.cpp)
 
+target_compile_options(testlible PRIVATE -Wall -Wno-unused-local-typedefs)
 target_link_libraries(testlible PRIVATE lible)
 target_include_directories(testlible PRIVATE ${tests_dir})
 target_include_directories(testlible PRIVATE ${src_dir}/src/)

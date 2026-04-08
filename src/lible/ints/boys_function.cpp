@@ -3,7 +3,7 @@
 
 namespace lints = lible::ints;
 
-lints::BoysGrid::BoysGrid(const int max_n) : max_n_(max_n + 6)
+lints::BoysGrid::BoysGrid(const int n) : n_(n), max_n_(n + 6)
 {
     n_intervals_ = large_x_ / interval_size_ + 1;
     fnx_grid_ = preEvaluate();
@@ -17,6 +17,11 @@ double lints::BoysGrid::getLargeX() const
 double lints::BoysGrid::getIntervalSize() const
 {
     return interval_size_;
+}
+
+int lints::BoysGrid::getN() const
+{
+    return n_;
 }
 
 int lints::BoysGrid::getMaxN() const

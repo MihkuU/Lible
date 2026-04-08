@@ -96,19 +96,19 @@ namespace lible::tests
     // double H2O 100 Angstrom
     std::vector<int> atomic_nrs_dh2o_100a{8, 1, 1, 8, 1, 1};
     std::vector<std::array<double, 3>> coords_dh2o_100a{
-            {0.0, 0.0, 0.0},
-            {0.757, 0.586, 0.0},
-            {-0.757, 0.586, 0.0},
-            {0.0, 100.0, 0.0},
-            {0.757, 100.586, 0.0},
-            {-0.757, 100.586, 0.0}
+        {0.0, 0.0, 0.0},
+        {0.757, 0.586, 0.0},
+        {-0.757, 0.586, 0.0},
+        {0.0, 100.0, 0.0},
+        {0.757, 100.586, 0.0},
+        {-0.757, 100.586, 0.0}
     };
 
     // H2
     std::vector<int> atomic_nrs_h2{1, 1};
     std::vector<std::array<double, 3>> coords_h2{
-            {0.0, 0.0, 0.0},
-            {1.0, 0.0, 0.0}
+        {0.0, 0.0, 0.0},
+        {1.0, 0.0, 0.0}
     };
 
     // Ozone
@@ -431,8 +431,8 @@ bool ltests::externalChargesErfKernel()
 
         for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
         {
-            vec2d ecints = lints::externalChargesErfKernel(ipair, charges, omegas,
-                                                           boys_grid, sp_data);
+            vec2d ecints = lints::externalChargesErfKernel(
+                ipair, charges, omegas, boys_grid, sp_data);
 
             for (size_t a = 0; a < ecints.dim<0>(); a++)
                 for (size_t b = 0; b < ecints.dim<1>(); b++)
@@ -448,7 +448,7 @@ bool ltests::externalChargesErfKernel()
 
 bool ltests::externalChargesD1Kernel()
 {
-    const double correct_answer = 3274.419345348968;
+    const double correct_answer = 3274.419345348923;
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
@@ -460,13 +460,13 @@ bool ltests::externalChargesD1Kernel()
     for (const lints::ShellPairData &sp_data : shell_pair_datas)
     {
         auto [la, lb] = sp_data.getLPair();
-        int lab = la + lb;
-        lints::BoysGrid boys_grid(lab);
+        int lab1 = la + lb + 1;
+        lints::BoysGrid boys_grid(lab1);
 
         for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
         {
-            std::array<vec2d, 6> ecints = lints::externalChargesD1Kernel(ipair, charges,
-                                                                         boys_grid, sp_data);
+            std::array<vec2d, 6> ecints = lints::externalChargesD1Kernel(
+                ipair, charges, boys_grid, sp_data);
 
             for (int icart = 0; icart < 6; icart++)
                 for (size_t a = 0; a < ecints[icart].dim<0>(); a++)
@@ -483,7 +483,7 @@ bool ltests::externalChargesD1Kernel()
 
 bool ltests::externalChargesOperatorD1Kernel()
 {
-    const double correct_answer = 1067.752096834278;
+    const double correct_answer = 1067.752096834267;
 
     lints::Structure structure("6-31+g", atomic_nrs_co2, coords_co2);
 
@@ -495,8 +495,8 @@ bool ltests::externalChargesOperatorD1Kernel()
     for (const lints::ShellPairData &sp_data : shell_pair_datas)
     {
         auto [la, lb] = sp_data.getLPair();
-        int lab = la + lb;
-        lints::BoysGrid boys_grid(lab);
+        int lab1 = la + lb + 1;
+        lints::BoysGrid boys_grid(lab1);
 
         for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
         {
@@ -575,7 +575,7 @@ bool ltests::potentialAtExternalChargesErfKernel()
         int lab = la + lb;
         lints::BoysGrid boys_grid(lab);
 
-        for (int ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+        for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
         {
             std::vector<vec2d> ecints =
                     lints::potentialAtExternalChargesErfKernel(ipair, charges, omegas, boys_grid,
@@ -942,8 +942,8 @@ bool ltests::deployERI2Kernel()
         for (const lints::ShellData &sh_data_b : shell_datas)
         {
             lints::ERI2Kernel eri2_kernel(sh_data_a, sh_data_b);
-            for (int ishell_a = 0; ishell_a < sh_data_a.n_shells_; ishell_a++)
-                for (int ishell_b = 0; ishell_b < sh_data_b.n_shells_; ishell_b++)
+            for (size_t ishell_a = 0; ishell_a < sh_data_a.n_shells_; ishell_a++)
+                for (size_t ishell_b = 0; ishell_b < sh_data_b.n_shells_; ishell_b++)
                 {
                     vec2d eri2_batch = eri2_kernel(ishell_a, ishell_b, sh_data_a, sh_data_b);
 
@@ -1758,7 +1758,8 @@ bool ltests::structureGhostCustomRI()
     lints::basis_atoms_t ghost_basis_atoms_h2o = lints::basisForAtoms(atomic_nrs_ghost_h2o, "def2-SVP");
     lints::basis_atoms_t basis_atoms_dh2o_aux = lints::basisForAtomsAux(atomic_nrs_dh2o, "def2-universal-jkfit");
     lints::basis_atoms_t basis_atoms_h2o_aux = lints::basisForAtomsAux(atomic_nrs_h2o, "def2-universal-jkfit");
-    lints::basis_atoms_t ghost_basis_atoms_h2o_aux = lints::basisForAtomsAux(atomic_nrs_ghost_h2o, "def2-universal-jkfit");
+    lints::basis_atoms_t ghost_basis_atoms_h2o_aux = lints::basisForAtomsAux(
+        atomic_nrs_ghost_h2o, "def2-universal-jkfit");
 
     lints::Structure structure_wo_ghost(basis_atoms_dh2o,
                                         basis_atoms_dh2o_aux,

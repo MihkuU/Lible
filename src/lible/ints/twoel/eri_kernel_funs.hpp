@@ -179,7 +179,7 @@ namespace lible::ints
                 double x = alpha * (dx * dx + dy * dy + dz * dz);
                 boys_f.calcFnx(x, &fnx[0]);
 
-                double fac = (2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q)));
+                double fac = 2.0 * std::pow(M_PI, 2.5) / (p * q * std::sqrt(p + q));
                 calcRInts_ERI<lab, lcd>(alpha, fac, &fnx[0], &xyz_pq[0], &rints[0]);
 
                 int ofs_ecoeffs_cd = icd * n_ecoeffs_cd;

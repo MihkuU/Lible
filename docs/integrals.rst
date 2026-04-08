@@ -280,6 +280,78 @@ For the code snippets shown below, assume the following data is available:
     Calculates nuclear attraction integrals for the given molecular structure. Uses OpenMP
     parallelization.
 
+.. cpp:function:: vec2d nuclearAttractionErf(const Structure &structure, const std::vector<double> &omegas)
+
+    Calculates the attenuated Coulomb attraction integrals for the given molecular structure. Uses
+    OpenMP parallelization.
+
+    .. important::
+        The number of attenuation parameters ``omegas`` must equal the number of atoms in the
+        structure.
+
+.. cpp:function:: vec2d externalCharges(const std::vector<std::array<double, 4>> &point_charges, \
+    const Structure &structure)
+
+    Calculates the one-electron Coulomb integrals with given point charges for the given molecular
+    structure. Uses OpenMP parallelization.
+
+.. cpp:function:: vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges, \
+    const std::vector<double> &omegas, const Structure &structure)
+
+    Calculates the attenuated one-electron Coulomb integrals with given point charges for the given
+    molecular structure. Uses OpenMP parallelization.
+
+    .. important::
+        The numbers of attenuation parameters ``omegas`` and point charges ``point_charges`` must
+        be equal.
+
+.. cpp:function:: vec2d externalChargesKernel(size_t ipair, const std::vector<std::array<double, 4>> &charges, \
+    const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of one-electron Coulomb integrals for a list of given charges.
+
+    .. code-block:: c++
+
+        for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+        {
+            // The boys grid must be initialized with the angular momentum correct angular momentum:
+            auto [la, lb] = sp_data.getLPair();
+            int lab = la + lb;
+            lible::ints::BoysGrid boys_grid(lab);
+
+            for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+            {
+                lible::vec2d ints_batch = lible::ints::externalChargesKernel(
+                    ipair, charges, boys_grid, sp_data);
+
+                // Consume the integrals..
+            }
+        }
+
+.. cpp:function:: vec2d externalChargesErfKernel(size_t ipair, const std::vector<std::array<double, 4>> &charges, \
+    const std::vector<double> &omegas, const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of attenuated Coulomb integrals.
+
+    .. important::
+        The numbers of attenuation parameters ``omegas`` and  charges ``charges`` must be equal.
+
+.. cpp:function:: std::array<vec2d, 6> externalChargesD1Kernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const BoysGrid &boys_grid, \
+    const ShellPairData &sp_data)
+
+    Calculates a batch of first-derivative one-electron Coulomb integrals.
+
+    .. important::
+        Due to differentiation, the Boys function grid has to be initialized with total angular
+        momentum incremented by one:
+
+        .. code-block:: c++
+
+            auto [la, lb] = sp_data.getLPair();
+            int lab1 = la + lb + 1;
+            lible::ints::BoysGrid boys_grid(lab1);
+
 Basis and Shells
 ~~~~~~~~~~~~~~~~
 
