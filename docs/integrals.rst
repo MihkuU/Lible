@@ -312,7 +312,7 @@ For the code snippets shown below, assume the following data is available:
 
     .. code-block:: c++
 
-        for (size_t ipair = 0; ipair < sp_data.n_pairs_; ipair++)
+        for (const lible::ints::ShellPairData &sp_data : sp_data_all)
         {
             // The boys grid must be initialized with the angular momentum correct angular momentum:
             auto [la, lb] = sp_data.getLPair();
@@ -351,6 +351,48 @@ For the code snippets shown below, assume the following data is available:
             auto [la, lb] = sp_data.getLPair();
             int lab1 = la + lb + 1;
             lible::ints::BoysGrid boys_grid(lab1);
+
+.. cpp:function:: std::array<vec2d, 6> externalChargesErfD1Kernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const std::vector<double> &omegas, \
+    const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of first-derivative attenuated one-electron Coulomb integrals.
+
+    .. important::
+        Due to differentiation, the Boys function grid has to be initialized with total angular
+        momentum incremented by one:
+
+        .. code-block:: c++
+
+            auto [la, lb] = sp_data.getLPair();
+            int lab1 = la + lb + 1;
+            lible::ints::BoysGrid boys_grid(lab1);
+
+    .. important::
+        The number of the attenuation parameters ``omegas`` must equal the number of
+        charges, :math:`(x, y, z, q)`, ``charges``.
+
+.. cpp:function:: std::vector<std::array<vec2d, 3>> externalChargesOperatorD1Kernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const BoysGrid &boys_grid, \
+    const ShellPairData &sp_data)
+
+    Calculates a batch of one-electron Coulomb operator derivative integrals. The returned list of
+    integrals has the length of the given charges, ``charges``.
+
+.. cpp:function:: std::vector<std::array<vec2d, 3>> externalChargesOperatorErfD1Kernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const std::vector<double> &omegas, \
+    const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of attenuated one-electron Coulomb operator derivative integrals. The returned
+    list of integrals has the length of the given charges, ``charges``.
+
+    .. important::
+        The Boys function grid has to be initialized with total angular momentum of
+        :math:`l = l_a + l_b + 1`.
+
+    .. important::
+        The number of the attenuation parameters ``omegas`` must equal the number of
+        charges, :math:`(x, y, z, q)`, ``charges``.
 
 Basis and Shells
 ~~~~~~~~~~~~~~~~

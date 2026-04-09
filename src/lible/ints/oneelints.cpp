@@ -1743,11 +1743,10 @@ lible::vec2d lints::nuclearAttraction(const Structure &structure)
     return ints;
 }
 
-lible::vec2d lints::nuclearAttractionErf(const Structure &structure,
-                                         const std::vector<double> &omegas)
+lible::vec2d lints::nuclearAttractionErf(const Structure &structure, const std::vector<double> &omegas)
 {
     if (omegas.size() != structure.getNAtoms())
-        throw std::runtime_error("Number of omega values must match number of atoms.");
+        throw std::runtime_error("nuclearAttractionErf(): number of omega values must match number of atoms");
 
     int l_max = structure.getMaxL();
     size_t dim_ao = structure.getDimAO();
@@ -1755,10 +1754,10 @@ lible::vec2d lints::nuclearAttractionErf(const Structure &structure,
     std::vector<std::array<double, 4>> charges(structure.getNAtoms());
     for (size_t iatom = 0; iatom < structure.getNAtoms(); iatom++)
     {
-        const std::array<double, 3> coords = structure.getCoordsAtom(iatom);
-        const std::array<double, 3> xyz_c{coords[0], coords[1], coords[2]};
+        std::array<double, 3> coords = structure.getCoordsAtom(iatom);
+        std::array<double, 3> xyz_c{coords[0], coords[1], coords[2]};
 
-        const double Z = structure.getZ(iatom);
+        double Z = structure.getZ(iatom);
         charges[iatom] = {xyz_c[0], xyz_c[1], xyz_c[2], Z};
     }
 
@@ -1847,6 +1846,10 @@ lints::externalChargesErfD1Kernel(const size_t ipair,
                                   const std::vector<double> &omegas, const BoysGrid &boys_grid,
                                   const ShellPairData &sp_data)
 {
+    if (omegas.size() != charges.size())
+        throw std::runtime_error("externalChargesErfD1Kernel(): the `omegas` and `charges` don't "
+            "have equal length");
+
     int la = sp_data.la_;
     int lb = sp_data.lb_;
     int lab = la + lb;
@@ -1880,8 +1883,7 @@ lints::externalChargesErfD1Kernel(const size_t ipair,
 
         auto [Ex, Ey, Ez] = ecoeffsPrimitivePair(a, b, la, lb, xyz_a, xyz_b);
 
-        auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b,
-                                                       {Ex, Ey, Ez});
+        auto [E1x, E1y, E1z] = ecoeffsPrimitivePair_n1(a, b, la, lb, xyz_a, xyz_b, {Ex, Ey, Ez});
 
         std::array<double, 3> xyz_p{
             (a * xyz_a[0] + b * xyz_b[0]) / p,
@@ -1892,7 +1894,7 @@ lints::externalChargesErfD1Kernel(const size_t ipair,
         vec3d rints_sum(Fill(0), lab + 2);
         for (size_t icharge = 0; icharge < charges.size(); icharge++)
         {
-            auto [xc, yc, zc, charge] = charges[icharge];
+            const auto &[xc, yc, zc, charge] = charges[icharge];
 
             std::array<double, 3> xyz_pc{xyz_p[0] - xc, xyz_p[1] - yc, xyz_p[2] - zc};
 
@@ -1965,6 +1967,10 @@ lints::externalChargesOperatorErfD1Kernel(const size_t ipair,
                                           const BoysGrid &boys_grid,
                                           const ShellPairData &sp_data)
 {
+    if (omegas.size() != charges.size())
+        throw std::runtime_error("externalChargesErfD1Kernel(): the `omegas` and `charges` don't "
+            "have equal length");
+
     int la = sp_data.la_;
     int lb = sp_data.lb_;
     int lab = la + lb;
