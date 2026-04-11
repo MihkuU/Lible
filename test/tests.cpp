@@ -604,13 +604,13 @@ bool ltests::dipoleMoment()
 
     double sum_dipole_moment = 0;
     for (int icart = 0; icart < 3; icart++)
-        for (size_t i = 0; i < dipole_moment_ints[icart].size(); i++)
-            sum_dipole_moment += std::fabs(dipole_moment_ints[icart][i]);
+        for (double integral : dipole_moment_ints[icart])
+            sum_dipole_moment += std::fabs(integral);
 
     if (std::fabs(sum_dipole_moment - correct_answer) < tol)
         return true;
-    else
-        return false;
+
+    return false;
 }
 
 bool ltests::dipoleMomentKernel()

@@ -175,9 +175,6 @@ namespace lible::ints
     /// Calculates the ERI4 tensor. OMP parallelized.
     vec4d eri4(const Structure &structure);
 
-    /// Function for doing an ERI4 benchmark.
-    void eri4Benchmark(const Structure &structure);
-
     /// Returns the main basis set for an atom.
     BasisAtom basisForAtom(int atomic_nr, const std::string &basis_set);
 
@@ -325,6 +322,9 @@ namespace lible::ints
 
     /// Returns the available auxiliary basis sets.
     std::set<std::string> availableBasisSetsAux();
+
+    /// Function for doing an ERI4 benchmark.
+    void eri4Benchmark(const Structure &structure);
 
     ///
     class BasisPaths

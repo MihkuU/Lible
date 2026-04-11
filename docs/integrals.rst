@@ -222,7 +222,7 @@ For the code snippets shown below, assume the following data is available:
 
 .. cpp:function:: vec2d overlap(const Structure &structure)
 
-    Calculates the overlap integrals for the given molecular structure. Uses OpenMP parallelization.
+    Calculates the overlap integrals. Uses OpenMP parallelization.
 
     .. code-block:: c++
 
@@ -264,8 +264,7 @@ For the code snippets shown below, assume the following data is available:
 
 .. cpp:function:: vec2d kineticEnergy(const Structure &structure)
 
-    Calculates the kinetic energy integrals for the given molecular structure. Uses OpenMP
-    parallelization.
+    Calculates the kinetic energy integrals. Uses OpenMP parallelization.
 
 .. cpp:function:: vec2d kineticEnergyKernel(size_t ipair, const ShellPairData &sp_data)
 
@@ -277,13 +276,11 @@ For the code snippets shown below, assume the following data is available:
 
 .. cpp:function:: vec2d nuclearAttraction(const Structure &structure)
 
-    Calculates nuclear attraction integrals for the given molecular structure. Uses OpenMP
-    parallelization.
+    Calculates nuclear attraction integrals. Uses OpenMP parallelization.
 
 .. cpp:function:: vec2d nuclearAttractionErf(const Structure &structure, const std::vector<double> &omegas)
 
-    Calculates the attenuated Coulomb attraction integrals for the given molecular structure. Uses
-    OpenMP parallelization.
+    Calculates the attenuated Coulomb attraction integrals. Uses OpenMP parallelization.
 
     .. important::
         The number of attenuation parameters ``omegas`` must equal the number of atoms in the
@@ -292,14 +289,13 @@ For the code snippets shown below, assume the following data is available:
 .. cpp:function:: vec2d externalCharges(const std::vector<std::array<double, 4>> &point_charges, \
     const Structure &structure)
 
-    Calculates the one-electron Coulomb integrals with given point charges for the given molecular
-    structure. Uses OpenMP parallelization.
+    Calculates the one-electron Coulomb integrals with given point charges. Uses OpenMP parallelization.
 
 .. cpp:function:: vec2d externalChargesErf(const std::vector<std::array<double, 4>> &point_charges, \
     const std::vector<double> &omegas, const Structure &structure)
 
-    Calculates the attenuated one-electron Coulomb integrals with given point charges for the given
-    molecular structure. Uses OpenMP parallelization.
+    Calculates the attenuated one-electron Coulomb integrals with given point charges. Uses
+    OpenMP parallelization.
 
     .. important::
         The numbers of attenuation parameters ``omegas`` and point charges ``point_charges`` must
@@ -394,6 +390,132 @@ For the code snippets shown below, assume the following data is available:
         The number of the attenuation parameters ``omegas`` must equal the number of
         charges, :math:`(x, y, z, q)`, ``charges``.
 
+.. cpp:function:: std::vector<vec2d> potentialAtExternalChargesKernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of one-electron Coulomb integrals at the given charges, :math:`(x, y, z, q)`.
+    Returns a list of integrals with the length of given charges.
+
+.. cpp:function:: std::vector<vec2d> potentialAtExternalChargesErfKernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const std::vector<double> &omegas, \
+    const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of attenuated one-electron Coulomb integrals at the given charges, :math:`(x, y, z, q)`.
+    Returns a list of integrals with the length of given charges.
+
+    .. important::
+        The list of charges must have the same length as the attenuated parameters (``omegas``).
+
+.. cpp:function:: std::array<vec2d, 3> dipoleMoment(const std::array<double, 3> &origin, const Structure &structure)
+
+    Calculates dipole moment integrals. Uses OpenMP parallelization.
+
+.. cpp:function:: std::array<vec2d, 3> dipoleMomentKernel(size_t ipair, const std::array<double, 3> &origin, \
+    const ShellPairData &sp_data)
+
+    Calculates a batch of dipole moment integrals.
+
+.. cpp:function:: std::array<vec2d, 3> spinOrbitCoupling1El(const Structure &structure)
+
+    Calculates spin-orbit coupling (SOC) one-electron integrals. Uses OpenMP parallelization.
+
+.. cpp:function:: std::array<vec2d, 3> spinOrbitCoupling1ElKernel(size_t ipair, \
+    const std::vector<std::array<double, 4>> &charges, const BoysGrid &boys_grid, \
+    const ShellPairData &sp_data)
+
+    Calculates a batch of of spin-orbit coupling (SOC) one-electron integrals.
+
+    .. important::
+        The boys grid must be initialized with :math:`l = l_a + l_b + 1`.
+
+.. cpp:function:: std::array<vec2d, 3> momentum(const Structure &structure)
+
+    Calculates linear momentum integrals. Uses OpenMP parallelization.
+
+.. cpp:function:: std::array<vec2d, 3> momentumKernel(size_t ipair, const ShellPairData &sp_data)
+
+    Calculates a batch of linear momentum integrals.
+
+.. cpp:function:: std::array<vec2d, 3> angularMomentum(const std::array<double, 3> &origin, \
+    const Structure &structure)
+
+    Calculates angular momentum integrals. Uses OpenMP parallelization.
+
+.. cpp:function:: std::array<vec2d, 3> angularMomentumKernel(size_t ipair, \
+    const std::array<double, 3> &origin, const ShellPairData &sp_data)
+
+    Calculates a batch of angular momentum integrals.
+
+.. cpp:function:: arr2d<vec2d, 3, 3> pVpIntegrals(const Structure &structure)
+
+    Calculates the :math:`\hat{p}_i \hat{V}\hat{p}_j` integrals. Used in X2C: https://doi.org/10.1063/1.4803693.
+    Uses OpenMP parallelization.
+
+.. cpp:function:: arr2d<vec2d, 3, 3> pVpKernel(size_t ipair, const std::vector<std::array<double, 4>> &charges, \
+    const BoysGrid &boys_grid, const ShellPairData &sp_data)
+
+    Calculates a batch of :math:`\hat{p}_i \hat{V}\hat{p}_j` integrals.
+
+    .. important::
+        The boys grid must be initialized with :math:`l = l_a + l_b + 2`.
+
+.. cpp:function:: std::vector<double> eri2Diagonal(const Structure &structure)
+
+    Calculates the diagonal part of the two-center Coulomb repulsion integrals in auxiliary basis:
+    :math:`(K|K)`. Uses OpenMP parallelization.
+
+    .. important::
+        The ``structure`` must be initialized with an auxiliary basis set beforehand.
+
+.. cpp:function:: vec2d eri4Diagonal(const Structure &structure)
+
+    Calculates the diagonal part of the four-center Coulomb repulsion integrals,
+    :math:`(\mu\nu|\mu\nu)`. Uses OpenMP parallelization.
+
+.. cpp:function:: vec3d eri3(const Structure &structure)
+
+    Calculates the three-center Coulomb repulsion integrals, :math:`(\mu\nu|K)`. Uses OpenMP
+    parallelization.
+
+.. cpp:function:: vec4d eri4(const Structure &structure)
+
+    Calculates the four-center Coulomb repulsion integrals, :math:`(\mu\nu|\kappa\tau)`. Uses
+    OpenMP parallelization
+
+.. cpp:function:: BasisAtom basisForAtom(int atomic_nr, const std::string &basis_set)
+
+    Returns the main basis set for for an atom.
+
+.. cpp:function:: BasisAtom basisForAtomAux(int atomic_nr, const std::string &aux_basis_set)
+
+    Returns the auxiliary basis set for an atom.
+
+.. cpp:function:: basis_atoms_t basisForAtoms(const std::vector<int> &atomic_nrs, \
+    const std::string &basis_set)
+
+    Returns the main basis set for the given atoms.
+
+.. cpp:function:: basis_atoms_t basisForAtomsAux(const std::vector<int> &atomic_nrs, \
+    const std::string &aux_basis_set)
+
+    Returns the auxiliary basis set for the given atoms.
+
+.. cpp:function:: std::vector<std::tuple<int, int, double>> sphericalTrafo(int l)
+
+    Returns the Cartesian to spherical transformation for the given angular momentum.
+
+    .. code-block:: c++
+
+        std::vector<double> atomic_orbitals_cart(lible::ints::numCartesians(l));
+
+        // Calculate values of atomic orbitals
+
+        auto spherical_trafo = lible::ints::sphericalTrafo(l);
+        std::vector<double> atomic_orbitals_sph(lible::ints::numSphericals(l));
+        // Transform AOs in Cartesian basis to spherical basis.
+        for (const auto& [mu, mu_, val] : spherical_trafo)
+            atomic_orbitals_sph[mu] += val * atomic_orbitals_cart[mu_];
+
 Basis and Shells
 ~~~~~~~~~~~~~~~~
 
@@ -425,7 +547,7 @@ shells, can be constructed. This section provides an overview of the contents in
 
 .. cpp:struct:: BasisAtom 
 
-   Structure representing the basis set on a specific atom.
+   Structure representing the basis set on an specific atom.
 
    .. cpp:var:: int atomic_nr_
 

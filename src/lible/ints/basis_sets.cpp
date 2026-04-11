@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <ranges>
 #include <sstream>
 #include <stdexcept>
 
@@ -317,7 +318,7 @@ lints::basis_atoms_t lints::basisForAtomsAux(const std::vector<int> &atomic_nrs,
 std::string lints::auxBasisPath(const std::string &aux_basis_set)
 {
     std::string bs = aux_basis_set;
-    std::transform(bs.begin(), bs.end(), bs.begin(), [](unsigned char c)
+    std::ranges::transform(bs, bs.begin(), [](unsigned char c)
     {
         return std::tolower(c);
     });
@@ -325,18 +326,17 @@ std::string lints::auxBasisPath(const std::string &aux_basis_set)
     std::string basis_family_str = auxBasisFamilyString(aux_basis_set);
     std::string basis_prefix = BasisPaths::getAuxBasisSetsPath() + "/" + basis_family_str;
 
-    std::string basis_path;
     for (const auto &entry : fs::directory_iterator(basis_prefix))
     {
-        basis_path = entry.path();
+        std::string basis_path = entry.path();
         std::string basis_name = entry.path().filename();
         basis_name = basis_name.substr(0, basis_name.find('.'));
         if (basis_name == bs)
             return basis_path;
     }
 
-    std::string message = std::format("The requested basis set {} could not be found!",
-                                      aux_basis_set);
+    std::string message = std::format("auxBasisPath(): the requested basis set {} could not be "
+                                      "found", aux_basis_set);
     throw std::runtime_error(message);
 }
 
@@ -377,8 +377,8 @@ std::set<std::string> lints::availableBasisSets()
 std::set<std::string> lints::availableBasisSetsAux()
 {
     std::set<std::string> aux_basis_sets;
-    for (const auto &item : aux_basis_families)
-        aux_basis_sets.insert(item.first);
+    for (const auto &aux_basis : aux_basis_families | std::views::keys)
+        aux_basis_sets.insert(aux_basis);
 
     return aux_basis_sets;
 }
@@ -386,15 +386,15 @@ std::set<std::string> lints::availableBasisSetsAux()
 std::string lints::auxBasisFamilyString(const std::string &aux_basis_set)
 {
     std::string basis_set_lc = aux_basis_set;
-    std::transform(basis_set_lc.begin(), basis_set_lc.end(), basis_set_lc.begin(),
-                   [](auto c)
-                   {
-                       return std::tolower(c);
-                   });
+    std::ranges::transform(basis_set_lc, basis_set_lc.begin(),
+                           [](auto c)
+                           {
+                               return std::tolower(c);
+                           });
 
-    if (aux_basis_families.find(basis_set_lc) == aux_basis_families.end())
-        throw std::runtime_error(std::format("The requested auxiliary basis set {} could not be found!",
-                                             aux_basis_set));
+    if (aux_basis_families.contains(basis_set_lc) == false)
+        throw std::runtime_error(std::format("auxBasisFamilyString(): the requested auxiliary basis"
+                                             " set {} could not be found", aux_basis_set));
 
     switch (aux_basis_families.at(basis_set_lc))
     {
@@ -403,22 +403,22 @@ std::string lints::auxBasisFamilyString(const std::string &aux_basis_set)
         case AuxBasisFamily::dunning_fit:
             return "dunning";
         default:
-            throw std::runtime_error("");
+            throw std::runtime_error("auxBasisFamilyString(): invalid basis family");
     }
 }
 
 std::string lints::basisFamilyString(const std::string &basis_set)
 {
     std::string basis_set_lc = basis_set;
-    std::transform(basis_set_lc.begin(), basis_set_lc.end(), basis_set_lc.begin(),
-                   [](auto c)
-                   {
-                       return std::tolower(c);
-                   });
+    std::ranges::transform(basis_set_lc, basis_set_lc.begin(),
+                           [](auto c)
+                           {
+                               return std::tolower(c);
+                           });
 
-    if (basis_families.find(basis_set_lc) == basis_families.end())
-        throw std::runtime_error(std::format("The requested basis set {} could not be found!",
-                                             basis_set));
+    if (basis_families.contains(basis_set_lc) == false)
+        throw std::runtime_error(std::format("basisFamilyString(): the requested basis set {} "
+                                             "could not be found", basis_set));
 
     switch (basis_families.at(basis_set_lc))
     {
