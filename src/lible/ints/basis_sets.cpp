@@ -343,7 +343,7 @@ std::string lints::auxBasisPath(const std::string &aux_basis_set)
 std::string lints::basisPath(const std::string &basis_set)
 {
     std::string bs = basis_set;
-    std::transform(bs.begin(), bs.end(), bs.begin(), [](unsigned char c)
+    std::ranges::transform(bs, bs.begin(), [](unsigned char c)
     {
         return std::tolower(c);
     });
@@ -351,10 +351,9 @@ std::string lints::basisPath(const std::string &basis_set)
     std::string basis_family_str = basisFamilyString(basis_set);
     std::string basis_prefix = BasisPaths::getMainBasisSetsPath() + "/" + basis_family_str;
 
-    std::string basis_path;
     for (const auto &entry : fs::directory_iterator(basis_prefix))
     {
-        basis_path = entry.path();
+        std::string basis_path = entry.path();
         std::string basis_name = entry.path().filename();
         basis_name = basis_name.substr(0, basis_name.find('.'));
         if (basis_name == bs)
@@ -368,8 +367,8 @@ std::string lints::basisPath(const std::string &basis_set)
 std::set<std::string> lints::availableBasisSets()
 {
     std::set<std::string> basis_sets;
-    for (const auto &item : basis_families)
-        basis_sets.insert(item.first);
+    for (const auto &basis : basis_families | std::views::keys)
+        basis_sets.insert(basis);
 
     return basis_sets;
 }
@@ -433,7 +432,7 @@ std::string lints::basisFamilyString(const std::string &basis_set)
         case BasisFamily::sto:
             return "sto";
         default:
-            throw std::runtime_error("");
+            throw std::runtime_error("basisFamilyString(): invalid basis family");
     }
 }
 
