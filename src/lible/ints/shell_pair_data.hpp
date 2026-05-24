@@ -117,10 +117,4 @@ namespace lible::ints
                         size_t &n_pairs, size_t &n_pairs_total, size_t &n_ppairs,
                         size_t &n_ppairs_total) const;
     };
-
-
-    struct ShellPairDataTmp
-    {
-    private:
-    };
 }

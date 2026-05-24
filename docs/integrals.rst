@@ -169,24 +169,25 @@ basis. The available integral kernels are summarized in the table below:
 Main Interface
 --------------
 
-Typically, integral calculation in a quantum chemistry programs involves choosing a molecular geometry
+Typically, integral calculation in quantum chemistry programs involves choosing a molecular geometry
 and a basis set. From this data, shells (``lible::ints::Shell``) can be constructed that contain 
-all the information required for calculating the integrals. In Lible, the shells are processed 
-further to create a special data structure called the *shell pair data* (``lible::ints::ShellPairData``).
-Therefore, most of the kernel calls involve the shell pair data and require specifying a pair of shells
-with an index. Graphically,
+all the information required for calculating the integrals. In Lible, the shells are taken
+to create a special data structure called the *shell pair data* (``lible::ints::ShellPairData``).
+Therefore, typical integral calculation with Lible involves the shell pair data and specifying a
+pair of shells with an index. Graphically, the flow of data from the initial geometry and basis set
+to integral calculation can be illustrated as:
 
 .. figure:: path2.png   
 
 It should be noted here, that sometimes, the shells are transformed into the so-called *shell data*
-(``lible::ints::ShellData``) data structure. This data structure is used for calculating integrals
+(``lible::ints::ShellData``) data structure. This data structure can be used for calculating integrals
 involving auxiliary basis functions, such as :math:`(\mu\nu|P)`.
 
 For convenience, it is possible to calculate some integrals directly, without utilizing the shell
 pair data. Lible provides a special data structure that records all the information about geometry,
 basis sets and shells for that purpose: ``lible::ints::Structure``.
 Using ``lible::ints::Structure``, integrals can be calculated such that the management of shell pair
-data is done in the backend. Graphically, this looks as follows:
+data is done under the hood. Graphically, this looks as follows:
 
 .. figure:: path3.png   
 
@@ -198,7 +199,7 @@ would become too large to be stored in memory.
 Let us assume that Lible is properly built/installed and linked against your code. To use the 
 library for calculating integrals, include the main header ``#include <lible/ints/ints.hpp>`` in 
 your source code. This header file constitutes the so-called main interface. The main interface
-contains inclusions of some other Lible header files which may be illustrated diagrammatically:
+contains inclusions of some other Lible header files:
 
 .. figure:: path1.png   
 
@@ -516,18 +517,12 @@ For the code snippets shown below, assume the following data is available:
         for (const auto& [mu, mu_, val] : spherical_trafo)
             atomic_orbitals_sph[mu] += val * atomic_orbitals_cart[mu_];
 
-Basis and Shells
-~~~~~~~~~~~~~~~~
+\<lible/ints/shell.hpp\>
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-The information content of the previous diagrams is a simplistic representation of what happens
-in quantum chemical calculations and more specifically, in calculating integrals which is a central
-task. Having chosen a molecular geometry and a basis set, the basic building blocks, i.e., the 
-shells, can be constructed. This section provides an overview of the contents in 
-``<lible/ints/shell.hpp>``.
-
-.. cpp:struct:: lible::ints::BasisShell
+.. cpp:struct:: BasisShell
    
-   Structure representing the basis set of a specific atomic orbital shell.
+   Structure representing the basis set for an atomic orbital shell.
 
    .. cpp:var:: int l_
 
@@ -543,11 +538,11 @@ shells, can be constructed. This section provides an overview of the contents in
 
 .. cpp:type:: basis_shells_t = std::vector<lible::ints::BasisShell>
 
-   Type representing a list of basis sets on shells.
+   Type for representing basis sets on a list of shells.
 
 .. cpp:struct:: BasisAtom 
 
-   Structure representing the basis set on an specific atom.
+   Structure representing the basis set on an atom.
 
    .. cpp:var:: int atomic_nr_
 
@@ -562,7 +557,7 @@ shells, can be constructed. This section provides an overview of the contents in
    Type representing a list of basis sets on atoms. Object of this type can be used to represent 
    the entire molecular basis set (main or auxiliary).
 
-.. cpp:struct:: lible::ints::Shell
+.. cpp:struct:: Shell
 
    Structure representing an atomic orbital shell. Contains essential data for calculating 
    integrals. rambleramble.
@@ -618,4 +613,10 @@ shells, can be constructed. This section provides an overview of the contents in
    .. cpp:var:: std::vector<double> norms_prim_
 
       Normalization coefficients of the Gaussian primitives.
-  
+
+\<lible/ints/shell_pair_data.hpp\>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:struct:: ShellData
+
+.. cpp:struct:: ShellPairData

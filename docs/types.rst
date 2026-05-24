@@ -282,4 +282,4 @@ Multidimensional array
 
     .. cpp:function:: friend bool operator==(const VectorMD &lhs, const VectorMD &rhs)
 
-        Comparison operator for two multidimensional arrays.
+        `Equal to` operator for two multidimensional arrays.

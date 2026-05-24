@@ -10,7 +10,7 @@ namespace lible::ints
     struct BasisShell
     {
         /// Angular momentum.
-        int l_;
+        int l_{};
         /// Gaussian primitive exponents.
         std::vector<double> exps_;
         /// Gaussian primitive contraction coefficients.
@@ -24,7 +24,7 @@ namespace lible::ints
     struct BasisAtom
     {
         /// Atomic number.
-        int atomic_nr_;
+        int atomic_nr_{};
         /// Basis sets for each shell on the atom.
         basis_shells_t basis_shells_;
     };
@@ -52,7 +52,7 @@ namespace lible::ints
         /// Index of the shell in the list of all shells.
         size_t idx_{};
         /// Index of the shell atom in the list of all atoms.
-        size_t idx_atom_{}; // TODO: remove
+        size_t idx_atom_{};
 
         /// Coordinates of the atom corresponding to the shell.
         std::array<double, 3> xyz_coords_{};

@@ -293,9 +293,9 @@ namespace lible
         /// equals-operator.
         friend bool operator==(const VectorMD &lhs, const VectorMD &rhs)
         {
-            return (lhs.getDimensions() == rhs.getDimensions() &&
-                    lhs.getBlockSizes() == rhs.getBlockSizes() &&
-                    lhs.getData() == rhs.getData());
+            return lhs.getDimensions() == rhs.getDimensions() &&
+                   lhs.getBlockSizes() == rhs.getBlockSizes() &&
+                   lhs.getData() == rhs.getData();
         }
 
     private:
