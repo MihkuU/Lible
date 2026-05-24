@@ -73,8 +73,12 @@ if(LIBLE_USE_MKL AND NOT LIBLE_USE_OPENBLAS)
 	endif()
 else()
 	include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindOpenBLAS.cmake)
-	target_link_libraries(lible PRIVATE ${OpenBLAS_LIB})
 	target_include_directories(lible PRIVATE ${OpenBLAS_INCLUDE_DIR})
+	if (LIBLE_BUILD_STATIC)
+		target_link_libraries(lible PRIVATE ${OpenBLAS_INCLUDE_DIR}/../lib/libopenblas.a)
+	else()
+		target_link_libraries(lible PRIVATE ${OpenBLAS_LIB})
+	endif()
 endif()
 
 # Basis sets
