@@ -144,7 +144,7 @@ namespace lible::ints
 
         /// Name of the main basis set.
         std::string basis_set_;
-        /// Name of the main ghost basis set/
+        /// Name of the main ghost basis set.
         std::string basis_set_ghost_;
         /// Name of the auxiliary basis set.
         std::string basis_set_aux_;

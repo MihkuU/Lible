@@ -98,20 +98,23 @@ namespace lible::ints
     /// charges, {x, y, z, q}. The Boys function must be initialized with l = la + lb + 1.
     /// Calculates only the operator part.
     std::vector<std::array<vec2d, 3>>
-    externalChargesOperatorErfD1Kernel(size_t ipair, const std::vector<std::array<double, 4>> &charges,
+    externalChargesOperatorErfD1Kernel(size_t ipair,
+                                       const std::vector<std::array<double, 4>> &charges,
                                        const std::vector<double> &omegas, const BoysGrid &boys_grid,
                                        const ShellPairData &sp_data);
 
     /// Calculates a batch of one-electron Coulomb integrals at the given charges, {x, y, z, q}.
     /// The Boys function must be initialized with l = la + lb.
     std::vector<vec2d>
-    potentialAtExternalChargesKernel(size_t ipair, const std::vector<std::array<double, 4>> &charges,
+    potentialAtExternalChargesKernel(size_t ipair,
+                                     const std::vector<std::array<double, 4>> &charges,
                                      const BoysGrid &boys_grid, const ShellPairData &sp_data);
 
     /// Calculates a batch of attenuated one-electron Coulomb integrals at the given charges,
     /// {x, y, z, q}. The Boys function must be initialized with l = la + lb.
     std::vector<vec2d>
-    potentialAtExternalChargesErfKernel(size_t ipair, const std::vector<std::array<double, 4>> &charges,
+    potentialAtExternalChargesErfKernel(size_t ipair,
+                                        const std::vector<std::array<double, 4>> &charges,
                                         const std::vector<double> &omegas,
                                         const BoysGrid &boys_grid, const ShellPairData &sp_data);
 

@@ -123,8 +123,8 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
       atomic_nrs_ghost_(atomic_nrs_ghost), basis_set_(basis_set), basis_set_ghost_(basis_set_ghost)
 {
     if (atomic_nrs_ghost_.size() != coords_ghost_.size() or atomic_nrs_.size() != coords_.size())
-        throw std::runtime_error("Structure::Structure(): number of ghost atomic or atomic numbers does not match "
-            "the number of corresponding (x, y, z)-coordinates");
+        throw std::runtime_error("Structure::Structure(): number of ghost atomic or atomic numbers "
+            "does not match the number of corresponding (x, y, z)-coordinates");
 
     n_atoms_ = atomic_nrs_.size();
     n_atoms_ghost_ = atomic_nrs_ghost_.size();
@@ -171,7 +171,8 @@ lints::Structure::Structure(const std::string &basis_set, const std::string &bas
     basis_atoms_t basis_atoms_aux = basisForAtomsAux(atomic_nrs_, basis_set_aux_);
     basis_atoms_t basis_atoms_aux_ghost = basisForAtomsAux(atomic_nrs_ghost_, basis_set_aux_ghost_);
 
-    shells_aux_ = constructShellsGhost(basis_atoms_aux, basis_atoms_aux_ghost, coords_, coords_ghost_);
+    shells_aux_ = constructShellsGhost(basis_atoms_aux, basis_atoms_aux_ghost, coords_,
+                                       coords_ghost_);
 
     for (const Shell &shell : shells_aux_)
     {

@@ -54,7 +54,7 @@ namespace lible::ints
         /// region.
         ShellPairData(bool use_symm, int la, int lb, const std::vector<Shell> &shells_a,
                       const std::vector<Shell> &shells_b,
-                      double primitives_thrs = 1e-15); // TODO: add this number as a constant somewhere
+                      double primitives_thrs = 1e-15); // TODO: add this number as a constant somewhere?
 
         /// Flag indicating whether symmetry is used or not.
         bool uses_symm_{};

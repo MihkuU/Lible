@@ -45,9 +45,9 @@ std::vector<double> lints::calcShellNorms(const int l, const std::vector<double>
     return norms;
 }
 
-std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
-                                                 const basis_shells_t &basis_shells,
-                                                 const std::array<double, 3> &coords_atom)
+std::vector<lints::Shell> lints::constructShells(
+    const int atomic_nr, const basis_shells_t &basis_shells,
+    const std::array<double, 3> &coords_atom)
 {
     size_t idx_shell = 0;
     size_t ofs_sph = 0;
@@ -86,9 +86,8 @@ std::vector<lints::Shell> lints::constructShells(const int atomic_nr,
     return shells;
 }
 
-std::vector<lints::Shell>
-lints::constructShells(const basis_atoms_t &basis_atoms,
-                       const std::vector<std::array<double, 3>> &coords_atoms)
+std::vector<lints::Shell> lints::constructShells(
+    const basis_atoms_t &basis_atoms, const std::vector<std::array<double, 3>> &coords_atoms)
 {
     if (basis_atoms.size() != coords_atoms.size())
         throw std::runtime_error("constructShells(): number of atoms in the basis set and the in "
@@ -135,15 +134,15 @@ lints::constructShells(const basis_atoms_t &basis_atoms,
     return shells;
 }
 
-std::vector<lints::Shell>
-lints::constructShellsGhost(const basis_atoms_t &basis_atoms,
-                            const basis_atoms_t &basis_atoms_ghost,
-                            const xyz_coords_t &coords_atoms,
-                            const xyz_coords_t &coords_atoms_ghost)
+std::vector<lints::Shell> lints::constructShellsGhost(
+    const basis_atoms_t &basis_atoms, const basis_atoms_t &basis_atoms_ghost,
+    const xyz_coords_t &coords_atoms, const xyz_coords_t &coords_atoms_ghost)
 {
-    if (basis_atoms.size() != coords_atoms.size() or basis_atoms_ghost.size() != coords_atoms_ghost.size())
-        throw std::runtime_error("constructShells(): number of ghost and/and/or normal atoms in the basis set and the in "
-            "list of coordinates doesn't match");
+    if (basis_atoms.size() != coords_atoms.size() ||
+        basis_atoms_ghost.size() != coords_atoms_ghost.size())
+        throw std::runtime_error(
+            "constructShellsGhost(): number of ghost and/and/or normal atoms in the basis set "
+            "and the in list of coordinates doesn't match");
 
     size_t idx_shell = 0;
     size_t ofs_sph = 0;
@@ -153,8 +152,10 @@ lints::constructShellsGhost(const basis_atoms_t &basis_atoms,
 
     basis_atoms_t basis_atoms_all = basis_atoms;
     xyz_coords_t coords_atoms_all = coords_atoms;
-    basis_atoms_all.insert(basis_atoms_all.end(), basis_atoms_ghost.begin(), basis_atoms_ghost.end());
-    coords_atoms_all.insert(coords_atoms_all.end(), coords_atoms_ghost.begin(), coords_atoms_ghost.end());
+    basis_atoms_all.insert(basis_atoms_all.end(), basis_atoms_ghost.begin(),
+                           basis_atoms_ghost.end());
+    coords_atoms_all.insert(coords_atoms_all.end(), coords_atoms_ghost.begin(),
+                            coords_atoms_ghost.end());
 
     for (size_t iatom = 0; iatom < basis_atoms_all.size(); iatom++)
     {
@@ -167,7 +168,7 @@ lints::constructShellsGhost(const basis_atoms_t &basis_atoms,
             int dim_sph = numSphericals(l);
 
             if (exps.size() != coeffs.size())
-                throw std::runtime_error("constructShells(): number of exponents/coefficients "
+                throw std::runtime_error("constructShellsGhost(): number of exponents/coefficients "
                     "doesn't match");
 
             size_t cdepth = exps.size();
