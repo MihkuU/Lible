@@ -5,7 +5,7 @@
 
 namespace lible::solver
 {
-    // Conjugate gradient
+    /* Conjugate gradient */
 
     /// Settings for the conjugate and preconditioned conjugate gradient (CG and PCG) solver.
     struct CGSettings
@@ -51,7 +51,7 @@ namespace lible::solver
                                const pcg_preconditioner_t &preconditioner,
                                const CGSettings &settings = CGSettings());
 
-    // Cholesky decomposition
+    /* Pivoted Cholesky decomposition */
 
     /// Settings for the pivoted Cholesky Decomposition.
     struct PCDSettings
@@ -84,4 +84,49 @@ namespace lible::solver
     PCDResults pivotedCD(const std::vector<double> &diagonal,
                          const cd_matrix_element_t &cd_matrix_element,
                          const PCDSettings &settings = PCDSettings());
+
+    /* Davidson diagonalization */
+
+    /// Settings for the Davidson diagonalization.
+    struct DVDSettings
+    {
+        /// Flag for printing out the progression.
+        bool print_{false};
+        /// Convergence tolerance (max. abs. residual).
+        double tol_conv_{1e-6};
+        /// Maximum number of iterations.
+        size_t max_iter_{100};
+        /// Maximum number of expansion vectors. The subspace is collapsed when exceeded.
+        size_t max_dim_subspace_{50};
+    };
+
+    /// Results from the Davidson diagonalization.
+    struct DVDResults
+    {
+        /// Final maximum absolute value of the residuals.
+        double max_abs_res_{};
+        /// Flag for whether the diagonalization converged.
+        bool converged_{false};
+        /// Number of iterations done.
+        size_t n_iter_{};
+        /// Eigenvalues.
+        std::vector<double> eigenvalues_;
+        /// Eigenvectors.
+        std::vector<std::vector<double>> eigenvectors_;
+    };
+
+    /// Type alias for the sigma vector function.
+    using dvd_sigma_t = std::function<std::vector<std::vector<double>>
+        (const std::vector<std::vector<double>> &trial_vecs)>;
+
+    /// Type alias for the preconditioner function.
+    using dvd_precondition_t = std::function<std::vector<std::vector<double>>
+        (const std::vector<double> &eigenvalues,
+         const std::vector<std::vector<double>> &residual_vecs)>;
+
+    /// Runs the Davidson-Liu diagonalization algorithm. Based on the section 3.2.1 from
+    /// https://doi.org/10.1016/S0065-3276(08)60532-8 and https://doi.org/10.1002/jcc.1111.
+    DVDResults diagonalize(size_t n_roots, const std::vector<std::vector<double>> &guess_vecs,
+                           const dvd_precondition_t &precondition, const dvd_sigma_t &calc_sigma,
+                           const DVDSettings &settings = DVDSettings());
 }

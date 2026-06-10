@@ -180,6 +180,212 @@ lsolver::PCDResults lsolver::pivotedCD(const std::vector<double> &diagonal,
 
         chol_vecs.push_back(chol_vec);
     }
-
     return {converged, m, pivot_indices, errors, chol_vecs};
+}
+
+namespace lible::solver
+{
+    /// Diagonalizes the Hamiltonian in the basis of the trial vectors. Eqs. (72) and (73) from
+    /// https://doi.org/10.1016/S0065-3276(08)60532-8.
+    std::pair<std::vector<double>, std::vector<std::vector<double>>>
+    diagonalizeSubHam(const std::vector<std::vector<double>> &trial_vecs,
+                      const std::vector<std::vector<double>> &sigma_vecs);
+
+    /// Makes the eigenvectors using eq. (76) from
+    /// https://doi.org/10.1016/S0065-3276(08)60532-8.
+    std::vector<std::vector<double>>
+    makeEigvecs(size_t n_roots, const std::vector<std::vector<double>> &eigvecs_sub,
+                const std::vector<std::vector<double>> &trial_vecs);
+
+    /// Makes the residual vectors using eq. (75) from
+    /// https://doi.org/10.1016/S0065-3276(08)60532-8.
+    std::vector<std::vector<double>>
+    makeResiduals(size_t n_roots, const std::vector<double> &eigvals_sub,
+                  const std::vector<std::vector<double>> &eigvecs_sub,
+                  const std::vector<std::vector<double>> &trial_vecs,
+                  const std::vector<std::vector<double>> &sigma_vecs);
+
+    /// Makes the new trial vectors using steps 3. 4. and 5. from section 3.2.1 from
+    /// https://doi.org/10.1016/S0065-3276(08)60532-8. Appends the new trial vectors to the
+    /// vector of all trial vectors. Throws an error if a near-zero denominator occurs.
+    std::vector<std::vector<double>>
+    makeNewTrialVecs(const std::vector<double> &eigenvalues,
+                     const std::vector<std::vector<double>> &residuals,
+                     const dvd_precondition_t &precondition,
+                     std::vector<std::vector<double>> &trial_vecs);
+
+    /// Returns the maximum absolute value in the residual vectors.
+    double getMaxAbsRes(const std::vector<std::vector<double>> &residuals);
+
+    /// TODO:
+    std::vector<std::vector<double>> collapseSubspace(std::vector<std::vector<double>> &sigma_vecs);
+}
+
+std::pair<std::vector<double>, std::vector<std::vector<double>>> lsolver::diagonalizeSubHam(
+    const std::vector<std::vector<double>> &trial_vecs,
+    const std::vector<std::vector<double>> &sigma_vecs)
+{
+    if (trial_vecs.size() != sigma_vecs.size())
+        throw std::runtime_error("diagonalizeSubHam(): Unequal number of trial/sigma vectors.");
+
+    arma::dmat sub_ham(trial_vecs.size(), trial_vecs.size(), arma::fill::zeros);
+    for (size_t i = 0; i < trial_vecs.size(); i++)
+        for (size_t j = 0; j < trial_vecs.size(); j++)
+        {
+            const auto &trial = trial_vecs[i];
+            const auto &sigma = sigma_vecs[j];
+            sub_ham(i, j) = std::inner_product(trial.begin(), trial.end(), sigma.begin(), 0.0);
+        }
+
+    arma::dvec eigvals;
+    arma::dmat eigvecs;
+    arma::eig_sym(eigvals, eigvecs, sub_ham);
+
+    std::vector<double> eigvals_out = arma::conv_to<std::vector<double>>::from(eigvals);
+    std::vector<std::vector<double>> eigvecs_out(eigvals.size());
+    for (size_t i = 0; i < eigvals.size(); i++)
+        eigvecs_out[i] = arma::conv_to<std::vector<double>>::from(eigvecs.col(i));
+
+    return {eigvals_out, eigvecs_out};
+}
+
+std::vector<std::vector<double>> lsolver::makeResiduals(
+    const size_t n_roots, const std::vector<double> &eigvals_sub,
+    const std::vector<std::vector<double>> &eigvecs_sub,
+    const std::vector<std::vector<double>> &trial_vecs,
+    const std::vector<std::vector<double>> &sigma_vecs)
+{
+    size_t dim = trial_vecs[0].size();
+
+    std::vector<std::vector<double>> residuals(n_roots);
+    for (size_t iroot = 0; iroot < n_roots; iroot++)
+    {
+        std::vector<double> residual(dim, 0);
+        for (size_t itrial = 0; itrial < trial_vecs.size(); itrial++)
+            for (size_t mu = 0; mu < dim; mu++)
+                residual[mu] += eigvecs_sub[iroot][itrial] *
+                        (sigma_vecs[itrial][mu] - eigvals_sub[iroot] * trial_vecs[itrial][mu]);
+
+        residuals[iroot] = residual;
+    }
+
+    return residuals;
+}
+
+std::vector<std::vector<double>> lsolver::makeEigvecs(
+    const size_t n_roots, const std::vector<std::vector<double>> &eigvecs_sub,
+    const std::vector<std::vector<double>> &trial_vecs)
+{
+    size_t dim = trial_vecs[0].size();
+
+    std::vector<std::vector<double>> eigvecs(n_roots);
+    for (size_t iroot = 0; iroot < n_roots; iroot++)
+    {
+        std::vector<double> eigvec(dim, 0);
+        for (size_t itrial = 0; itrial < trial_vecs.size(); itrial++)
+            for (size_t mu = 0; mu < dim; mu++)
+                eigvec[mu] += eigvecs_sub[iroot][itrial] * trial_vecs[itrial][mu];
+
+        eigvecs[iroot] = eigvec;
+    }
+
+    return eigvecs;
+}
+
+std::vector<std::vector<double>> lsolver::makeNewTrialVecs(
+    const std::vector<double> &eigenvalues, const std::vector<std::vector<double>> &residuals,
+    const dvd_precondition_t &precondition, std::vector<std::vector<double>> &trial_vecs)
+{
+    std::vector<std::vector<double>> correction_vecs = precondition(eigenvalues, residuals);
+
+    size_t dim = trial_vecs[0].size();
+    std::vector<std::vector<double>> trial_vecs_new;
+    for (auto delta : correction_vecs)
+    {
+        for (const auto &trial : trial_vecs)
+        {
+            double num = std::inner_product(trial.begin(), trial.end(), trial.begin(), 0.0);
+            double den = std::inner_product(trial.begin(), trial.end(), trial.begin(), 0.0);
+
+            for (size_t i = 0; i < dim; i++)
+                delta[i] -= num / den * trial[i];
+        }
+
+        double norm = std::sqrt(std::inner_product(delta.begin(), delta.end(), delta.begin(), 0.0));
+        if (norm < 1e-15)
+            throw std::runtime_error("makeNewTrialVecs(): trial vector norm below 1e-15");
+
+        for (auto &val : delta)
+            val /= norm;
+
+        trial_vecs.push_back(delta);
+    }
+
+    return trial_vecs_new;
+}
+
+double lsolver::getMaxAbsRes(const std::vector<std::vector<double>> &residuals)
+{
+    double max_abs_res = 0;
+    for (const auto &residual : residuals)
+    {
+        double max_abs_res_root = *std::ranges::max_element(
+            residual, [](const double a, const double b)
+            {
+                return std::fabs(a) < std::fabs(b);
+            });
+
+        if (max_abs_res_root > max_abs_res)
+            max_abs_res = max_abs_res_root;
+    }
+
+    return max_abs_res;
+}
+
+lsolver::DVDResults lsolver::diagonalize(
+    const size_t n_roots, const std::vector<std::vector<double>> &guess_vecs,
+    const dvd_precondition_t &precondition, const dvd_sigma_t &calc_sigma,
+    const DVDSettings &settings)
+{
+    // TODO: error handling
+    // TODO: converged roots
+    const auto &[print, tol_conv, max_iter, max_dim_subspace] = settings;
+
+    std::vector<std::vector<double>> trial_vecs = guess_vecs;
+    std::vector<std::vector<double>> trial_vecs_new = guess_vecs;
+    std::vector<std::vector<double>> sigma_vecs;
+
+    double max_abs_res = 0;
+    bool converged = false;
+    std::vector<double> eigenvalues(n_roots);
+    std::vector<std::vector<double>> eigenvectors;
+
+    size_t iter = 0;
+    for (; iter < max_iter; iter++)
+    {
+        // Make new sigma vectors, diagonalize subspace Hamiltonian, make eigenvalues/eigenvectors.
+        std::vector<std::vector<double>> sigma_vecs_new = calc_sigma(trial_vecs_new);
+        sigma_vecs.insert(sigma_vecs.end(), sigma_vecs_new.begin(), sigma_vecs_new.end());
+
+        const auto &[eigvals_sub, eigvecs_sub] = diagonalizeSubHam(trial_vecs, sigma_vecs);
+
+        for (size_t iroot = 0; iroot < n_roots; iroot++)
+            eigenvalues[iroot] = eigvals_sub[iroot];
+        eigenvectors = makeEigvecs(n_roots, eigvecs_sub, trial_vecs);
+
+        // Make residuals. Stop if converged.
+        std::vector<std::vector<double>> residuals = makeResiduals(
+            n_roots, eigvals_sub, eigvecs_sub, trial_vecs, sigma_vecs);
+
+        max_abs_res = getMaxAbsRes(residuals);
+        if (max_abs_res < tol_conv)
+            break;
+
+        // Make new trial vectors. Collapse if the subspace size is exceeded.
+        trial_vecs_new = makeNewTrialVecs(eigenvalues, residuals, precondition, trial_vecs);
+
+        // TODO: collapse
+    }
+
+    return {max_abs_res, converged, iter, eigenvalues, eigenvectors};
 }
