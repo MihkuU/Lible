@@ -94,6 +94,8 @@ namespace lible::solver
         bool print_{false};
         /// Convergence tolerance (max. abs. residual).
         double tol_conv_{1e-6};
+        /// Tolerance for omitting new trial vectors after the Gram-Schmidt procedure.
+        double tol_gs_{1e-3};
         /// Maximum number of iterations.
         size_t max_iter_{100};
         /// Maximum number of expansion vectors. The subspace is collapsed when exceeded.
@@ -113,20 +115,27 @@ namespace lible::solver
         std::vector<double> eigenvalues_;
         /// Eigenvectors.
         std::vector<std::vector<double>> eigenvectors_;
+        /// Eigenvalues from all the iterations. For each root.
+        std::vector<std::vector<double>> eigenvalues_history_;
+        /// Maximum absolute values of residuals from all the iterations. Largest value given
+        /// among roots per iteration.
+        std::vector<double> residuals_history_;
     };
 
-    /// Type alias for the sigma vector function.
+    /// Type alias for the sigma vector function. Returns the sigma vectors.
     using dvd_sigma_t = std::function<std::vector<std::vector<double>>
         (const std::vector<std::vector<double>> &trial_vecs)>;
 
-    /// Type alias for the preconditioner function.
+    /// Type alias for the preconditioner function. Returns the preconditioned residual vectors.
     using dvd_precondition_t = std::function<std::vector<std::vector<double>>
         (const std::vector<double> &eigenvalues,
          const std::vector<std::vector<double>> &residual_vecs)>;
 
     /// Runs the Davidson-Liu diagonalization algorithm. Based on the section 3.2.1 from
-    /// https://doi.org/10.1016/S0065-3276(08)60532-8 and https://doi.org/10.1002/jcc.1111.
-    DVDResults diagonalize(size_t n_roots, const std::vector<std::vector<double>> &guess_vecs,
-                           const dvd_precondition_t &precondition, const dvd_sigma_t &calc_sigma,
-                           const DVDSettings &settings = DVDSettings());
+    /// https://doi.org/10.1016/S0065-3276(08)60532-8 and Appendix A from
+    /// https://doi.org/10.1002/jcc.1111.
+    DVDResults
+    diagonalizeDavidson(size_t n_roots, const std::vector<std::vector<double>> &guess_vecs,
+                        const dvd_precondition_t &precondition, const dvd_sigma_t &calc_sigma,
+                        const DVDSettings &settings = DVDSettings());
 }

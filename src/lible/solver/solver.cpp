@@ -205,20 +205,20 @@ namespace lible::solver
                   const std::vector<std::vector<double>> &trial_vecs,
                   const std::vector<std::vector<double>> &sigma_vecs);
 
-    /// Makes the new trial vectors using steps 3. 4. and 5. from section 3.2.1 from
-    /// https://doi.org/10.1016/S0065-3276(08)60532-8. Appends the new trial vectors to the
-    /// vector of all trial vectors. Throws an error if a near-zero denominator occurs.
+    /// TODO:
     std::vector<std::vector<double>>
-    makeNewTrialVecs(const std::vector<double> &eigenvalues,
+    makeNewTrialVecs(double tol_gs, const std::vector<bool> &converged_roots,
+                     const std::vector<double> &eigenvalues,
                      const std::vector<std::vector<double>> &residuals,
                      const dvd_precondition_t &precondition,
                      std::vector<std::vector<double>> &trial_vecs);
 
-    /// Returns the maximum absolute value in the residual vectors.
-    double getMaxAbsRes(const std::vector<std::vector<double>> &residuals);
-
     /// TODO:
     std::vector<std::vector<double>> collapseSubspace(std::vector<std::vector<double>> &sigma_vecs);
+
+
+    std::pair<bool, double> checkConvergence(std::vector<bool> &converged_roots, double conv_tol,
+                                             const std::vector<std::vector<double>> &residuals);
 }
 
 std::pair<std::vector<double>, std::vector<std::vector<double>>> lsolver::diagonalizeSubHam(
@@ -293,6 +293,7 @@ std::vector<std::vector<double>> lsolver::makeEigvecs(
 }
 
 std::vector<std::vector<double>> lsolver::makeNewTrialVecs(
+    const double tol_gs, const std::vector<bool> &converged_roots,
     const std::vector<double> &eigenvalues, const std::vector<std::vector<double>> &residuals,
     const dvd_precondition_t &precondition, std::vector<std::vector<double>> &trial_vecs)
 {
@@ -300,8 +301,16 @@ std::vector<std::vector<double>> lsolver::makeNewTrialVecs(
 
     size_t dim = trial_vecs[0].size();
     std::vector<std::vector<double>> trial_vecs_new;
-    for (auto delta : correction_vecs)
+    for (size_t iroot = 0; iroot < correction_vecs.size(); iroot++)
     {
+        if (converged_roots[iroot] == true)
+            continue;
+
+        std::vector<double> delta = correction_vecs[iroot];
+        double norm = std::sqrt(std::inner_product(delta.begin(), delta.end(), delta.begin(), 0.0));
+        for (auto &val : delta)
+            val /= norm;
+
         for (const auto &trial : trial_vecs)
         {
             double num = std::inner_product(trial.begin(), trial.end(), trial.begin(), 0.0);
@@ -311,45 +320,58 @@ std::vector<std::vector<double>> lsolver::makeNewTrialVecs(
                 delta[i] -= num / den * trial[i];
         }
 
-        double norm = std::sqrt(std::inner_product(delta.begin(), delta.end(), delta.begin(), 0.0));
-        if (norm < 1e-15)
-            throw std::runtime_error("makeNewTrialVecs(): trial vector norm below 1e-15");
-
+        norm = std::sqrt(std::inner_product(delta.begin(), delta.end(), delta.begin(), 0.0));
         for (auto &val : delta)
             val /= norm;
 
+        if (norm < tol_gs)
+            continue;
+
+        trial_vecs_new.push_back(delta);
         trial_vecs.push_back(delta);
     }
 
     return trial_vecs_new;
 }
 
-double lsolver::getMaxAbsRes(const std::vector<std::vector<double>> &residuals)
+std::pair<bool, double> lsolver::checkConvergence(
+    std::vector<bool> &converged_roots, const double conv_tol,
+    const std::vector<std::vector<double>> &residuals)
 {
     double max_abs_res = 0;
-    for (const auto &residual : residuals)
+    for (size_t iroot = 0; iroot < residuals.size(); iroot++)
     {
-        double max_abs_res_root = *std::ranges::max_element(
-            residual, [](const double a, const double b)
+        double max_abs_res_iroot = *std::ranges::max_element(
+            residuals[iroot].begin(), residuals[iroot].end(),
+            [](const double a, const double b)
             {
                 return std::fabs(a) < std::fabs(b);
             });
 
-        if (max_abs_res_root > max_abs_res)
-            max_abs_res = max_abs_res_root;
+        if (max_abs_res_iroot < conv_tol)
+            converged_roots[iroot] = true;
+
+        if (max_abs_res_iroot > max_abs_res)
+            max_abs_res = max_abs_res_iroot;
     }
 
-    return max_abs_res;
+    for (bool is_root_converged : converged_roots)
+        if (is_root_converged == false)
+            return {false, max_abs_res};
+
+    return {true, max_abs_res};
 }
 
-lsolver::DVDResults lsolver::diagonalize(
+lsolver::DVDResults lsolver::diagonalizeDavidson(
     const size_t n_roots, const std::vector<std::vector<double>> &guess_vecs,
     const dvd_precondition_t &precondition, const dvd_sigma_t &calc_sigma,
     const DVDSettings &settings)
 {
-    // TODO: error handling
-    // TODO: converged roots
-    const auto &[print, tol_conv, max_iter, max_dim_subspace] = settings;
+    if (guess_vecs.size() < n_roots)
+        throw std::runtime_error(
+            "diagonalize(): `guess_vecs` must have at least `n_roots` vectors");
+    // TODO: subspace collapse
+    const auto &[print, tol_conv, tol_gs, max_iter, max_dim_subspace] = settings;
 
     std::vector<std::vector<double>> trial_vecs = guess_vecs;
     std::vector<std::vector<double>> trial_vecs_new = guess_vecs;
@@ -357,8 +379,11 @@ lsolver::DVDResults lsolver::diagonalize(
 
     double max_abs_res = 0;
     bool converged = false;
+    std::vector<bool> converged_roots(n_roots, false);
     std::vector<double> eigenvalues(n_roots);
     std::vector<std::vector<double>> eigenvectors;
+    std::vector<std::vector<double>> eigenvalues_history;
+    std::vector<double> residuals_history;
 
     size_t iter = 0;
     for (; iter < max_iter; iter++)
@@ -371,21 +396,30 @@ lsolver::DVDResults lsolver::diagonalize(
 
         for (size_t iroot = 0; iroot < n_roots; iroot++)
             eigenvalues[iroot] = eigvals_sub[iroot];
+        eigenvalues_history.push_back(eigenvalues);
+
         eigenvectors = makeEigvecs(n_roots, eigvecs_sub, trial_vecs);
 
         // Make residuals. Stop if converged.
         std::vector<std::vector<double>> residuals = makeResiduals(
             n_roots, eigvals_sub, eigvecs_sub, trial_vecs, sigma_vecs);
 
-        max_abs_res = getMaxAbsRes(residuals);
-        if (max_abs_res < tol_conv)
+        std::tie(converged, max_abs_res) = checkConvergence(converged_roots, tol_conv, residuals);
+
+        residuals_history.push_back(max_abs_res);
+
+        if (converged)
             break;
 
         // Make new trial vectors. Collapse if the subspace size is exceeded.
-        trial_vecs_new = makeNewTrialVecs(eigenvalues, residuals, precondition, trial_vecs);
+        trial_vecs_new = makeNewTrialVecs(
+            tol_gs, converged_roots, eigenvalues, residuals, precondition, trial_vecs);
 
         // TODO: collapse
     }
 
-    return {max_abs_res, converged, iter, eigenvalues, eigenvectors};
+    return {
+        max_abs_res, converged, iter, eigenvalues, eigenvectors, eigenvalues_history,
+        residuals_history
+    };
 }
