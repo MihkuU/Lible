@@ -5,11 +5,13 @@
 
 namespace lible::solver
 {
-    /* Conjugate gradient */
+    /* Preconditioned conjugate gradient */
 
     /// Settings for the conjugate and preconditioned conjugate gradient (CG and PCG) solver.
-    struct CGSettings
+    struct PCGSettings
     {
+        /// Flag for printing the progression.
+        bool print_{false};
         /// Maximum number of iterations.
         size_t max_iter_{100};
         /// Maximum absolute value of the residual to signal convergence.
@@ -17,13 +19,12 @@ namespace lible::solver
     };
 
     /// Results returned by the conjugate and preconditioned conjugate gradient (CG and PCG) solver.
-    struct CGResults
+    struct PCGResults
     {
         /// Flag for whether convergence was achieved.
         bool converged_{false};
         /// Number of iterations that were run.
         size_t n_iter_{0};
-
         /// Maximum absolute values of the residuals at each iteration.
         std::vector<double> max_abs_residuals_;
         /// Obtained solution from the conjugate gradient solver.
@@ -31,25 +32,18 @@ namespace lible::solver
     };
 
     /// Type alias for the CG and PCG sigma vector function object.
-    using cg_sigma_t = std::function<std::vector<double>(
+    using pcg_sigma_t = std::function<std::vector<double>(
         const std::vector<double> &trial)>;
     /// Type alias for the PCG preconditioner function object.
     using pcg_preconditioner_t = std::function<std::vector<double>(
         const std::vector<double> &residual)>;
 
-    // TODO: cite matrix computations by Golub here instead.
-    /// Runs the conjugate gradient (CG) method. Based on Section 2.7.6 from
-    /// "Numerical Recipes 3rd. ed."
-    CGResults conjugateGradient(const std::vector<double> &guess, const std::vector<double> &rhs,
-                                const cg_sigma_t &calc_sigma,
-                                const CGSettings &settings = CGSettings());
-
-    /// Runs the preconditioned conjugate gradient method. Based on Section 2.7.6 from
-    /// "Numerical Recipes 3rd. ed."
-    CGResults preconditionedCG(const std::vector<double> &guess, const std::vector<double> &rhs,
-                               const cg_sigma_t &calc_sigma,
+    /// Runs the preconditioned conjugate gradient algorithm. Based on Algorithm 11.5.1 from
+    /// "Matrix Computations 4th edition".
+    PCGResults preconditionedCG(const std::vector<double> &guess, const std::vector<double> &rhs,
+                               const pcg_sigma_t &calc_sigma,
                                const pcg_preconditioner_t &preconditioner,
-                               const CGSettings &settings = CGSettings());
+                               const PCGSettings &settings = PCGSettings());
 
     /* Pivoted Cholesky decomposition */
 

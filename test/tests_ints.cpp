@@ -12,7 +12,7 @@ namespace lints = lible::ints;
 
 namespace lible::tests
 {
-    const static double tol = 1e-12;
+    static const double tol = 1e-12;
 
     // CO2-
     std::vector<int> atomic_nrs_co2{6, 8, 8};

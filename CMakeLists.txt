@@ -81,8 +81,8 @@ else()
 	endif()
 endif()
 
-# Basis sets
-## TODO: figure out how to make this stuff work with installation?
+### Basis sets
+# TODO: figure out how to make this stuff work with installation?
 
 if(LIBLE_BUILD_INTS)
 	set(lible_main_basis_srcdir "${src_dir}/src/lible/ints/lible_basis")

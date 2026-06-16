@@ -137,11 +137,13 @@ int main(int argc, char **argv)
         success = lible::tests::calcBoysF();
     else if (test_name == "calcRInts3D")
         success = lible::tests::calcRInts3D();
+    else if (test_name == "preconditionedCG")
+        success = lible::tests::preconditionedCG();
     else
         throw std::runtime_error(std::format("Invalid test name specified: {}", test_name));
 
     if (success)
         return 0;
-    else
-        return 1;
+
+    return 1;
 }

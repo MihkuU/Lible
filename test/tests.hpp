@@ -2,6 +2,8 @@
 
 namespace lible::tests
 {
+    /* lible::ints */
+
     bool overlap();
 
     bool overlapKernel();
@@ -123,4 +125,8 @@ namespace lible::tests
     bool structureGhostCustom();
 
     bool structureGhostCustomRI();
+
+    /* lible::solver */
+
+    bool preconditionedCG();
 }

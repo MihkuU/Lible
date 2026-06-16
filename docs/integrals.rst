@@ -814,3 +814,6 @@ For the code snippets shown below, assume the following data is available:
     .. cpp::function:: std::pair<int, int> getLPair() const
 
         Returns the angular momentum pair.
+
+\<lible/ints/boys_function.hpp\>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -11,12 +11,12 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY ${CMAKE_C
 # arma
 target_compile_definitions(lible PRIVATE ARMA_DONT_USE_WRAPPER)
 target_include_directories(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/include)
-if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib")
+if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib")
     target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib/libarmadillo.a)
-elseif(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64")
+elseif (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64")
     target_link_libraries(lible PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/arma/build/lib64/libarmadillo.a)
-endif()
+endif ()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_definitions(lible PRIVATE ARMA_NO_DEBUG)
-endif()
+endif ()
