@@ -1,9 +1,8 @@
 header:
   license:
-    spdx-id: BSD-3D
-    copyright-owner: Mihkel Ugandi
+    spdx-id: MIT
+    copyright-owner: Your Name or Company
   paths-ignore:
+    - 'node_modules/**'
     - '.github/**'
-    - 'extern/**`
-    - 'cmake/**`
-    - 'docs/**'
+    - 'dist/**'
