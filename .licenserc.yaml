@@ -1,0 +1,9 @@
+header:
+  license:
+    spdx-id: BSD-3D
+    copyright-owner: Mihkel Ugandi
+  paths-ignore:
+    - '.github/**'
+        - 'extern/**`
+        - 'cmake/**`
+        - 'docs/**'
