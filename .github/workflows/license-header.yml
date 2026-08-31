@@ -1,4 +1,4 @@
-yamlname: Auto Add License Headers
+name: Auto Add License Headers
 
 on:
   push:
