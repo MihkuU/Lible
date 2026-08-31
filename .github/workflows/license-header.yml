@@ -1,0 +1,26 @@
+yamlname: Auto Add License Headers
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  license-gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allows the action to commit fixes back to your repo
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Check and Fix License Headers
+        uses: apache/skywalking-eyes@main
+        with:
+          mode: fix
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: automatically add missing license headers"
