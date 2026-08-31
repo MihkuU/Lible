@@ -4,6 +4,6 @@ header:
     copyright-owner: Mihkel Ugandi
   paths-ignore:
     - '.github/**'
-        - 'extern/**`
-        - 'cmake/**`
-        - 'docs/**'
+    - 'extern/**`
+    - 'cmake/**`
+    - 'docs/**'
