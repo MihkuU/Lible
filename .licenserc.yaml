@@ -1,7 +1,7 @@
 header:
   license:
-    spdx-id: MIT
-    copyright-owner: Your Name or Company
+    spdx-id: BSD-3-Clause
+    copyright-owner: Mihkel Ugandi
   paths-ignore:
     - 'node_modules/**'
     - '.github/**'
