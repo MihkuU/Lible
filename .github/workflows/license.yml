@@ -1,0 +1,15 @@
+name: License Header Check
+
+on: [push, pull_request]
+
+jobs:
+  check-license:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Check & Fix License Headers
+        uses: apache/skywalking-eyes@main
+        with:
+          log: info
